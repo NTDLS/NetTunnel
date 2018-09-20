@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NetTunnel.Library.Routing
+namespace NetTunnel.Library.Tunneling
 {
     public static class Crc16
     {

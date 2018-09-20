@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace NetTunnel.Library.Routing
+namespace NetTunnel.Library.Tunneling
 {
-    public class Route
+    public class Tunnel
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public BindingProtocal BindingProtocal { get; set; }
@@ -22,7 +22,7 @@ namespace NetTunnel.Library.Routing
 
         public Endpoints Endpoints = new Endpoints();
 
-        public Route()
+        public Tunnel()
         {
             Id = Guid.NewGuid();
             AcceptBacklogSize = Constants.DefaultAcceptBacklogSize;

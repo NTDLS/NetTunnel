@@ -1,4 +1,4 @@
-﻿namespace NetTunnel.Service.Routing
+﻿namespace NetTunnel.Service.Tunneling
 {
     public class Packet
     {

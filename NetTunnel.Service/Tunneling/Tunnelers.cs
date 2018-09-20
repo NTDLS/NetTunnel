@@ -1,56 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using NetTunnel.Library.Routing;
+using NetTunnel.Library.Tunneling;
 using NetTunnel.Library.Win32;
 
-namespace NetTunnel.Service.Routing
+namespace NetTunnel.Service.Tunneling
 {
-    public class Routers
+    public class Tunnelers
     {
-        public List<Router> List = new List<Router>();
+        public List<Tunneler> List = new List<Tunneler>();
 
-        public List<Route> Routes()
+        public List<Tunnel> Tunnels()
         {
-            var routes = new List<Route>();
+            var tunnels = new List<Tunnel>();
 
-            foreach (var router in List)
+            foreach (var tunnel in List)
             {
-                routes.Add(router.Route);
+                tunnels.Add(tunnel.Tunnel);
             }
 
-            return routes;
+            return tunnels;
         }
 
-        public Router this[System.Guid routeId]
+        public Tunneler this[System.Guid tunnelId]
         {
             get
             {
-                return (from o in List where o.Route.Id == routeId select o).FirstOrDefault();
+                return (from o in List where o.Tunnel.Id == tunnelId select o).FirstOrDefault();
             }
         }
 
-        public void Add(Router router)
+        public void Add(Tunneler tunneler)
         {
-            List.Add(router);
+            List.Add(tunneler);
         }
 
         public void Start()
         {
-            foreach (var router in List)
+            foreach (var tunneler in List)
             {
-                if (router.Route.AutoStart)
+                if (tunneler.Tunnel.AutoStart)
                 {
                     try
                     {
-                        router.Start();
+                        tunneler.Start();
                     }
                     catch (Exception ex)
                     {
                         Singletons.EventLog.WriteEvent(new EventLogging.EventPayload
                         {
                             Severity = EventLogging.Severity.Error,
-                            CustomText = "Failed to start route.",
+                            CustomText = "Failed to start tunnel.",
                             Exception = ex
                         });
                     }
@@ -60,18 +60,18 @@ namespace NetTunnel.Service.Routing
 
         public void Stop()
         {
-            foreach (var router in List)
+            foreach (var tunneler in List)
             {
                 try
                 {
-                    router.Stop();
+                    tunneler.Stop();
                 }
                 catch (Exception ex)
                 {
                     Singletons.EventLog.WriteEvent(new EventLogging.EventPayload
                     {
                         Severity = EventLogging.Severity.Error,
-                        CustomText = "Failed to stop route.",
+                        CustomText = "Failed to stop tunnel.",
                         Exception = ex
                     });
                 }

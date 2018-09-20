@@ -7,18 +7,16 @@ using System.Runtime.Caching;
 using System.Text;
 using System.Threading;
 using NetTunnel.Library;
-using NetTunnel.Library.Routing;
+using NetTunnel.Library.Tunneling;
 using NetTunnel.Library.Win32;
 
-namespace NetTunnel.Service.Routing
+namespace NetTunnel.Service.Tunneling
 {
-    public class Router
+    public class Tunneler
     {
         #region Backend Variables.
 
-        public RouterStatistics Stats { get; set; }
-
-        private readonly Route _route;
+        private readonly Tunnel _tunnel;
         private Socket _listenSocket = null;
         private readonly List<SocketState> _connections = new List<SocketState>();
         private AsyncCallback _onDataReceivedCallback;
@@ -34,20 +32,19 @@ namespace NetTunnel.Service.Routing
             }
         }
 
-        public Route Route
+        public Tunnel Tunnel
         {
             get
             {
-                return _route;
+                return _tunnel;
             }
         }
 
         #endregion
 
-        public Router(Route route)
+        public Tunneler(Tunnel tunnel)
         {
-            Stats = new RouterStatistics();
-            this._route = route;
+            this._tunnel = tunnel;
         }
 
         public bool IsRunning
@@ -71,11 +68,11 @@ namespace NetTunnel.Service.Routing
             {
                 IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
 
-                if (_route.BindingProtocal == BindingProtocal.Pv6)
+                if (_tunnel.BindingProtocal == BindingProtocal.Pv6)
                 {
                     _listenSocket = new Socket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
                 }
-                else if (_route.BindingProtocal == BindingProtocal.Pv4)
+                else if (_tunnel.BindingProtocal == BindingProtocal.Pv4)
                 {
                     _listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 }
@@ -84,16 +81,16 @@ namespace NetTunnel.Service.Routing
                     throw new NotImplementedException();
                 }
 
-                if (_route.ListenOnAllAddresses)
+                if (_tunnel.ListenOnAllAddresses)
                 {
-                    if (_route.BindingProtocal == BindingProtocal.Pv6)
+                    if (_tunnel.BindingProtocal == BindingProtocal.Pv6)
                     {
-                        IPEndPoint ipLocal = new IPEndPoint(IPAddress.IPv6Any, _route.ListenPort);
+                        IPEndPoint ipLocal = new IPEndPoint(IPAddress.IPv6Any, _tunnel.ListenPort);
                         _listenSocket.Bind(ipLocal);
                     }
-                    else if (_route.BindingProtocal == BindingProtocal.Pv4)
+                    else if (_tunnel.BindingProtocal == BindingProtocal.Pv4)
                     {
-                        IPEndPoint ipLocal = new IPEndPoint(IPAddress.Any, _route.ListenPort);
+                        IPEndPoint ipLocal = new IPEndPoint(IPAddress.Any, _tunnel.ListenPort);
                         _listenSocket.Bind(ipLocal);
                     }
                     else
@@ -103,17 +100,17 @@ namespace NetTunnel.Service.Routing
                 }
                 else
                 {
-                    foreach (var binding in _route.Bindings)
+                    foreach (var binding in _tunnel.Bindings)
                     {
                         if (binding.Enabled)
                         {
-                            IPEndPoint ipLocal = new IPEndPoint(IPAddress.Parse(binding.Address), _route.ListenPort);
+                            IPEndPoint ipLocal = new IPEndPoint(IPAddress.Parse(binding.Address), _tunnel.ListenPort);
                             _listenSocket.Bind(ipLocal);
                         }
                     }
                 }
 
-                _listenSocket.Listen(_route.AcceptBacklogSize);
+                _listenSocket.Listen(_tunnel.AcceptBacklogSize);
                 _listenSocket.BeginAccept(new AsyncCallback(OnConnectionAccepted), null);
 
                 return true;
@@ -135,7 +132,7 @@ namespace NetTunnel.Service.Routing
                 Singletons.EventLog.WriteEvent(new EventLogging.EventPayload
                 {
                     Severity = EventLogging.Severity.Error,
-                    CustomText = "Failed to start route.",
+                    CustomText = "Failed to start tunnel.",
                     Exception = ex
                 });
 
@@ -183,7 +180,7 @@ namespace NetTunnel.Service.Routing
                 Singletons.EventLog.WriteEvent(new EventLogging.EventPayload
                 {
                     Severity = EventLogging.Severity.Error,
-                    CustomText = "Failed to stop route.",
+                    CustomText = "Failed to stop tunnel.",
                     Exception = ex
                 });
                 throw;
@@ -200,12 +197,10 @@ namespace NetTunnel.Service.Routing
             {
                 if (_listenSocket != null)
                 {
-                    Stats.TotalConnections++;
-
                     Socket socket = _listenSocket.EndAccept(asyn);
-                    SocketState connection = new SocketState(socket, _route.InitialBufferSize);
+                    SocketState connection = new SocketState(socket, _tunnel.InitialBufferSize);
 
-                    connection.Route = _route;
+                    connection.Tunnel = _tunnel;
 
                     (new Thread(EstablishPeerConnection)).Start(connection);
 
@@ -238,10 +233,9 @@ namespace NetTunnel.Service.Routing
                 socket.Connect(ipEnd);
                 if (socket.Connected)
                 {
-                    Stats.TotalConnections++;
-                    var connection = new SocketState(socket, _route.InitialBufferSize);
+                    var connection = new SocketState(socket, _tunnel.InitialBufferSize);
 
-                    connection.Route = _route;
+                    connection.Tunnel = _tunnel;
 
                     return connection;
                 }
@@ -275,7 +269,7 @@ namespace NetTunnel.Service.Routing
             Endpoint foreignConnectionEndpoint = null;
             SocketState foreignConnection = null;
 
-            foreach (var remotePeer in _route.Endpoints.List)
+            foreach (var remotePeer in _tunnel.Endpoints.List)
             {
                 if (remotePeer.Enabled)
                 {
@@ -317,13 +311,11 @@ namespace NetTunnel.Service.Routing
                     _onDataReceivedCallback = new AsyncCallback(OnDataReceived);
                 }
 
-                if (connection.BytesReceived == connection.Buffer.Length && connection.BytesReceived < _route.MaxBufferSize)
+                if (connection.BytesReceived == connection.Buffer.Length && connection.BytesReceived < _tunnel.MaxBufferSize)
                 {
                     int largerBufferSize = connection.Buffer.Length + (connection.Buffer.Length / 4);
                     connection.Buffer = new byte[largerBufferSize];
                 }
-
-                Stats.BytesReceived += (UInt64)connection.BytesReceived;
 
                 connection.Socket.BeginReceive(connection.Buffer, 0, connection.Buffer.Length, SocketFlags.None, _onDataReceivedCallback, connection);
             }
@@ -353,9 +345,9 @@ namespace NetTunnel.Service.Routing
                     return;
                 }
 
-                //Console.WriteLine("--Recv:{0}, Packet: {1}", route.Name, Encoding.UTF8.GetString(connection.Buffer.Take(connection.BytesReceived).ToArray()));
+                //Console.WriteLine("--Recv:{0}, Packet: {1}", tunnel.Name, Encoding.UTF8.GetString(connection.Buffer.Take(connection.BytesReceived).ToArray()));
 
-                List<PacketEnvelope> envelopes = Packetizer.DissasemblePacketData(this, connection, false, null, null);
+                List<PacketEnvelope> envelopes = Packetizer.DissasemblePacketData(connection, false, null, null);
                 foreach (var envelope in envelopes)
                 {
                     if (envelope.Label == null)
@@ -400,24 +392,21 @@ namespace NetTunnel.Service.Routing
 
         void ProcessReceivedData(SocketState connection, byte[] buffer, int bufferSize)
         {
-            //Console.WriteLine("--Send:{0}, Packet: {1}", route.Name, Encoding.UTF8.GetString(buffer.Take(bufferSize).ToArray()));
+            //Console.WriteLine("--Send:{0}, Packet: {1}", tunnel.Name, Encoding.UTF8.GetString(buffer.Take(bufferSize).ToArray()));
 
             byte[] sendBuffer = Packetizer.AssembleMessagePacket(buffer, bufferSize, false, null, null);
-            Stats.BytesSent += (UInt64)sendBuffer.Length;
             connection.Peer.Socket.Send(sendBuffer, sendBuffer.Length, SocketFlags.None);
         }
 
         private void SendPacketEnvelope(SocketState connection, PacketEnvelope envelope, string encryptionKey, string salt)
         {
             byte[] sendBuffer = Packetizer.AssembleMessagePacket(envelope, true, encryptionKey, salt);
-            Stats.BytesSent += (UInt64)sendBuffer.Length;
             connection.Socket.Send(sendBuffer, sendBuffer.Length, SocketFlags.None);
         }
 
         private void SendPacketEnvelope(SocketState connection, PacketEnvelope envelope)
         {
             byte[] sendBuffer = Packetizer.AssembleMessagePacket(envelope, false, null, null);
-            Stats.BytesSent += (UInt64)sendBuffer.Length;
             connection.Socket.Send(sendBuffer, sendBuffer.Length, SocketFlags.None);
         }
 

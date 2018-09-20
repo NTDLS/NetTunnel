@@ -1,12 +1,12 @@
 ﻿using System.Net.Sockets;
 using NetTunnel.Library;
-using NetTunnel.Library.Routing;
+using NetTunnel.Library.Tunneling;
 
-namespace NetTunnel.Service.Routing
+namespace NetTunnel.Service.Tunneling
 {
     public class SocketState
     {
-        public Route Route { get; set; }
+        public Tunnel Tunnel { get; set; }
         public SocketState Peer { get; set; }
         public int BytesReceived { get; set; }
         public Socket Socket { get; set; }

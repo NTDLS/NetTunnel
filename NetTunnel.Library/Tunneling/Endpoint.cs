@@ -1,4 +1,4 @@
-﻿namespace NetTunnel.Library.Routing
+﻿namespace NetTunnel.Library.Tunneling
 {
     public class Endpoint
     {

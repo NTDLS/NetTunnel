@@ -6,10 +6,10 @@ using System.Linq;
 using System.Runtime.Caching;
 using System.Text;
 using NetTunnel.Library;
-using NetTunnel.Library.Routing;
+using NetTunnel.Library.Tunneling;
 using NetTunnel.Library.Utility;
 
-namespace NetTunnel.Service.Routing
+namespace NetTunnel.Service.Tunneling
 {
     internal static class Packetizer
     {
@@ -128,7 +128,7 @@ namespace NetTunnel.Service.Routing
             }
         }
 
-        public static List<PacketEnvelope> DissasemblePacketData(Router router, SocketState state, bool encrypt, string encryptPacketKey, string keySalt)
+        public static List<PacketEnvelope> DissasemblePacketData(SocketState state, bool encrypt, string encryptPacketKey, string keySalt)
         {
             List<PacketEnvelope> envelopes = new List<PacketEnvelope>();
 
@@ -161,7 +161,6 @@ namespace NetTunnel.Service.Routing
                     {
                         SkipPacket(ref state);
                         //throw new Exception("Malformed payload packet, invalid delimiter.");
-                        router.Stats.PacketMalformedCount++;
                         continue;
                     }
 
@@ -169,7 +168,6 @@ namespace NetTunnel.Service.Routing
                     {
                         SkipPacket(ref state);
                         //throw new Exception("Malformed payload packet, invalid length."); 
-                        router.Stats.PacketSizeExceededCount++;
                         continue;
                     }
 
@@ -177,7 +175,6 @@ namespace NetTunnel.Service.Routing
                     {
                         //We have data in the buffer, but it's not enough to make up
                         //  the entire message (fragmented packet) so we will break and wait on more data.
-                        router.Stats.PacketFragmentCount++;
                         break;
                     }
 
@@ -187,7 +184,6 @@ namespace NetTunnel.Service.Routing
                     {
                         SkipPacket(ref state);
                         //throw new Exception("Malformed payload packet, invalid CRC.");
-                        router.Stats.PacketCrcFailureCount++;
                         continue;
                     }
 

@@ -9,7 +9,7 @@
         public const int DefaultInitialBufferSize = 4096;
         public const int DefaultMaxBufferSize = 1048576;
         public const int DefaultAcceptBacklogSize = 10;
-        public const string RoutesConfigFileName = "routes.json";
+        public const string TunnelConfigFileName = "tunnel.json";
         public const string ServerConfigFileName = "service.json";
 
         public const int PayloadDelimiter = 122455788;
