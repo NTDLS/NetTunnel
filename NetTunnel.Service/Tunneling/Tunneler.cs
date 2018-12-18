@@ -265,7 +265,7 @@ namespace NetTunnel.Service.Tunneling
         void EstablishPeerConnection(object connectionObject)
         {
             SocketState accpetedConnection = (SocketState)connectionObject;
-            SocketState foreignConnection = Connect(_tunnel.Endpoint.Address, _tunnel.Endpoint.Port);
+            SocketState foreignConnection = Connect(_tunnel.Destination.Address, _tunnel.Destination.Port);
 
             if (foreignConnection == null)
             {

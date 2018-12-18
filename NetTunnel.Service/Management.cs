@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using NetTunnel.Library;
 using NetTunnel.Library.Tunneling;
 using NetTunnel.Library.Win32;
 using NetTunnel.Service.Tunneling;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace NetTunnel.Service
 {
     public class Management
     {
-        private Configuration _config;
         private readonly Tunnelers _tunnelers = new Tunnelers();
 
         public Management()
@@ -24,10 +22,10 @@ namespace NetTunnel.Service
         {
             try
             {
-                string configPath = RegistryHelper.GetString(Registry.LocalMachine, Constants.RegsitryKey, "", "ConfigPath");
+                string configPath = RegistryHelper.GetString(Registry.LocalMachine, Constants.ServerRegsitryKey, "", "ConfigPath");
 
-                string configurationText = JsonConvert.SerializeObject(_config);
-                File.WriteAllText(Path.Combine(configPath, Constants.ServerConfigFileName), configurationText);
+                string configurationText = JsonConvert.SerializeObject(Singletons.Config);
+                File.WriteAllText(Path.Combine(configPath, Constants.ServiceConfigFileName), configurationText);
 
                 string tunnelText = JsonConvert.SerializeObject(_tunnelers.Tunnels());
                 File.WriteAllText(Path.Combine(configPath, Constants.TunnelConfigFileName), tunnelText);
@@ -49,13 +47,13 @@ namespace NetTunnel.Service
             {
                 Console.WriteLine("Loading configuration...");
 
-                AddTestTunnels();
+                AddTestData();
 
-                string configPath = RegistryHelper.GetString(Registry.LocalMachine, Constants.RegsitryKey, "", "ConfigPath");
+                string configPath = RegistryHelper.GetString(Registry.LocalMachine, Constants.ServerRegsitryKey, "", "ConfigPath");
 
                 Console.WriteLine("Server configuration...");
-                string configurationText = File.ReadAllText(Path.Combine(configPath, Constants.ServerConfigFileName));
-                _config = JsonConvert.DeserializeObject<Configuration>(configurationText);
+                string configurationText = File.ReadAllText(Path.Combine(configPath, Constants.ServiceConfigFileName));
+                Singletons.Config = JsonConvert.DeserializeObject<Configuration>(configurationText);
 
                 Console.WriteLine("Tunnel configuration...");
                 string tunnelText = File.ReadAllText(Path.Combine(configPath, Constants.TunnelConfigFileName));
@@ -81,28 +79,28 @@ namespace NetTunnel.Service
             }
         }
 
-        private void AddTestTunnels()
+        private void AddTestData()
         {
-            string configPath = RegistryHelper.GetString(Registry.LocalMachine, Constants.RegsitryKey, "", "ConfigPath");
+            string configPath = RegistryHelper.GetString(Registry.LocalMachine, Constants.ServerRegsitryKey, "", "ConfigPath");
 
             var configuration = new Configuration();
-            File.WriteAllText(Path.Combine(configPath, Constants.ServerConfigFileName), JsonConvert.SerializeObject(configuration));
+            configuration.Clients.Add(new Client()
+            {
+                Address = new Endpoint("127.0.0.1", 17446),
+                Username = "admin",
+                Password = "admin"
+            });
+            File.WriteAllText(Path.Combine(configPath, Constants.ServiceConfigFileName), JsonConvert.SerializeObject(configuration));
 
             var tunnels = new List<Tunnel>();
-
             var tunnel = new Tunnel()
             {
-                AcceptBacklogSize = 2,
-                AutoStart = true,
                 BindingProtocal = BindingProtocal.Pv4,
                 Description = "Test tunnel #1",
-                Id = Guid.NewGuid(),
-                InitialBufferSize = 1024,
-                MaxBufferSize = 1024 * 1024 * 10,
                 ListenPort = 80,
                 Name = "TestTunnel#1",
                 ListenOnAllAddresses = true,
-                Endpoint = new Endpoint("ntdls.com", 80)
+                Destination = new Endpoint("ntdls.com", 80)
             };
             tunnels.Add(tunnel);
 
@@ -115,7 +113,7 @@ namespace NetTunnel.Service
             {
                 LoadConfiguration();
 
-                Console.WriteLine("starting tunneler...");
+                Console.WriteLine("Starting tunneler...");
                 _tunnelers.Start();
             }
             catch (Exception ex)

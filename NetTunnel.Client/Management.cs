@@ -9,8 +9,6 @@ namespace NetTunnel.Client
 {
     public class Management
     {
-        private Configuration _config;
-
         public Management()
         {
         }
@@ -19,10 +17,10 @@ namespace NetTunnel.Client
         {
             try
             {
-                string configPath = RegistryHelper.GetString(Registry.LocalMachine, Constants.RegsitryKey, "", "ConfigPath");
+                string configPath = RegistryHelper.GetString(Registry.LocalMachine, Constants.ClientRegsitryKey, "", "ConfigPath");
 
-                string configurationText = JsonConvert.SerializeObject(_config);
-                File.WriteAllText(Path.Combine(configPath, Constants.ServerConfigFileName), configurationText);
+                string configurationText = JsonConvert.SerializeObject(Singletons.Config);
+                File.WriteAllText(Path.Combine(configPath, Constants.ServiceConfigFileName), configurationText);
             }
             catch (Exception ex)
             {
@@ -41,13 +39,13 @@ namespace NetTunnel.Client
             {
                 Console.WriteLine("Loading configuration...");
 
-                AddTestTunnels();
+                AddTestData();
 
-                string configPath = RegistryHelper.GetString(Registry.LocalMachine, Constants.RegsitryKey, "", "ConfigPath");
+                string configPath = RegistryHelper.GetString(Registry.LocalMachine, Constants.ClientRegsitryKey, "", "ConfigPath");
 
-                Console.WriteLine("Server configuration...");
-                string configurationText = File.ReadAllText(Path.Combine(configPath, Constants.ServerConfigFileName));
-                _config = JsonConvert.DeserializeObject<Configuration>(configurationText);
+                Console.WriteLine("Client configuration...");
+                string configurationText = File.ReadAllText(Path.Combine(configPath, Constants.ServiceConfigFileName));
+                Singletons.Config = JsonConvert.DeserializeObject<Configuration>(configurationText);
             }
             catch (Exception ex)
             {
@@ -60,9 +58,17 @@ namespace NetTunnel.Client
             }
         }
 
-        private void AddTestTunnels()
+        private void AddTestData()
         {
-        }
+            string configPath = RegistryHelper.GetString(Registry.LocalMachine, Constants.ClientRegsitryKey, "", "ConfigPath");
+
+            var configuration = new Configuration()
+            {
+                Username = "admin",
+                Password = "admin"
+            };
+            File.WriteAllText(Path.Combine(configPath, Constants.ServiceConfigFileName), JsonConvert.SerializeObject(configuration));
+        }        
 
         public void Start()
         {

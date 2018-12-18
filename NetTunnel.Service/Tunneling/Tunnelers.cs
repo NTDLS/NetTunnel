@@ -37,23 +37,22 @@ namespace NetTunnel.Service.Tunneling
 
         public void Start()
         {
+            KeepConnectedThread();
+
             foreach (var tunneler in List)
             {
-                if (tunneler.Tunnel.AutoStart)
+                try
                 {
-                    try
+                    tunneler.Start();
+                }
+                catch (Exception ex)
+                {
+                    Singletons.EventLog.WriteEvent(new EventLogging.EventPayload
                     {
-                        tunneler.Start();
-                    }
-                    catch (Exception ex)
-                    {
-                        Singletons.EventLog.WriteEvent(new EventLogging.EventPayload
-                        {
-                            Severity = EventLogging.Severity.Error,
-                            CustomText = "Failed to start tunnel.",
-                            Exception = ex
-                        });
-                    }
+                        Severity = EventLogging.Severity.Error,
+                        CustomText = "Failed to start tunnel.",
+                        Exception = ex
+                    });
                 }
             }
         }

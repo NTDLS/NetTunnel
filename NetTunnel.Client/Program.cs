@@ -70,7 +70,7 @@ namespace NetTunnel.Client
                                 {
                                     try
                                     {
-                                        ServiceController serviceController = new System.ServiceProcess.ServiceController(Constants.ServiceName);
+                                        ServiceController serviceController = new System.ServiceProcess.ServiceController(Constants.ClientServiceName);
                                         serviceController.Start();
                                         serviceController.WaitForStatus(System.ServiceProcess.ServiceControllerStatus.Running, new System.TimeSpan(0, 0, 0, 10)); //10 seconds.
                                     }
@@ -85,7 +85,7 @@ namespace NetTunnel.Client
                                 {
                                     try
                                     {
-                                        ServiceController serviceController = new System.ServiceProcess.ServiceController(Constants.ServiceName);
+                                        ServiceController serviceController = new System.ServiceProcess.ServiceController(Constants.ClientServiceName);
                                         serviceController.Stop();
                                         serviceController.WaitForStatus(System.ServiceProcess.ServiceControllerStatus.Stopped, new System.TimeSpan(0, 0, 10, 0)); //10 minutes - because this could take some time.
                                     }
