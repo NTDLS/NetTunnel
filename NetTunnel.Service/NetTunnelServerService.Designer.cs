@@ -1,6 +1,6 @@
 ﻿namespace NetTunnel.Service
 {
-    partial class NetworkDlsNetTunnelService
+    partial class NetTunnelServerService
     {
         /// <summary> 
         /// Required designer variable.
@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             // 
-            // NetworkDLSNetTunnelService
+            // NetTunnelServerService
             // 
-            this.ServiceName = "NetworkDLSNetTunnelService";
+            this.ServiceName = "NetTunnelServerService";
 
         }
 

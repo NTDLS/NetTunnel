@@ -1,6 +1,6 @@
-﻿namespace NetTunnel.Service
+﻿namespace NetTunnel.Client
 {
-    partial class NetTunnelServiceInstaller
+    partial class NetTunnelClientServiceInstaller
     {
         /// <summary>
         /// Required designer variable.
@@ -28,34 +28,34 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.serviceProcessInstaller = new System.ServiceProcess.ServiceProcessInstaller();
+            this.clientServiceProcessInstaller = new System.ServiceProcess.ServiceProcessInstaller();
             this.serviceInstaller = new System.ServiceProcess.ServiceInstaller();
             // 
-            // serviceProcessInstaller
+            // clientServiceProcessInstaller
             // 
-            this.serviceProcessInstaller.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
-            this.serviceProcessInstaller.Password = null;
-            this.serviceProcessInstaller.Username = null;
+            this.clientServiceProcessInstaller.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
+            this.clientServiceProcessInstaller.Password = null;
+            this.clientServiceProcessInstaller.Username = null;
             // 
             // serviceInstaller
             // 
             this.serviceInstaller.Description = "Provides TCP/IP v4/v6/tunneling and routing services on NT based operating system" +
     "s.";
-            this.serviceInstaller.DisplayName = "NetworkDLS NetTunnel";
-            this.serviceInstaller.ServiceName = "NetworkDLSNetTunnelService";
+            this.serviceInstaller.DisplayName = "NetworkDLS NetTunnel Client";
+            this.serviceInstaller.ServiceName = "NetTunnelClientService";
             this.serviceInstaller.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             // 
-            // NetTunnelServiceInstaller
+            // NetTunnelClientServiceInstaller
             // 
             this.Installers.AddRange(new System.Configuration.Install.Installer[] {
-            this.serviceProcessInstaller,
+            this.clientServiceProcessInstaller,
             this.serviceInstaller});
 
         }
 
         #endregion
 
-        private System.ServiceProcess.ServiceProcessInstaller serviceProcessInstaller;
+        private System.ServiceProcess.ServiceProcessInstaller clientServiceProcessInstaller;
         private System.ServiceProcess.ServiceInstaller serviceInstaller;
     }
 }

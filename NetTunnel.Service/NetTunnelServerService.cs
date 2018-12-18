@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace NetTunnel.Service
 {
-    partial class NetworkDlsNetTunnelService : ServiceBase
+    partial class NetTunnelServerService : ServiceBase
     {
         RoutingServices _routingServices = new RoutingServices();
 
-        public NetworkDlsNetTunnelService()
+        public NetTunnelServerService()
         {
             InitializeComponent();
         }

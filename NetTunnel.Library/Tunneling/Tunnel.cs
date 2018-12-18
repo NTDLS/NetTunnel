@@ -19,8 +19,7 @@ namespace NetTunnel.Library.Tunneling
         public string Description { get; set; }
         public List<Binding> Bindings { get; set; }
         public bool ListenOnAllAddresses { get; set; }
-
-        public Endpoints Endpoints = new Endpoints();
+        public Endpoint Endpoint { get; set; }
 
         public Tunnel()
         {
@@ -29,6 +28,7 @@ namespace NetTunnel.Library.Tunneling
             InitialBufferSize = Constants.DefaultInitialBufferSize;
             MaxBufferSize = Constants.DefaultMaxBufferSize;
             Bindings = new List<Binding>();
+            Endpoint = new Endpoint();
         }
     }
 }

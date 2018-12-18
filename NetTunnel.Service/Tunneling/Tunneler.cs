@@ -265,21 +265,7 @@ namespace NetTunnel.Service.Tunneling
         void EstablishPeerConnection(object connectionObject)
         {
             SocketState accpetedConnection = (SocketState)connectionObject;
-
-            Endpoint foreignConnectionEndpoint = null;
-            SocketState foreignConnection = null;
-
-            foreach (var remotePeer in _tunnel.Endpoints.List)
-            {
-                if (remotePeer.Enabled)
-                {
-                    if ((foreignConnection = Connect(remotePeer.Address, remotePeer.Port)) != null)
-                    {
-                        foreignConnectionEndpoint = remotePeer;
-                        break;
-                    }
-                }
-            }
+            SocketState foreignConnection = Connect(_tunnel.Endpoint.Address, _tunnel.Endpoint.Port);
 
             if (foreignConnection == null)
             {

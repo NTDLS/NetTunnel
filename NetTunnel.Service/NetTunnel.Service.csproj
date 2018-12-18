@@ -61,18 +61,18 @@
   <ItemGroup>
     <Compile Include="Configuration.cs" />
     <Compile Include="Management.cs" />
-    <Compile Include="NetTunnelService.cs">
+    <Compile Include="NetTunnelServerService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="NetTunnelService.Designer.cs">
-      <DependentUpon>NetTunnelService.cs</DependentUpon>
+    <Compile Include="NetTunnelServerService.Designer.cs">
+      <DependentUpon>NetTunnelServerService.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
-    <Compile Include="NetTunnelServiceInstaller.cs">
+    <Compile Include="NetTunnelServerServiceInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="NetTunnelServiceInstaller.Designer.cs">
-      <DependentUpon>NetTunnelServiceInstaller.cs</DependentUpon>
+    <Compile Include="NetTunnelServerServiceInstaller.Designer.cs">
+      <DependentUpon>NetTunnelServerServiceInstaller.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tunneling\Keyset.cs" />
@@ -96,11 +96,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="NetTunnelService.resx">
-      <DependentUpon>NetTunnelService.cs</DependentUpon>
+    <EmbeddedResource Include="NetTunnelServerService.resx">
+      <DependentUpon>NetTunnelServerService.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="NetTunnelServiceInstaller.resx">
-      <DependentUpon>NetTunnelServiceInstaller.cs</DependentUpon>
+    <EmbeddedResource Include="NetTunnelServerServiceInstaller.resx">
+      <DependentUpon>NetTunnelServerServiceInstaller.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

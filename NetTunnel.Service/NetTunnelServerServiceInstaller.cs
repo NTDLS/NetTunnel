@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace NetTunnel.Service
 {
     [RunInstaller(true)]
-    public partial class NetTunnelServiceInstaller : System.Configuration.Install.Installer
+    public partial class NetTunnelServerServiceInstaller : System.Configuration.Install.Installer
     {
-        public NetTunnelServiceInstaller()
+        public NetTunnelServerServiceInstaller()
         {
             InitializeComponent();
         }

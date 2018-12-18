@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5CD8C3B0-BA16-46D4-A844-93F5FDB0ADA5}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{348C4E4C-2FA4-43C8-A7AE-9C7C223563BE}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NetTunnel.Library</RootNamespace>
-    <AssemblyName>NetTunnel.Library</AssemblyName>
+    <RootNamespace>NetTunnel.Client</RootNamespace>
+    <AssemblyName>NetTunnel.Client</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,16 +33,24 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject />
+    <ApplicationIcon>AppIcon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -50,29 +59,46 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Constants.cs" />
-    <Compile Include="Crypto\Hashing.cs" />
-    <Compile Include="General\BasicObjects.cs" />
+    <Compile Include="Configuration.cs" />
+    <Compile Include="Management.cs" />
+    <Compile Include="NetTunnelClientService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="NetTunnelClientService.Designer.cs">
+      <DependentUpon>NetTunnelClientService.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NetTunnelClientServiceInstaller.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="NetTunnelClientServiceInstaller.Designer.cs">
+      <DependentUpon>NetTunnelClientServiceInstaller.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tunneling\Binding.cs" />
-    <Compile Include="Tunneling\CRC16.cs" />
-    <Compile Include="Tunneling\Endpoint.cs" />
-    <Compile Include="Tunneling\PacketEnvelope.cs" />
-    <Compile Include="Tunneling\Tunnel.cs" />
-    <Compile Include="Utility\Formatters.cs" />
-    <Compile Include="Utility\Serialization.cs" />
-    <Compile Include="Utility\Strings.cs" />
-    <Compile Include="Utility\Exceptions.cs" />
-    <Compile Include="Utility\Helpers.cs" />
-    <Compile Include="Win32\EventLogging.cs" />
-    <Compile Include="Win32\RegistryHelper.cs" />
+    <Compile Include="RoutingServices.cs" />
+    <Compile Include="Singletons.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="app.manifest" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Payloads\" />
+    <ProjectReference Include="..\NetTunnel.Library\NetTunnel.Library.csproj">
+      <Project>{5cd8c3b0-ba16-46d4-a844-93f5fdb0ada5}</Project>
+      <Name>NetTunnel.Library</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="AppIcon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="NetTunnelClientService.resx">
+      <DependentUpon>NetTunnelClientService.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NetTunnelClientServiceInstaller.resx">
+      <DependentUpon>NetTunnelClientServiceInstaller.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

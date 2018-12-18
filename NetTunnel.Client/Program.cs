@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.ServiceProcess;
 
-namespace NetTunnel.Service
+namespace NetTunnel.Client
 {
     static class Program
     {
@@ -103,7 +103,7 @@ namespace NetTunnel.Service
                     ServiceBase[] servicesToRun;
                     servicesToRun = new ServiceBase[]
                         {
-                           new NetTunnelServerService()
+                           new NetTunnelClientService()
                         };
                     ServiceBase.Run(servicesToRun);
                 }
@@ -120,7 +120,7 @@ namespace NetTunnel.Service
                     routingServices.Stop();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Singletons.EventLog.WriteEvent(new EventLogging.EventPayload
                 {
