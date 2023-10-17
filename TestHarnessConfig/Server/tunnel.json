@@ -1,1 +1,0 @@
-[{"BindingProtocal":"Pv4","Id":"5871959f-a163-4088-a2dd-ee5a84bb80fe","Name":"TestTunnel#1","ListenPort":80,"AcceptBacklogSize":5,"InitialBufferSize":4096,"MaxBufferSize":1048576,"Description":"Test tunnel #1","Bindings":[],"ListenOnAllAddresses":true,"Destination":{"Address":"ntdls.com","Port":80}}]
