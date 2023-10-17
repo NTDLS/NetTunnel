@@ -102,11 +102,11 @@ namespace NetTunnel.ClientAPI
             {
                 if (message == null)
                 {
-                    throw new NullException($"Value should not be null: '{strName}'.");
+                    throw new NtNullException($"Value should not be null: '{strName}'.");
                 }
                 else
                 {
-                    throw new NullException(message);
+                    throw new NtNullException(message);
                 }
             }
         }
@@ -116,7 +116,7 @@ namespace NetTunnel.ClientAPI
         {
             if (value == null || value == Guid.Empty)
             {
-                throw new NullException($"Value should not be null or empty: '{strName}'.");
+                throw new NtNullException($"Value should not be null or empty: '{strName}'.");
             }
         }
 
@@ -125,7 +125,7 @@ namespace NetTunnel.ClientAPI
         {
             if (string.IsNullOrEmpty(value))
             {
-                throw new NullException($"Value should not be null or empty: '{strName}'.");
+                throw new NtNullException($"Value should not be null or empty: '{strName}'.");
             }
         }
 
@@ -134,7 +134,7 @@ namespace NetTunnel.ClientAPI
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new NullException($"Value should not be null or empty: '{strName}'.");
+                throw new NtNullException($"Value should not be null or empty: '{strName}'.");
             }
         }
 
@@ -143,7 +143,7 @@ namespace NetTunnel.ClientAPI
         {
             if (condition)
             {
-                throw new AssertException(message);
+                throw new NtAssertException(message);
             }
         }
 
@@ -152,7 +152,7 @@ namespace NetTunnel.ClientAPI
         {
             if (condition)
             {
-                throw new AssertException(message);
+                throw new NtAssertException(message);
             }
         }
     }

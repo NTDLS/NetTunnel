@@ -2,15 +2,15 @@
 
 namespace NetTunnel.ClientAPI.Exceptions
 {
-    public class APIResponseException : ExceptionBase
+    public class NtAssertException : NtExceptionBase
     {
-        public APIResponseException()
+        public NtAssertException()
         {
             Severity = KbLogSeverity.Warning;
         }
 
-        public APIResponseException(string? message)
-            : base($"API exception: {message}.")
+        public NtAssertException(string? message)
+            : base($"Assert exception: {message}.")
 
         {
             Severity = KbLogSeverity.Exception;

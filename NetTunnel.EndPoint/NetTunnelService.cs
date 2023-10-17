@@ -32,11 +32,13 @@
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+
             builder.Services.AddControllers(options =>
             {
                 options.InputFormatters.Add(new TextPlainInputFormatter());
             });
 
+            builder.Services.AddHttpContextAccessor();
             builder.Logging.ClearProviders();
             builder.Logging.SetMinimumLevel(LogLevel.Warning);
 

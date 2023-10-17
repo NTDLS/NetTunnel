@@ -15,7 +15,7 @@
         {
             var session = new UserSession(username, clientIpAddress);
 
-            if (passwordHash == "abcdefg")
+            if (username.ToLower() == "admin" && passwordHash == "abcdefg")
             {
                 Collection.Add(session);
 

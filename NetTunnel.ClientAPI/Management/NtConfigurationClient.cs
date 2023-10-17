@@ -4,11 +4,11 @@ using Newtonsoft.Json;
 
 namespace NetTunnel.ClientAPI.Management
 {
-    public class ConfigurationClient
+    public class NtConfigurationClient
     {
-        private readonly Client _client;
+        private readonly NtClient _client;
 
-        public ConfigurationClient(Client client)
+        public NtConfigurationClient(NtClient client)
         {
             _client = client;
         }
@@ -19,10 +19,10 @@ namespace NetTunnel.ClientAPI.Management
 
             using var response = _client.Connection.GetAsync(url);
             string resultText = response.Result.Content.ReadAsStringAsync().Result;
-            var result = JsonConvert.DeserializeObject<ActionResponseLogin>(resultText);
+            var result = JsonConvert.DeserializeObject<NtActionResponseLogin>(resultText);
             if (result == null || result.Success == false)
             {
-                throw new APIResponseException(result == null ? "Invalid response" : result.ExceptionText);
+                throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
             }
 
             _client.SessionId = result.SessionId;
@@ -51,10 +51,10 @@ namespace NetTunnel.ClientAPI.Management
 
             using var response = _client.Connection.GetAsync(url);
             string resultText = response.Result.Content.ReadAsStringAsync().Result;
-            var result = JsonConvert.DeserializeObject<ActionResponse>(resultText);
+            var result = JsonConvert.DeserializeObject<NtActionResponse>(resultText);
             if (result == null || result.Success == false)
             {
-                throw new APIResponseException(result == null ? "Invalid response" : result.ExceptionText);
+                throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
             }
         }
     }

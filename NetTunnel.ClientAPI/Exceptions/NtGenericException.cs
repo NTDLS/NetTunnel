@@ -2,15 +2,15 @@
 
 namespace NetTunnel.ClientAPI.Exceptions
 {
-    public class NullException : ExceptionBase
+    public class NtGenericException : NtExceptionBase
     {
-        public NullException()
+        public NtGenericException()
         {
             Severity = KbLogSeverity.Warning;
         }
 
-        public NullException(string? message)
-            : base($"Null exception: {message}.")
+        public NtGenericException(string? message)
+            : base($"Generic exception: {message}.")
 
         {
             Severity = KbLogSeverity.Exception;

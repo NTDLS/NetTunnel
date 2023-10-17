@@ -3,7 +3,7 @@ using NetTunnel.ClientAPI.Management;
 
 namespace NetTunnel.ClientAPI
 {
-    public class Client : IDisposable
+    public class NtClient : IDisposable
     {
         public bool IsConnected => _connection != null;
         public string BaseAddress { get; private set; }
@@ -19,7 +19,7 @@ namespace NetTunnel.ClientAPI
         }
 
         public Guid SessionId { get; internal set; } = Guid.Empty;
-        public ConfigurationClient Configuration { get; private set; }
+        public NtConfigurationClient Configuration { get; private set; }
 
         private HttpClient? _connection = null;
 
@@ -27,32 +27,34 @@ namespace NetTunnel.ClientAPI
         /// Connects to the server using a URL.
         /// </summary>
         /// <param name="baseAddress">Base address should be in the form http://host:port/</param>
-        public Client(string baseAddress)
+        public NtClient(string baseAddress)
         {
             BaseAddress = baseAddress;
 
-            Configuration = new ConfigurationClient(this);
+            Configuration = new NtConfigurationClient(this);
+
+            Connect();
         }
 
         /// <summary>
         /// Connects to the server using a URL and a non-default timeout.
         /// </summary>
         /// <param name="baseAddress">Base address should be in the form http://host:port/</param>
-        public Client(string baseAddress, TimeSpan timeout)
+        public NtClient(string baseAddress, TimeSpan timeout)
         {
             BaseAddress = baseAddress;
             Timeout = timeout;
 
-            Configuration = new ConfigurationClient(this);
+            Configuration = new NtConfigurationClient(this);
 
             Connect();
         }
 
-        void Connect()
+        private void Connect()
         {
             if (IsConnected)
             {
-                throw new GenericException("The client is already connected.");
+                throw new NtGenericException("The client is already connected.");
             }
 
             try
