@@ -5,18 +5,18 @@ namespace NetTunnel.EndPoint.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ConfigController
+    public class ConfigurationController
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ConfigController(IHttpContextAccessor httpContextAccessor)
+        public ConfigurationController(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
         [Route("Login/{username}/{passwordHash}")]
-        public ControllerActionResponse Login(string username, string passwordHash)
+        public ActionResponse Login(string username, string passwordHash)
         {
             try
             {
@@ -29,18 +29,18 @@ namespace NetTunnel.EndPoint.Controllers
                 if (userSession != null)
                 {
                     Singletons.Core.Log.Write($"Login success: Username: {username}, Session: {userSession.SessionId}");
-                    return new ControllerActionResponse(userSession.SessionId) { Success = false };
+                    return new ActionResponseLogin(userSession.SessionId) { Success = false };
                 }
                 else
                 {
                     Singletons.Core.Log.Write($"Login failed: Username: {username}");
-                    return new ControllerActionResponse() { Success = false };
+                    throw new Exception("Login failed.");
                 }
             }
             catch (Exception ex)
             {
                 Singletons.Core.Log.Write($"Login exception: Username: {username}, Exception: {ex.Message}");
-                return new ControllerActionResponse
+                return new ActionResponseLogin(ex)
                 {
                     ExceptionText = ex.Message,
                     Success = false
@@ -50,7 +50,7 @@ namespace NetTunnel.EndPoint.Controllers
 
         [HttpGet]
         [Route("{sessionId}/List")]
-        public ControllerActionResponse ListEndpoints(Guid sessionId)
+        public ActionResponse ListEndpoints(Guid sessionId)
         {
             try
             {
@@ -60,7 +60,7 @@ namespace NetTunnel.EndPoint.Controllers
 
                 var userSession = Singletons.Core.Sessions.Acquire(sessionId, clientIpAddress);
 
-                return new ControllerActionResponse
+                return new ActionResponse
                 {
                     Success = false
                 };
@@ -69,7 +69,7 @@ namespace NetTunnel.EndPoint.Controllers
             {
                 Singletons.Core.Log.Write($"ListEndpoints Exception: {ex.Message}");
 
-                return new ControllerActionResponse
+                return new ActionResponse
                 {
                     ExceptionText = ex.Message,
                     Success = false

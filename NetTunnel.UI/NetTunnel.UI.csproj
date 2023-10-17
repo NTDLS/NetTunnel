@@ -17,4 +17,9 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\NetTunnel.ClientAPI\NetTunnel.ClientAPI.csproj" />
+    <ProjectReference Include="..\NetTunnel.Library\NetTunnel.Library.csproj" />
+  </ItemGroup>
+
 </Project>
