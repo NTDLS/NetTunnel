@@ -39,7 +39,7 @@
             // 
             listView1.Columns.AddRange(new ColumnHeader[] { columnHeaderName, columnHeaderDirection, columnHeaderPort });
             listView1.GridLines = true;
-            listView1.Location = new Point(44, 50);
+            listView1.Location = new Point(12, 12);
             listView1.Name = "listView1";
             listView1.Size = new Size(705, 364);
             listView1.TabIndex = 0;

@@ -6,14 +6,14 @@ namespace NetTunnel.ClientAPI.Exceptions
     {
         public NtAssertException()
         {
-            Severity = KbLogSeverity.Warning;
+            Severity = NtLogSeverity.Warning;
         }
 
         public NtAssertException(string? message)
             : base($"Assert exception: {message}.")
 
         {
-            Severity = KbLogSeverity.Exception;
+            Severity = NtLogSeverity.Exception;
         }
     }
 }

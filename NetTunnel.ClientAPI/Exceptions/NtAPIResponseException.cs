@@ -6,14 +6,14 @@ namespace NetTunnel.ClientAPI.Exceptions
     {
         public NtAPIResponseException()
         {
-            Severity = KbLogSeverity.Warning;
+            Severity = NtLogSeverity.Warning;
         }
 
         public NtAPIResponseException(string? message)
             : base($"API exception: {message}.")
 
         {
-            Severity = KbLogSeverity.Exception;
+            Severity = NtLogSeverity.Exception;
         }
     }
 }

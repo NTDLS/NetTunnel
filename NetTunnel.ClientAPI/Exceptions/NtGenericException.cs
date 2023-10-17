@@ -6,14 +6,14 @@ namespace NetTunnel.ClientAPI.Exceptions
     {
         public NtGenericException()
         {
-            Severity = KbLogSeverity.Warning;
+            Severity = NtLogSeverity.Warning;
         }
 
         public NtGenericException(string? message)
             : base($"Generic exception: {message}.")
 
         {
-            Severity = KbLogSeverity.Exception;
+            Severity = NtLogSeverity.Exception;
         }
     }
 }

@@ -4,18 +4,18 @@ namespace NetTunnel.ClientAPI.Exceptions
 {
     public class NtExceptionBase : Exception
     {
-        public KbLogSeverity Severity { get; set; }
+        public NtLogSeverity Severity { get; set; }
 
         public NtExceptionBase()
         {
-            Severity = KbLogSeverity.Exception;
+            Severity = NtLogSeverity.Exception;
         }
 
         public NtExceptionBase(string? message)
             : base(message)
 
         {
-            Severity = KbLogSeverity.Exception;
+            Severity = NtLogSeverity.Exception;
         }
     }
 }

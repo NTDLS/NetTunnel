@@ -6,14 +6,14 @@ namespace NetTunnel.ClientAPI.Exceptions
     {
         public NtNullException()
         {
-            Severity = KbLogSeverity.Warning;
+            Severity = NtLogSeverity.Warning;
         }
 
         public NtNullException(string? message)
             : base($"Null exception: {message}.")
 
         {
-            Severity = KbLogSeverity.Exception;
+            Severity = NtLogSeverity.Exception;
         }
     }
 }
