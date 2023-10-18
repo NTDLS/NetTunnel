@@ -31,17 +31,19 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             listView1 = new ListView();
             columnHeaderName = new ColumnHeader();
-            columnHeaderDirection = new ColumnHeader();
+            columnEntrypoint = new ColumnHeader();
             columnHeaderPort = new ColumnHeader();
+            columnHeaderTunnels = new ColumnHeader();
             SuspendLayout();
             // 
             // listView1
             // 
-            listView1.Columns.AddRange(new ColumnHeader[] { columnHeaderName, columnHeaderDirection, columnHeaderPort });
+            listView1.Columns.AddRange(new ColumnHeader[] { columnHeaderName, columnEntrypoint, columnHeaderPort, columnHeaderTunnels });
+            listView1.Dock = DockStyle.Fill;
             listView1.GridLines = true;
-            listView1.Location = new Point(12, 12);
+            listView1.Location = new Point(0, 0);
             listView1.Name = "listView1";
-            listView1.Size = new Size(705, 364);
+            listView1.Size = new Size(751, 463);
             listView1.TabIndex = 0;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
@@ -49,24 +51,32 @@
             // columnHeaderName
             // 
             columnHeaderName.Text = "Name";
-            columnHeaderName.Width = 200;
+            columnHeaderName.Width = 250;
             // 
-            // columnHeaderDirection
+            // columnEntrypoint
             // 
-            columnHeaderDirection.Text = "Direction";
+            columnEntrypoint.Text = "Entry Point";
+            columnEntrypoint.Width = 115;
             // 
             // columnHeaderPort
             // 
             columnHeaderPort.Text = "Port";
+            columnHeaderPort.Width = 100;
+            // 
+            // columnHeaderTunnels
+            // 
+            columnHeaderTunnels.Text = "Tunnels";
+            columnHeaderTunnels.Width = 80;
             // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(751, 463);
             Controls.Add(listView1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "FormMain";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "NetTunnel";
             Load += Form1_Load;
             ResumeLayout(false);
@@ -76,7 +86,8 @@
 
         private ListView listView1;
         private ColumnHeader columnHeaderName;
-        private ColumnHeader columnHeaderDirection;
+        private ColumnHeader columnEntrypoint;
         private ColumnHeader columnHeaderPort;
+        private ColumnHeader columnHeaderTunnels;
     }
 }
