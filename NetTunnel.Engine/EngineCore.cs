@@ -1,5 +1,5 @@
 ﻿using NetTunnel.Engine.Managers;
-using NetTunnel.Library.Config;
+using NetTunnel.Library.Types;
 
 namespace NetTunnel.Engine
 {
@@ -10,7 +10,7 @@ namespace NetTunnel.Engine
         public EndpointManager Endpoints { get; set; }
         public UserManager Users { get; set; }
 
-        public EngineCore(EndpointServiceConfiguration config)
+        public EngineCore(NtEndpointServiceConfiguration config)
         {
             Log = new(this);
             Sessions = new(this);

@@ -17,6 +17,5 @@ namespace NetTunnel.Library.Types
                 Port = Port
             };
         }
-
     }
 }

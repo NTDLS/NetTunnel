@@ -1,5 +1,4 @@
 ﻿using NetTunnel.ClientAPI;
-using System.Net;
 
 namespace NetTunnel.UI
 {

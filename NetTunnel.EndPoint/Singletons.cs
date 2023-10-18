@@ -1,5 +1,5 @@
 ﻿using NetTunnel.Engine;
-using NetTunnel.Library.Config;
+using NetTunnel.Library.Types;
 
 namespace NetTunnel.EndPoint
 {
@@ -15,8 +15,8 @@ namespace NetTunnel.EndPoint
             }
         }
 
-        private static EndpointServiceConfiguration? _settings = null;
-        public static EndpointServiceConfiguration Configuration
+        private static NtEndpointServiceConfiguration? _settings = null;
+        public static NtEndpointServiceConfiguration Configuration
         {
             get
             {
@@ -27,7 +27,7 @@ namespace NetTunnel.EndPoint
                                  .AddEnvironmentVariables()
                                  .Build();
 
-                    _settings = config.GetRequiredSection("Settings").Get<EndpointServiceConfiguration>();
+                    _settings = config.GetRequiredSection("Settings").Get<NtEndpointServiceConfiguration>();
                     if (_settings == null)
                     {
                         throw new Exception("Failed to load configuration.");
