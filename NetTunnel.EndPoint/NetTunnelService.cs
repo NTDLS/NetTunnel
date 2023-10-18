@@ -27,7 +27,7 @@ namespace NetTunnel.EndPoint
 
         public static X509Certificate2 CreateSelfSignedCertificate()
         {
-            using (RSA rsa = RSA.Create(2048)) // You can adjust the key size
+            using (RSA rsa = RSA.Create(Singletons.Configuration.RSAKeyLength))
             {
                 var request = new CertificateRequest($"CN=NetTunnel.EndPoint.private", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
                 var certificate = request.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(1));
@@ -76,7 +76,7 @@ namespace NetTunnel.EndPoint
 
             app.UseAuthorization();
             app.MapControllers();
-            app.RunAsync("https://localhost:5000/");
+            app.RunAsync($"https://localhost:{Singletons.Configuration.ManagementPort}/");
 
             if (app.Environment.IsDevelopment())
             {

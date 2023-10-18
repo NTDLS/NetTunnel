@@ -2,6 +2,7 @@
 {
     public class EndpointServiceConfiguration
     {
-        public int ManagementPort { get; set; }
+        public int ManagementPort { get; set; } = 52845;
+        public int RSAKeyLength { get; set; } = 2048;
     }
 }

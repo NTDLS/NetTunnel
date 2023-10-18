@@ -4,7 +4,16 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ApplicationIcon>Multi.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="C:\Users\ntdls\.nuget\packages\ntdls.semaphore\1.5.1\contentFiles\any\net7.0\NTDLS.Semaphore.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Multi.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="NTDLS.Semaphore" Version="1.5.1" />
