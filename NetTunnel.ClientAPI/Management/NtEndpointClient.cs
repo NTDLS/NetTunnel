@@ -4,33 +4,18 @@ using Newtonsoft.Json;
 
 namespace NetTunnel.ClientAPI.Management
 {
-    public class NtConfigurationClient
+    public class NtEndpointClient
     {
         private readonly NtClient _client;
 
-        public NtConfigurationClient(NtClient client)
+        public NtEndpointClient(NtClient client)
         {
             _client = client;
         }
 
-        public void Login(string username, string passwordHash)
+        public async Task<NtActionResponseEndpoints> List()
         {
-            string url = $"api/Configuration/{username}/{passwordHash}/Login";
-
-            using var response = _client.Connection.GetAsync(url);
-            string resultText = response.Result.Content.ReadAsStringAsync().Result;
-            var result = JsonConvert.DeserializeObject<NtActionResponseLogin>(resultText);
-            if (result == null || result.Success == false)
-            {
-                throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
-            }
-
-            _client.SessionId = result.SessionId;
-        }
-
-        public async Task<NtActionResponseEndpoints> ListEndpoints()
-        {
-            string url = $"api/Configuration/{_client.SessionId}/ListEndpoints";
+            string url = $"api/Endpoint/{_client.SessionId}/List";
 
             using var response = await _client.Connection.GetAsync(url);
             string resultText = await response.Content.ReadAsStringAsync();

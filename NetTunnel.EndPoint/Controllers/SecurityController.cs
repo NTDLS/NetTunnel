@@ -5,11 +5,11 @@ namespace NetTunnel.EndPoint.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ConfigurationController
+    public class SecurityController
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ConfigurationController(IHttpContextAccessor httpContextAccessor)
+        public SecurityController(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
         }
@@ -53,21 +53,21 @@ namespace NetTunnel.EndPoint.Controllers
         }
 
         [HttpGet]
-        [Route("{sessionId}/ListEndpoints")]
-        public NtActionResponseEndpoints ListEndpoints(Guid sessionId)
+        [Route("{sessionId}/Logout")]
+        public NtActionResponse Logout(Guid sessionId)
         {
             try
             {
-                Singletons.Core.Log.Write($"ListEndpoints: SessionId: {sessionId}");
+                Singletons.Core.Log.Write($"Logout: SessionId: {sessionId}");
 
                 var clientIpAddress = _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString();
 
                 var userSession = Singletons.Core.Sessions.Acquire(sessionId, clientIpAddress);
 
+                Singletons.Core.Sessions.Logout(userSession);
 
-                return new NtActionResponseEndpoints
+                return new NtActionResponse
                 {
-                    Collection = Singletons.Core.Endpoints.Clone(),
                     Success = true
                 };
             }
@@ -75,7 +75,7 @@ namespace NetTunnel.EndPoint.Controllers
             {
                 Singletons.Core.Log.Write($"ListEndpoints Exception: {ex.Message}");
 
-                return new NtActionResponseEndpoints
+                return new NtActionResponse
                 {
                     ExceptionText = ex.Message,
                     Success = false

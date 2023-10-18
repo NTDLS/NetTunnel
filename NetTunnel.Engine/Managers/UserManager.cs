@@ -6,29 +6,23 @@ namespace NetTunnel.Engine.Managers
     {
         private readonly EngineCore _core;
 
-        public CriticalResource<List<NtUser>> Collection { get; set; } = new();
+        private CriticalResource<List<NtUser>> _collection = new();
 
         public UserManager(EngineCore core)
         {
             _core = core;
         }
 
-        public void Add(string username, string passwordHash)
-        {
-            Add(new NtUser(username, passwordHash));
-        }
+        public void Add(string username, string passwordHash) => Add(new NtUser(username, passwordHash));
 
-        public void Add(NtUser user)
-        {
-            Collection.Use((o) => o.Add(user));
-        }
+        public void Add(NtUser user) => _collection.Use((o) => o.Add(user));
 
         public bool ValidateLogin(string username, string passwordHash)
         {
             username = username.ToLower();
             passwordHash = passwordHash.ToLower();
 
-            return Collection.Use((o) =>
+            return _collection.Use((o) =>
                 o.Where(u => u.Username == username && u.PasswordHash == passwordHash).Any());
         }
     }

@@ -26,7 +26,7 @@ namespace NetTunnel.UI
                 {
                     _client = new NtClient(formLogin.Address, formLogin.Username, formLogin.Password);
 
-                    _client.Configuration.ListEndpoints().ContinueWith((o) =>
+                    _client.Endpoint.List().ContinueWith((o) =>
                     {
                         PopulateEndpointGrid(o.Result.Collection);
                     });

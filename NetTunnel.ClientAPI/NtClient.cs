@@ -20,7 +20,8 @@ namespace NetTunnel.ClientAPI
         }
 
         public Guid SessionId { get; internal set; } = Guid.Empty;
-        public NtConfigurationClient Configuration { get; private set; }
+        public NtEndpointClient Endpoint { get; private set; }
+        public NtSecurityClient Security { get; private set; }
 
         private HttpClient? _connection = null;
 
@@ -32,7 +33,8 @@ namespace NetTunnel.ClientAPI
         {
             BaseAddress = baseAddress;
 
-            Configuration = new NtConfigurationClient(this);
+            Endpoint = new(this);
+            Security = new(this);
 
             Connect();
         }
@@ -41,11 +43,12 @@ namespace NetTunnel.ClientAPI
         {
             BaseAddress = baseAddress;
 
-            Configuration = new NtConfigurationClient(this);
+            Endpoint = new NtEndpointClient(this);
+            Security = new(this);
 
             Connect();
 
-            Configuration.Login(username, passwordHash);
+            Security.Login(username, passwordHash);
         }
 
         /// <summary>
@@ -57,7 +60,8 @@ namespace NetTunnel.ClientAPI
             BaseAddress = baseAddress;
             Timeout = timeout;
 
-            Configuration = new NtConfigurationClient(this);
+            Endpoint = new NtEndpointClient(this);
+            Security = new(this);
 
             Connect();
         }
@@ -111,7 +115,7 @@ namespace NetTunnel.ClientAPI
                 {
                     if (IsConnected && SessionId != Guid.Empty)
                     {
-                        Configuration.Logout();
+                        Endpoint.Logout();
                     }
                 }
                 catch

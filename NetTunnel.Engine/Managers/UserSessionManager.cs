@@ -1,10 +1,12 @@
-﻿namespace NetTunnel.Engine.Managers
+﻿using NTDLS.Semaphore;
+
+namespace NetTunnel.Engine.Managers
 {
     public class UserSessionManager
     {
         private readonly EngineCore _core;
 
-        public List<UserSession> Collection { get; set; } = new();
+        private CriticalResource<List<UserSession>> _collection = new();
 
         public UserSessionManager(EngineCore core)
         {
@@ -16,7 +18,7 @@
             if (_core.Users.ValidateLogin(username, passwordHash))
             {
                 var session = new UserSession(username, clientIpAddress);
-                Collection.Add(session);
+                _collection.Use((o) => o.Add(session));
                 return session;
             }
             return null;
@@ -24,7 +26,7 @@
 
         public UserSession Acquire(Guid sessionId, string? clientIpAddress)
         {
-            var session = Collection.Where(o => o.SessionId == sessionId).FirstOrDefault();
+            var session = _collection.Use((o) => o.Where(o => o.SessionId == sessionId).FirstOrDefault());
             if (session == null)
             {
                 throw new Exception("Session was not found.");
@@ -37,5 +39,7 @@
 
             return session;
         }
+
+        public void Logout(UserSession session) => _collection.Use((o) => { o.Remove(session); });
     }
 }
