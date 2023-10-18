@@ -5,6 +5,7 @@ namespace NetTunnel.ClientAPI
 {
     public class NtClient : IDisposable
     {
+        public bool AutoAcceptSSLCertificate { get; set; } = true;
         public bool IsConnected => _connection != null;
         public string BaseAddress { get; private set; }
         public TimeSpan Timeout { get; private set; } = new TimeSpan(0, 8, 0, 0, 0);
@@ -71,7 +72,15 @@ namespace NetTunnel.ClientAPI
             try
             {
                 SessionId = Guid.NewGuid();
-                _connection = new HttpClient
+
+                var handler = new HttpClientHandler();
+
+                if (AutoAcceptSSLCertificate)
+                {
+                    handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true;
+                }
+
+                _connection = new HttpClient(handler)
                 {
                     BaseAddress = new Uri(BaseAddress),
                     Timeout = Timeout

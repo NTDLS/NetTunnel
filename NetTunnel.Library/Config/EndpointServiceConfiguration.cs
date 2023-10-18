@@ -2,6 +2,6 @@
 {
     public class EndpointServiceConfiguration
     {
-        public string BaseAddress { get; set; } = string.Empty;
+        public int ManagementPort { get; set; }
     }
 }

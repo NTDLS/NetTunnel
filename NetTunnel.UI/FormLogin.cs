@@ -1,4 +1,5 @@
 ﻿using NetTunnel.ClientAPI;
+using System.Net;
 
 namespace NetTunnel.UI
 {
@@ -31,7 +32,7 @@ namespace NetTunnel.UI
                 Username = textBoxUsername.Text;
                 Password = textBoxPassword.Text;
 
-                Address = $"http://{textBoxAddress.Text}:{port}/";
+                Address = $"https://{textBoxAddress.Text}:{port}/";
 
                 using var _ = new NtClient(Address, Username, Password);
 

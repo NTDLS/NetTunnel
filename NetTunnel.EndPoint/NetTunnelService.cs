@@ -1,4 +1,7 @@
-﻿namespace NetTunnel.EndPoint
+﻿using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+
+namespace NetTunnel.EndPoint
 {
     internal class NetTunnelService
     {
@@ -22,6 +25,17 @@
             _thread.Join();
         }
 
+        public static X509Certificate2 CreateSelfSignedCertificate()
+        {
+            using (RSA rsa = RSA.Create(2048)) // You can adjust the key size
+            {
+                var request = new CertificateRequest($"CN=NetTunnel.EndPoint.private", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+                var certificate = request.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(1));
+
+                return new X509Certificate2(certificate.Export(X509ContentType.Pkcs12), "");
+            }
+        }
+
         private void DoWork()
         {
             Singletons.Core.Start();
@@ -32,7 +46,6 @@
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-
             builder.Services.AddControllers(options =>
             {
                 options.InputFormatters.Add(new TextPlainInputFormatter());
@@ -42,24 +55,35 @@
             builder.Logging.ClearProviders();
             builder.Logging.SetMinimumLevel(LogLevel.Warning);
 
+            var certificate = CreateSelfSignedCertificate();
+
+            builder.WebHost.UseKestrel(options =>
+            {
+                options.ListenAnyIP(Singletons.Configuration.ManagementPort, listenOptions =>
+                {
+                    listenOptions.UseHttps(certificate);
+                });
+            });
+
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+                Console.WriteLine($"https://localhost:{Singletons.Configuration.ManagementPort}/swagger/index.html");
             }
 
             app.UseAuthorization();
             app.MapControllers();
-            app.RunAsync(Singletons.Configuration.BaseAddress);
+            app.RunAsync("https://localhost:5000/");
 
             if (app.Environment.IsDevelopment())
             {
                 //System.Diagnostics.Process.Start("explorer", $"{Configuration.BaseAddress}swagger/index.html");
             }
 
-            Singletons.Core.Log.Write($"Listening on {Singletons.Configuration.BaseAddress}.");
+            Singletons.Core.Log.Write($"Listening on {Singletons.Configuration.ManagementPort}.");
 
             while (true)
             {
