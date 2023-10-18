@@ -13,12 +13,10 @@
 
         public UserSession? Login(string username, string passwordHash, string? clientIpAddress)
         {
-            var session = new UserSession(username, clientIpAddress);
-
-            if (username.ToLower() == "admin" && passwordHash == "abcdefg")
+            if (_core.Users.ValidateLogin(username, passwordHash))
             {
+                var session = new UserSession(username, clientIpAddress);
                 Collection.Add(session);
-
                 return session;
             }
             return null;
