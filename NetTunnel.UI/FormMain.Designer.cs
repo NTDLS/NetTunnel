@@ -29,24 +29,26 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
-            listView1 = new ListView();
+            listViewEndpoints = new ListView();
             columnHeaderName = new ColumnHeader();
             columnEntrypoint = new ColumnHeader();
             columnHeaderPort = new ColumnHeader();
             columnHeaderTunnels = new ColumnHeader();
             SuspendLayout();
             // 
-            // listView1
+            // listViewEndpoints
             // 
-            listView1.Columns.AddRange(new ColumnHeader[] { columnHeaderName, columnEntrypoint, columnHeaderPort, columnHeaderTunnels });
-            listView1.Dock = DockStyle.Fill;
-            listView1.GridLines = true;
-            listView1.Location = new Point(0, 0);
-            listView1.Name = "listView1";
-            listView1.Size = new Size(751, 463);
-            listView1.TabIndex = 0;
-            listView1.UseCompatibleStateImageBehavior = false;
-            listView1.View = View.Details;
+            listViewEndpoints.Columns.AddRange(new ColumnHeader[] { columnHeaderName, columnEntrypoint, columnHeaderPort, columnHeaderTunnels });
+            listViewEndpoints.Dock = DockStyle.Fill;
+            listViewEndpoints.FullRowSelect = true;
+            listViewEndpoints.GridLines = true;
+            listViewEndpoints.HeaderStyle = ColumnHeaderStyle.Nonclickable;
+            listViewEndpoints.Location = new Point(0, 0);
+            listViewEndpoints.Name = "listViewEndpoints";
+            listViewEndpoints.Size = new Size(751, 463);
+            listViewEndpoints.TabIndex = 0;
+            listViewEndpoints.UseCompatibleStateImageBehavior = false;
+            listViewEndpoints.View = View.Details;
             // 
             // columnHeaderName
             // 
@@ -73,7 +75,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(751, 463);
-            Controls.Add(listView1);
+            Controls.Add(listViewEndpoints);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "FormMain";
             StartPosition = FormStartPosition.CenterScreen;
@@ -84,7 +86,7 @@
 
         #endregion
 
-        private ListView listView1;
+        private ListView listViewEndpoints;
         private ColumnHeader columnHeaderName;
         private ColumnHeader columnEntrypoint;
         private ColumnHeader columnHeaderPort;

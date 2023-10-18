@@ -36,13 +36,17 @@
             textBoxPassword = new TextBox();
             buttonCancel = new Button();
             buttonLogin = new Button();
+            labelRemotePort = new Label();
+            textBoxPort = new TextBox();
+            textBoxAddress = new TextBox();
+            labelRemoteAddress = new Label();
             ((System.ComponentModel.ISupportInitialize)pictureBoxLogin).BeginInit();
             SuspendLayout();
             // 
             // pictureBoxLogin
             // 
             pictureBoxLogin.Image = Properties.Resources.Login;
-            pictureBoxLogin.Location = new Point(24, 43);
+            pictureBoxLogin.Location = new Point(19, 33);
             pictureBoxLogin.Name = "pictureBoxLogin";
             pictureBoxLogin.Size = new Size(52, 54);
             pictureBoxLogin.SizeMode = PictureBoxSizeMode.CenterImage;
@@ -52,7 +56,7 @@
             // labelUsername
             // 
             labelUsername.AutoSize = true;
-            labelUsername.Location = new Point(112, 25);
+            labelUsername.Location = new Point(90, 72);
             labelUsername.Name = "labelUsername";
             labelUsername.Size = new Size(60, 15);
             labelUsername.TabIndex = 1;
@@ -61,7 +65,7 @@
             // labelPassword
             // 
             labelPassword.AutoSize = true;
-            labelPassword.Location = new Point(112, 74);
+            labelPassword.Location = new Point(90, 121);
             labelPassword.Name = "labelPassword";
             labelPassword.Size = new Size(57, 15);
             labelPassword.TabIndex = 2;
@@ -69,41 +73,80 @@
             // 
             // textBoxUsername
             // 
-            textBoxUsername.Location = new Point(112, 43);
+            textBoxUsername.Location = new Point(90, 90);
             textBoxUsername.Name = "textBoxUsername";
-            textBoxUsername.Size = new Size(167, 23);
-            textBoxUsername.TabIndex = 0;
+            textBoxUsername.Size = new Size(201, 23);
+            textBoxUsername.TabIndex = 2;
             // 
             // textBoxPassword
             // 
-            textBoxPassword.Location = new Point(112, 92);
+            textBoxPassword.Location = new Point(90, 139);
             textBoxPassword.Name = "textBoxPassword";
-            textBoxPassword.Size = new Size(167, 23);
-            textBoxPassword.TabIndex = 1;
+            textBoxPassword.PasswordChar = '*';
+            textBoxPassword.Size = new Size(201, 23);
+            textBoxPassword.TabIndex = 3;
             // 
             // buttonCancel
             // 
-            buttonCancel.Location = new Point(204, 140);
+            buttonCancel.Location = new Point(221, 189);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(75, 23);
-            buttonCancel.TabIndex = 3;
+            buttonCancel.TabIndex = 5;
             buttonCancel.Text = "Cancel";
             buttonCancel.UseVisualStyleBackColor = true;
+            buttonCancel.Click += buttonCancel_Click;
             // 
             // buttonLogin
             // 
-            buttonLogin.Location = new Point(123, 140);
+            buttonLogin.Location = new Point(140, 189);
             buttonLogin.Name = "buttonLogin";
             buttonLogin.Size = new Size(75, 23);
-            buttonLogin.TabIndex = 2;
+            buttonLogin.TabIndex = 4;
             buttonLogin.Text = "Login";
             buttonLogin.UseVisualStyleBackColor = true;
+            buttonLogin.Click += buttonLogin_Click;
+            // 
+            // labelRemotePort
+            // 
+            labelRemotePort.AutoSize = true;
+            labelRemotePort.Location = new Point(233, 16);
+            labelRemotePort.Name = "labelRemotePort";
+            labelRemotePort.Size = new Size(29, 15);
+            labelRemotePort.TabIndex = 8;
+            labelRemotePort.Text = "Port";
+            // 
+            // textBoxPort
+            // 
+            textBoxPort.Location = new Point(233, 34);
+            textBoxPort.Name = "textBoxPort";
+            textBoxPort.Size = new Size(58, 23);
+            textBoxPort.TabIndex = 1;
+            // 
+            // textBoxAddress
+            // 
+            textBoxAddress.Location = new Point(90, 34);
+            textBoxAddress.Name = "textBoxAddress";
+            textBoxAddress.Size = new Size(137, 23);
+            textBoxAddress.TabIndex = 0;
+            // 
+            // labelRemoteAddress
+            // 
+            labelRemoteAddress.AutoSize = true;
+            labelRemoteAddress.Location = new Point(90, 16);
+            labelRemoteAddress.Name = "labelRemoteAddress";
+            labelRemoteAddress.Size = new Size(86, 15);
+            labelRemoteAddress.TabIndex = 5;
+            labelRemoteAddress.Text = "Address / host:";
             // 
             // FormLogin
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(300, 185);
+            ClientSize = new Size(312, 227);
+            Controls.Add(labelRemotePort);
+            Controls.Add(textBoxPort);
+            Controls.Add(textBoxAddress);
+            Controls.Add(labelRemoteAddress);
             Controls.Add(buttonLogin);
             Controls.Add(buttonCancel);
             Controls.Add(textBoxPassword);
@@ -133,5 +176,9 @@
         private TextBox textBoxPassword;
         private Button buttonCancel;
         private Button buttonLogin;
+        private Label labelRemotePort;
+        private TextBox textBoxPort;
+        private TextBox textBoxAddress;
+        private Label labelRemoteAddress;
     }
 }

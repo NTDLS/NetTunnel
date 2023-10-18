@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NTDLS.Semaphore" Version="1.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\NetTunnel.ClientAPI\NetTunnel.ClientAPI.csproj" />
     <ProjectReference Include="..\NetTunnel.Library\NetTunnel.Library.csproj" />
   </ItemGroup>

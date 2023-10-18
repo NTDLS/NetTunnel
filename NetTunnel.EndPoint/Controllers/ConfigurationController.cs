@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NetTunnel.Library.Payloads;
+using NetTunnel.ClientAPI.Payload.Response;
 
 namespace NetTunnel.EndPoint.Controllers
 {
@@ -53,8 +53,8 @@ namespace NetTunnel.EndPoint.Controllers
         }
 
         [HttpGet]
-        [Route("{sessionId}/List")]
-        public NtActionResponse ListEndpoints(Guid sessionId)
+        [Route("{sessionId}/ListEndpoints")]
+        public NtActionResponseEndpoints ListEndpoints(Guid sessionId)
         {
             try
             {
@@ -64,16 +64,18 @@ namespace NetTunnel.EndPoint.Controllers
 
                 var userSession = Singletons.Core.Sessions.Acquire(sessionId, clientIpAddress);
 
-                return new NtActionResponse
+
+                return new NtActionResponseEndpoints
                 {
-                    Success = false
+                    Collection = Singletons.Core.Endpoints.Clone(),
+                    Success = true
                 };
             }
             catch (Exception ex)
             {
                 Singletons.Core.Log.Write($"ListEndpoints Exception: {ex.Message}");
 
-                return new NtActionResponse
+                return new NtActionResponseEndpoints
                 {
                     ExceptionText = ex.Message,
                     Success = false

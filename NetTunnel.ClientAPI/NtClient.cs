@@ -36,6 +36,17 @@ namespace NetTunnel.ClientAPI
             Connect();
         }
 
+        public NtClient(string baseAddress, string username, string passwordHash)
+        {
+            BaseAddress = baseAddress;
+
+            Configuration = new NtConfigurationClient(this);
+
+            Connect();
+
+            Configuration.Login(username, passwordHash);
+        }
+
         /// <summary>
         /// Connects to the server using a URL and a non-default timeout.
         /// </summary>

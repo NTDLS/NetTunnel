@@ -2,8 +2,6 @@
 {
     public static class Constants
     {
-        public static string FriendlyName = "NetTunnel";
-
         public enum NtLogSeverity
         {
             Trace = 0, //Super-verbose, debug-like information.

@@ -2,6 +2,8 @@
 {
     public static class Constants
     {
+        public static string FriendlyName = "NetTunnel";
+
         public enum BindDirection
         {
             Incomming,

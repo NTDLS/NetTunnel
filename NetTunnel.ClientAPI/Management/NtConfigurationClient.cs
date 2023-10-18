@@ -1,5 +1,5 @@
 ﻿using NetTunnel.ClientAPI.Exceptions;
-using NetTunnel.Library.Payloads;
+using NetTunnel.ClientAPI.Payload.Response;
 using Newtonsoft.Json;
 
 namespace NetTunnel.ClientAPI.Management
@@ -26,6 +26,21 @@ namespace NetTunnel.ClientAPI.Management
             }
 
             _client.SessionId = result.SessionId;
+        }
+
+        public async Task<NtActionResponseEndpoints> ListEndpoints()
+        {
+            string url = $"api/Configuration/{_client.SessionId}/ListEndpoints";
+
+            using var response = await _client.Connection.GetAsync(url);
+            string resultText = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<NtActionResponseEndpoints>(resultText);
+            if (result == null || result.Success == false)
+            {
+                throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
+            }
+
+            return result;
         }
 
         /*

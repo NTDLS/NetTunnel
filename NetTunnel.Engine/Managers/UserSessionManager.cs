@@ -1,15 +1,15 @@
-﻿namespace NetTunnel.Engine
+﻿namespace NetTunnel.Engine.Managers
 {
-    public class UserSessions
+    public class UserSessionManager
     {
         private readonly EngineCore _core;
 
-        public UserSessions(EngineCore core)
+        public List<UserSession> Collection { get; set; } = new();
+
+        public UserSessionManager(EngineCore core)
         {
             _core = core;
         }
-
-        public List<UserSession> Collection { get; set; } = new();
 
         public UserSession? Login(string username, string passwordHash, string? clientIpAddress)
         {

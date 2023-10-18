@@ -28,4 +28,8 @@
     <ProjectReference Include="..\NetTunnel.Library\NetTunnel.Library.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Payload\Request\" />
+  </ItemGroup>
+
 </Project>

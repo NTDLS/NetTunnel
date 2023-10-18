@@ -35,7 +35,7 @@
             textBoxRemoteAddress = new TextBox();
             textBoxRemoteUsername = new TextBox();
             textBoxRemotePassword = new TextBox();
-            textBox1 = new TextBox();
+            textBoxRemotePort = new TextBox();
             labelRemotePort = new Label();
             buttonAdd = new Button();
             buttonCancel = new Button();
@@ -46,7 +46,7 @@
             // labelRemoteAddress
             // 
             labelRemoteAddress.AutoSize = true;
-            labelRemoteAddress.Location = new Point(17, 82);
+            labelRemoteAddress.Location = new Point(17, 77);
             labelRemoteAddress.Name = "labelRemoteAddress";
             labelRemoteAddress.Size = new Size(128, 15);
             labelRemoteAddress.TabIndex = 0;
@@ -72,7 +72,7 @@
             // 
             // textBoxRemoteAddress
             // 
-            textBoxRemoteAddress.Location = new Point(17, 100);
+            textBoxRemoteAddress.Location = new Point(17, 95);
             textBoxRemoteAddress.Name = "textBoxRemoteAddress";
             textBoxRemoteAddress.Size = new Size(156, 23);
             textBoxRemoteAddress.TabIndex = 1;
@@ -88,20 +88,21 @@
             // 
             textBoxRemotePassword.Location = new Point(17, 216);
             textBoxRemotePassword.Name = "textBoxRemotePassword";
+            textBoxRemotePassword.PasswordChar = '*';
             textBoxRemotePassword.Size = new Size(239, 23);
             textBoxRemotePassword.TabIndex = 4;
             // 
-            // textBox1
+            // textBoxRemotePort
             // 
-            textBox1.Location = new Point(179, 100);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(77, 23);
-            textBox1.TabIndex = 2;
+            textBoxRemotePort.Location = new Point(179, 95);
+            textBoxRemotePort.Name = "textBoxRemotePort";
+            textBoxRemotePort.Size = new Size(77, 23);
+            textBoxRemotePort.TabIndex = 2;
             // 
             // labelRemotePort
             // 
             labelRemotePort.AutoSize = true;
-            labelRemotePort.Location = new Point(179, 82);
+            labelRemotePort.Location = new Point(179, 77);
             labelRemotePort.Name = "labelRemotePort";
             labelRemotePort.Size = new Size(29, 15);
             labelRemotePort.TabIndex = 4;
@@ -109,7 +110,7 @@
             // 
             // buttonAdd
             // 
-            buttonAdd.Location = new Point(155, 263);
+            buttonAdd.Location = new Point(98, 259);
             buttonAdd.Name = "buttonAdd";
             buttonAdd.Size = new Size(75, 23);
             buttonAdd.TabIndex = 5;
@@ -118,7 +119,7 @@
             // 
             // buttonCancel
             // 
-            buttonCancel.Location = new Point(236, 263);
+            buttonCancel.Location = new Point(181, 259);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(75, 23);
             buttonCancel.TabIndex = 6;
@@ -129,7 +130,7 @@
             // 
             textBoxName.Location = new Point(17, 32);
             textBoxName.Name = "textBoxName";
-            textBoxName.Size = new Size(294, 23);
+            textBoxName.Size = new Size(239, 23);
             textBoxName.TabIndex = 0;
             // 
             // labelName
@@ -145,13 +146,13 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(328, 298);
+            ClientSize = new Size(273, 298);
             Controls.Add(textBoxName);
             Controls.Add(labelName);
             Controls.Add(buttonCancel);
             Controls.Add(buttonAdd);
             Controls.Add(labelRemotePort);
-            Controls.Add(textBox1);
+            Controls.Add(textBoxRemotePort);
             Controls.Add(textBoxRemotePassword);
             Controls.Add(textBoxRemoteUsername);
             Controls.Add(textBoxRemoteAddress);
@@ -178,7 +179,7 @@
         private TextBox textBoxRemoteAddress;
         private TextBox textBoxRemoteUsername;
         private TextBox textBoxRemotePassword;
-        private TextBox textBox1;
+        private TextBox textBoxRemotePort;
         private Label labelRemotePort;
         private Button buttonAdd;
         private Button buttonCancel;

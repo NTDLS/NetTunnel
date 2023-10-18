@@ -1,4 +1,4 @@
-﻿namespace NetTunnel.Library.Payloads
+﻿namespace NetTunnel.ClientAPI.Payload.Response
 {
     public class NtActionResponseLogin : NtActionResponse
     {

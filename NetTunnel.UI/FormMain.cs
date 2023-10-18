@@ -1,4 +1,5 @@
 using NetTunnel.ClientAPI;
+using NetTunnel.Library.Types;
 
 namespace NetTunnel.UI
 {
@@ -14,9 +15,52 @@ namespace NetTunnel.UI
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            _client = new NtClient("http://localhost:52845/");
+            Shown += FormMain_Shown;
+        }
 
-            _client.Configuration.Login("admin", "abcdefg");
+        private void FormMain_Shown(object? sender, EventArgs e)
+        {
+            using (var formLogin = new FormLogin())
+            {
+                if (formLogin.ShowDialog() == DialogResult.OK)
+                {
+                    _client = new NtClient(formLogin.Address, formLogin.Username, formLogin.Password);
+
+                    _client.Configuration.ListEndpoints().ContinueWith((o) =>
+                    {
+                        PopulateEndpointGrid(o.Result.Collection);
+                    });
+                }
+                else
+                {
+                    Close();
+                }
+            }
+        }
+
+        private void PopulateEndpointGrid(List<NtEndpoint> endpoints)
+        {
+            foreach (var endpoint in endpoints)
+            {
+                AddEndpointToGrid(endpoint);
+            }
+        }
+
+        void AddEndpointToGrid(NtEndpoint endpoint)
+        {
+            if (listViewEndpoints.InvokeRequired)
+            {
+                listViewEndpoints.Invoke(AddEndpointToGrid, endpoint);
+            }
+            else
+            {
+                // This code will execute on the UI thread.
+                ListViewItem item = new ListViewItem(endpoint.Name);
+                item.SubItems.Add(endpoint.Direction.ToString());
+                item.SubItems.Add($"{endpoint.Port}");
+
+                listViewEndpoints.Items.Add(item);
+            }
         }
 
         public new void Dispose()
