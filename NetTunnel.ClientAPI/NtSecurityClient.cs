@@ -4,7 +4,7 @@ using NetTunnel.EndPoint;
 using Newtonsoft.Json;
 using System.Text;
 
-namespace NetTunnel.ClientAPI.Management
+namespace NetTunnel.ClientAPI
 {
     public class NtSecurityClient
     {

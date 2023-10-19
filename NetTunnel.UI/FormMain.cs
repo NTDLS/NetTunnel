@@ -40,13 +40,16 @@ namespace NetTunnel.UI
                     {
                         _client = new NtClient(formLogin.Address, formLogin.Username, formLogin.Password);
 
-                        _client.Endpoint.List().ContinueWith(t =>
+                        _client.IncommingEndpoint.List().ContinueWith(t =>
                         {
-                            foreach (var endpoint in t.Result.Collection)
-                            {
-                                AddEndpointToGrid(endpoint);
-                            }
+                            t.Result.Collection.ForEach(t => AddIncommingEndpointToGrid(t));
                         });
+
+                        _client.OutgoingEndpoint.List().ContinueWith(t =>
+                        {
+                            t.Result.Collection.ForEach(t => AddOutgoingEndpointToGrid(t));
+                        });
+
                         return true;
                     }
                 }
@@ -59,18 +62,33 @@ namespace NetTunnel.UI
         }
 
 
-        void AddEndpointToGrid(NtEndpoint endpoint)
+        void AddIncommingEndpointToGrid(NtIncommingEndpoint endpoint)
         {
             if (listViewEndpoints.InvokeRequired)
             {
-                listViewEndpoints.Invoke(AddEndpointToGrid, endpoint);
+                listViewEndpoints.Invoke(AddIncommingEndpointToGrid, endpoint);
             }
             else
             {
-                // This code will execute on the UI thread.
-                ListViewItem item = new ListViewItem(endpoint.Name);
-                item.SubItems.Add(endpoint.Direction.ToString());
-                item.SubItems.Add($"{endpoint.Port}");
+                var item = new ListViewItem(endpoint.Name);
+                item.SubItems.Add("Incomming");
+                item.SubItems.Add($"<dynamic>");
+
+                listViewEndpoints.Items.Add(item);
+            }
+        }
+
+        void AddOutgoingEndpointToGrid(NtOutgoingEndpoint endpoint)
+        {
+            if (listViewEndpoints.InvokeRequired)
+            {
+                listViewEndpoints.Invoke(AddOutgoingEndpointToGrid, endpoint);
+            }
+            else
+            {
+                var item = new ListViewItem(endpoint.Name);
+                item.SubItems.Add("Outgoing");
+                item.SubItems.Add($"{endpoint.Address}{endpoint.Port}");
 
                 listViewEndpoints.Items.Add(item);
             }

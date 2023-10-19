@@ -7,14 +7,16 @@ namespace NetTunnel.EndPoint.Engine
     {
         public Logger Log { get; set; }
         public UserSessionManager Sessions { get; set; }
-        public EndpointManager Endpoints { get; set; }
+        public OutgoingEndpointManager OutgoingEndpoints { get; set; }
+        public IncommingEndpointManager IncommingEndpoints { get; set; }
         public UserManager Users { get; set; }
 
         public EngineCore(NtEndpointServiceConfiguration config)
         {
             Log = new(this);
             Sessions = new(this);
-            Endpoints = new(this);
+            OutgoingEndpoints = new(this);
+            IncommingEndpoints = new(this);
             Users = new(this);
 
             /*
@@ -22,7 +24,9 @@ namespace NetTunnel.EndPoint.Engine
             Users.Add("admin", Utility.CalculateSHA256("abcdefg"));
             Users.Add("root", Utility.CalculateSHA256("123456789"));
             Users.SaveToDisk();
+            */
 
+            /*
             //Add debugging endpoints:
             for (int i = 0; i < 10; i++)
             {

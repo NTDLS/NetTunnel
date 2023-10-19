@@ -4,29 +4,29 @@ using NTDLS.Semaphore;
 
 namespace NetTunnel.EndPoint.Engine.Managers
 {
-    public class EndpointManager
+    public class OutgoingEndpointManager
     {
         private readonly EngineCore _core;
 
-        private readonly CriticalResource<List<NtEndpoint>> _collection = new();
+        private readonly CriticalResource<List<NtOutgoingEndpoint>> _collection = new();
 
-        public EndpointManager(EngineCore core)
+        public OutgoingEndpointManager(EngineCore core)
         {
             _core = core;
 
             LoadFromDisk();
         }
 
-        public void Add(NtEndpoint endpoint)
+        public void Add(NtOutgoingEndpoint endpoint)
         {
             _collection.Use((o) => o.Add(endpoint.Clone()));
         }
 
-        public List<NtEndpoint> Clone()
+        public List<NtOutgoingEndpoint> Clone()
         {
             return _collection.Use((o) =>
             {
-                List<NtEndpoint> clones = new();
+                List<NtOutgoingEndpoint> clones = new();
                 foreach (var endpoint in o)
                 {
                     clones.Add(endpoint);
@@ -43,7 +43,7 @@ namespace NetTunnel.EndPoint.Engine.Managers
             {
                 if (o.Count != 0) throw new Exception("Can not load configuration on top of existing collection.");
 
-                Persistence.LoadFromDisk<List<NtEndpoint>>()?.ForEach(o => Add(o));
+                Persistence.LoadFromDisk<List<NtOutgoingEndpoint>>()?.ForEach(o => Add(o));
             });
 
         }

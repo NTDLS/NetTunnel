@@ -1,5 +1,4 @@
 ﻿using NetTunnel.ClientAPI.Exceptions;
-using NetTunnel.ClientAPI.Management;
 
 namespace NetTunnel.ClientAPI
 {
@@ -20,7 +19,8 @@ namespace NetTunnel.ClientAPI
         }
 
         public Guid SessionId { get; internal set; } = Guid.Empty;
-        public NtEndpointClient Endpoint { get; private set; }
+        public NtIncommingEndpointClient IncommingEndpoint { get; private set; }
+        public NtOutgoingEndpointClient OutgoingEndpoint { get; private set; }
         public NtSecurityClient Security { get; private set; }
 
         private HttpClient? _connection = null;
@@ -33,7 +33,8 @@ namespace NetTunnel.ClientAPI
         {
             BaseAddress = baseAddress;
 
-            Endpoint = new(this);
+            IncommingEndpoint = new(this);
+            OutgoingEndpoint = new(this);
             Security = new(this);
 
             Connect();
@@ -43,7 +44,8 @@ namespace NetTunnel.ClientAPI
         {
             BaseAddress = baseAddress;
 
-            Endpoint = new NtEndpointClient(this);
+            IncommingEndpoint = new(this);
+            OutgoingEndpoint = new(this);
             Security = new(this);
 
             Connect();
@@ -60,7 +62,8 @@ namespace NetTunnel.ClientAPI
             BaseAddress = baseAddress;
             Timeout = timeout;
 
-            Endpoint = new NtEndpointClient(this);
+            IncommingEndpoint = new(this);
+            OutgoingEndpoint = new(this);
             Security = new(this);
 
             Connect();
