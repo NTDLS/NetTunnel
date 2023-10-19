@@ -1,8 +1,8 @@
 ﻿using NetTunnel.ClientAPI;
-using NetTunnel.Engine.Managers;
+using NetTunnel.EndPoint.Engine.Managers;
 using NetTunnel.Library.Types;
 
-namespace NetTunnel.Engine
+namespace NetTunnel.EndPoint.Engine
 {
     public class EngineCore
     {

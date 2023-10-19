@@ -1,7 +1,6 @@
-﻿using NetTunnel.Engine;
-using NetTunnel.Library.Types;
+﻿using NetTunnel.Library.Types;
 
-namespace NetTunnel.EndPoint
+namespace NetTunnel.EndPoint.Engine
 {
     public static class Singletons
     {

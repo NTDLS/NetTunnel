@@ -1,6 +1,6 @@
 ﻿using NetTunnel.ClientAPI.Exceptions;
 using NetTunnel.ClientAPI.Payload;
-using NetTunnel.Engine;
+using NetTunnel.EndPoint;
 using Newtonsoft.Json;
 using System.Text;
 

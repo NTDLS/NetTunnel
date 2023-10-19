@@ -1,4 +1,4 @@
-﻿namespace NetTunnel.Engine
+﻿namespace NetTunnel.EndPoint
 {
     public class NtUser
     {

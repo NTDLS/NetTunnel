@@ -1,5 +1,5 @@
 ﻿using NetTunnel.ClientAPI;
-using NetTunnel.Engine;
+using NetTunnel.EndPoint;
 
 namespace NetTunnel.UI
 {

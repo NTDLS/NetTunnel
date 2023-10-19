@@ -1,7 +1,7 @@
 ﻿using NetTunnel.Library.Types;
 using NTDLS.Semaphore;
 
-namespace NetTunnel.Engine.Managers
+namespace NetTunnel.EndPoint.Engine.Managers
 {
     public class EndpointManager
     {

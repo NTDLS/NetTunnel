@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NetTunnel.ClientAPI;
 using NetTunnel.ClientAPI.Payload;
-using NetTunnel.Engine;
+using NetTunnel.EndPoint.Engine;
 using Newtonsoft.Json;
 
 namespace NetTunnel.EndPoint.Controllers

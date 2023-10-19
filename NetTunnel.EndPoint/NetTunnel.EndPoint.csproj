@@ -18,13 +18,18 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.12" />
+    <PackageReference Include="NTDLS.Semaphore" Version="1.5.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Topshelf" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NetTunnel.Engine\NetTunnel.Engine.csproj" />
+    <ProjectReference Include="..\NetTunnel.ClientAPI\NetTunnel.ClientAPI.csproj" />
     <ProjectReference Include="..\NetTunnel.Library\NetTunnel.Library.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Managers\" />
   </ItemGroup>
 
 </Project>
