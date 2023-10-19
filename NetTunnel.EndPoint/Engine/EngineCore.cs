@@ -1,5 +1,4 @@
-﻿using NetTunnel.ClientAPI;
-using NetTunnel.EndPoint.Engine.Managers;
+﻿using NetTunnel.EndPoint.Engine.Managers;
 using NetTunnel.Library.Types;
 
 namespace NetTunnel.EndPoint.Engine
@@ -18,29 +17,24 @@ namespace NetTunnel.EndPoint.Engine
             Endpoints = new(this);
             Users = new(this);
 
-#if DEBUG
+            /*
             //Add debugging users:
-            {
-                Users.Add("admin", Utility.CalculateSHA256("abcdefg"));
-                Users.Add("root", Utility.CalculateSHA256("123456789"));
-            }
+            Users.Add("admin", Utility.CalculateSHA256("abcdefg"));
+            Users.Add("root", Utility.CalculateSHA256("123456789"));
+            Users.SaveToDisk();
 
             //Add debugging endpoints:
+            for (int i = 0; i < 10; i++)
             {
-                Endpoints.Collection.Use((o) =>
+                Endpoints.Add(new NtEndpoint()
                 {
-                    for (int i = 0; i < 10; i++)
-                    {
-                        o.Add(new NtEndpoint()
-                        {
-                            Direction = Library.Constants.BindDirection.Incomming,
-                            Name = $"Test endpoint {i}",
-                            Port = 8080 + 1
-                        });
-                    }
+                    Direction = Library.Constants.BindDirection.Incomming,
+                    Name = $"Test endpoint {i}",
+                    Port = 8080 + 1
                 });
             }
-#endif
+            Endpoints.SaveToDisk();
+            */
         }
 
         public void Start()

@@ -1,4 +1,5 @@
-﻿using NTDLS.Semaphore;
+﻿using NetTunnel.Library;
+using NTDLS.Semaphore;
 
 namespace NetTunnel.EndPoint.Engine.Managers
 {
@@ -11,6 +12,8 @@ namespace NetTunnel.EndPoint.Engine.Managers
         public UserManager(EngineCore core)
         {
             _core = core;
+
+            LoadFromDisk();
         }
 
         public void Add(string username, string passwordHash) => Add(new NtUser(username, passwordHash));
@@ -33,9 +36,21 @@ namespace NetTunnel.EndPoint.Engine.Managers
                 List<NtUser> clones = new();
                 foreach (var user in o)
                 {
-                    clones.Add(user.Clone());
+                    clones.Add(user);
                 }
                 return clones;
+            });
+        }
+
+        public void SaveToDisk() => Persistence.SaveToDisk(Clone());
+
+        private void LoadFromDisk()
+        {
+            _collection.Use((o) =>
+            {
+                if (o.Count != 0) throw new Exception("Can not load configuration on top of existing collection.");
+
+                Persistence.LoadFromDisk<List<NtUser>>()?.ForEach(o => Add(o));
             });
         }
     }

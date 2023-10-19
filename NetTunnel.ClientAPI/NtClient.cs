@@ -115,7 +115,7 @@ namespace NetTunnel.ClientAPI
                 {
                     if (IsConnected && SessionId != Guid.Empty)
                     {
-                        Endpoint.Logout();
+                        Security.Logout();
                     }
                 }
                 catch

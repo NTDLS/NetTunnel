@@ -4,8 +4,9 @@ namespace NetTunnel.Library.Types
 {
     public class NtEndpoint
     {
+        public EndpointDirection Direction { get; set; }
         public string Name { get; set; } = string.Empty;
-        public BindDirection Direction { get; set; }
+        public int Address { get; set; }
         public int Port { get; set; }
 
         public NtEndpoint Clone()
@@ -14,6 +15,7 @@ namespace NetTunnel.Library.Types
             {
                 Direction = Direction,
                 Name = Name,
+                Address = Address,
                 Port = Port
             };
         }

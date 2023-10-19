@@ -47,6 +47,7 @@ namespace NetTunnel.EndPoint.Controllers
                 Utility.EnsureNotNull(content);
 
                 Singletons.Core.Users.Add(content);
+                Singletons.Core.Users.SaveToDisk();
 
                 return new NtActionResponse
                 {
