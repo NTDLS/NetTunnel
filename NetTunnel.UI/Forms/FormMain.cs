@@ -1,7 +1,7 @@
 using NetTunnel.ClientAPI;
 using NetTunnel.Library.Types;
 
-namespace NetTunnel.UI
+namespace NetTunnel.UI.Forms
 {
     public partial class FormMain : Form
     {
@@ -28,6 +28,50 @@ namespace NetTunnel.UI
             {
                 if (!ChangeConnection()) Close();
             };
+
+            listViewEndpoints.MouseUp += ListViewEndpoints_MouseUp;
+
+        }
+
+        private void ListViewEndpoints_MouseUp(object? sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                var itemUnderMouse = listViewEndpoints.GetItemAt(e.X, e.Y);
+                if (itemUnderMouse != null)
+                {
+                    itemUnderMouse.Selected = true;
+                }
+
+                var menu = new ContextMenuStrip();
+
+                menu.Items.Add("Add Endpoint");
+
+                if (itemUnderMouse != null)
+                {
+                    menu.Items.Add(new ToolStripSeparator());
+                    menu.Items.Add("Delete Endpoint");
+                }
+
+                menu.Show(listViewEndpoints, new Point(e.X, e.Y));
+
+                menu.ItemClicked += (object? sender, ToolStripItemClickedEventArgs e) =>
+                {
+                    if (e.ClickedItem?.Text == "Add Endpoint")
+                    {
+                        Utility.EnsureNotNull(_client);
+
+                        using (var formAddEndpoint = new FormAddEndpoint(_client))
+                        {
+                            formAddEndpoint.ShowDialog();
+                        }
+                    }
+                    else if (e.ClickedItem?.Text == "Delete Endpoint")
+                    {
+                        MessageBox.Show("Not implemented");
+                    }
+                };
+            }
         }
 
         private bool ChangeConnection()
@@ -109,9 +153,9 @@ namespace NetTunnel.UI
         private void usersToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Utility.EnsureNotNull(_client);
-            using (var FormUsers = new FormUsers(_client))
+            using (var formUsers = new FormUsers(_client))
             {
-                FormUsers.ShowDialog();
+                formUsers.ShowDialog();
             }
         }
 

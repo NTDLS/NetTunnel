@@ -1,4 +1,4 @@
-﻿namespace NetTunnel.UI
+﻿namespace NetTunnel.UI.Forms
 {
     partial class FormAddEndpoint
     {
@@ -116,6 +116,7 @@
             buttonAdd.TabIndex = 5;
             buttonAdd.Text = "Add";
             buttonAdd.UseVisualStyleBackColor = true;
+            buttonAdd.Click += buttonAdd_Click;
             // 
             // buttonCancel
             // 
@@ -125,6 +126,7 @@
             buttonCancel.TabIndex = 6;
             buttonCancel.Text = "Cancel";
             buttonCancel.UseVisualStyleBackColor = true;
+            buttonCancel.Click += buttonCancel_Click;
             // 
             // textBoxName
             // 
@@ -167,6 +169,7 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
             Text = "NetTunnel : Endpoint";
+            Load += FormAddEndpoint_Load;
             ResumeLayout(false);
             PerformLayout();
         }

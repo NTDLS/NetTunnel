@@ -1,3 +1,5 @@
+using NetTunnel.UI.Forms;
+
 namespace NetTunnel.UI
 {
     internal static class Program

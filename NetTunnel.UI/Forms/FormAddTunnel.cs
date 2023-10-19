@@ -1,8 +1,8 @@
-﻿namespace NetTunnel.UI
+﻿namespace NetTunnel.UI.Forms
 {
-    public partial class FormAddEndpoint : Form
+    public partial class FormAddTunnel : Form
     {
-        public FormAddEndpoint()
+        public FormAddTunnel()
         {
             InitializeComponent();
 

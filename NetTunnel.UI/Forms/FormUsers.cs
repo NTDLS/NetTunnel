@@ -1,7 +1,7 @@
 ﻿using NetTunnel.ClientAPI;
 using NetTunnel.EndPoint;
 
-namespace NetTunnel.UI
+namespace NetTunnel.UI.Forms
 {
     public partial class FormUsers : Form
     {

@@ -1,4 +1,4 @@
-﻿namespace NetTunnel.UI
+﻿namespace NetTunnel.UI.Forms
 {
     partial class FormMain
     {

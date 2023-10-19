@@ -3,7 +3,7 @@
     public class NtOutgoingEndpoint
     {
         public string Name { get; set; } = string.Empty;
-        public int Address { get; set; }
+        public string Address { get; set; } = string.Empty;
         public int Port { get; set; }
 
         public NtOutgoingEndpoint Clone()

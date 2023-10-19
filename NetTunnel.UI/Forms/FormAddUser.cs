@@ -1,9 +1,10 @@
 ﻿using NetTunnel.ClientAPI;
 using NetTunnel.EndPoint;
+using NetTunnel.UI.Forms;
 
-namespace NetTunnel.UI
+namespace NetTunnel.UI.Forms
 {
-    public partial class FormAddUser : Form
+    public partial class FormAddUser : BaseForm
     {
         private readonly NtClient? _client;
         public NtUser? CreatedUser { get; set; }
@@ -38,31 +39,22 @@ namespace NetTunnel.UI
 
                 CreatedUser = new NtUser(textBoxUsername.Text, Utility.CalculateSHA256(textBoxUsername.Text));
 
-                buttonSave.Enabled = false;
+                EnableControl(buttonSave, false);
 
                 _client.Security.CreateUser(CreatedUser).ContinueWith(t =>
                 {
-                    if (!t.IsCompletedSuccessfully) throw new Exception("Failed to create new user.");
+                    if (!t.IsCompletedSuccessfully)
+                    {
+                        EnableControl(buttonSave, true);
+                        throw new Exception("Failed to create new user.");
+                    }
 
-                    CloseFormWitResult(DialogResult.OK);
+                    CloseFormWithResult(DialogResult.OK);
                 });
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK);
-            }
-        }
-
-        void CloseFormWitResult(DialogResult result)
-        {
-            if (InvokeRequired)
-            {
-                Invoke(CloseFormWitResult, result);
-            }
-            else
-            {
-                DialogResult = DialogResult.OK;
-                Close();
             }
         }
 

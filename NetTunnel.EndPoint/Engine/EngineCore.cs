@@ -21,7 +21,7 @@ namespace NetTunnel.EndPoint.Engine
 
             /*
             //Add debugging users:
-            Users.Add("admin", Utility.CalculateSHA256("abcdefg"));
+            Users.Add("admin", Utility.CalculateSHA256("abcdefgh"));
             Users.Add("root", Utility.CalculateSHA256("123456789"));
             Users.SaveToDisk();
             */

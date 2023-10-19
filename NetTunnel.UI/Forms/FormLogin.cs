@@ -1,6 +1,6 @@
 ﻿using NetTunnel.ClientAPI;
 
-namespace NetTunnel.UI
+namespace NetTunnel.UI.Forms
 {
     public partial class FormLogin : Form
     {
@@ -19,7 +19,7 @@ namespace NetTunnel.UI
             textBoxPort.Text = "52845";
 
             textBoxUsername.Text = "admin";
-            textBoxPassword.Text = "abcdefg";
+            textBoxPassword.Text = "abcdefgh";
         }
 
         private void buttonLogin_Click(object sender, EventArgs e)
