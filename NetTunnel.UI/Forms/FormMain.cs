@@ -63,7 +63,10 @@ namespace NetTunnel.UI.Forms
 
                         using (var formAddEndpoint = new FormAddEndpoint(_client))
                         {
-                            formAddEndpoint.ShowDialog();
+                            if (formAddEndpoint.ShowDialog() == DialogResult.OK)
+                            {
+                                RepopulateEndpointsGrid();
+                            }
                         }
                     }
                     else if (e.ClickedItem?.Text == "Delete Endpoint")
@@ -83,17 +86,7 @@ namespace NetTunnel.UI.Forms
                     if (formLogin.ShowDialog() == DialogResult.OK)
                     {
                         _client = new NtClient(formLogin.Address, formLogin.Username, formLogin.Password);
-
-                        _client.IncommingEndpoint.List().ContinueWith(t =>
-                        {
-                            t.Result.Collection.ForEach(t => AddIncommingEndpointToGrid(t));
-                        });
-
-                        _client.OutgoingEndpoint.List().ContinueWith(t =>
-                        {
-                            t.Result.Collection.ForEach(t => AddOutgoingEndpointToGrid(t));
-                        });
-
+                        RepopulateEndpointsGrid();
                         return true;
                     }
                 }
@@ -105,36 +98,53 @@ namespace NetTunnel.UI.Forms
             return false;
         }
 
-
-        void AddIncommingEndpointToGrid(NtIncommingEndpoint endpoint)
+        private void RepopulateEndpointsGrid()
         {
-            if (listViewEndpoints.InvokeRequired)
-            {
-                listViewEndpoints.Invoke(AddIncommingEndpointToGrid, endpoint);
-            }
-            else
-            {
-                var item = new ListViewItem(endpoint.Name);
-                item.SubItems.Add("Incomming");
-                item.SubItems.Add($"<dynamic>");
+            Utility.EnsureNotNull(_client);
 
-                listViewEndpoints.Items.Add(item);
-            }
-        }
+            listViewEndpoints.Items.Clear();
 
-        void AddOutgoingEndpointToGrid(NtOutgoingEndpoint endpoint)
-        {
-            if (listViewEndpoints.InvokeRequired)
+            _client.IncommingEndpoint.List().ContinueWith(t =>
             {
-                listViewEndpoints.Invoke(AddOutgoingEndpointToGrid, endpoint);
-            }
-            else
-            {
-                var item = new ListViewItem(endpoint.Name);
-                item.SubItems.Add("Outgoing");
-                item.SubItems.Add($"{endpoint.Address}{endpoint.Port}");
+                t.Result.Collection.ForEach(t => AddIncommingEndpointToGrid(t));
+            });
 
-                listViewEndpoints.Items.Add(item);
+            _client.OutgoingEndpoint.List().ContinueWith(t =>
+            {
+                t.Result.Collection.ForEach(t => AddOutgoingEndpointToGrid(t));
+            });
+
+            void AddIncommingEndpointToGrid(NtIncommingEndpoint endpoint)
+            {
+                if (listViewEndpoints.InvokeRequired)
+                {
+                    listViewEndpoints.Invoke(AddIncommingEndpointToGrid, endpoint);
+                }
+                else
+                {
+                    var item = new ListViewItem(endpoint.Name);
+                    item.SubItems.Add("Incomming");
+                    item.SubItems.Add($"<dynamic>");
+
+                    listViewEndpoints.Items.Add(item);
+                }
+            }
+
+            void AddOutgoingEndpointToGrid(NtOutgoingEndpoint endpoint)
+            {
+                if (listViewEndpoints.InvokeRequired)
+                {
+                    listViewEndpoints.Invoke(AddOutgoingEndpointToGrid, endpoint);
+                }
+                else
+                {
+                    var item = new ListViewItem(endpoint.Name);
+                    item.SubItems.Add("Outgoing");
+                    item.SubItems.Add($"{endpoint.Address}{endpoint.Port}");
+
+                    listViewEndpoints.Items.Add(item);
+
+                }
             }
         }
 

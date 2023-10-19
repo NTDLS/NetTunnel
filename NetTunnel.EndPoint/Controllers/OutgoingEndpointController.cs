@@ -36,6 +36,25 @@ namespace NetTunnel.EndPoint.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("{sessionId}/Delete/{endpointId}")]
+        public NtActionResponse Delete(Guid sessionId, Guid endpointId)
+        {
+            try
+            {
+                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+
+                Singletons.Core.OutgoingEndpoints.Delete(endpointId);
+                Singletons.Core.OutgoingEndpoints.SaveToDisk();
+
+                return new NtActionResponse { Success = true };
+            }
+            catch (Exception ex)
+            {
+                return new NtActionResponseIncommingEndpoints(ex);
+            }
+        }
+
         /// <summary>
         /// This is called locally to add a local listening endpoint. This is the endpoint that may be behind a firewall.
         /// </summary>
@@ -56,10 +75,7 @@ namespace NetTunnel.EndPoint.Controllers
                 Singletons.Core.OutgoingEndpoints.Add(endpoint);
                 Singletons.Core.OutgoingEndpoints.SaveToDisk();
 
-                return new NtActionResponse
-                {
-                    Success = true
-                };
+                return new NtActionResponse { Success = true };
             }
             catch (Exception ex)
             {

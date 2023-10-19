@@ -1,6 +1,5 @@
 ﻿using NetTunnel.ClientAPI;
 using NetTunnel.Library.Types;
-using NetTunnel.UI.Forms;
 
 namespace NetTunnel.UI.Forms
 {
@@ -41,7 +40,6 @@ namespace NetTunnel.UI.Forms
 
             try
             {
-
                 if (textBoxName.Text.Length == 0)
                     throw new Exception("You must specify a name This is for your identification only.");
                 if (textBoxRemoteAddress.Text.Length == 0)
@@ -55,24 +53,17 @@ namespace NetTunnel.UI.Forms
 
                 EnableControl(buttonAdd, false);
 
-                var outgoingEndpoint = new NtOutgoingEndpoint()
-                {
-                    Name = textBoxName.Text,
-                    Address = textBoxRemoteAddress.Text,
-                    Port = int.Parse(textBoxRemotePort.Text),
-                };
+                var outgoingEndpoint = new NtOutgoingEndpoint(textBoxName.Text,
+                    textBoxRemoteAddress.Text, int.Parse(textBoxRemotePort.Text),
+                    textBoxRemoteUsername.Text, Utility.CalculateSHA256(textBoxRemotePassword.Text));
 
-                var incommingEndpoint = new NtIncommingEndpoint()
-                {
-                    Name = textBoxName.Text,
-                    Username = textBoxRemoteUsername.Text,
-                    PasswordHash = Utility.CalculateSHA256(textBoxRemotePassword.Text),
-                };
+                var incommingEndpoint = new NtIncommingEndpoint(textBoxName.Text);
 
                 NtClient remoteClient;
 
                 try
                 {
+                    //Connect to the remote endpoint.
                     remoteClient = new NtClient($"https://{outgoingEndpoint.Address}:{outgoingEndpoint.Port}/");
                 }
                 catch (Exception ex)
@@ -83,7 +74,8 @@ namespace NetTunnel.UI.Forms
 
                 try
                 {
-                    remoteClient.Security.Login(incommingEndpoint.Username, incommingEndpoint.PasswordHash);
+                    //Log into the remote endpoint.
+                    remoteClient.Security.Login(outgoingEndpoint.Username, outgoingEndpoint.PasswordHash);
                 }
                 catch (Exception ex)
                 {
@@ -91,6 +83,7 @@ namespace NetTunnel.UI.Forms
                     throw new Exception($"Failed to login to the remote endpoint: {ex.Message}.");
                 }
 
+                //Add the outgoing endpoint config to the local endpoint instance.
                 _client.OutgoingEndpoint.Add(outgoingEndpoint).ContinueWith(t =>
                 {
                     if (!t.IsCompletedSuccessfully)
@@ -99,12 +92,17 @@ namespace NetTunnel.UI.Forms
                         throw new Exception("Failed to create local outgoing endpoint.");
                     }
 
+                    //Add the incomming endpoint config to the remote endpoint instance.
                     remoteClient.IncommingEndpoint.Add(incommingEndpoint).ContinueWith(t =>
                     {
                         if (!t.IsCompletedSuccessfully)
                         {
-                            EnableControl(buttonAdd, false);
-                            throw new Exception("Failed to create remote incomming endpoint.");
+                            //If we failed to create the remote endpoint config, remove the local config.
+                            _client.OutgoingEndpoint.Delete(outgoingEndpoint.Id).ContinueWith(t =>
+                            {
+                                EnableControl(buttonAdd, false);
+                                throw new Exception("Failed to create remote incomming endpoint.");
+                            });
                         }
 
                         CloseFormWithResult(DialogResult.OK);

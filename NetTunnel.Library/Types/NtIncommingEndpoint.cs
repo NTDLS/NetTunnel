@@ -2,17 +2,19 @@
 {
     public class NtIncommingEndpoint
     {
-        public string Name { get; set; } = string.Empty;
-        public string Username { get; set; } = string.Empty;
-        public string PasswordHash { get; set; } = string.Empty;
+        public Guid Id { get; private set; } = Guid.NewGuid();
+        public string Name { get; set; }
+
+        public NtIncommingEndpoint(string name)
+        {
+            Name = name;
+        }
 
         public NtIncommingEndpoint Clone()
         {
-            return new NtIncommingEndpoint
+            return new NtIncommingEndpoint(Name)
             {
-                Name = Name,
-                Username = Username,
-                PasswordHash = PasswordHash
+                Id = Id
             };
         }
     }

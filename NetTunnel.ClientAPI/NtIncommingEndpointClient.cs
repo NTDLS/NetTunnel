@@ -44,5 +44,18 @@ namespace NetTunnel.ClientAPI
                 throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
             }
         }
+
+        public async Task Delete(Guid endpointId)
+        {
+            string url = $"api/IncommingEndpoint/{_client.SessionId}/Delete/{endpointId}";
+
+            using var response = await _client.Connection.GetAsync(url);
+            string resultText = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<NtActionResponseOutgoingEndpoints>(resultText);
+            if (result == null || result.Success == false)
+            {
+                throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
+            }
+        }
     }
 }

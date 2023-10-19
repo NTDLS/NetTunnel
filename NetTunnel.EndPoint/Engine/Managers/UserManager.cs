@@ -1,4 +1,5 @@
-﻿using NetTunnel.Library;
+﻿using NetTunnel.ClientAPI;
+using NetTunnel.Library;
 using NTDLS.Semaphore;
 
 namespace NetTunnel.EndPoint.Engine.Managers
@@ -51,6 +52,16 @@ namespace NetTunnel.EndPoint.Engine.Managers
                 if (o.Count != 0) throw new Exception("Can not load configuration on top of existing collection.");
 
                 Persistence.LoadFromDisk<List<NtUser>>()?.ForEach(o => Add(o));
+
+#if DEBUG
+                if (o.Count == 0)//Add debugging users:
+                {
+                    Add("admin", Utility.CalculateSHA256("abcdefgh"));
+                    Add("root", Utility.CalculateSHA256("12345678"));
+                    SaveToDisk();
+                }
+#endif
+
             });
         }
     }

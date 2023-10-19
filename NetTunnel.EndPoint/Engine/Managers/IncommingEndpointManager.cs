@@ -17,10 +17,8 @@ namespace NetTunnel.EndPoint.Engine.Managers
             LoadFromDisk();
         }
 
-        public void Add(NtIncommingEndpoint endpoint)
-        {
-            _collection.Use((o) => o.Add(endpoint.Clone()));
-        }
+        public void Add(NtIncommingEndpoint endpoint) => _collection.Use((o) => o.Add(endpoint.Clone()));
+        public void Delete(Guid endpointId) => _collection.Use((o) => o.RemoveAll(o => o.Id == endpointId));
 
         public List<NtIncommingEndpoint> Clone()
         {
