@@ -19,7 +19,7 @@ namespace NetTunnel.ClientAPI
         }
 
         public Guid SessionId { get; internal set; } = Guid.Empty;
-        public NtIncommingEndpointClient IncommingEndpoint { get; private set; }
+        public NtIncomingEndpointClient IncomingEndpoint { get; private set; }
         public NtOutgoingEndpointClient OutgoingEndpoint { get; private set; }
         public NtSecurityClient Security { get; private set; }
 
@@ -33,7 +33,7 @@ namespace NetTunnel.ClientAPI
         {
             BaseAddress = baseAddress;
 
-            IncommingEndpoint = new(this);
+            IncomingEndpoint = new(this);
             OutgoingEndpoint = new(this);
             Security = new(this);
 
@@ -44,7 +44,7 @@ namespace NetTunnel.ClientAPI
         {
             BaseAddress = baseAddress;
 
-            IncommingEndpoint = new(this);
+            IncomingEndpoint = new(this);
             OutgoingEndpoint = new(this);
             Security = new(this);
 
@@ -62,7 +62,7 @@ namespace NetTunnel.ClientAPI
             BaseAddress = baseAddress;
             Timeout = timeout;
 
-            IncommingEndpoint = new(this);
+            IncomingEndpoint = new(this);
             OutgoingEndpoint = new(this);
             Security = new(this);
 

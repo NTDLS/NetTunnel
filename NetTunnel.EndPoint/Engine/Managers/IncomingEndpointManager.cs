@@ -4,13 +4,13 @@ using NTDLS.Semaphore;
 
 namespace NetTunnel.EndPoint.Engine.Managers
 {
-    public class IncommingEndpointManager
+    public class IncomingEndpointManager
     {
         private readonly EngineCore _core;
 
-        private readonly CriticalResource<List<IncommingEndpoint>> _collection = new();
+        private readonly CriticalResource<List<IncomingEndpoint>> _collection = new();
 
-        public IncommingEndpointManager(EngineCore core)
+        public IncomingEndpointManager(EngineCore core)
         {
             _core = core;
 
@@ -21,11 +21,11 @@ namespace NetTunnel.EndPoint.Engine.Managers
 
         public void StopAll() => _collection.Use((o) => o.ForEach((o) => o.Stop()));
 
-        public void Add(NtIncommingEndpointConfig config)
+        public void Add(NtIncomingEndpointConfig config)
         {
             _collection.Use((o) =>
             {
-                var endpoint = new IncommingEndpoint(config);
+                var endpoint = new IncomingEndpoint(_core, config);
                 o.Add(endpoint);
                 //endpoint.Start(); //We do not want to start the endpoints at construction, but rather by the engine Start() function.
             });
@@ -41,11 +41,11 @@ namespace NetTunnel.EndPoint.Engine.Managers
             });
         }
 
-        public List<NtIncommingEndpointConfig> CloneConfigurations()
+        public List<NtIncomingEndpointConfig> CloneConfigurations()
         {
             return _collection.Use((o) =>
             {
-                List<NtIncommingEndpointConfig> clones = new();
+                List<NtIncomingEndpointConfig> clones = new();
                 foreach (var endpoint in o)
                 {
                     clones.Add(endpoint.CloneConfiguration());
@@ -61,7 +61,7 @@ namespace NetTunnel.EndPoint.Engine.Managers
             _collection.Use((o) =>
             {
                 if (o.Count != 0) throw new Exception("Can not load configuration on top of existing collection.");
-                Persistence.LoadFromDisk<List<NtIncommingEndpointConfig>>()?.ForEach(o => Add(o));
+                Persistence.LoadFromDisk<List<NtIncomingEndpointConfig>>()?.ForEach(o => Add(o));
             });
         }
     }

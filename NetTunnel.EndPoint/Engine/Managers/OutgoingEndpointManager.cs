@@ -25,7 +25,7 @@ namespace NetTunnel.EndPoint.Engine.Managers
         {
             _collection.Use((o) =>
             {
-                var endpoint = new OutgoingEndpoint(config);
+                var endpoint = new OutgoingEndpoint(_core, config);
                 o.Add(endpoint);
                 //endpoint.Start(); //We do not want to start the endpoints at construction, but rather by the engine Start() function.
             });

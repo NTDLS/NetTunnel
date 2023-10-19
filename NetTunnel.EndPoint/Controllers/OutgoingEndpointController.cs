@@ -51,7 +51,7 @@ namespace NetTunnel.EndPoint.Controllers
             }
             catch (Exception ex)
             {
-                return new NtActionResponseIncommingEndpoints(ex);
+                return new NtActionResponseIncomingEndpoints(ex);
             }
         }
 

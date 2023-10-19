@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library.Types;
+using System.Net.Sockets;
 
 namespace NetTunnel.EndPoint.Engine
 {
@@ -7,11 +8,16 @@ namespace NetTunnel.EndPoint.Engine
     /// </summary>
     public class OutgoingEndpoint
     {
-        public NtOutgoingEndpointConfig _configuration;
+        private readonly EngineCore _core;
+        private NtOutgoingEndpointConfig _configuration;
+        private Thread? _outgoingConnectionThread;
+        private bool _keepRunning = false;
+
         public Guid Id { get => _configuration.Id; }
 
-        public OutgoingEndpoint(NtOutgoingEndpointConfig config)
+        public OutgoingEndpoint(EngineCore core, NtOutgoingEndpointConfig config)
         {
+            _core = core;
             _configuration = config;
         }
 
@@ -19,10 +25,64 @@ namespace NetTunnel.EndPoint.Engine
 
         public void Start()
         {
+            _keepRunning = true;
+
+            _core.Logging.Write($"Starting outgoing endpoint '{_configuration.Name}'");
+
+            _outgoingConnectionThread = new Thread(OutgoingConnectionThreadProc);
+            _outgoingConnectionThread.Start();
         }
 
         public void Stop()
         {
         }
+
+        void OutgoingConnectionThreadProc()
+        {
+            while (_keepRunning)
+            {
+                try
+                {
+                    _core.Logging.Write($"Attempting to connect to outgoing endpoint '{_configuration.Name}' at {_configuration.Address}:{_configuration.Port}.");
+
+                    var client = new TcpClient(_configuration.Address, _configuration.Port);
+
+                    _core.Logging.Write($"Connection successful for endpoint '{_configuration.Name}' at {_configuration.Address}:{_configuration.Port}.");
+
+                    HandleClient(client);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
+            }
+
+        }
+
+        void HandleClient(TcpClient client)
+        {
+            while (_keepRunning)
+            {
+                /*
+                using (NetworkStream stream = client.GetStream())
+                {
+                    // Send data to the server.
+                    string message = "Hello, server!";
+                    byte[] data = Encoding.UTF8.GetBytes(message);
+                    stream.Write(data, 0, data.Length);
+
+                    // Receive data from the server.
+                    byte[] receiveBuffer = new byte[1024];
+                    int bytesRead = stream.Read(receiveBuffer, 0, receiveBuffer.Length);
+                    string receivedMessage = Encoding.UTF8.GetString(receiveBuffer, 0, bytesRead);
+                    Console.WriteLine($"Received: {receivedMessage}");
+                }
+                */
+                Thread.Sleep(10);
+            }
+
+            client.Close();
+        }
+
     }
 }

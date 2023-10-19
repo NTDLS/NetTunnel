@@ -9,30 +9,30 @@ namespace NetTunnel.EndPoint.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class IncommingEndpointController : ControllerBase
+    public class IncomingEndpointController : ControllerBase
     {
-        public IncommingEndpointController(IHttpContextAccessor httpContextAccessor)
+        public IncomingEndpointController(IHttpContextAccessor httpContextAccessor)
             : base(httpContextAccessor)
         {
         }
 
         [HttpGet]
         [Route("{sessionId}/List")]
-        public NtActionResponseIncommingEndpoints List(Guid sessionId)
+        public NtActionResponseIncomingEndpoints List(Guid sessionId)
         {
             try
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                return new NtActionResponseIncommingEndpoints
+                return new NtActionResponseIncomingEndpoints
                 {
-                    Collection = Singletons.Core.IncommingEndpoints.CloneConfigurations(),
+                    Collection = Singletons.Core.IncomingEndpoints.CloneConfigurations(),
                     Success = true
                 };
             }
             catch (Exception ex)
             {
-                return new NtActionResponseIncommingEndpoints(ex);
+                return new NtActionResponseIncomingEndpoints(ex);
             }
         }
 
@@ -44,14 +44,14 @@ namespace NetTunnel.EndPoint.Controllers
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                Singletons.Core.IncommingEndpoints.Delete(endpointId);
-                Singletons.Core.IncommingEndpoints.SaveToDisk();
+                Singletons.Core.IncomingEndpoints.Delete(endpointId);
+                Singletons.Core.IncomingEndpoints.SaveToDisk();
 
                 return new NtActionResponse { Success = true };
             }
             catch (Exception ex)
             {
-                return new NtActionResponseIncommingEndpoints(ex);
+                return new NtActionResponseIncomingEndpoints(ex);
             }
         }
 
@@ -69,11 +69,11 @@ namespace NetTunnel.EndPoint.Controllers
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                var endpoint = JsonConvert.DeserializeObject<NtIncommingEndpointConfig>(value);
+                var endpoint = JsonConvert.DeserializeObject<NtIncomingEndpointConfig>(value);
                 Utility.EnsureNotNull(endpoint);
 
-                Singletons.Core.IncommingEndpoints.Add(endpoint);
-                Singletons.Core.IncommingEndpoints.SaveToDisk();
+                Singletons.Core.IncomingEndpoints.Add(endpoint);
+                Singletons.Core.IncomingEndpoints.SaveToDisk();
 
                 return new NtActionResponse { Success = true };
             }

@@ -104,9 +104,9 @@ namespace NetTunnel.UI.Forms
 
             listViewEndpoints.Items.Clear();
 
-            _client.IncommingEndpoint.List().ContinueWith(t =>
+            _client.IncomingEndpoint.List().ContinueWith(t =>
             {
-                t.Result.Collection.ForEach(t => AddIncommingEndpointToGrid(t));
+                t.Result.Collection.ForEach(t => AddIncomingEndpointToGrid(t));
             });
 
             _client.OutgoingEndpoint.List().ContinueWith(t =>
@@ -114,16 +114,16 @@ namespace NetTunnel.UI.Forms
                 t.Result.Collection.ForEach(t => AddOutgoingEndpointToGrid(t));
             });
 
-            void AddIncommingEndpointToGrid(NtIncommingEndpointConfig endpoint)
+            void AddIncomingEndpointToGrid(NtIncomingEndpointConfig endpoint)
             {
                 if (listViewEndpoints.InvokeRequired)
                 {
-                    listViewEndpoints.Invoke(AddIncommingEndpointToGrid, endpoint);
+                    listViewEndpoints.Invoke(AddIncomingEndpointToGrid, endpoint);
                 }
                 else
                 {
                     var item = new ListViewItem(endpoint.Name);
-                    item.SubItems.Add("Incomming");
+                    item.SubItems.Add("Incoming");
                     item.SubItems.Add($"<dynamic>");
 
                     listViewEndpoints.Items.Add(item);

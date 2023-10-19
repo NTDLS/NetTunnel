@@ -85,13 +85,13 @@ namespace NetTunnel.EndPoint
                 //System.Diagnostics.Process.Start("explorer", $"{Configuration.BaseAddress}swagger/index.html");
             }
 
-            Singletons.Core.Log.Write($"Listening on {Singletons.Configuration.ManagementPort}.");
+            Singletons.Core.Logging.Write($"Listening on {Singletons.Configuration.ManagementPort}.");
 
             while (true)
             {
                 if (_semaphoreToRequestStop.Wait(500))
                 {
-                    Singletons.Core.Log.Write($"Stopping...");
+                    Singletons.Core.Logging.Write($"Stopping...");
                     app.StopAsync();
                     Singletons.Core.Stop();
                     break;
