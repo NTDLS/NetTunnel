@@ -53,11 +53,11 @@ namespace NetTunnel.UI.Forms
 
                 EnableControl(buttonAdd, false);
 
-                var outgoingEndpoint = new NtOutgoingEndpoint(textBoxName.Text,
+                var outgoingEndpoint = new NtOutgoingEndpointConfig(textBoxName.Text,
                     textBoxRemoteAddress.Text, int.Parse(textBoxRemotePort.Text),
                     textBoxRemoteUsername.Text, Utility.CalculateSHA256(textBoxRemotePassword.Text));
 
-                var incommingEndpoint = new NtIncommingEndpoint(textBoxName.Text);
+                var incommingEndpoint = new NtIncommingEndpointConfig(textBoxName.Text);
 
                 NtClient remoteClient;
 

@@ -22,10 +22,14 @@ namespace NetTunnel.EndPoint.Engine
 
         public void Start()
         {
+            IncommingEndpoints.StartAll();
+            OutgoingEndpoints.StartAll();
         }
 
         public void Stop()
         {
+            IncommingEndpoints.StopAll();
+            OutgoingEndpoints.StopAll();
         }
     }
 }

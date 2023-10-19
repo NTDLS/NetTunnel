@@ -1,6 +1,6 @@
 ﻿namespace NetTunnel.Library.Types
 {
-    public class NtOutgoingEndpoint
+    public class NtOutgoingEndpointConfig
     {
         public Guid Id { get; private set; } = Guid.NewGuid();
         public string Name { get; set; }
@@ -9,7 +9,7 @@
         public string Username { get; set; }
         public string PasswordHash { get; set; }
 
-        public NtOutgoingEndpoint(string name, string address, int port, string username, string passwordHash)
+        public NtOutgoingEndpointConfig(string name, string address, int port, string username, string passwordHash)
         {
             Name = name;
             Address = address;
@@ -18,9 +18,9 @@
             PasswordHash = passwordHash;
         }
 
-        public NtOutgoingEndpoint Clone()
+        public NtOutgoingEndpointConfig Clone()
         {
-            return new NtOutgoingEndpoint(Name, Address, Port, Username, PasswordHash)
+            return new NtOutgoingEndpointConfig(Name, Address, Port, Username, PasswordHash)
             {
                 Id = Id
             };

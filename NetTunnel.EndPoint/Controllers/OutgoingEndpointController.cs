@@ -26,7 +26,7 @@ namespace NetTunnel.EndPoint.Controllers
 
                 return new NtActionResponseOutgoingEndpoints
                 {
-                    Collection = Singletons.Core.OutgoingEndpoints.Clone(),
+                    Collection = Singletons.Core.OutgoingEndpoints.CloneConfigurations(),
                     Success = true
                 };
             }
@@ -69,7 +69,7 @@ namespace NetTunnel.EndPoint.Controllers
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                var endpoint = JsonConvert.DeserializeObject<NtOutgoingEndpoint>(value);
+                var endpoint = JsonConvert.DeserializeObject<NtOutgoingEndpointConfig>(value);
                 Utility.EnsureNotNull(endpoint);
 
                 Singletons.Core.OutgoingEndpoints.Add(endpoint);

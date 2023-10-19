@@ -114,7 +114,7 @@ namespace NetTunnel.UI.Forms
                 t.Result.Collection.ForEach(t => AddOutgoingEndpointToGrid(t));
             });
 
-            void AddIncommingEndpointToGrid(NtIncommingEndpoint endpoint)
+            void AddIncommingEndpointToGrid(NtIncommingEndpointConfig endpoint)
             {
                 if (listViewEndpoints.InvokeRequired)
                 {
@@ -130,7 +130,7 @@ namespace NetTunnel.UI.Forms
                 }
             }
 
-            void AddOutgoingEndpointToGrid(NtOutgoingEndpoint endpoint)
+            void AddOutgoingEndpointToGrid(NtOutgoingEndpointConfig endpoint)
             {
                 if (listViewEndpoints.InvokeRequired)
                 {

@@ -8,7 +8,7 @@ namespace NetTunnel.EndPoint.Engine.Managers
     {
         private readonly EngineCore _core;
 
-        private readonly CriticalResource<List<NtIncommingEndpoint>> _collection = new();
+        private readonly CriticalResource<List<IncommingEndpoint>> _collection = new();
 
         public IncommingEndpointManager(EngineCore core)
         {
@@ -17,33 +17,52 @@ namespace NetTunnel.EndPoint.Engine.Managers
             LoadFromDisk();
         }
 
-        public void Add(NtIncommingEndpoint endpoint) => _collection.Use((o) => o.Add(endpoint.Clone()));
-        public void Delete(Guid endpointId) => _collection.Use((o) => o.RemoveAll(o => o.Id == endpointId));
+        public void StartAll() => _collection.Use((o) => o.ForEach((o) => o.Start()));
 
-        public List<NtIncommingEndpoint> Clone()
+        public void StopAll() => _collection.Use((o) => o.ForEach((o) => o.Stop()));
+
+        public void Add(NtIncommingEndpointConfig config)
+        {
+            _collection.Use((o) =>
+            {
+                var endpoint = new IncommingEndpoint(config);
+                o.Add(endpoint);
+                //endpoint.Start(); //We do not want to start the endpoints at construction, but rather by the engine Start() function.
+            });
+        }
+
+        public void Delete(Guid endpointId)
+        {
+            _collection.Use((o) =>
+            {
+                var endpoint = o.Where(o => o.Id == endpointId).First();
+                endpoint.Stop();
+                o.Remove(endpoint);
+            });
+        }
+
+        public List<NtIncommingEndpointConfig> CloneConfigurations()
         {
             return _collection.Use((o) =>
             {
-                List<NtIncommingEndpoint> clones = new();
+                List<NtIncommingEndpointConfig> clones = new();
                 foreach (var endpoint in o)
                 {
-                    clones.Add(endpoint);
+                    clones.Add(endpoint.CloneConfiguration());
                 }
                 return clones;
             });
         }
 
-        public void SaveToDisk() => Persistence.SaveToDisk(Clone());
+        public void SaveToDisk() => Persistence.SaveToDisk(CloneConfigurations());
 
         private void LoadFromDisk()
         {
             _collection.Use((o) =>
             {
                 if (o.Count != 0) throw new Exception("Can not load configuration on top of existing collection.");
-
-                Persistence.LoadFromDisk<List<NtIncommingEndpoint>>()?.ForEach(o => Add(o));
+                Persistence.LoadFromDisk<List<NtIncommingEndpointConfig>>()?.ForEach(o => Add(o));
             });
-
         }
     }
 }

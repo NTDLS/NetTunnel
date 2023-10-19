@@ -1,18 +1,18 @@
 ﻿namespace NetTunnel.Library.Types
 {
-    public class NtIncommingEndpoint
+    public class NtIncommingEndpointConfig
     {
         public Guid Id { get; private set; } = Guid.NewGuid();
         public string Name { get; set; }
 
-        public NtIncommingEndpoint(string name)
+        public NtIncommingEndpointConfig(string name)
         {
             Name = name;
         }
 
-        public NtIncommingEndpoint Clone()
+        public NtIncommingEndpointConfig Clone()
         {
-            return new NtIncommingEndpoint(Name)
+            return new NtIncommingEndpointConfig(Name)
             {
                 Id = Id
             };
