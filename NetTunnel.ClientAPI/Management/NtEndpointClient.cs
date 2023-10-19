@@ -1,5 +1,5 @@
 ﻿using NetTunnel.ClientAPI.Exceptions;
-using NetTunnel.ClientAPI.Payload.Response;
+using NetTunnel.ClientAPI.Payload;
 using Newtonsoft.Json;
 
 namespace NetTunnel.ClientAPI.Management
@@ -43,11 +43,11 @@ namespace NetTunnel.ClientAPI.Management
                 throw new APIResponseException(result == null ? "Invalid response" : result.ExceptionText);
             }
         }         
-         */
+        */
 
         public void Logout()
         {
-            string url = $"api/Configuration/{_client.SessionId}/Logout";
+            string url = $"api/Security/{_client.SessionId}/Logout";
 
             using var response = _client.Connection.GetAsync(url);
             string resultText = response.Result.Content.ReadAsStringAsync().Result;

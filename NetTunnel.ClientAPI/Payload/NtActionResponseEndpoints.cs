@@ -1,16 +1,12 @@
 ﻿using NetTunnel.Library.Types;
 
-namespace NetTunnel.ClientAPI.Payload.Response
+namespace NetTunnel.ClientAPI.Payload
 {
     public class NtActionResponseEndpoints : NtActionResponse
     {
-        public Guid SessionId { get; set; } = Guid.Empty;
-
         public List<NtEndpoint> Collection { get; set; } = new();
 
-        public NtActionResponseEndpoints()
-        {
-        }
+        public NtActionResponseEndpoints() { }
 
         public NtActionResponseEndpoints(Exception ex)
         {

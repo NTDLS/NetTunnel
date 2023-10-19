@@ -182,7 +182,7 @@
             MinimizeBox = false;
             Name = "FormAddTunnel";
             ShowInTaskbar = false;
-            Text = "NetTunnel : Add Tunnel";
+            Text = "NetTunnel : Tunnel";
             groupBoxListenEndpoint.ResumeLayout(false);
             groupBoxListenEndpoint.PerformLayout();
             ResumeLayout(false);

@@ -3,48 +3,61 @@ using NetTunnel.Library.Types;
 
 namespace NetTunnel.UI
 {
-
     public partial class FormMain : Form
     {
-        public NtClient? _client { get; set; }
+        private NtClient? _client;
+
+        #region Constructor / Deconstructor.
 
         public FormMain()
         {
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        public new void Dispose()
         {
-            Shown += FormMain_Shown;
+            _client?.Dispose();
+            base.Dispose();
         }
 
-        private void FormMain_Shown(object? sender, EventArgs e)
-        {
-            using (var formLogin = new FormLogin())
-            {
-                if (formLogin.ShowDialog() == DialogResult.OK)
-                {
-                    _client = new NtClient(formLogin.Address, formLogin.Username, formLogin.Password);
+        #endregion
 
-                    _client.Endpoint.List().ContinueWith((o) =>
+        private void FormMain_Load(object sender, EventArgs e)
+        {
+            Shown += (object? sender, EventArgs e) =>
+            {
+                if (!ChangeConnection()) Close();
+            };
+        }
+
+        private bool ChangeConnection()
+        {
+            try
+            {
+                using (var formLogin = new FormLogin())
+                {
+                    if (formLogin.ShowDialog() == DialogResult.OK)
                     {
-                        PopulateEndpointGrid(o.Result.Collection);
-                    });
-                }
-                else
-                {
-                    Close();
+                        _client = new NtClient(formLogin.Address, formLogin.Username, formLogin.Password);
+
+                        _client.Endpoint.List().ContinueWith(t =>
+                        {
+                            foreach (var endpoint in t.Result.Collection)
+                            {
+                                AddEndpointToGrid(endpoint);
+                            }
+                        });
+                        return true;
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK);
+            }
+            return false;
         }
 
-        private void PopulateEndpointGrid(List<NtEndpoint> endpoints)
-        {
-            foreach (var endpoint in endpoints)
-            {
-                AddEndpointToGrid(endpoint);
-            }
-        }
 
         void AddEndpointToGrid(NtEndpoint endpoint)
         {
@@ -63,10 +76,27 @@ namespace NetTunnel.UI
             }
         }
 
-        public new void Dispose()
+        #region Body menu click.
+
+        private void connectToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            _client?.Dispose();
-            base.Dispose();
+            if (!ChangeConnection()) Close();
         }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void usersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Utility.EnsureNotNull(_client);
+            using (var FormUsers = new FormUsers(_client))
+            {
+                FormUsers.ShowDialog();
+            }
+        }
+
+        #endregion
     }
 }

@@ -1,12 +1,10 @@
-﻿namespace NetTunnel.ClientAPI.Payload.Response
+﻿namespace NetTunnel.ClientAPI.Payload
 {
     public class NtActionResponseLogin : NtActionResponse
     {
         public Guid SessionId { get; set; } = Guid.Empty;
 
-        public NtActionResponseLogin()
-        {
-        }
+        public NtActionResponseLogin() { }
 
         public NtActionResponseLogin(Exception ex)
         {

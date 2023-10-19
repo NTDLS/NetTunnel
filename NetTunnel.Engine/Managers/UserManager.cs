@@ -25,5 +25,18 @@ namespace NetTunnel.Engine.Managers
             return _collection.Use((o) =>
                 o.Where(u => u.Username == username && u.PasswordHash == passwordHash).Any());
         }
+
+        public List<NtUser> Clone()
+        {
+            return _collection.Use((o) =>
+            {
+                List<NtUser> clones = new();
+                foreach (var user in o)
+                {
+                    clones.Add(user.Clone());
+                }
+                return clones;
+            });
+        }
     }
 }

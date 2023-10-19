@@ -1,6 +1,8 @@
 ﻿using NetTunnel.ClientAPI.Exceptions;
-using NetTunnel.ClientAPI.Payload.Response;
+using NetTunnel.ClientAPI.Payload;
+using NetTunnel.Engine;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace NetTunnel.ClientAPI.Management
 {
@@ -40,5 +42,36 @@ namespace NetTunnel.ClientAPI.Management
                 throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
             }
         }
+
+        public async Task<NtActionResponseUsers> ListUsers()
+        {
+            string url = $"api/Security/{_client.SessionId}/ListUsers";
+
+            using var response = await _client.Connection.GetAsync(url);
+            string resultText = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<NtActionResponseUsers>(resultText);
+            if (result == null || result.Success == false)
+            {
+                throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
+            }
+
+            return result;
+        }
+
+        public async Task CreateUser(NtUser user)
+        {
+            string url = $"api/Security/{_client.SessionId}/CreateUser";
+
+            var postContent = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "text/plain");
+
+            using var response = _client.Connection.PostAsync(url, postContent);
+            string resultText = await response.Result.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<NtActionResponse>(resultText);
+            if (result == null || result.Success == false)
+            {
+                throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
+            }
+        }
     }
 }
+

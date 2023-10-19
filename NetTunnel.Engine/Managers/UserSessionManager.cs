@@ -24,7 +24,7 @@ namespace NetTunnel.Engine.Managers
             return null;
         }
 
-        public UserSession Acquire(Guid sessionId, string? clientIpAddress)
+        public UserSession Validate(Guid sessionId, string? clientIpAddress)
         {
             var session = _collection.Use((o) => o.Where(o => o.SessionId == sessionId).FirstOrDefault());
             if (session == null)

@@ -1,17 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NetTunnel.ClientAPI.Payload.Response;
+using NetTunnel.ClientAPI.Payload;
 
 namespace NetTunnel.EndPoint.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class EndpointController
+    public class EndpointController : ControllerBase
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
         public EndpointController(IHttpContextAccessor httpContextAccessor)
+            : base(httpContextAccessor)
         {
-            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
@@ -20,12 +18,7 @@ namespace NetTunnel.EndPoint.Controllers
         {
             try
             {
-                Singletons.Core.Log.Write($"ListEndpoints: SessionId: {sessionId}");
-
-                var clientIpAddress = _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString();
-
-                var userSession = Singletons.Core.Sessions.Acquire(sessionId, clientIpAddress);
-
+                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
                 return new NtActionResponseEndpoints
                 {
@@ -35,13 +28,7 @@ namespace NetTunnel.EndPoint.Controllers
             }
             catch (Exception ex)
             {
-                Singletons.Core.Log.Write($"ListEndpoints Exception: {ex.Message}");
-
-                return new NtActionResponseEndpoints
-                {
-                    ExceptionText = ex.Message,
-                    Success = false
-                };
+                return new NtActionResponseEndpoints(ex);
             }
         }
     }

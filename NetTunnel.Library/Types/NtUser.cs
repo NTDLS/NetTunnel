@@ -10,5 +10,10 @@
             Username = username.ToLower();
             PasswordHash = passwordHash.ToLower();
         }
+
+        public NtUser Clone()
+        {
+            return new NtUser(Username, "");
+        }
     }
 }

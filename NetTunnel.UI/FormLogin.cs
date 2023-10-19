@@ -12,6 +12,9 @@ namespace NetTunnel.UI
         {
             InitializeComponent();
 
+            AcceptButton = buttonLogin;
+            CancelButton = buttonCancel;
+
             textBoxAddress.Text = "127.0.0.1";
             textBoxPort.Text = "52845";
 
@@ -24,12 +27,10 @@ namespace NetTunnel.UI
             try
             {
                 if (int.TryParse(textBoxPort.Text, out var port) == false)
-                {
                     throw new Exception("Invalid port.");
-                }
 
                 Username = textBoxUsername.Text;
-                Password = textBoxPassword.Text;
+                Password = Utility.CalculateSHA256(textBoxPassword.Text);
 
                 Address = $"https://{textBoxAddress.Text}:{port}/";
 

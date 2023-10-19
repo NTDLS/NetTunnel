@@ -5,6 +5,9 @@
         public FormAddTunnel()
         {
             InitializeComponent();
+
+            AcceptButton = buttonAdd;
+            CancelButton = buttonCancel;
         }
     }
 }

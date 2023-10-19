@@ -166,7 +166,7 @@
             Name = "FormAddEndpoint";
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
-            Text = "NetTunnel : Add Endpoint";
+            Text = "NetTunnel : Endpoint";
             ResumeLayout(false);
             PerformLayout();
         }

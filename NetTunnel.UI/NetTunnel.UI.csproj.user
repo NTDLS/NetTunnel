@@ -7,10 +7,16 @@
     <Compile Update="FormAddTunnel.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="FormAddUser.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="FormLogin.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="FormMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="FormUsers.cs">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>

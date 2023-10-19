@@ -16,18 +16,15 @@ namespace NetTunnel.Engine.Managers
 
         public List<NtEndpoint> Clone()
         {
-            List<NtEndpoint> clones = new();
-
-            Collection.Use((o) =>
+            return Collection.Use((o) =>
             {
+                List<NtEndpoint> clones = new();
                 foreach (var endpoint in o)
                 {
                     clones.Add(endpoint.Clone());
                 }
+                return clones;
             });
-
-            return clones;
         }
-
     }
 }

@@ -5,6 +5,9 @@
         public FormAddEndpoint()
         {
             InitializeComponent();
+
+            AcceptButton = buttonAdd;
+            CancelButton = buttonCancel;
         }
     }
 }

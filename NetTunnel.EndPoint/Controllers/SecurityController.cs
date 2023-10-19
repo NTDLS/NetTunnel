@@ -1,17 +1,62 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NetTunnel.ClientAPI.Payload.Response;
+using NetTunnel.ClientAPI;
+using NetTunnel.ClientAPI.Payload;
+using NetTunnel.Engine;
+using Newtonsoft.Json;
 
 namespace NetTunnel.EndPoint.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class SecurityController
+    public class SecurityController : ControllerBase
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
         public SecurityController(IHttpContextAccessor httpContextAccessor)
+            : base(httpContextAccessor)
         {
-            _httpContextAccessor = httpContextAccessor;
+        }
+
+        [HttpGet]
+        [Route("{sessionId}/ListUsers")]
+        public NtActionResponseUsers ListUsers(Guid sessionId)
+        {
+            try
+            {
+                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+
+                return new NtActionResponseUsers
+                {
+                    Collection = Singletons.Core.Users.Clone(),
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new NtActionResponseUsers(ex);
+            }
+        }
+
+        [HttpPost]
+        [Route("{sessionId}/CreateUser")]
+        public NtActionResponse CreateUser(Guid sessionId, [FromBody] string value)
+        {
+            try
+            {
+                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+
+                var content = JsonConvert.DeserializeObject<NtUser>(value);
+                Utility.EnsureNotNull(content);
+
+                Singletons.Core.Users.Add(content);
+
+                return new NtActionResponse
+                {
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new NtActionResponse(ex);
+            }
         }
 
         [HttpGet]
@@ -20,15 +65,10 @@ namespace NetTunnel.EndPoint.Controllers
         {
             try
             {
-                Singletons.Core.Log.Write($"Login: Username: {username}");
-
-                var clientIpAddress = _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString();
-
-                var userSession = Singletons.Core.Sessions.Login(username, passwordHash, clientIpAddress);
+                var userSession = Singletons.Core.Sessions.Login(username, passwordHash, GetPeerIpAddress());
 
                 if (userSession != null)
                 {
-                    Singletons.Core.Log.Write($"Login success: Username: {username}, Session: {userSession.SessionId}");
                     return new NtActionResponseLogin()
                     {
                         SessionId = userSession.SessionId,
@@ -37,18 +77,12 @@ namespace NetTunnel.EndPoint.Controllers
                 }
                 else
                 {
-                    Singletons.Core.Log.Write($"Login failed: Username: {username}");
                     throw new Exception("Login failed.");
                 }
             }
             catch (Exception ex)
             {
-                Singletons.Core.Log.Write($"Login exception: Username: {username}, Exception: {ex.Message}");
-                return new NtActionResponseLogin(ex)
-                {
-                    ExceptionText = ex.Message,
-                    Success = false
-                };
+                return new NtActionResponseLogin(ex);
             }
         }
 
@@ -58,11 +92,7 @@ namespace NetTunnel.EndPoint.Controllers
         {
             try
             {
-                Singletons.Core.Log.Write($"Logout: SessionId: {sessionId}");
-
-                var clientIpAddress = _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString();
-
-                var userSession = Singletons.Core.Sessions.Acquire(sessionId, clientIpAddress);
+                var userSession = Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
                 Singletons.Core.Sessions.Logout(userSession);
 
@@ -73,13 +103,7 @@ namespace NetTunnel.EndPoint.Controllers
             }
             catch (Exception ex)
             {
-                Singletons.Core.Log.Write($"ListEndpoints Exception: {ex.Message}");
-
-                return new NtActionResponse
-                {
-                    ExceptionText = ex.Message,
-                    Success = false
-                };
+                return new NtActionResponse(ex);
             }
         }
     }
