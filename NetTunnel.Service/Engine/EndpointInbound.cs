@@ -7,7 +7,7 @@ namespace NetTunnel.Service.Engine
     /// <summary>
     /// This is the class that opens a listening TCP/IP port to wait on connections from a remote tunnel.
     /// </summary>
-    public class InboundEndpoint
+    public class EndpointInbound
     {
         private readonly EngineCore _core;
         private NtEndpointInboundConfig _configuration;
@@ -16,7 +16,7 @@ namespace NetTunnel.Service.Engine
 
         public Guid Id { get => _configuration.Id; }
 
-        public InboundEndpoint(EngineCore core, NtEndpointInboundConfig config)
+        public EndpointInbound(EngineCore core, NtEndpointInboundConfig config)
         {
             _core = core;
             _configuration = config;

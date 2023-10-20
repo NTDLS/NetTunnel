@@ -4,30 +4,30 @@ using System.Net.Sockets;
 namespace NetTunnel.Service.Engine
 {
     /// <summary>
-    /// This is the class that makes an outgoing TCP/IP connection to a listening endpoint.
+    /// This is the class that makes an outgoing TCP/IP connection to a listening tunnel.
     /// </summary>
-    public class OutboundEndpoint
+    public class TunnelOutbound
     {
         private readonly EngineCore _core;
-        private NtEndpointOutboundConfig _configuration;
+        private NtTunnelOutboundConfig _configuration;
         private Thread? _outgoingConnectionThread;
         private bool _keepRunning = false;
 
         public Guid Id { get => _configuration.Id; }
 
-        public OutboundEndpoint(EngineCore core, NtEndpointOutboundConfig config)
+        public TunnelOutbound(EngineCore core, NtTunnelOutboundConfig config)
         {
             _core = core;
             _configuration = config;
         }
 
-        public NtEndpointOutboundConfig CloneConfiguration() => _configuration.Clone();
+        public NtTunnelOutboundConfig CloneConfiguration() => _configuration.Clone();
 
         public void Start()
         {
             _keepRunning = true;
 
-            _core.Logging.Write($"Starting outgoing endpoint '{_configuration.Name}'");
+            _core.Logging.Write($"Starting outgoing tunnel '{_configuration.Name}'");
 
             _outgoingConnectionThread = new Thread(OutgoingConnectionThreadProc);
             _outgoingConnectionThread.Start();
@@ -43,11 +43,11 @@ namespace NetTunnel.Service.Engine
             {
                 try
                 {
-                    _core.Logging.Write($"Attempting to connect to outgoing endpoint '{_configuration.Name}' at {_configuration.Address}:{_configuration.DataPort}.");
+                    _core.Logging.Write($"Attempting to connect to outgoing tunnel '{_configuration.Name}' at {_configuration.Address}:{_configuration.DataPort}.");
 
                     var client = new TcpClient(_configuration.Address, _configuration.DataPort);
 
-                    _core.Logging.Write($"Connection successful for endpoint '{_configuration.Name}' at {_configuration.Address}:{_configuration.DataPort}.");
+                    _core.Logging.Write($"Connection successful for tunnel '{_configuration.Name}' at {_configuration.Address}:{_configuration.DataPort}.");
 
                     HandleClient(client);
                 }

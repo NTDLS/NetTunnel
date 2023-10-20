@@ -8,7 +8,7 @@ namespace NetTunnel.Service.Engine.Managers
     {
         private readonly EngineCore _core;
 
-        private readonly CriticalResource<List<OutboundTunnel>> _collection = new();
+        private readonly CriticalResource<List<TunnelOutbound>> _collection = new();
 
         public TunnelOutboundManager(EngineCore core)
         {
@@ -25,7 +25,7 @@ namespace NetTunnel.Service.Engine.Managers
         {
             _collection.Use((o) =>
             {
-                var tunnel = new OutboundTunnel(_core, config);
+                var tunnel = new TunnelOutbound(_core, config);
                 o.Add(tunnel);
                 //tunnel.Start(); //We do not want to start the tunnels at construction, but rather by the engine Start() function.
             });
