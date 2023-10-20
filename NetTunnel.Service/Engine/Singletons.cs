@@ -1,6 +1,6 @@
 ﻿using NetTunnel.Library.Types;
 
-namespace NetTunnel.EndPoint.Engine
+namespace NetTunnel.Service.Engine
 {
     public static class Singletons
     {
@@ -14,8 +14,8 @@ namespace NetTunnel.EndPoint.Engine
             }
         }
 
-        private static NtEndpointServiceConfiguration? _settings = null;
-        public static NtEndpointServiceConfiguration Configuration
+        private static NtServiceConfiguration? _settings = null;
+        public static NtServiceConfiguration Configuration
         {
             get
             {
@@ -26,7 +26,7 @@ namespace NetTunnel.EndPoint.Engine
                                  .AddEnvironmentVariables()
                                  .Build();
 
-                    _settings = config.GetRequiredSection("Settings").Get<NtEndpointServiceConfiguration>();
+                    _settings = config.GetRequiredSection("Settings").Get<NtServiceConfiguration>();
                     if (_settings == null)
                     {
                         throw new Exception("Failed to load configuration.");

@@ -4,10 +4,10 @@
     <Compile Update="Forms\BaseForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Forms\FormAddEndpoint.cs">
+    <Compile Update="Forms\FormAddTunnel.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Forms\FormAddTunnel.cs">
+    <Compile Update="Forms\FormAddEndpoint.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Forms\FormAddUser.cs">

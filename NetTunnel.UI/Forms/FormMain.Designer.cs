@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
-            listViewEndpoints = new ListView();
+            listViewTunnels = new ListView();
             columnHeaderName = new ColumnHeader();
             columnEntrypoint = new ColumnHeader();
             columnHeaderPort = new ColumnHeader();
@@ -46,17 +46,17 @@
             // 
             // listViewEndpoints
             // 
-            listViewEndpoints.Columns.AddRange(new ColumnHeader[] { columnHeaderName, columnEntrypoint, columnHeaderPort, columnHeaderTunnels });
-            listViewEndpoints.Dock = DockStyle.Fill;
-            listViewEndpoints.FullRowSelect = true;
-            listViewEndpoints.GridLines = true;
-            listViewEndpoints.HeaderStyle = ColumnHeaderStyle.Nonclickable;
-            listViewEndpoints.Location = new Point(0, 24);
-            listViewEndpoints.Name = "listViewEndpoints";
-            listViewEndpoints.Size = new Size(751, 417);
-            listViewEndpoints.TabIndex = 0;
-            listViewEndpoints.UseCompatibleStateImageBehavior = false;
-            listViewEndpoints.View = View.Details;
+            listViewTunnels.Columns.AddRange(new ColumnHeader[] { columnHeaderName, columnEntrypoint, columnHeaderPort, columnHeaderTunnels });
+            listViewTunnels.Dock = DockStyle.Fill;
+            listViewTunnels.FullRowSelect = true;
+            listViewTunnels.GridLines = true;
+            listViewTunnels.HeaderStyle = ColumnHeaderStyle.Nonclickable;
+            listViewTunnels.Location = new Point(0, 24);
+            listViewTunnels.Name = "listViewEndpoints";
+            listViewTunnels.Size = new Size(751, 417);
+            listViewTunnels.TabIndex = 0;
+            listViewTunnels.UseCompatibleStateImageBehavior = false;
+            listViewTunnels.View = View.Details;
             // 
             // columnHeaderName
             // 
@@ -135,7 +135,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(751, 463);
-            Controls.Add(listViewEndpoints);
+            Controls.Add(listViewTunnels);
             Controls.Add(menuStripBody);
             Controls.Add(statusStripBody);
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -152,7 +152,7 @@
 
         #endregion
 
-        private ListView listViewEndpoints;
+        private ListView listViewTunnels;
         private ColumnHeader columnHeaderName;
         private ColumnHeader columnEntrypoint;
         private ColumnHeader columnHeaderPort;

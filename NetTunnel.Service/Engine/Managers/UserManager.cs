@@ -1,8 +1,9 @@
 ﻿using NetTunnel.ClientAPI;
+using NetTunnel.EndPoint;
 using NetTunnel.Library;
 using NTDLS.Semaphore;
 
-namespace NetTunnel.EndPoint.Engine.Managers
+namespace NetTunnel.Service.Engine.Managers
 {
     public class UserManager
     {

@@ -2,15 +2,15 @@
 using NetTunnel.Library.Types;
 using NTDLS.Semaphore;
 
-namespace NetTunnel.EndPoint.Engine.Managers
+namespace NetTunnel.Service.Engine.Managers
 {
-    public class IncomingEndpointManager
+    public class TunnelOutboundManager
     {
         private readonly EngineCore _core;
 
-        private readonly CriticalResource<List<IncomingEndpoint>> _collection = new();
+        private readonly CriticalResource<List<OutboundTunnel>> _collection = new();
 
-        public IncomingEndpointManager(EngineCore core)
+        public TunnelOutboundManager(EngineCore core)
         {
             _core = core;
 
@@ -21,34 +21,34 @@ namespace NetTunnel.EndPoint.Engine.Managers
 
         public void StopAll() => _collection.Use((o) => o.ForEach((o) => o.Stop()));
 
-        public void Add(NtIncomingEndpointConfig config)
+        public void Add(NtTunnelOutboundConfig config)
         {
             _collection.Use((o) =>
             {
-                var endpoint = new IncomingEndpoint(_core, config);
-                o.Add(endpoint);
-                //endpoint.Start(); //We do not want to start the endpoints at construction, but rather by the engine Start() function.
+                var tunnel = new OutboundTunnel(_core, config);
+                o.Add(tunnel);
+                //tunnel.Start(); //We do not want to start the tunnels at construction, but rather by the engine Start() function.
             });
         }
 
-        public void Delete(Guid endpointId)
+        public void Delete(Guid tunnelId)
         {
             _collection.Use((o) =>
             {
-                var endpoint = o.Where(o => o.Id == endpointId).First();
-                endpoint.Stop();
-                o.Remove(endpoint);
+                var tunnel = o.Where(o => o.Id == tunnelId).First();
+                tunnel.Stop();
+                o.Remove(tunnel);
             });
         }
 
-        public List<NtIncomingEndpointConfig> CloneConfigurations()
+        public List<NtTunnelOutboundConfig> CloneConfigurations()
         {
             return _collection.Use((o) =>
             {
-                List<NtIncomingEndpointConfig> clones = new();
-                foreach (var endpoint in o)
+                List<NtTunnelOutboundConfig> clones = new();
+                foreach (var tunnel in o)
                 {
-                    clones.Add(endpoint.CloneConfiguration());
+                    clones.Add(tunnel.CloneConfiguration());
                 }
                 return clones;
             });
@@ -61,7 +61,7 @@ namespace NetTunnel.EndPoint.Engine.Managers
             _collection.Use((o) =>
             {
                 if (o.Count != 0) throw new Exception("Can not load configuration on top of existing collection.");
-                Persistence.LoadFromDisk<List<NtIncomingEndpointConfig>>()?.ForEach(o => Add(o));
+                Persistence.LoadFromDisk<List<NtTunnelOutboundConfig>>()?.ForEach(o => Add(o));
             });
         }
     }

@@ -2,33 +2,33 @@
 using System.Net;
 using System.Net.Sockets;
 
-namespace NetTunnel.EndPoint.Engine
+namespace NetTunnel.Service.Engine
 {
     /// <summary>
-    /// This is the class that opens a listening TCP/IP port to wait on connections from a remote endpoint.
+    /// This is the class that opens a listening TCP/IP port to wait on connections from a remote tunnel.
     /// </summary>
-    public class IncomingEndpoint
+    public class InboundTunnel
     {
         private readonly EngineCore _core;
-        private NtIncomingEndpointConfig _configuration;
+        private NtTunnelInboundConfig _configuration;
         private Thread? _incomingConnectionThread;
         private bool _keepRunning = false;
 
         public Guid Id { get => _configuration.Id; }
 
-        public IncomingEndpoint(EngineCore core, NtIncomingEndpointConfig config)
+        public InboundTunnel(EngineCore core, NtTunnelInboundConfig config)
         {
             _core = core;
             _configuration = config;
         }
 
-        public NtIncomingEndpointConfig CloneConfiguration() => _configuration.Clone();
+        public NtTunnelInboundConfig CloneConfiguration() => _configuration.Clone();
 
         public void Start()
         {
             _keepRunning = true;
 
-            _core.Logging.Write($"Starting incoming endpoint '{_configuration.Name}' on port {_configuration.DataPort}");
+            _core.Logging.Write($"Starting incoming tunnel '{_configuration.Name}' on port {_configuration.DataPort}");
 
             _incomingConnectionThread = new Thread(IncomingConnectionThreadProc);
             _incomingConnectionThread.Start();
@@ -48,18 +48,18 @@ namespace NetTunnel.EndPoint.Engine
             {
                 listener.Start();
 
-                _core.Logging.Write($"Listening incoming endpoint '{_configuration.Name}' on port {_configuration.DataPort}");
+                _core.Logging.Write($"Listening incoming tunnel '{_configuration.Name}' on port {_configuration.DataPort}");
 
                 while (_keepRunning)
                 {
-                    _core.Logging.Write($"Waiting for connection for incoming endpoint '{_configuration.Name}' on port {_configuration.DataPort}");
+                    _core.Logging.Write($"Waiting for connection for incoming tunnel '{_configuration.Name}' on port {_configuration.DataPort}");
 
                     var client = listener.AcceptTcpClient();
-                    _core.Logging.Write($"Connected on incoming endpoint '{_configuration.Name}' on port {_configuration.DataPort}");
+                    _core.Logging.Write($"Connected on incoming tunnel '{_configuration.Name}' on port {_configuration.DataPort}");
 
                     HandleClient(client);
 
-                    _core.Logging.Write($"Disconnected incoming endpoint '{_configuration.Name}' on port {_configuration.DataPort}");
+                    _core.Logging.Write($"Disconnected incoming tunnel '{_configuration.Name}' on port {_configuration.DataPort}");
 
                     Thread.Sleep(1000);
                 }

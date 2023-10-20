@@ -1,7 +1,7 @@
 ﻿using NetTunnel.Library.Types;
 using NTDLS.Semaphore;
 
-namespace NetTunnel.EndPoint.Engine.Managers
+namespace NetTunnel.Service.Engine.Managers
 {
     public class UserSessionManager
     {

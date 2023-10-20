@@ -1,4 +1,4 @@
-﻿namespace NetTunnel.EndPoint.Engine.Managers
+﻿namespace NetTunnel.Service.Engine.Managers
 {
     public class Logger
     {

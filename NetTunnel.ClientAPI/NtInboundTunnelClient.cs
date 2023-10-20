@@ -6,22 +6,22 @@ using System.Text;
 
 namespace NetTunnel.ClientAPI
 {
-    public class NtIncomingEndpointClient
+    public class NtInboundTunnelClient
     {
         private readonly NtClient _client;
 
-        public NtIncomingEndpointClient(NtClient client)
+        public NtInboundTunnelClient(NtClient client)
         {
             _client = client;
         }
 
-        public async Task<NtActionResponseIncomingEndpoints> List()
+        public async Task<NtActionResponseInboundTunnels> List()
         {
-            string url = $"api/IncomingEndpoint/{_client.SessionId}/List";
+            string url = $"api/InboundTunnel/{_client.SessionId}/List";
 
             using var response = await _client.Connection.GetAsync(url);
             string resultText = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<NtActionResponseIncomingEndpoints>(resultText);
+            var result = JsonConvert.DeserializeObject<NtActionResponseInboundTunnels>(resultText);
             if (result == null || result.Success == false)
             {
                 throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
@@ -30,11 +30,11 @@ namespace NetTunnel.ClientAPI
             return result;
         }
 
-        public async Task Add(NtIncomingEndpointConfig endpoint)
+        public async Task Add(NtTunnelInboundConfig tunnel)
         {
-            string url = $"api/IncomingEndpoint/{_client.SessionId}/Add";
+            string url = $"api/InboundTunnel/{_client.SessionId}/Add";
 
-            var postContent = new StringContent(JsonConvert.SerializeObject(endpoint), Encoding.UTF8, "text/plain");
+            var postContent = new StringContent(JsonConvert.SerializeObject(tunnel), Encoding.UTF8, "text/plain");
 
             using var response = _client.Connection.PostAsync(url, postContent);
             string resultText = await response.Result.Content.ReadAsStringAsync();
@@ -45,13 +45,13 @@ namespace NetTunnel.ClientAPI
             }
         }
 
-        public async Task Delete(Guid endpointId)
+        public async Task Delete(Guid tunnelId)
         {
-            string url = $"api/IncomingEndpoint/{_client.SessionId}/Delete/{endpointId}";
+            string url = $"api/InboundTunnel/{_client.SessionId}/Delete/{tunnelId}";
 
             using var response = await _client.Connection.GetAsync(url);
             string resultText = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<NtActionResponseOutgoingEndpoints>(resultText);
+            var result = JsonConvert.DeserializeObject<NtActionResponseOutboundTunnels>(resultText);
             if (result == null || result.Success == false)
             {
                 throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);

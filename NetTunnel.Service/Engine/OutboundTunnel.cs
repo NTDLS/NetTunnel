@@ -1,33 +1,33 @@
 ﻿using NetTunnel.Library.Types;
 using System.Net.Sockets;
 
-namespace NetTunnel.EndPoint.Engine
+namespace NetTunnel.Service.Engine
 {
     /// <summary>
-    /// This is the class that makes an outgoing TCP/IP connection to a listening endpoint.
+    /// This is the class that makes an outgoing TCP/IP connection to a listening tunnel.
     /// </summary>
-    public class OutgoingEndpoint
+    public class OutboundTunnel
     {
         private readonly EngineCore _core;
-        private NtOutgoingEndpointConfig _configuration;
+        private NtTunnelOutboundConfig _configuration;
         private Thread? _outgoingConnectionThread;
         private bool _keepRunning = false;
 
         public Guid Id { get => _configuration.Id; }
 
-        public OutgoingEndpoint(EngineCore core, NtOutgoingEndpointConfig config)
+        public OutboundTunnel(EngineCore core, NtTunnelOutboundConfig config)
         {
             _core = core;
             _configuration = config;
         }
 
-        public NtOutgoingEndpointConfig CloneConfiguration() => _configuration.Clone();
+        public NtTunnelOutboundConfig CloneConfiguration() => _configuration.Clone();
 
         public void Start()
         {
             _keepRunning = true;
 
-            _core.Logging.Write($"Starting outgoing endpoint '{_configuration.Name}'");
+            _core.Logging.Write($"Starting outgoing tunnel '{_configuration.Name}'");
 
             _outgoingConnectionThread = new Thread(OutgoingConnectionThreadProc);
             _outgoingConnectionThread.Start();
@@ -43,11 +43,11 @@ namespace NetTunnel.EndPoint.Engine
             {
                 try
                 {
-                    _core.Logging.Write($"Attempting to connect to outgoing endpoint '{_configuration.Name}' at {_configuration.Address}:{_configuration.Port}.");
+                    _core.Logging.Write($"Attempting to connect to outgoing tunnel '{_configuration.Name}' at {_configuration.Address}:{_configuration.Port}.");
 
                     var client = new TcpClient(_configuration.Address, _configuration.Port);
 
-                    _core.Logging.Write($"Connection successful for endpoint '{_configuration.Name}' at {_configuration.Address}:{_configuration.Port}.");
+                    _core.Logging.Write($"Connection successful for tunnel '{_configuration.Name}' at {_configuration.Address}:{_configuration.Port}.");
 
                     HandleClient(client);
                 }
