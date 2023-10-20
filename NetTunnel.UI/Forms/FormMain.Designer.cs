@@ -31,9 +31,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             listViewTunnels = new ListView();
             columnHeaderName = new ColumnHeader();
-            columnEntrypoint = new ColumnHeader();
-            columnHeaderPort = new ColumnHeader();
-            columnHeaderTunnels = new ColumnHeader();
+            columnDirection = new ColumnHeader();
+            columnHeaderAddress = new ColumnHeader();
+            columnHeaderEndpoints = new ColumnHeader();
             menuStripBody = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
             connectToolStripMenuItem = new ToolStripMenuItem();
@@ -44,15 +44,15 @@
             menuStripBody.SuspendLayout();
             SuspendLayout();
             // 
-            // listViewEndpoints
+            // listViewTunnels
             // 
-            listViewTunnels.Columns.AddRange(new ColumnHeader[] { columnHeaderName, columnEntrypoint, columnHeaderPort, columnHeaderTunnels });
+            listViewTunnels.Columns.AddRange(new ColumnHeader[] { columnHeaderName, columnDirection, columnHeaderAddress, columnHeaderEndpoints });
             listViewTunnels.Dock = DockStyle.Fill;
             listViewTunnels.FullRowSelect = true;
             listViewTunnels.GridLines = true;
             listViewTunnels.HeaderStyle = ColumnHeaderStyle.Nonclickable;
             listViewTunnels.Location = new Point(0, 24);
-            listViewTunnels.Name = "listViewEndpoints";
+            listViewTunnels.Name = "listViewTunnels";
             listViewTunnels.Size = new Size(751, 417);
             listViewTunnels.TabIndex = 0;
             listViewTunnels.UseCompatibleStateImageBehavior = false;
@@ -63,20 +63,20 @@
             columnHeaderName.Text = "Name";
             columnHeaderName.Width = 250;
             // 
-            // columnEntrypoint
+            // columnDirection
             // 
-            columnEntrypoint.Text = "Entry Point";
-            columnEntrypoint.Width = 115;
+            columnDirection.Text = "Direction";
+            columnDirection.Width = 115;
             // 
-            // columnHeaderPort
+            // columnHeaderAddress
             // 
-            columnHeaderPort.Text = "Port";
-            columnHeaderPort.Width = 100;
+            columnHeaderAddress.Text = "Address";
+            columnHeaderAddress.Width = 100;
             // 
-            // columnHeaderTunnels
+            // columnHeaderEndpoints
             // 
-            columnHeaderTunnels.Text = "Tunnels";
-            columnHeaderTunnels.Width = 80;
+            columnHeaderEndpoints.Text = "Endpoints";
+            columnHeaderEndpoints.Width = 80;
             // 
             // menuStripBody
             // 
@@ -97,14 +97,14 @@
             // connectToolStripMenuItem
             // 
             connectToolStripMenuItem.Name = "connectToolStripMenuItem";
-            connectToolStripMenuItem.Size = new Size(180, 22);
+            connectToolStripMenuItem.Size = new Size(119, 22);
             connectToolStripMenuItem.Text = "Connect";
             connectToolStripMenuItem.Click += connectToolStripMenuItem_Click;
             // 
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(180, 22);
+            exitToolStripMenuItem.Size = new Size(119, 22);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
@@ -118,7 +118,7 @@
             // usersToolStripMenuItem
             // 
             usersToolStripMenuItem.Name = "usersToolStripMenuItem";
-            usersToolStripMenuItem.Size = new Size(180, 22);
+            usersToolStripMenuItem.Size = new Size(102, 22);
             usersToolStripMenuItem.Text = "Users";
             usersToolStripMenuItem.Click += usersToolStripMenuItem_Click;
             // 
@@ -154,9 +154,9 @@
 
         private ListView listViewTunnels;
         private ColumnHeader columnHeaderName;
-        private ColumnHeader columnEntrypoint;
-        private ColumnHeader columnHeaderPort;
-        private ColumnHeader columnHeaderTunnels;
+        private ColumnHeader columnDirection;
+        private ColumnHeader columnHeaderAddress;
+        private ColumnHeader columnHeaderEndpoints;
         private MenuStrip menuStripBody;
         private ToolStripMenuItem fileToolStripMenuItem;
         private ToolStripMenuItem connectToolStripMenuItem;

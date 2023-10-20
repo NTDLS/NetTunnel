@@ -47,15 +47,15 @@
             // 
             // textBoxName
             // 
-            textBoxName.Location = new Point(16, 31);
+            textBoxName.Location = new Point(16, 33);
             textBoxName.Name = "textBoxName";
-            textBoxName.Size = new Size(395, 23);
+            textBoxName.Size = new Size(351, 23);
             textBoxName.TabIndex = 0;
             // 
             // labelName
             // 
             labelName.AutoSize = true;
-            labelName.Location = new Point(16, 13);
+            labelName.Location = new Point(16, 15);
             labelName.Name = "labelName";
             labelName.Size = new Size(115, 15);
             labelName.TabIndex = 8;
@@ -64,23 +64,23 @@
             // radioButtonRemoteEndpoint
             // 
             radioButtonRemoteEndpoint.AutoSize = true;
-            radioButtonRemoteEndpoint.Location = new Point(22, 22);
+            radioButtonRemoteEndpoint.Location = new Point(16, 51);
             radioButtonRemoteEndpoint.Name = "radioButtonRemoteEndpoint";
-            radioButtonRemoteEndpoint.Size = new Size(117, 19);
+            radioButtonRemoteEndpoint.Size = new Size(66, 19);
             radioButtonRemoteEndpoint.TabIndex = 2;
-            radioButtonRemoteEndpoint.Text = "Remote endpoint";
+            radioButtonRemoteEndpoint.Text = "Remote";
             radioButtonRemoteEndpoint.UseVisualStyleBackColor = true;
             // 
             // radioButtonLocalEndpoint
             // 
             radioButtonLocalEndpoint.AutoSize = true;
             radioButtonLocalEndpoint.Checked = true;
-            radioButtonLocalEndpoint.Location = new Point(22, 53);
+            radioButtonLocalEndpoint.Location = new Point(16, 25);
             radioButtonLocalEndpoint.Name = "radioButtonLocalEndpoint";
-            radioButtonLocalEndpoint.Size = new Size(104, 19);
+            radioButtonLocalEndpoint.Size = new Size(53, 19);
             radioButtonLocalEndpoint.TabIndex = 3;
             radioButtonLocalEndpoint.TabStop = true;
-            radioButtonLocalEndpoint.Text = "Local endpoint";
+            radioButtonLocalEndpoint.Text = "Local";
             radioButtonLocalEndpoint.UseVisualStyleBackColor = true;
             // 
             // groupBoxListenEndpoint
@@ -89,14 +89,14 @@
             groupBoxListenEndpoint.Controls.Add(radioButtonLocalEndpoint);
             groupBoxListenEndpoint.Location = new Point(16, 74);
             groupBoxListenEndpoint.Name = "groupBoxListenEndpoint";
-            groupBoxListenEndpoint.Size = new Size(163, 89);
+            groupBoxListenEndpoint.Size = new Size(124, 85);
             groupBoxListenEndpoint.TabIndex = 1;
             groupBoxListenEndpoint.TabStop = false;
             groupBoxListenEndpoint.Text = "Listen Endpoint";
             // 
             // textBoxListenPort
             // 
-            textBoxListenPort.Location = new Point(192, 92);
+            textBoxListenPort.Location = new Point(148, 88);
             textBoxListenPort.Name = "textBoxListenPort";
             textBoxListenPort.Size = new Size(63, 23);
             textBoxListenPort.TabIndex = 4;
@@ -104,7 +104,7 @@
             // labelListenPort
             // 
             labelListenPort.AutoSize = true;
-            labelListenPort.Location = new Point(192, 74);
+            labelListenPort.Location = new Point(148, 70);
             labelListenPort.Name = "labelListenPort";
             labelListenPort.Size = new Size(63, 15);
             labelListenPort.TabIndex = 13;
@@ -112,7 +112,7 @@
             // 
             // textBoxTerminationAddress
             // 
-            textBoxTerminationAddress.Location = new Point(192, 140);
+            textBoxTerminationAddress.Location = new Point(148, 136);
             textBoxTerminationAddress.Name = "textBoxTerminationAddress";
             textBoxTerminationAddress.Size = new Size(150, 23);
             textBoxTerminationAddress.TabIndex = 5;
@@ -120,7 +120,7 @@
             // labelTerminationAddress
             // 
             labelTerminationAddress.AutoSize = true;
-            labelTerminationAddress.Location = new Point(192, 122);
+            labelTerminationAddress.Location = new Point(148, 118);
             labelTerminationAddress.Name = "labelTerminationAddress";
             labelTerminationAddress.Size = new Size(147, 15);
             labelTerminationAddress.TabIndex = 15;
@@ -128,7 +128,7 @@
             // 
             // textBoxTerminationPort
             // 
-            textBoxTerminationPort.Location = new Point(348, 140);
+            textBoxTerminationPort.Location = new Point(304, 136);
             textBoxTerminationPort.Name = "textBoxTerminationPort";
             textBoxTerminationPort.Size = new Size(63, 23);
             textBoxTerminationPort.TabIndex = 6;
@@ -136,7 +136,7 @@
             // labelTerminationPort
             // 
             labelTerminationPort.AutoSize = true;
-            labelTerminationPort.Location = new Point(348, 122);
+            labelTerminationPort.Location = new Point(304, 118);
             labelTerminationPort.Name = "labelTerminationPort";
             labelTerminationPort.Size = new Size(29, 15);
             labelTerminationPort.TabIndex = 17;
@@ -144,7 +144,7 @@
             // 
             // buttonAdd
             // 
-            buttonAdd.Location = new Point(255, 195);
+            buttonAdd.Location = new Point(211, 181);
             buttonAdd.Name = "buttonAdd";
             buttonAdd.Size = new Size(75, 23);
             buttonAdd.TabIndex = 7;
@@ -153,7 +153,7 @@
             // 
             // buttonCancel
             // 
-            buttonCancel.Location = new Point(336, 195);
+            buttonCancel.Location = new Point(292, 181);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(75, 23);
             buttonCancel.TabIndex = 8;
@@ -164,7 +164,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(434, 231);
+            ClientSize = new Size(382, 212);
             Controls.Add(buttonCancel);
             Controls.Add(buttonAdd);
             Controls.Add(textBoxTerminationPort);
@@ -182,7 +182,9 @@
             MinimizeBox = false;
             Name = "FormAddEndpoint";
             ShowInTaskbar = false;
+            StartPosition = FormStartPosition.CenterParent;
             Text = "NetTunnel : Endpoint";
+            Load += FormAddEndpoint_Load;
             groupBoxListenEndpoint.ResumeLayout(false);
             groupBoxListenEndpoint.PerformLayout();
             ResumeLayout(false);

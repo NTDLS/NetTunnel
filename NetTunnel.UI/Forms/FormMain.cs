@@ -49,7 +49,7 @@ namespace NetTunnel.UI.Forms
 
                 if (itemUnderMouse != null)
                 {
-                    menu.Items.Add("Add Endpoint");
+                    menu.Items.Add("Add Endpoint to Tunnel");
                     menu.Items.Add(new ToolStripSeparator());
                     menu.Items.Add("Delete Tunnel");
                 }
@@ -65,6 +65,18 @@ namespace NetTunnel.UI.Forms
                         using (var formAddTunnel = new FormAddTunnel(_client))
                         {
                             if (formAddTunnel.ShowDialog() == DialogResult.OK)
+                            {
+                                RepopulateTunnelsGrid();
+                            }
+                        }
+                    }
+                    else if (e.ClickedItem?.Text == "Add Endpoint to Tunnel")
+                    {
+                        Utility.EnsureNotNull(_client);
+
+                        using (var formAddEndpoint = new FormAddEndpoint(_client))
+                        {
+                            if (formAddEndpoint.ShowDialog() == DialogResult.OK)
                             {
                                 RepopulateTunnelsGrid();
                             }
@@ -125,8 +137,8 @@ namespace NetTunnel.UI.Forms
                 {
                     var item = new ListViewItem(tunnel.Name);
                     item.Tag = tunnel;
-                    item.SubItems.Add("Incoming");
-                    item.SubItems.Add($"<dynamic>");
+                    item.SubItems.Add("Inbound");
+                    item.SubItems.Add($"*:{tunnel.DataPort}");
 
                     listViewTunnels.Items.Add(item);
                 }
@@ -142,8 +154,8 @@ namespace NetTunnel.UI.Forms
                 {
                     var item = new ListViewItem(tunnel.Name);
                     item.Tag = tunnel;
-                    item.SubItems.Add("Outgoing");
-                    item.SubItems.Add($"{tunnel.Address}{tunnel.Port}");
+                    item.SubItems.Add("Outbound");
+                    item.SubItems.Add($"{tunnel.Address}{tunnel.DataPort}");
 
                     listViewTunnels.Items.Add(item);
 

@@ -43,11 +43,11 @@ namespace NetTunnel.Service.Engine
             {
                 try
                 {
-                    _core.Logging.Write($"Attempting to connect to outgoing tunnel '{_configuration.Name}' at {_configuration.Address}:{_configuration.Port}.");
+                    _core.Logging.Write($"Attempting to connect to outgoing tunnel '{_configuration.Name}' at {_configuration.Address}:{_configuration.DataPort}.");
 
-                    var client = new TcpClient(_configuration.Address, _configuration.Port);
+                    var client = new TcpClient(_configuration.Address, _configuration.DataPort);
 
-                    _core.Logging.Write($"Connection successful for tunnel '{_configuration.Name}' at {_configuration.Address}:{_configuration.Port}.");
+                    _core.Logging.Write($"Connection successful for tunnel '{_configuration.Name}' at {_configuration.Address}:{_configuration.DataPort}.");
 
                     HandleClient(client);
                 }

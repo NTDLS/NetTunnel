@@ -10,7 +10,6 @@ namespace NetTunnel.UI.Forms
         public FormAddTunnel()
         {
             InitializeComponent();
-
         }
 
         public FormAddTunnel(NtClient client)
@@ -34,7 +33,6 @@ namespace NetTunnel.UI.Forms
 
         private void FormAddEndpoint_Load(object sender, EventArgs e) { }
 
-
         private void buttonAdd_Click(object sender, EventArgs e)
         {
             Utility.EnsureNotNull(_client);
@@ -57,7 +55,7 @@ namespace NetTunnel.UI.Forms
                 EnableControl(buttonAdd, false);
 
                 var outgoingEndpoint = new NtTunnelOutboundConfig(textBoxName.Text,
-                    textBoxRemoteAddress.Text, int.Parse(textBoxRemotePort.Text),
+                    textBoxRemoteAddress.Text, int.Parse(textBoxRemotePort.Text), int.Parse(textBoxEndpointDataPort.Text),
                     textBoxRemoteUsername.Text, Utility.CalculateSHA256(textBoxRemotePassword.Text));
 
                 var incomingEndpoint = new NtTunnelInboundConfig(textBoxName.Text, int.Parse(textBoxEndpointDataPort.Text));
@@ -67,7 +65,7 @@ namespace NetTunnel.UI.Forms
                 try
                 {
                     //Connect to the remote endpoint.
-                    remoteClient = new NtClient($"https://{outgoingEndpoint.Address}:{outgoingEndpoint.Port}/");
+                    remoteClient = new NtClient($"https://{outgoingEndpoint.Address}:{outgoingEndpoint.ManagementPort}/");
                 }
                 catch (Exception ex)
                 {
