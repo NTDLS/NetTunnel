@@ -123,6 +123,7 @@ namespace NetTunnel.UI.Forms
                 else
                 {
                     var item = new ListViewItem(endpoint.Name);
+                    item.Tag = endpoint;
                     item.SubItems.Add("Incoming");
                     item.SubItems.Add($"<dynamic>");
 
@@ -139,6 +140,7 @@ namespace NetTunnel.UI.Forms
                 else
                 {
                     var item = new ListViewItem(endpoint.Name);
+                    item.Tag = endpoint;
                     item.SubItems.Add("Outgoing");
                     item.SubItems.Add($"{endpoint.Address}{endpoint.Port}");
 

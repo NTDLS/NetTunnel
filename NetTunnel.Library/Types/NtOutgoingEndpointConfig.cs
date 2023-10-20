@@ -8,6 +8,8 @@
         public int Port { get; set; }
         public string Username { get; set; }
         public string PasswordHash { get; set; }
+        public List<NtTunnelConnectorConfig> Connectors { get; set; } = new();
+        public List<NtTunnelListenerConfig> Listeners { get; set; } = new();
 
         public NtOutgoingEndpointConfig(string name, string address, int port, string username, string passwordHash)
         {
