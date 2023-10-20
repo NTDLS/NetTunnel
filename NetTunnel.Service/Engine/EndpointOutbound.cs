@@ -9,19 +9,19 @@ namespace NetTunnel.Service.Engine
     public class EndpointOutbound
     {
         private readonly EngineCore _core;
-        private NtEndpointOutboundConfig _configuration;
+        private NtEndpointOutboundConfiguration _configuration;
         private Thread? _outgoingConnectionThread;
         private bool _keepRunning = false;
 
         public Guid Id { get => _configuration.Id; }
 
-        public EndpointOutbound(EngineCore core, NtEndpointOutboundConfig config)
+        public EndpointOutbound(EngineCore core, NtEndpointOutboundConfiguration config)
         {
             _core = core;
             _configuration = config;
         }
 
-        public NtEndpointOutboundConfig CloneConfiguration() => _configuration.Clone();
+        public NtEndpointOutboundConfiguration CloneConfiguration() => _configuration.Clone();
 
         public void Start()
         {

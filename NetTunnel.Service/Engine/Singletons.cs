@@ -14,8 +14,8 @@ namespace NetTunnel.Service.Engine
             }
         }
 
-        private static NtServiceConfiguration? _settings = null;
-        public static NtServiceConfiguration Configuration
+        private static NtServiceApplicationConfiguration? _settings = null;
+        public static NtServiceApplicationConfiguration Configuration
         {
             get
             {
@@ -26,7 +26,7 @@ namespace NetTunnel.Service.Engine
                                  .AddEnvironmentVariables()
                                  .Build();
 
-                    _settings = config.GetRequiredSection("Settings").Get<NtServiceConfiguration>();
+                    _settings = config.GetRequiredSection("Settings").Get<NtServiceApplicationConfiguration>();
                     if (_settings == null)
                     {
                         throw new Exception("Failed to load configuration.");

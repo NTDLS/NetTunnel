@@ -130,7 +130,7 @@ namespace NetTunnel.UI.Forms
                 t.Result.Collection.ForEach(t => AddOutgoingTunnelToGrid(t));
             });
 
-            void AddIncomingTunnelToGrid(NtTunnelInboundConfig tunnel)
+            void AddIncomingTunnelToGrid(NtTunnelInboundConfiguration tunnel)
             {
                 if (listViewTunnels.InvokeRequired)
                 {
@@ -147,7 +147,7 @@ namespace NetTunnel.UI.Forms
                 }
             }
 
-            void AddOutgoingTunnelToGrid(NtTunnelOutboundConfig tunnel)
+            void AddOutgoingTunnelToGrid(NtTunnelOutboundConfiguration tunnel)
             {
                 if (listViewTunnels.InvokeRequired)
                 {

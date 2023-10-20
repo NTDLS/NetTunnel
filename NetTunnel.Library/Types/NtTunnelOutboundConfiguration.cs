@@ -1,6 +1,6 @@
 ﻿namespace NetTunnel.Library.Types
 {
-    public class NtTunnelOutboundConfig
+    public class NtTunnelOutboundConfiguration
     {
         public Guid Id { get; private set; } = Guid.NewGuid();
         public string Name { get; set; }
@@ -9,10 +9,10 @@
         public int DataPort { get; set; }
         public string Username { get; set; }
         public string PasswordHash { get; set; }
-        public List<NtEndpointOutboundConfig> Connectors { get; set; } = new();
-        public List<NtEndpointInboundConfig> Listeners { get; set; } = new();
+        public List<NtEndpointOutboundConfiguration> OutboundEndpointConfigurations { get; private set; } = new();
+        public List<NtEndpointInboundConfiguration> InboundEndpointConfigurations { get; private set; } = new();
 
-        public NtTunnelOutboundConfig(string name, string address, int managementPort, int dataPort, string username, string passwordHash)
+        public NtTunnelOutboundConfiguration(string name, string address, int managementPort, int dataPort, string username, string passwordHash)
         {
             Name = name;
             Address = address;
@@ -22,9 +22,9 @@
             PasswordHash = passwordHash;
         }
 
-        public NtTunnelOutboundConfig Clone()
+        public NtTunnelOutboundConfiguration Clone()
         {
-            return new NtTunnelOutboundConfig(Name, Address, ManagementPort, DataPort, Username, PasswordHash)
+            return new NtTunnelOutboundConfiguration(Name, Address, ManagementPort, DataPort, Username, PasswordHash)
             {
                 Id = Id
             };

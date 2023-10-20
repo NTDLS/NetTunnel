@@ -10,19 +10,19 @@ namespace NetTunnel.Service.Engine
     public class EndpointInbound
     {
         private readonly EngineCore _core;
-        private NtEndpointInboundConfig _configuration;
+        private NtEndpointInboundConfiguration _configuration;
         private Thread? _incomingConnectionThread;
         private bool _keepRunning = false;
 
         public Guid Id { get => _configuration.Id; }
 
-        public EndpointInbound(EngineCore core, NtEndpointInboundConfig config)
+        public EndpointInbound(EngineCore core, NtEndpointInboundConfiguration config)
         {
             _core = core;
             _configuration = config;
         }
 
-        public NtEndpointInboundConfig CloneConfiguration() => _configuration.Clone();
+        public NtEndpointInboundConfiguration CloneConfiguration() => _configuration.Clone();
 
         public void Start()
         {

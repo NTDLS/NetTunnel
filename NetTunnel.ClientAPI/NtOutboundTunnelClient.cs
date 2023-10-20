@@ -30,7 +30,7 @@ namespace NetTunnel.ClientAPI
             return result;
         }
 
-        public async Task Add(NtTunnelOutboundConfig tunnel)
+        public async Task Add(NtTunnelOutboundConfiguration tunnel)
         {
             string url = $"api/OutboundTunnel/{_client.SessionId}/Add";
 

@@ -21,7 +21,7 @@ namespace NetTunnel.Service.Engine.Managers
 
         public void StopAll() => _collection.Use((o) => o.ForEach((o) => o.Stop()));
 
-        public void Add(NtEndpointInboundConfig config)
+        public void Add(NtEndpointInboundConfiguration config)
         {
             _collection.Use((o) =>
             {
@@ -41,11 +41,11 @@ namespace NetTunnel.Service.Engine.Managers
             });
         }
 
-        public List<NtEndpointInboundConfig> CloneConfigurations()
+        public List<NtEndpointInboundConfiguration> CloneConfigurations()
         {
             return _collection.Use((o) =>
             {
-                List<NtEndpointInboundConfig> clones = new();
+                List<NtEndpointInboundConfiguration> clones = new();
                 foreach (var endpoint in o)
                 {
                     clones.Add(endpoint.CloneConfiguration());
@@ -61,7 +61,7 @@ namespace NetTunnel.Service.Engine.Managers
             _collection.Use((o) =>
             {
                 if (o.Count != 0) throw new Exception("Can not load configuration on top of existing collection.");
-                Persistence.LoadFromDisk<List<NtEndpointInboundConfig>>()?.ForEach(o => Add(o));
+                Persistence.LoadFromDisk<List<NtEndpointInboundConfiguration>>()?.ForEach(o => Add(o));
             });
         }
     }

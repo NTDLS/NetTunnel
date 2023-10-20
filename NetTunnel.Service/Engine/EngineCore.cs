@@ -11,7 +11,7 @@ namespace NetTunnel.Service.Engine
         public TunnelInboundManager IncomingTunnels { get; set; }
         public UserManager Users { get; set; }
 
-        public EngineCore(NtServiceConfiguration config)
+        public EngineCore(NtServiceApplicationConfiguration config)
         {
             Logging = new(this);
             Sessions = new(this);

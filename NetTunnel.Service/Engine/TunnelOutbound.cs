@@ -9,19 +9,32 @@ namespace NetTunnel.Service.Engine
     public class TunnelOutbound
     {
         private readonly EngineCore _core;
-        private NtTunnelOutboundConfig _configuration;
+        private NtTunnelOutboundConfiguration _configuration;
         private Thread? _outgoingConnectionThread;
         private bool _keepRunning = false;
 
+        private List<EndpointInbound> _inboundEndpoints = new();
+        private List<EndpointOutbound> _outboundEndpoints = new();
+
         public Guid Id { get => _configuration.Id; }
 
-        public TunnelOutbound(EngineCore core, NtTunnelOutboundConfig config)
+        public TunnelOutbound(EngineCore core, NtTunnelOutboundConfiguration config)
         {
             _core = core;
             _configuration = config;
+
+            foreach (var cfg in config.InboundEndpointConfigurations)
+            {
+                _inboundEndpoints.Add(new(_core, cfg));
+            }
+
+            foreach (var cfg in config.OutboundEndpointConfigurations)
+            {
+                _outboundEndpoints.Add(new(_core, cfg));
+            }
         }
 
-        public NtTunnelOutboundConfig CloneConfiguration() => _configuration.Clone();
+        public NtTunnelOutboundConfiguration CloneConfiguration() => _configuration.Clone();
 
         public void Start()
         {
@@ -31,6 +44,9 @@ namespace NetTunnel.Service.Engine
 
             _outgoingConnectionThread = new Thread(OutgoingConnectionThreadProc);
             _outgoingConnectionThread.Start();
+
+            _inboundEndpoints.ForEach(x => x.Start());
+            _outboundEndpoints.ForEach(x => x.Start());
         }
 
         public void Stop()

@@ -69,7 +69,7 @@ namespace NetTunnel.EndPoint.Controllers
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                var endpoint = JsonConvert.DeserializeObject<NtTunnelOutboundConfig>(value);
+                var endpoint = JsonConvert.DeserializeObject<NtTunnelOutboundConfiguration>(value);
                 Utility.EnsureNotNull(endpoint);
 
                 Singletons.Core.OutgoingTunnels.Add(endpoint);

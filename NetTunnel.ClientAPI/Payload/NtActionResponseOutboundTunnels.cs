@@ -4,7 +4,7 @@ namespace NetTunnel.ClientAPI.Payload
 {
     public class NtActionResponseOutboundTunnels : NtActionResponse
     {
-        public List<NtTunnelOutboundConfig> Collection { get; set; } = new();
+        public List<NtTunnelOutboundConfiguration> Collection { get; set; } = new();
 
         public NtActionResponseOutboundTunnels() { }
 
