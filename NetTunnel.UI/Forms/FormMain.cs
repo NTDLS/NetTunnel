@@ -73,8 +73,11 @@ namespace NetTunnel.UI.Forms
                     else if (e.ClickedItem?.Text == "Add Endpoint to Tunnel")
                     {
                         Utility.EnsureNotNull(_client);
+                        Utility.EnsureNotNull(itemUnderMouse);
 
-                        using (var formAddEndpoint = new FormAddEndpoint(_client))
+                        var tunnelId = (Guid)itemUnderMouse.Tag;
+
+                        using (var formAddEndpoint = new FormAddEndpoint(_client, tunnelId))
                         {
                             if (formAddEndpoint.ShowDialog() == DialogResult.OK)
                             {
@@ -136,7 +139,7 @@ namespace NetTunnel.UI.Forms
                 else
                 {
                     var item = new ListViewItem(tunnel.Name);
-                    item.Tag = tunnel;
+                    item.Tag = tunnel.Id;
                     item.SubItems.Add("Inbound");
                     item.SubItems.Add($"*:{tunnel.DataPort}");
 
@@ -153,7 +156,7 @@ namespace NetTunnel.UI.Forms
                 else
                 {
                     var item = new ListViewItem(tunnel.Name);
-                    item.Tag = tunnel;
+                    item.Tag = tunnel.Id;
                     item.SubItems.Add("Outbound");
                     item.SubItems.Add($"{tunnel.Address}{tunnel.DataPort}");
 
