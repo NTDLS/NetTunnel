@@ -8,9 +8,9 @@
         public List<NtEndpointOutboundConfiguration> OutboundEndpointConfigurations { get; private set; } = new();
         public List<NtEndpointInboundConfiguration> InboundEndpointConfigurations { get; private set; } = new();
 
-        public NtTunnelInboundConfiguration(Guid id, string name, int dataPort)
+        public NtTunnelInboundConfiguration(Guid pairId, string name, int dataPort)
         {
-            PairId = id;
+            PairId = pairId;
             Name = name;
             DataPort = dataPort;
         }

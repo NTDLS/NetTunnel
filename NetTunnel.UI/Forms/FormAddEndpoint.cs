@@ -6,14 +6,14 @@ namespace NetTunnel.UI.Forms
     public partial class FormAddEndpoint : BaseForm
     {
         private readonly NtClient? _client;
-        private readonly Guid? _tunnelPairId;
+        private readonly ITunnel? _tunnel;
 
-        public FormAddEndpoint(NtClient client, Guid tunnelPairId)
+        public FormAddEndpoint(NtClient client, ITunnel tunnel)
         {
             InitializeComponent();
 
             _client = client;
-            _tunnelPairId = tunnelPairId;
+            _tunnel = tunnel;
 
             AcceptButton = buttonAdd;
             CancelButton = buttonCancel;
@@ -34,6 +34,7 @@ namespace NetTunnel.UI.Forms
         private void buttonAdd_Click(object sender, EventArgs e)
         {
             Utility.EnsureNotNull(_client);
+            Utility.EnsureNotNull(_tunnel);
 
             try
             {
@@ -60,14 +61,15 @@ namespace NetTunnel.UI.Forms
 
                 EnableControl(buttonAdd, false);
 
-                var endpointPairId = Guid.NewGuid(); //The endpointId is the same on both services.
+                _tunnel.DispatchMessage("TODO: add this endpoint");
 
                 /*
-                var outgoingEndpoint = new NtEndpointOutboundConfiguration(endpointPairId, textBoxName.Text,
-                    textBoxRemoteAddress.Text, int.Parse(textBoxRemotePort.Text), int.Parse(textBoxEndpointDataPort.Text),
-                    textBoxRemoteUsername.Text, Utility.CalculateSHA256(textBoxRemotePassword.Text));
+                var endpointPairId = Guid.NewGuid(); //The endpointId is the same on both services.
 
-                var incomingEndpoint = new NtEndpointInboundConfiguration(endpointPairId, textBoxName.Text, int.Parse(textBoxEndpointDataPort.Text));
+                var outgoingEndpoint = new NtEndpointOutboundConfiguration(endpointPairId, textBoxName.Text,
+                    textBoxTerminationAddress.Text, int.Parse(textBoxTerminationPort.Text));
+
+                var incomingEndpoint = new NtEndpointInboundConfiguration(endpointPairId, textBoxName.Text, int.Parse(textBoxListenPort.Text));
 
                 NtClient remoteClient;
 
@@ -119,6 +121,7 @@ namespace NetTunnel.UI.Forms
                     });
                 });
                 */
+
             }
             catch (Exception ex)
             {

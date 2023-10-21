@@ -8,7 +8,6 @@ namespace NetTunnel.ClientAPI
         public bool IsConnected => _connection != null;
         public string BaseAddress { get; private set; }
         public TimeSpan Timeout { get; private set; } = new TimeSpan(0, 8, 0, 0, 0);
-
         public HttpClient Connection
         {
             get
@@ -40,7 +39,7 @@ namespace NetTunnel.ClientAPI
             TunnelOutbound = new(this);
             EndpointInbound = new(this);
             EndpointOutbound = new(this);
-            Security = new (this);
+            Security = new(this);
 
             Connect();
         }

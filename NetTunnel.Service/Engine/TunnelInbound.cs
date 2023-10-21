@@ -32,6 +32,11 @@ namespace NetTunnel.Service.Engine
             configuration.OutboundEndpointConfigurations.ForEach(o => _outboundEndpoints.Add(new(_core, this, o)));
         }
 
+        public void DispatchMessage(string message)
+        {
+            throw new NotImplementedException();
+        }
+
         public NtTunnelInboundConfiguration CloneConfiguration()
         {
             var tunnelConfiguration = new NtTunnelInboundConfiguration(PairId, Name, DataPort);
@@ -152,6 +157,5 @@ namespace NetTunnel.Service.Engine
             // Close the client when done.
             client.Close();
         }
-
     }
 }

@@ -40,6 +40,11 @@ namespace NetTunnel.Service.Engine
             configuration.OutboundEndpointConfigurations.ForEach(o => _outboundEndpoints.Add(new(_core, this, o)));
         }
 
+        public void DispatchMessage(string message)
+        {
+            throw new NotImplementedException();
+        }
+
         public NtTunnelOutboundConfiguration CloneConfiguration()
         {
             var tunnelConfiguration = new NtTunnelOutboundConfiguration(PairId, Name, Address, ManagementPort, DataPort, Username, PasswordHash);
