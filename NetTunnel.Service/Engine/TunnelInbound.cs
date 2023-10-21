@@ -1,5 +1,4 @@
 ﻿using NetTunnel.Library.Types;
-using Newtonsoft.Json;
 using System.Net;
 using System.Net.Sockets;
 
@@ -11,28 +10,46 @@ namespace NetTunnel.Service.Engine
     public class TunnelInbound : ITunnel
     {
         private readonly EngineCore _core;
-        private readonly NtTunnelInboundConfiguration _configuration;
         private Thread? _incomingConnectionThread;
         private bool _keepRunning = false;
 
         private readonly List<EndpointInbound> _inboundEndpoints = new();
         private readonly List<EndpointOutbound> _outboundEndpoints = new();
 
-        [JsonIgnore]
-        public Guid PairId { get => _configuration.PairId; }
-        [JsonIgnore]
-        public string Name { get => _configuration.Name; }
+        public Guid PairId { get; private set; }
+        public string Name { get; private set; }
+        public int DataPort { get; private set; }
 
         public TunnelInbound(EngineCore core, NtTunnelInboundConfiguration configuration)
         {
             _core = core;
-            _configuration = configuration;
+
+            PairId = configuration.PairId;
+            Name = configuration.Name;
+            DataPort = configuration.DataPort;
 
             configuration.InboundEndpointConfigurations.ForEach(o => _inboundEndpoints.Add(new(_core, this, o)));
             configuration.OutboundEndpointConfigurations.ForEach(o => _outboundEndpoints.Add(new(_core, this, o)));
         }
 
-        public NtTunnelInboundConfiguration CloneConfiguration() => _configuration.Clone();
+        public NtTunnelInboundConfiguration CloneConfiguration()
+        {
+            var tunnelConfiguration = new NtTunnelInboundConfiguration(PairId, Name, DataPort);
+
+            foreach (var endpoint in _inboundEndpoints)
+            {
+                var endpointConfiguration = new NtEndpointInboundConfiguration(endpoint.PairId, endpoint.Name, endpoint.Port);
+                tunnelConfiguration.InboundEndpointConfigurations.Add(endpointConfiguration);
+            }
+
+            foreach (var endpoint in _outboundEndpoints)
+            {
+                var endpointConfiguration = new NtEndpointOutboundConfiguration(endpoint.PairId, endpoint.Name, endpoint.Address, endpoint.Port);
+                tunnelConfiguration.OutboundEndpointConfigurations.Add(endpointConfiguration);
+            }
+
+            return tunnelConfiguration;
+        }
 
         public void AddEndpoint(NtEndpointInboundConfiguration configuration)
             => _inboundEndpoints.Add(new EndpointInbound(_core, this, configuration));
@@ -44,7 +61,7 @@ namespace NetTunnel.Service.Engine
         {
             _keepRunning = true;
 
-            _core.Logging.Write($"Starting incoming tunnel '{_configuration.Name}' on port {_configuration.DataPort}");
+            _core.Logging.Write($"Starting incoming tunnel '{Name}' on port {DataPort}");
 
             _incomingConnectionThread = new Thread(IncomingConnectionThreadProc);
             _incomingConnectionThread.Start();
@@ -61,24 +78,24 @@ namespace NetTunnel.Service.Engine
 
         private void IncomingConnectionThreadProc()
         {
-            var listener = new TcpListener(IPAddress.Any, _configuration.DataPort);
+            var listener = new TcpListener(IPAddress.Any, DataPort);
 
             try
             {
                 listener.Start();
 
-                _core.Logging.Write($"Listening incoming tunnel '{_configuration.Name}' on port {_configuration.DataPort}");
+                _core.Logging.Write($"Listening incoming tunnel '{Name}' on port {DataPort}");
 
                 while (_keepRunning)
                 {
-                    _core.Logging.Write($"Waiting for connection for incoming tunnel '{_configuration.Name}' on port {_configuration.DataPort}");
+                    _core.Logging.Write($"Waiting for connection for incoming tunnel '{Name}' on port {DataPort}");
 
                     var client = listener.AcceptTcpClient();
-                    _core.Logging.Write($"Connected on incoming tunnel '{_configuration.Name}' on port {_configuration.DataPort}");
+                    _core.Logging.Write($"Connected on incoming tunnel '{Name}' on port {DataPort}");
 
                     HandleClient(client);
 
-                    _core.Logging.Write($"Disconnected incoming tunnel '{_configuration.Name}' on port {_configuration.DataPort}");
+                    _core.Logging.Write($"Disconnected incoming tunnel '{Name}' on port {DataPort}");
 
                     Thread.Sleep(1000);
                 }

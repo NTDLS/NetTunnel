@@ -6,31 +6,34 @@ namespace NetTunnel.Service.Engine
     /// <summary>
     /// This is the class that makes an outgoing TCP/IP connection to a listening endpoint.
     /// </summary>
-    public class EndpointOutbound: IEndpoint
+    public class EndpointOutbound : IEndpoint
     {
         private readonly EngineCore _core;
-        private NtEndpointOutboundConfiguration _configuration;
         private Thread? _outgoingConnectionThread;
         private bool _keepRunning = false;
         private readonly ITunnel _tunnel;
 
-        public Guid PairId { get => _configuration.PairId; }
-        public string Name { get => _configuration.Name; }
+        public Guid PairId { get; private set; }
+        public string Name { get; private set; }
+        public string Address { get; private set; }
+        public int Port { get; private set; }
 
         public EndpointOutbound(EngineCore core, ITunnel tunnel, NtEndpointOutboundConfiguration configuration)
         {
             _core = core;
             _tunnel = tunnel;
-            _configuration = configuration;
-        }
 
-        public NtEndpointOutboundConfiguration CloneConfiguration() => _configuration.Clone();
+            PairId = configuration.PairId;
+            Name = configuration.Name;
+            Address = configuration.Address;
+            Port = configuration.Port;
+        }
 
         public void Start()
         {
             _keepRunning = true;
 
-            _core.Logging.Write($"Starting outgoing endpoint '{_configuration.Name}'");
+            _core.Logging.Write($"Starting outgoing endpoint '{Name}'");
 
             _outgoingConnectionThread = new Thread(OutgoingConnectionThreadProc);
             _outgoingConnectionThread.Start();
@@ -48,11 +51,11 @@ namespace NetTunnel.Service.Engine
             {
                 try
                 {
-                    _core.Logging.Write($"Attempting to connect to outgoing endpoint '{_configuration.Name}' at {_configuration.Address}:{_configuration.DataPort}.");
+                    _core.Logging.Write($"Attempting to connect to outgoing endpoint '{Name}' at {Address}:{Port}.");
 
-                    var client = new TcpClient(_configuration.Address, _configuration.DataPort);
+                    var client = new TcpClient(Address, Port);
 
-                    _core.Logging.Write($"Connection successful for endpoint '{_configuration.Name}' at {_configuration.Address}:{_configuration.DataPort}.");
+                    _core.Logging.Write($"Connection successful for endpoint '{Name}' at {Address}:{Port}.");
 
                     HandleClient(client);
                 }

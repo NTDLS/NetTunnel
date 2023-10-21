@@ -11,29 +11,30 @@ namespace NetTunnel.Service.Engine
     public class EndpointInbound
     {
         private readonly EngineCore _core;
-        private NtEndpointInboundConfiguration _configuration;
         private Thread? _incomingConnectionThread;
         private bool _keepRunning = false;
         private List<Thread> _handlerThreads = new();
         private readonly ITunnel _tunnel;
 
-        public Guid PairId { get => _configuration.PairId; }
-        public string Name { get => _configuration.Name; }
+        public Guid PairId { get; private set; }
+        public string Name { get; private set; }
+        public int Port { get; private set; }
 
         public EndpointInbound(EngineCore core, ITunnel tunnel, NtEndpointInboundConfiguration configuration)
         {
             _core = core;
             _tunnel = tunnel;
-            _configuration = configuration;
-        }
 
-        public NtEndpointInboundConfiguration CloneConfiguration() => _configuration.Clone();
+            PairId = configuration.PairId;
+            Name = configuration.Name;
+            Port = configuration.Port;
+        }
 
         public void Start()
         {
             _keepRunning = true;
 
-            _core.Logging.Write($"Starting incoming endpoint '{_configuration.Name}' on port {_configuration.ListenPort}");
+            _core.Logging.Write($"Starting incoming endpoint '{Name}' on port {Port}");
 
             _incomingConnectionThread = new Thread(IncomingConnectionThreadProc);
             _incomingConnectionThread.Start();
@@ -47,21 +48,21 @@ namespace NetTunnel.Service.Engine
 
         void IncomingConnectionThreadProc()
         {
-            var listener = new TcpListener(IPAddress.Any, _configuration.ListenPort);
+            var listener = new TcpListener(IPAddress.Any, Port);
 
             try
             {
                 listener.Start();
 
-                _core.Logging.Write($"Listening incoming endpoint '{_configuration.Name}' on port {_configuration.ListenPort}");
+                _core.Logging.Write($"Listening incoming endpoint '{Name}' on port {Port}");
 
                 while (_keepRunning)
                 {
-                    _core.Logging.Write($"Waiting for connection for incoming endpoint '{_configuration.Name}' on port {_configuration.ListenPort}");
+                    _core.Logging.Write($"Waiting for connection for incoming endpoint '{Name}' on port {Port}");
 
                     var client = listener.AcceptTcpClient();
 
-                    _core.Logging.Write($"Accepted on incoming endpoint '{_configuration.Name}' on port {_configuration.ListenPort}");
+                    _core.Logging.Write($"Accepted on incoming endpoint '{Name}' on port {Port}");
 
                     var handlerThread = new Thread(HandleClientThreadProc);
                     _handlerThreads.Add(handlerThread);
@@ -87,12 +88,8 @@ namespace NetTunnel.Service.Engine
             var client = (TcpClient)obj;
 
             //Here we need to tell the remote service to start an outgoing connection for this endpoint and on its owning tunnel.
-
-
-            //
-            //_configuration.TunnelId
-            //this.Id
-
+            //_tunnel.PairId
+            //PairId
 
             while (_keepRunning)
             {

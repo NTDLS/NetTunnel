@@ -1,5 +1,4 @@
 ﻿using NetTunnel.Library.Types;
-using Newtonsoft.Json;
 using System.Net.Sockets;
 
 namespace NetTunnel.Service.Engine
@@ -10,28 +9,55 @@ namespace NetTunnel.Service.Engine
     public class TunnelOutbound : ITunnel
     {
         private readonly EngineCore _core;
-        private readonly NtTunnelOutboundConfiguration _configuration;
+        //private readonly NtTunnelOutboundConfiguration _configuration;
         private Thread? _outgoingConnectionThread;
         private bool _keepRunning = false;
 
         private readonly List<EndpointInbound> _inboundEndpoints = new();
         private readonly List<EndpointOutbound> _outboundEndpoints = new();
 
-        [JsonIgnore]
-        public Guid PairId { get => _configuration.PairId; }
-        [JsonIgnore]
-        public string Name { get => _configuration.Name; }
+        public Guid PairId { get; private set; }
+        public string Name { get; set; }
+        public string Address { get; set; }
+        public int ManagementPort { get; set; }
+        public int DataPort { get; set; }
+        public string Username { get; set; }
+        public string PasswordHash { get; set; }
 
         public TunnelOutbound(EngineCore core, NtTunnelOutboundConfiguration configuration)
         {
             _core = core;
-            _configuration = configuration;
+
+            PairId = configuration.PairId;
+            Name = configuration.Name;
+            Address = configuration.Address;
+            ManagementPort = configuration.ManagementPort;
+            DataPort = configuration.DataPort;
+            Username = configuration.Username;
+            PasswordHash = configuration.PasswordHash;
 
             configuration.InboundEndpointConfigurations.ForEach(o => _inboundEndpoints.Add(new(_core, this, o)));
             configuration.OutboundEndpointConfigurations.ForEach(o => _outboundEndpoints.Add(new(_core, this, o)));
         }
 
-        public NtTunnelOutboundConfiguration CloneConfiguration() => _configuration.Clone();
+        public NtTunnelOutboundConfiguration CloneConfiguration()
+        {
+            var tunnelConfiguration = new NtTunnelOutboundConfiguration(PairId, Name, Address, ManagementPort, DataPort, Username, PasswordHash);
+
+            foreach (var endpoint in _inboundEndpoints)
+            {
+                var endpointConfiguration = new NtEndpointInboundConfiguration(endpoint.PairId, endpoint.Name, endpoint.Port);
+                tunnelConfiguration.InboundEndpointConfigurations.Add(endpointConfiguration);
+            }
+
+            foreach (var endpoint in _outboundEndpoints)
+            {
+                var endpointConfiguration = new NtEndpointOutboundConfiguration(endpoint.PairId, endpoint.Name, endpoint.Address, endpoint.Port);
+                tunnelConfiguration.OutboundEndpointConfigurations.Add(endpointConfiguration);
+            }
+
+            return tunnelConfiguration;
+        }
 
         public void AddEndpoint(NtEndpointInboundConfiguration configuration)
             => _inboundEndpoints.Add(new EndpointInbound(_core, this, configuration));
@@ -43,7 +69,7 @@ namespace NetTunnel.Service.Engine
         {
             _keepRunning = true;
 
-            _core.Logging.Write($"Starting outgoing tunnel '{_configuration.Name}'");
+            _core.Logging.Write($"Starting outgoing tunnel '{Name}'");
 
             _outgoingConnectionThread = new Thread(OutgoingConnectionThreadProc);
             _outgoingConnectionThread.Start();
@@ -64,11 +90,11 @@ namespace NetTunnel.Service.Engine
             {
                 try
                 {
-                    _core.Logging.Write($"Attempting to connect to outgoing tunnel '{_configuration.Name}' at {_configuration.Address}:{_configuration.DataPort}.");
+                    _core.Logging.Write($"Attempting to connect to outgoing tunnel '{Name}' at {Address}:{DataPort}.");
 
-                    var client = new TcpClient(_configuration.Address, _configuration.DataPort);
+                    var client = new TcpClient(Address, DataPort);
 
-                    _core.Logging.Write($"Connection successful for tunnel '{_configuration.Name}' at {_configuration.Address}:{_configuration.DataPort}.");
+                    _core.Logging.Write($"Connection successful for tunnel '{Name}' at {Address}:{DataPort}.");
 
                     HandleClient(client);
                 }

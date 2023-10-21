@@ -5,23 +5,15 @@
     /// </summary>
     public class NtEndpointInboundConfiguration
     {
-        public Guid PairId { get; private set; } = Guid.NewGuid();
-        public string Name { get; set; }
-        public int ListenPort { get; set; }
-        public Guid TunnelId { get; set; }
+        public Guid PairId { get; private set; }
+        public string Name { get; private set; }
+        public int Port { get; private set; }
 
-        public NtEndpointInboundConfiguration(string name, int dataPort)
+        public NtEndpointInboundConfiguration(Guid pairId, string name, int port)
         {
+            PairId = pairId;
             Name = name;
-            ListenPort = dataPort;
-        }
-
-        public NtEndpointInboundConfiguration Clone()
-        {
-            return new NtEndpointInboundConfiguration(Name, ListenPort)
-            {
-                PairId = PairId
-            };
+            Port = port;
         }
     }
 }
