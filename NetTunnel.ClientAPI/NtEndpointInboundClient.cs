@@ -6,22 +6,22 @@ using System.Text;
 
 namespace NetTunnel.ClientAPI
 {
-    public class NtTunnelOutboundClient
+    public class NtEndpointInboundClient
     {
         private readonly NtClient _client;
 
-        public NtTunnelOutboundClient(NtClient client)
+        public NtEndpointInboundClient(NtClient client)
         {
             _client = client;
         }
 
-        public async Task<NtActionResponseTunnelsOutbound> List()
+        public async Task<NtActionResponseEndpointsInbound> List(Guid tunnelPairId)
         {
-            string url = $"api/TunnelOutbound/{_client.SessionId}/List";
+            string url = $"api/EndpointInbound/{_client.SessionId}/List/{tunnelPairId}";
 
             using var response = await _client.Connection.GetAsync(url);
             string resultText = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<NtActionResponseTunnelsOutbound>(resultText);
+            var result = JsonConvert.DeserializeObject<NtActionResponseEndpointsInbound>(resultText);
             if (result == null || result.Success == false)
             {
                 throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
@@ -30,9 +30,9 @@ namespace NetTunnel.ClientAPI
             return result;
         }
 
-        public async Task Add(NtTunnelOutboundConfiguration tunnel)
+        public async Task Add(Guid tunnelPairId, NtEndpointInboundConfiguration tunnel)
         {
-            string url = $"api/TunnelOutbound/{_client.SessionId}/Add";
+            string url = $"api/EndpointInbound/{_client.SessionId}/Add/{tunnelPairId}";
 
             var postContent = new StringContent(JsonConvert.SerializeObject(tunnel), Encoding.UTF8, "text/plain");
 
@@ -45,9 +45,9 @@ namespace NetTunnel.ClientAPI
             }
         }
 
-        public async Task Delete(Guid tunnelPairId)
+        public async Task Delete(Guid tunnelPairId, Guid endpointPairId)
         {
-            string url = $"api/TunnelOutbound/{_client.SessionId}/Delete/{tunnelPairId}";
+            string url = $"api/EndpointInbound/{_client.SessionId}/Delete/{tunnelPairId}/{endpointPairId}";
 
             using var response = await _client.Connection.GetAsync(url);
             string resultText = await response.Content.ReadAsStringAsync();

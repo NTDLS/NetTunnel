@@ -51,7 +51,7 @@ namespace NetTunnel.ClientAPI
 
             using var response = await _client.Connection.GetAsync(url);
             string resultText = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<NtActionResponseTunnelsOutbound>(resultText);
+            var result = JsonConvert.DeserializeObject<NtActionResponse>(resultText);
             if (result == null || result.Success == false)
             {
                 throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
