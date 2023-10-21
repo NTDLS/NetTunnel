@@ -2,13 +2,13 @@
 
 namespace NetTunnel.ClientAPI.Payload
 {
-    public class NtActionResponseInboundTunnels : NtActionResponse
+    public class NtActionResponseTunnelsInbound : NtActionResponse
     {
         public List<NtTunnelInboundConfiguration> Collection { get; set; } = new();
 
-        public NtActionResponseInboundTunnels() { }
+        public NtActionResponseTunnelsInbound() { }
 
-        public NtActionResponseInboundTunnels(Exception ex)
+        public NtActionResponseTunnelsInbound(Exception ex)
         {
             ExceptionText = ex.Message;
             Success = false;

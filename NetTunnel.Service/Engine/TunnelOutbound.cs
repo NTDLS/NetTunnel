@@ -59,11 +59,25 @@ namespace NetTunnel.Service.Engine
             return tunnelConfiguration;
         }
 
-        public void AddEndpoint(NtEndpointInboundConfiguration configuration)
+        public void AddInboundEndpoint(NtEndpointInboundConfiguration configuration)
             => _inboundEndpoints.Add(new EndpointInbound(_core, this, configuration));
 
-        public void AddEndpoint(NtEndpointOutboundConfiguration configuration)
+        public void AddOutboundEndpoint(NtEndpointOutboundConfiguration configuration)
             => _outboundEndpoints.Add(new EndpointOutbound(_core, this, configuration));
+
+        public void DeleteInboundEndpoint(Guid endpointPairId)
+        {
+            var endpoint = _inboundEndpoints.Where(o => o.PairId == endpointPairId).Single();
+            endpoint.Stop();
+            _inboundEndpoints.Remove(endpoint);
+        }
+
+        public void DeleteOutboundEndpoint(Guid endpointPairId)
+        {
+            var endpoint = _inboundEndpoints.Where(o => o.PairId == endpointPairId).Single();
+            endpoint.Stop();
+            _inboundEndpoints.Remove(endpoint);
+        }
 
         public void Start()
         {

@@ -20,21 +20,39 @@ namespace NetTunnel.Service.Engine.Managers
         public void StartAll() => _collection.Use((o) => o.ForEach((o) => o.Start()));
         public void StopAll() => _collection.Use((o) => o.ForEach((o) => o.Stop()));
 
-        public void AddEndpoint(Guid tunnelPairId, NtEndpointInboundConfiguration configuration)
+        public void DeleteInboundEndpoint(Guid tunnelPairId, Guid endpointPairId)
         {
             _collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
-                tunnel.AddEndpoint(configuration);
+                tunnel.DeleteInboundEndpoint(endpointPairId);
             });
         }
 
-        public void AddEndpoint(Guid tunnelPairId, NtEndpointOutboundConfiguration configuration)
+        public void DeleteOutboundEndpoint(Guid tunnelPairId, Guid endpointPairId)
         {
             _collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
-                tunnel.AddEndpoint(configuration);
+                tunnel.DeleteOutboundEndpoint(endpointPairId);
+            });
+        }
+
+        public void AddInboundEndpoint(Guid tunnelPairId, NtEndpointInboundConfiguration configuration)
+        {
+            _collection.Use((o) =>
+            {
+                var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
+                tunnel.AddInboundEndpoint(configuration);
+            });
+        }
+
+        public void AddOutboundEndpoint(Guid tunnelPairId, NtEndpointOutboundConfiguration configuration)
+        {
+            _collection.Use((o) =>
+            {
+                var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
+                tunnel.AddOutboundEndpoint(configuration);
             });
         }
 
@@ -66,6 +84,15 @@ namespace NetTunnel.Service.Engine.Managers
                 {
                     //Name = o._con
                 };
+            });
+        }
+
+        public NtTunnelInboundConfiguration CloneConfiguration(Guid tunnerPairId)
+        {
+            return _collection.Use((o) =>
+            {
+                var tunnel = o.Where(o => o.PairId == tunnerPairId).Single();
+                return tunnel.CloneConfiguration();
             });
         }
 

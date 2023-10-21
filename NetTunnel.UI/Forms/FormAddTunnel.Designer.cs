@@ -41,7 +41,7 @@
             buttonCancel = new Button();
             textBoxName = new TextBox();
             labelName = new Label();
-            textBoxEndpointDataPort = new TextBox();
+            textBoxTunnelDataPort = new TextBox();
             labelEndpointDataPort = new Label();
             groupBoxLoginInfo = new GroupBox();
             groupBoxLoginInfo.SuspendLayout();
@@ -150,10 +150,10 @@
             // 
             // textBoxEndpointDataPort
             // 
-            textBoxEndpointDataPort.Location = new Point(17, 79);
-            textBoxEndpointDataPort.Name = "textBoxEndpointDataPort";
-            textBoxEndpointDataPort.Size = new Size(77, 23);
-            textBoxEndpointDataPort.TabIndex = 1;
+            textBoxTunnelDataPort.Location = new Point(17, 79);
+            textBoxTunnelDataPort.Name = "textBoxEndpointDataPort";
+            textBoxTunnelDataPort.Size = new Size(77, 23);
+            textBoxTunnelDataPort.TabIndex = 1;
             // 
             // labelEndpointDataPort
             // 
@@ -188,7 +188,7 @@
             ClientSize = new Size(312, 365);
             Controls.Add(groupBoxLoginInfo);
             Controls.Add(labelEndpointDataPort);
-            Controls.Add(textBoxEndpointDataPort);
+            Controls.Add(textBoxTunnelDataPort);
             Controls.Add(textBoxName);
             Controls.Add(labelName);
             Controls.Add(buttonCancel);
@@ -201,7 +201,7 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
             Text = "NetTunnel : Tunnel";
-            Load += FormAddEndpoint_Load;
+            Load += FormAddTunnel_Load;
             groupBoxLoginInfo.ResumeLayout(false);
             groupBoxLoginInfo.PerformLayout();
             ResumeLayout(false);
@@ -222,7 +222,7 @@
         private Button buttonCancel;
         private TextBox textBoxName;
         private Label labelName;
-        private TextBox textBoxEndpointDataPort;
+        private TextBox textBoxTunnelDataPort;
         private Label labelEndpointDataPort;
         private GroupBox groupBoxLoginInfo;
     }

@@ -5,58 +5,58 @@ using NetTunnel.Library.Types;
 using NetTunnel.Service.Engine;
 using Newtonsoft.Json;
 
-namespace NetTunnel.EndPoint.Controllers
+namespace NetTunnel.Service.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class InboundTunnelController : ControllerBase
+    public class TunnelOutboundController : ControllerBase
     {
-        public InboundTunnelController(IHttpContextAccessor httpContextAccessor)
+        public TunnelOutboundController(IHttpContextAccessor httpContextAccessor)
             : base(httpContextAccessor)
         {
         }
 
         [HttpGet]
         [Route("{sessionId}/List")]
-        public NtActionResponseInboundTunnels List(Guid sessionId)
+        public NtActionResponseTunnelsOutbound List(Guid sessionId)
         {
             try
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                return new NtActionResponseInboundTunnels
+                return new NtActionResponseTunnelsOutbound
                 {
-                    Collection = Singletons.Core.InboundTunnels.CloneConfigurations(),
+                    Collection = Singletons.Core.OutboundTunnels.CloneConfigurations(),
                     Success = true
                 };
             }
             catch (Exception ex)
             {
-                return new NtActionResponseInboundTunnels(ex);
+                return new NtActionResponseTunnelsOutbound(ex);
             }
         }
 
         [HttpGet]
-        [Route("{sessionId}/Delete/{endpointId}")]
-        public NtActionResponse Delete(Guid sessionId, Guid endpointId)
+        [Route("{sessionId}/Delete/{tunnelPairId}")]
+        public NtActionResponse Delete(Guid sessionId, Guid tunnelPairId)
         {
             try
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                Singletons.Core.InboundTunnels.Delete(endpointId);
-                Singletons.Core.InboundTunnels.SaveToDisk();
+                Singletons.Core.OutboundTunnels.Delete(tunnelPairId);
+                Singletons.Core.OutboundTunnels.SaveToDisk();
 
                 return new NtActionResponse { Success = true };
             }
             catch (Exception ex)
             {
-                return new NtActionResponseInboundTunnels(ex);
+                return new NtActionResponseTunnelsInbound(ex);
             }
         }
 
         /// <summary>
-        /// This is called locally to add a local listening endpoint. This is the endpoint that may be behind a firewall.
+        /// This is called locally to add a local listening tunnel. This is the tunnel that may be behind a firewall.
         /// </summary>
         /// <param name="sessionId"></param>
         /// <param name="value"></param>
@@ -69,11 +69,11 @@ namespace NetTunnel.EndPoint.Controllers
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                var endpoint = JsonConvert.DeserializeObject<NtTunnelInboundConfiguration>(value);
-                Utility.EnsureNotNull(endpoint);
+                var tunnel = JsonConvert.DeserializeObject<NtTunnelOutboundConfiguration>(value);
+                Utility.EnsureNotNull(tunnel);
 
-                Singletons.Core.InboundTunnels.Add(endpoint);
-                Singletons.Core.InboundTunnels.SaveToDisk();
+                Singletons.Core.OutboundTunnels.Add(tunnel);
+                Singletons.Core.OutboundTunnels.SaveToDisk();
 
                 return new NtActionResponse { Success = true };
             }

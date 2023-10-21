@@ -1,4 +1,4 @@
-﻿using NetTunnel.EndPoint;
+﻿using NetTunnel.Service;
 
 namespace NetTunnel.ClientAPI.Payload
 {

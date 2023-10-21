@@ -120,12 +120,12 @@ namespace NetTunnel.UI.Forms
 
             listViewTunnels.Items.Clear();
 
-            _client.IncomingTunnel.List().ContinueWith(t =>
+            _client.TunnelInbound.List().ContinueWith(t =>
             {
                 t.Result.Collection.ForEach(t => AddIncomingTunnelToGrid(t));
             });
 
-            _client.OutgoingTunnel.List().ContinueWith(t =>
+            _client.TunnelOutbound.List().ContinueWith(t =>
             {
                 t.Result.Collection.ForEach(t => AddOutgoingTunnelToGrid(t));
             });

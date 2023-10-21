@@ -6,22 +6,22 @@ using System.Text;
 
 namespace NetTunnel.ClientAPI
 {
-    public class NtInboundTunnelClient
+    public class NtTunnelInboundClient
     {
         private readonly NtClient _client;
 
-        public NtInboundTunnelClient(NtClient client)
+        public NtTunnelInboundClient(NtClient client)
         {
             _client = client;
         }
 
-        public async Task<NtActionResponseInboundTunnels> List()
+        public async Task<NtActionResponseTunnelsInbound> List()
         {
-            string url = $"api/InboundTunnel/{_client.SessionId}/List";
+            string url = $"api/TunnelInbound/{_client.SessionId}/List";
 
             using var response = await _client.Connection.GetAsync(url);
             string resultText = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<NtActionResponseInboundTunnels>(resultText);
+            var result = JsonConvert.DeserializeObject<NtActionResponseTunnelsInbound>(resultText);
             if (result == null || result.Success == false)
             {
                 throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
@@ -32,7 +32,7 @@ namespace NetTunnel.ClientAPI
 
         public async Task Add(NtTunnelInboundConfiguration tunnel)
         {
-            string url = $"api/InboundTunnel/{_client.SessionId}/Add";
+            string url = $"api/TunnelInbound/{_client.SessionId}/Add";
 
             var postContent = new StringContent(JsonConvert.SerializeObject(tunnel), Encoding.UTF8, "text/plain");
 
@@ -47,11 +47,11 @@ namespace NetTunnel.ClientAPI
 
         public async Task Delete(Guid tunnelPairId)
         {
-            string url = $"api/InboundTunnel/{_client.SessionId}/Delete/{tunnelPairId}";
+            string url = $"api/TunnelInbound/{_client.SessionId}/Delete/{tunnelPairId}";
 
             using var response = await _client.Connection.GetAsync(url);
             string resultText = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<NtActionResponseOutboundTunnels>(resultText);
+            var result = JsonConvert.DeserializeObject<NtActionResponseTunnelsOutbound>(resultText);
             if (result == null || result.Success == false)
             {
                 throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);

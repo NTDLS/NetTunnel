@@ -5,53 +5,56 @@ using NetTunnel.Library.Types;
 using NetTunnel.Service.Engine;
 using Newtonsoft.Json;
 
-namespace NetTunnel.EndPoint.Controllers
+namespace NetTunnel.Service.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class OutboundTunnelController : ControllerBase
+    public class InboundEndpointController : ControllerBase
     {
-        public OutboundTunnelController(IHttpContextAccessor httpContextAccessor)
+        public InboundEndpointController(IHttpContextAccessor httpContextAccessor)
             : base(httpContextAccessor)
         {
         }
 
         [HttpGet]
-        [Route("{sessionId}/List")]
-        public NtActionResponseOutboundTunnels List(Guid sessionId)
+        [Route("{sessionId}/List/{tunnelPairId}")]
+        public NtActionResponseEndpointsInbound List(Guid sessionId, Guid tunnelPairId)
         {
             try
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                return new NtActionResponseOutboundTunnels
+                var tunnel = Singletons.Core.InboundTunnels.CloneConfiguration(tunnelPairId);
+
+                return new NtActionResponseEndpointsInbound
                 {
-                    Collection = Singletons.Core.OutboundTunnels.CloneConfigurations(),
+                    Collection = tunnel.InboundEndpointConfigurations,
                     Success = true
                 };
             }
             catch (Exception ex)
             {
-                return new NtActionResponseOutboundTunnels(ex);
+                return new NtActionResponseEndpointsInbound(ex);
             }
         }
 
         [HttpGet]
-        [Route("{sessionId}/Delete/{endpointId}")]
-        public NtActionResponse Delete(Guid sessionId, Guid endpointId)
+        [Route("{sessionId}/Delete/{tunnelPairId}/{endpointPairId}")]
+        public NtActionResponse Delete(Guid sessionId, Guid tunnelPairId, Guid endpointPairId)
         {
             try
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                Singletons.Core.OutboundTunnels.Delete(endpointId);
-                Singletons.Core.OutboundTunnels.SaveToDisk();
+                var tunnel = Singletons.Core.InboundTunnels.CloneConfiguration(tunnelPairId);
+                Singletons.Core.InboundTunnels.DeleteInboundEndpoint(tunnelPairId, endpointPairId);
+                Singletons.Core.InboundTunnels.SaveToDisk();
 
                 return new NtActionResponse { Success = true };
             }
             catch (Exception ex)
             {
-                return new NtActionResponseInboundTunnels(ex);
+                return new NtActionResponseTunnelsInbound(ex);
             }
         }
 
@@ -62,18 +65,18 @@ namespace NetTunnel.EndPoint.Controllers
         /// <param name="value"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("{sessionId}/Add")]
-        public NtActionResponse Add(Guid sessionId, [FromBody] string value)
+        [Route("{sessionId}/Add/{tunnelPairId}")]
+        public NtActionResponse Add(Guid sessionId, Guid tunnelPairId, [FromBody] string value)
         {
             try
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                var endpoint = JsonConvert.DeserializeObject<NtTunnelOutboundConfiguration>(value);
+                var endpoint = JsonConvert.DeserializeObject<NtEndpointInboundConfiguration>(value);
                 Utility.EnsureNotNull(endpoint);
 
-                Singletons.Core.OutboundTunnels.Add(endpoint);
-                Singletons.Core.OutboundTunnels.SaveToDisk();
+                Singletons.Core.InboundTunnels.AddInboundEndpoint(tunnelPairId, endpoint);
+                Singletons.Core.InboundTunnels.SaveToDisk();
 
                 return new NtActionResponse { Success = true };
             }

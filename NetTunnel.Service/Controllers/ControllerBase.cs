@@ -1,4 +1,4 @@
-﻿namespace NetTunnel.EndPoint.Controllers
+﻿namespace NetTunnel.Service.Controllers
 {
 
     public class ControllerBase

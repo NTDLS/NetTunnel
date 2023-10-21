@@ -1,5 +1,5 @@
 ﻿using NetTunnel.ClientAPI;
-using NetTunnel.EndPoint;
+using NetTunnel.Service;
 using NetTunnel.Library;
 using NTDLS.Semaphore;
 

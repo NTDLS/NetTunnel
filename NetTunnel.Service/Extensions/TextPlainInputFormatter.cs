@@ -2,7 +2,7 @@
 using Microsoft.Net.Http.Headers;
 using System.Text;
 
-namespace NetTunnel.EndPoint.Extensions
+namespace NetTunnel.Service.Extensions
 {
     public class TextPlainInputFormatter : TextInputFormatter
     {

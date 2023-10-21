@@ -4,7 +4,7 @@ using NetTunnel.ClientAPI.Payload;
 using NetTunnel.Service.Engine;
 using Newtonsoft.Json;
 
-namespace NetTunnel.EndPoint.Controllers
+namespace NetTunnel.Service.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

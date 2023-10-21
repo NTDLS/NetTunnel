@@ -150,6 +150,7 @@
             buttonAdd.TabIndex = 7;
             buttonAdd.Text = "Add";
             buttonAdd.UseVisualStyleBackColor = true;
+            buttonAdd.Click += buttonAdd_Click;
             // 
             // buttonCancel
             // 

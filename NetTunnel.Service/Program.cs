@@ -1,6 +1,6 @@
 using Topshelf;
 
-namespace NetTunnel.EndPoint
+namespace NetTunnel.Service
 {
     public class Program
     {
