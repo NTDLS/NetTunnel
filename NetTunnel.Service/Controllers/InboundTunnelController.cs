@@ -26,7 +26,7 @@ namespace NetTunnel.EndPoint.Controllers
 
                 return new NtActionResponseInboundTunnels
                 {
-                    Collection = Singletons.Core.IncomingTunnels.CloneConfigurations(),
+                    Collection = Singletons.Core.InboundTunnels.CloneConfigurations(),
                     Success = true
                 };
             }
@@ -44,8 +44,8 @@ namespace NetTunnel.EndPoint.Controllers
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                Singletons.Core.IncomingTunnels.Delete(endpointId);
-                Singletons.Core.IncomingTunnels.SaveToDisk();
+                Singletons.Core.InboundTunnels.Delete(endpointId);
+                Singletons.Core.InboundTunnels.SaveToDisk();
 
                 return new NtActionResponse { Success = true };
             }
@@ -72,8 +72,8 @@ namespace NetTunnel.EndPoint.Controllers
                 var endpoint = JsonConvert.DeserializeObject<NtTunnelInboundConfiguration>(value);
                 Utility.EnsureNotNull(endpoint);
 
-                Singletons.Core.IncomingTunnels.Add(endpoint);
-                Singletons.Core.IncomingTunnels.SaveToDisk();
+                Singletons.Core.InboundTunnels.Add(endpoint);
+                Singletons.Core.InboundTunnels.SaveToDisk();
 
                 return new NtActionResponse { Success = true };
             }

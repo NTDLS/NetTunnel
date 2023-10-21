@@ -15,13 +15,16 @@ namespace NetTunnel.Service.Engine
         private Thread? _incomingConnectionThread;
         private bool _keepRunning = false;
         private List<Thread> _handlerThreads = new();
+        private readonly ITunnel _tunnel;
 
-        public Guid Id { get => _configuration.Id; }
+        public Guid PairId { get => _configuration.PairId; }
+        public string Name { get => _configuration.Name; }
 
-        public EndpointInbound(EngineCore core, NtEndpointInboundConfiguration config)
+        public EndpointInbound(EngineCore core, ITunnel tunnel, NtEndpointInboundConfiguration configuration)
         {
             _core = core;
-            _configuration = config;
+            _tunnel = tunnel;
+            _configuration = configuration;
         }
 
         public NtEndpointInboundConfiguration CloneConfiguration() => _configuration.Clone();

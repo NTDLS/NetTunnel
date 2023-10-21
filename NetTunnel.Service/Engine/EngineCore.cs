@@ -7,29 +7,36 @@ namespace NetTunnel.Service.Engine
     {
         public Logger Logging { get; set; }
         public UserSessionManager Sessions { get; set; }
-        public TunnelOutboundManager OutgoingTunnels { get; set; }
-        public TunnelInboundManager IncomingTunnels { get; set; }
+        public TunnelOutboundManager OutboundTunnels { get; set; }
+        public TunnelInboundManager InboundTunnels { get; set; }
         public UserManager Users { get; set; }
 
         public EngineCore(NtServiceApplicationConfiguration config)
         {
             Logging = new(this);
             Sessions = new(this);
-            OutgoingTunnels = new(this);
-            IncomingTunnels = new(this);
+            OutboundTunnels = new(this);
+            InboundTunnels = new(this);
             Users = new(this);
+        }
+
+        public void GetAllTunnels()
+        {
+            var outbound = OutboundTunnels.GetBasicInfo();
+            var inbound = InboundTunnels.GetBasicInfo();
+
         }
 
         public void Start()
         {
-            IncomingTunnels.StartAll();
-            OutgoingTunnels.StartAll();
+            InboundTunnels.StartAll();
+            OutboundTunnels.StartAll();
         }
 
         public void Stop()
         {
-            IncomingTunnels.StopAll();
-            OutgoingTunnels.StopAll();
+            InboundTunnels.StopAll();
+            OutboundTunnels.StopAll();
         }
     }
 }

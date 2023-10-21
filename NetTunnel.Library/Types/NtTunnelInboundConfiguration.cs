@@ -2,7 +2,7 @@
 {
     public class NtTunnelInboundConfiguration
     {
-        public Guid Id { get; private set; }
+        public Guid PairId { get; private set; }
         public string Name { get; set; }
         public int DataPort { get; set; }
         public List<NtEndpointOutboundConfiguration> OutboundEndpointConfigurations { get; private set; } = new();
@@ -10,14 +10,14 @@
 
         public NtTunnelInboundConfiguration(Guid id, string name, int dataPort)
         {
-            Id = id;
+            PairId = id;
             Name = name;
             DataPort = dataPort;
         }
 
         public NtTunnelInboundConfiguration Clone()
         {
-            return new NtTunnelInboundConfiguration(Id, Name, DataPort);
+            return new NtTunnelInboundConfiguration(PairId, Name, DataPort);
         }
     }
 }

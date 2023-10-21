@@ -45,9 +45,9 @@ namespace NetTunnel.ClientAPI
             }
         }
 
-        public async Task Delete(Guid tunnelId)
+        public async Task Delete(Guid tunnelPairId)
         {
-            string url = $"api/InboundTunnel/{_client.SessionId}/Delete/{tunnelId}";
+            string url = $"api/InboundTunnel/{_client.SessionId}/Delete/{tunnelPairId}";
 
             using var response = await _client.Connection.GetAsync(url);
             string resultText = await response.Content.ReadAsStringAsync();

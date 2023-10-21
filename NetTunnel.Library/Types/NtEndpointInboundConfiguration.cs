@@ -5,7 +5,7 @@
     /// </summary>
     public class NtEndpointInboundConfiguration
     {
-        public Guid Id { get; private set; } = Guid.NewGuid();
+        public Guid PairId { get; private set; } = Guid.NewGuid();
         public string Name { get; set; }
         public int ListenPort { get; set; }
         public Guid TunnelId { get; set; }
@@ -20,9 +20,8 @@
         {
             return new NtEndpointInboundConfiguration(Name, ListenPort)
             {
-                Id = Id
+                PairId = PairId
             };
         }
-
     }
 }

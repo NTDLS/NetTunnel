@@ -11,7 +11,7 @@
         //THIS IS A COPY OF THE CONFIG FROM THE TUNNELL JUST TO GET BUILDS WORKING, THIS IS NOT CORRECT!
         //THIS IS A COPY OF THE CONFIG FROM THE TUNNELL JUST TO GET BUILDS WORKING, THIS IS NOT CORRECT!
 
-        public Guid Id { get; private set; } = Guid.NewGuid();
+        public Guid PairId { get; private set; } = Guid.NewGuid();
         public string Name { get; set; }
         public string Address { get; set; }
         public int ManagementPort { get; set; }
@@ -35,7 +35,7 @@
         {
             return new NtEndpointOutboundConfiguration(Name, Address, ManagementPort, DataPort, Username, PasswordHash)
             {
-                Id = Id
+                PairId = PairId
             };
         }
     }

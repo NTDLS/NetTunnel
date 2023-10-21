@@ -5,14 +5,14 @@ namespace NetTunnel.UI.Forms
     public partial class FormAddEndpoint : Form
     {
         private readonly NtClient? _client;
-        private readonly Guid? _tunnelId;
+        private readonly Guid? _tunnelPairId;
 
-        public FormAddEndpoint(NtClient client, Guid tunnelId)
+        public FormAddEndpoint(NtClient client, Guid tunnelPairId)
         {
             InitializeComponent();
 
             _client = client;
-            _tunnelId = tunnelId;
+            _tunnelPairId = tunnelPairId;
 
             AcceptButton = buttonAdd;
             CancelButton = buttonCancel;

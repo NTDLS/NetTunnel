@@ -18,8 +18,25 @@ namespace NetTunnel.Service.Engine.Managers
         }
 
         public void StartAll() => _collection.Use((o) => o.ForEach((o) => o.Start()));
-
         public void StopAll() => _collection.Use((o) => o.ForEach((o) => o.Stop()));
+
+        public void AddEndpoint(Guid tunnelPairId, NtEndpointInboundConfiguration configuration)
+        {
+            _collection.Use((o) =>
+            {
+                var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
+                tunnel.AddEndpoint(configuration);
+            });
+        }
+
+        public void AddEndpoint(Guid tunnelPairId, NtEndpointOutboundConfiguration configuration)
+        {
+            _collection.Use((o) =>
+            {
+                var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
+                tunnel.AddEndpoint(configuration);
+            });
+        }
 
         public void Add(NtTunnelOutboundConfiguration config)
         {
@@ -31,13 +48,24 @@ namespace NetTunnel.Service.Engine.Managers
             });
         }
 
-        public void Delete(Guid tunnelId)
+        public void Delete(Guid tunnelPairId)
         {
             _collection.Use((o) =>
             {
-                var tunnel = o.Where(o => o.Id == tunnelId).First();
+                var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
                 tunnel.Stop();
                 o.Remove(tunnel);
+            });
+        }
+
+        public NtTunnelBasicInfo GetBasicInfo()
+        {
+            return _collection.Use((o) =>
+            {
+                return new NtTunnelBasicInfo
+                {
+                    //Name = o._con
+                };
             });
         }
 

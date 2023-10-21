@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library.Types;
+using Newtonsoft.Json;
 using System.Net;
 using System.Net.Sockets;
 
@@ -7,35 +8,37 @@ namespace NetTunnel.Service.Engine
     /// <summary>
     /// This is the class that opens a listening TCP/IP port to wait on connections from a remote tunnel.
     /// </summary>
-    public class TunnelInbound
+    public class TunnelInbound : ITunnel
     {
         private readonly EngineCore _core;
-        private NtTunnelInboundConfiguration _configuration;
+        private readonly NtTunnelInboundConfiguration _configuration;
         private Thread? _incomingConnectionThread;
         private bool _keepRunning = false;
 
-        private List<EndpointInbound> _inboundEndpoints = new();
-        private List<EndpointOutbound> _outboundEndpoints = new();
+        private readonly List<EndpointInbound> _inboundEndpoints = new();
+        private readonly List<EndpointOutbound> _outboundEndpoints = new();
 
-        public Guid Id { get => _configuration.Id; }
+        [JsonIgnore]
+        public Guid PairId { get => _configuration.PairId; }
+        [JsonIgnore]
+        public string Name { get => _configuration.Name; }
 
-        public TunnelInbound(EngineCore core, NtTunnelInboundConfiguration config)
+        public TunnelInbound(EngineCore core, NtTunnelInboundConfiguration configuration)
         {
             _core = core;
-            _configuration = config;
+            _configuration = configuration;
 
-            foreach (var cfg in config.InboundEndpointConfigurations)
-            {
-                _inboundEndpoints.Add(new(_core, cfg));
-            }
-
-            foreach (var cfg in config.OutboundEndpointConfigurations)
-            {
-                _outboundEndpoints.Add(new(_core, cfg));
-            }
+            configuration.InboundEndpointConfigurations.ForEach(o => _inboundEndpoints.Add(new(_core, this, o)));
+            configuration.OutboundEndpointConfigurations.ForEach(o => _outboundEndpoints.Add(new(_core, this, o)));
         }
 
         public NtTunnelInboundConfiguration CloneConfiguration() => _configuration.Clone();
+
+        public void AddEndpoint(NtEndpointInboundConfiguration configuration)
+            => _inboundEndpoints.Add(new EndpointInbound(_core, this, configuration));
+
+        public void AddEndpoint(NtEndpointOutboundConfiguration configuration)
+            => _outboundEndpoints.Add(new EndpointOutbound(_core, this, configuration));
 
         public void Start()
         {

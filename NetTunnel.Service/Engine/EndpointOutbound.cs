@@ -6,19 +6,22 @@ namespace NetTunnel.Service.Engine
     /// <summary>
     /// This is the class that makes an outgoing TCP/IP connection to a listening endpoint.
     /// </summary>
-    public class EndpointOutbound
+    public class EndpointOutbound: IEndpoint
     {
         private readonly EngineCore _core;
         private NtEndpointOutboundConfiguration _configuration;
         private Thread? _outgoingConnectionThread;
         private bool _keepRunning = false;
+        private readonly ITunnel _tunnel;
 
-        public Guid Id { get => _configuration.Id; }
+        public Guid PairId { get => _configuration.PairId; }
+        public string Name { get => _configuration.Name; }
 
-        public EndpointOutbound(EngineCore core, NtEndpointOutboundConfiguration config)
+        public EndpointOutbound(EngineCore core, ITunnel tunnel, NtEndpointOutboundConfiguration configuration)
         {
             _core = core;
-            _configuration = config;
+            _tunnel = tunnel;
+            _configuration = configuration;
         }
 
         public NtEndpointOutboundConfiguration CloneConfiguration() => _configuration.Clone();
