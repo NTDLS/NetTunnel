@@ -64,7 +64,6 @@ namespace NetTunnel.Service.Engine
                     Console.WriteLine($"Error: {ex.Message}");
                 }
             }
-
         }
 
         private void HandleClient(TcpClient client)

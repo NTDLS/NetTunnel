@@ -20,12 +20,13 @@ namespace NetTunnel.Service.Engine
             Users = new(this);
         }
 
+        /*
         public void GetAllTunnels()
         {
             var outbound = OutboundTunnels.GetBasicInfo();
             var inbound = InboundTunnels.GetBasicInfo();
-
         }
+        */
 
         public void Start()
         {
