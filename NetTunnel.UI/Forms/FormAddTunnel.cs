@@ -54,11 +54,13 @@ namespace NetTunnel.UI.Forms
 
                 EnableControl(buttonAdd, false);
 
-                var outgoingEndpoint = new NtTunnelOutboundConfiguration(textBoxName.Text,
+                var tunnelId = Guid.NewGuid(); //The TunnelId is the same on both services.
+
+                var outgoingEndpoint = new NtTunnelOutboundConfiguration(tunnelId, textBoxName.Text,
                     textBoxRemoteAddress.Text, int.Parse(textBoxRemotePort.Text), int.Parse(textBoxEndpointDataPort.Text),
                     textBoxRemoteUsername.Text, Utility.CalculateSHA256(textBoxRemotePassword.Text));
 
-                var incomingEndpoint = new NtTunnelInboundConfiguration(textBoxName.Text, int.Parse(textBoxEndpointDataPort.Text));
+                var incomingEndpoint = new NtTunnelInboundConfiguration(tunnelId, textBoxName.Text, int.Parse(textBoxEndpointDataPort.Text));
 
                 NtClient remoteClient;
 

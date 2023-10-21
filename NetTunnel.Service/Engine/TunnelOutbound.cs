@@ -51,9 +51,11 @@ namespace NetTunnel.Service.Engine
 
         public void Stop()
         {
+            _keepRunning = false;
+            //TODO: Wait on thread(s) to stop.
         }
 
-        void OutgoingConnectionThreadProc()
+        private void OutgoingConnectionThreadProc()
         {
             while (_keepRunning)
             {
@@ -72,7 +74,6 @@ namespace NetTunnel.Service.Engine
                     Console.WriteLine($"Error: {ex.Message}");
                 }
             }
-
         }
 
         void HandleClient(TcpClient client)

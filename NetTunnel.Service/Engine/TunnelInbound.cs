@@ -53,10 +53,10 @@ namespace NetTunnel.Service.Engine
         public void Stop()
         {
             _keepRunning = false;
-            //TODO: Wait on thread to stop.
+            //TODO: Wait on thread(s) to stop.
         }
 
-        void IncomingConnectionThreadProc()
+        private void IncomingConnectionThreadProc()
         {
             var listener = new TcpListener(IPAddress.Any, _configuration.DataPort);
 

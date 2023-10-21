@@ -35,6 +35,8 @@ namespace NetTunnel.Service.Engine
 
         public void Stop()
         {
+            _keepRunning = false;
+            //TODO: Wait on thread(s) to stop.
         }
 
         void OutgoingConnectionThreadProc()
@@ -59,26 +61,21 @@ namespace NetTunnel.Service.Engine
 
         }
 
-        void HandleClient(TcpClient client)
+        private void HandleClient(TcpClient client)
         {
             while (_keepRunning)
             {
                 /*
-                using (NetworkStream stream = client.GetStream())
+                NetworkStream stream = client.GetStream();
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
                 {
-                    // Send data to the server.
-                    string message = "Hello, server!";
-                    byte[] data = Encoding.UTF8.GetBytes(message);
-                    stream.Write(data, 0, data.Length);
-
-                    // Receive data from the server.
-                    byte[] receiveBuffer = new byte[1024];
-                    int bytesRead = stream.Read(receiveBuffer, 0, receiveBuffer.Length);
-                    string receivedMessage = Encoding.UTF8.GetString(receiveBuffer, 0, bytesRead);
-                    Console.WriteLine($"Received: {receivedMessage}");
+                    //stream.Write().
                 }
                 */
-                Thread.Sleep(10);
+
+                Thread.Sleep(1);
             }
 
             client.Close();

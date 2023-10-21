@@ -2,7 +2,7 @@
 {
     public class NtTunnelOutboundConfiguration
     {
-        public Guid Id { get; private set; } = Guid.NewGuid();
+        public Guid Id { get; private set; }
         public string Name { get; set; }
         public string Address { get; set; }
         public int ManagementPort { get; set; }
@@ -12,8 +12,9 @@
         public List<NtEndpointOutboundConfiguration> OutboundEndpointConfigurations { get; private set; } = new();
         public List<NtEndpointInboundConfiguration> InboundEndpointConfigurations { get; private set; } = new();
 
-        public NtTunnelOutboundConfiguration(string name, string address, int managementPort, int dataPort, string username, string passwordHash)
+        public NtTunnelOutboundConfiguration(Guid id, string name, string address, int managementPort, int dataPort, string username, string passwordHash)
         {
+            Id = id;
             Name = name;
             Address = address;
             ManagementPort = managementPort;
@@ -24,10 +25,7 @@
 
         public NtTunnelOutboundConfiguration Clone()
         {
-            return new NtTunnelOutboundConfiguration(Name, Address, ManagementPort, DataPort, Username, PasswordHash)
-            {
-                Id = Id
-            };
+            return new NtTunnelOutboundConfiguration(Id, Name, Address, ManagementPort, DataPort, Username, PasswordHash);
         }
     }
 }
