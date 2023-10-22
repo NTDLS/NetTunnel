@@ -1,5 +1,4 @@
 ﻿using ProtoBuf;
-using static NetTunnel.Service.Packetizer.Constants;
 
 namespace NetTunnel.Service.Packetizer
 {
@@ -10,17 +9,9 @@ namespace NetTunnel.Service.Packetizer
     [ProtoContract]
     internal class NtPacket
     {
-        /// <summary>
-        /// The enclosed payload.
-        /// </summary>
         [ProtoMember(1)]
-        public NtPayload Payload { get; set; } = new();
-        /// <summary>
-        /// The type of command. Tells the engine how to interpret the enclosed message.
-        /// </summary>
+        public string? EnclosedPayloadType { get; set; }
         [ProtoMember(2)]
-        public NtPayloadType PayloadType { get; set; }
-        [ProtoMember(3)]
-        internal DateTime CreatedTime { get; set; } = DateTime.UtcNow;
+        public byte[] Payload { get; set; } = Array.Empty<byte>();
     }
 }

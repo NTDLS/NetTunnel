@@ -10,13 +10,5 @@
             public const int PACKET_BUFFER_SIZE = 8192;
             //public const int ACK_TIMEOUT_MS = 5000;
         }
-
-        internal enum NtPayloadType
-        {
-            Unspecified,
-            Hello,
-            Message,
-            CommandAck
-        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library.Types;
+using NetTunnel.Service.Packetizer.PacketPayloads;
 using ProtoBuf;
 using System.IO.Compression;
 using System.Net.Sockets;
@@ -12,7 +13,7 @@ namespace NetTunnel.Service.Packetizer
     /// </summary>
     internal static class NtPacketizer
     {
-        public delegate void ProcessPacketCallback(ITunnel tunnel, NtPacket packet);
+        public delegate void ProcessPacketCallback(ITunnel tunnel, IPacketPayload payload);
 
         public static byte[] AssemblePacket(NtPacket packet)
         {
@@ -66,24 +67,29 @@ namespace NetTunnel.Service.Packetizer
             }
         }
 
-        public static void SendStreamPacketMessage(NetworkStream stream, NtPacketPayloadMessage message)
+        public static void SendStreamPacketPayload<T>(NetworkStream? stream, T payload) where T : class
         {
+            if (stream == null)
+            {
+                throw new Exception("SendStreamPacketPayload stream can not be null.");
+            }
             var cmd = new NtPacket()
             {
-                PayloadType = NtPayloadType.Message,
-                Payload = new NtPayload()
-                {
-                    EnclosedType = message.GetType().Name,
-                    Content = ToByteArray(message)
-                }
+                EnclosedPayloadType = payload.GetType().Name,
+                Payload = ToByteArray(payload)
             };
 
             var packetBytes = AssemblePacket(cmd);
             stream.Write(packetBytes, 0, packetBytes.Length);
         }
 
-        public static void ReceiveAndProcessStreamPackets(NetworkStream stream, ITunnel tunnel, NtPacketBuffer packetBuffer, ProcessPacketCallback processPacketCallback)
+        public static void ReceiveAndProcessStreamPackets(NetworkStream? stream, ITunnel tunnel, NtPacketBuffer packetBuffer, ProcessPacketCallback processPacketCallback)
         {
+            if (stream == null)
+            {
+                throw new Exception("ReceiveAndProcessStreamPackets stream can not be null.");
+            }
+
             Array.Clear(packetBuffer.ReceiveBuffer);
             packetBuffer.ReceiveBufferUsed = stream.Read(packetBuffer.ReceiveBuffer, 0, packetBuffer.ReceiveBuffer.Length);
             ProcessPacketBuffer(tunnel, packetBuffer, processPacketCallback);
@@ -155,7 +161,11 @@ namespace NetTunnel.Service.Packetizer
 
                     var packet = ToObject<NtPacket>(packetBody);
 
-                    processPacketCallback(tunnel, packet);
+                    if (packet.EnclosedPayloadType == "NtPacketPayloadMessage")
+                    {
+                        var message = ToObject<NtPacketPayloadMessage>(packet.Payload);
+                        processPacketCallback(tunnel, message);
+                    }
 
                     //Zero out the consumed portion of the packet buffer - more for fun than anything else.
                     Array.Clear(packetBuffer.PacketBuilder, 0, grossPacketSize);

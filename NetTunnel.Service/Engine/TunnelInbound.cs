@@ -1,6 +1,6 @@
-﻿using NetTunnel.ClientAPI;
-using NetTunnel.Library.Types;
+﻿using NetTunnel.Library.Types;
 using NetTunnel.Service.Packetizer;
+using NetTunnel.Service.Packetizer.PacketPayloads;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
@@ -137,16 +137,14 @@ namespace NetTunnel.Service.Engine
             }
         }
 
-        internal void SendStreamPacketMessage(NtPacketPayloadMessage message)
-        {
-            Utility.EnsureNotNull(_stream);
-            NtPacketizer.SendStreamPacketMessage(_stream, message);
-        }
+        internal void SendStreamPacketMessage(NtPacketPayloadMessage message) =>
+            NtPacketizer.SendStreamPacketPayload(_stream, message);
+
+        internal void SendStreamPacketBytes(NtPacketPayloadBytes message) =>
+            NtPacketizer.SendStreamPacketPayload(_stream, message);
 
         private void ReseiveTunnelPackets(TcpClient client)
         {
-            Utility.EnsureNotNull(_stream);
-
             var packetBuffer = new NtPacketBuffer();
 
             while (_keepRunning)
@@ -164,12 +162,12 @@ namespace NetTunnel.Service.Engine
             client.Close();
         }
 
-        void ProcessPacketCallbackHandler(ITunnel tunnel, NtPacket packet)
+        void ProcessPacketCallbackHandler(ITunnel tunnel, IPacketPayload packet)
         {
-            if (packet.PayloadType == Packetizer.Constants.NtPayloadType.Message)
+            if (packet is NtPacketPayloadMessage)
             {
-                var message = NtPacketizer.ToObject<NtPacketPayloadMessage>(packet.Payload.Content);
-                Debug.Print($"{message.Message}: {packet.CreatedTime}");
+                var message = (NtPacketPayloadMessage)packet;
+                Debug.Print($"{message.Message}");
             }
         }
     }
