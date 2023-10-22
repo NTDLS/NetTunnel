@@ -3,6 +3,7 @@ using NetTunnel.Service.Packetizer;
 using NetTunnel.Service.Packetizer.PacketPayloads;
 using System.Diagnostics;
 using System.Net.Sockets;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.Engine
 {
@@ -47,6 +48,14 @@ namespace NetTunnel.Service.Engine
         {
             throw new NotImplementedException();
         }
+
+        public void AddEndpoint(NtEndpointInboundConfiguration endpointInbound, NtEndpointOutboundConfiguration endpointOutbound, EndpointDirection whichIsLocal)
+        {
+            //SendStreamPacketBytes (NtPacketPayloadAddEndpointInbound message)
+
+
+        }
+
 
         public NtTunnelOutboundConfiguration CloneConfiguration()
         {
@@ -133,9 +142,8 @@ namespace NetTunnel.Service.Engine
 
         void ProcessPacketCallbackHandler(ITunnel tunnel, IPacketPayload packet)
         {
-            if (packet is NtPacketPayloadMessage)
+            if (packet is NtPacketPayloadMessage message)
             {
-                var message = (NtPacketPayloadMessage)packet;
                 Debug.Print($"{message.Message}");
             }
         }
@@ -145,6 +153,12 @@ namespace NetTunnel.Service.Engine
 
         internal void SendStreamPacketBytes(NtPacketPayloadBytes message) =>
             NtPacketizer.SendStreamPacketPayload(_stream, message);
+
+        internal void DispatchAddEndpointInbound(NtEndpointInboundConfiguration configuration) =>
+            NtPacketizer.SendStreamPacketPayload(_stream, new NtPacketPayloadAddEndpointInbound(configuration));
+
+        internal void DispatchAddEndpointOutbound(NtEndpointOutboundConfiguration configuration) =>
+            NtPacketizer.SendStreamPacketPayload(_stream, new NtPacketPayloadAddEndpointOutbound(configuration));
 
         private void ReceiveTunnelPackets(TcpClient client)
         {

@@ -1,4 +1,6 @@
-﻿namespace NetTunnel.Library.Types
+﻿using static NetTunnel.Library.Constants;
+
+namespace NetTunnel.Library.Types
 {
     public interface ITunnel
     {
@@ -15,5 +17,8 @@
         /// </summary>
         /// <param name="message"></param>
         public void DispatchMessage(string message);
+
+        public void AddEndpoint(NtEndpointInboundConfiguration endpointInbound,
+            NtEndpointOutboundConfiguration endpointOutbound, EndpointDirection whichIsLocal);
     }
 }

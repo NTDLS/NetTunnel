@@ -4,6 +4,7 @@ using NetTunnel.Service.Packetizer.PacketPayloads;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.Engine
 {
@@ -39,6 +40,25 @@ namespace NetTunnel.Service.Engine
         public void DispatchMessage(string message)
         {
             throw new NotImplementedException();
+        }
+
+        public void AddEndpoint(NtEndpointInboundConfiguration endpointInbound, NtEndpointOutboundConfiguration endpointOutbound, EndpointDirection whichIsLocal)
+        {
+            if (whichIsLocal == EndpointDirection.Inbound)
+            {
+                var localEndpoint = new EndpointInbound(_core, this, endpointInbound);
+                _inboundEndpoints.Add(localEndpoint);
+
+                DispatchAddEndpointOutbound(endpointOutbound);
+            }
+
+            if (whichIsLocal == EndpointDirection.Outbound)
+            {
+                var localEndpoint = new EndpointOutbound(_core, this, endpointOutbound);
+                _outboundEndpoints.Add(localEndpoint);
+
+                DispatchAddEndpointInbound(endpointInbound);
+            }
         }
 
         public NtTunnelInboundConfiguration CloneConfiguration()
@@ -152,6 +172,12 @@ namespace NetTunnel.Service.Engine
         internal void SendStreamPacketBytes(NtPacketPayloadBytes message) =>
             NtPacketizer.SendStreamPacketPayload(_stream, message);
 
+        internal void DispatchAddEndpointInbound(NtEndpointInboundConfiguration configuration) =>
+            NtPacketizer.SendStreamPacketPayload(_stream, new NtPacketPayloadAddEndpointInbound(configuration));
+
+        internal void DispatchAddEndpointOutbound(NtEndpointOutboundConfiguration configuration) =>
+            NtPacketizer.SendStreamPacketPayload(_stream, new NtPacketPayloadAddEndpointOutbound(configuration));
+
         private void ReceiveTunnelPackets(TcpClient client)
         {
             var packetBuffer = new NtPacketBuffer();
@@ -161,7 +187,7 @@ namespace NetTunnel.Service.Engine
                 SendStreamPacketMessage(new NtPacketPayloadMessage()
                 {
                     Label = "This is the label.",
-                    Message = "Message from inbound."
+                    Message = "Message from outbound."
                 });
 
                 NtPacketizer.ReceiveAndProcessStreamPackets(_stream, this, packetBuffer, ProcessPacketCallbackHandler);

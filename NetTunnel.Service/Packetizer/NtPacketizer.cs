@@ -3,6 +3,7 @@ using NetTunnel.Service.Packetizer.PacketPayloads;
 using ProtoBuf;
 using System.IO.Compression;
 using System.Net.Sockets;
+using Topshelf.HostConfigurators;
 using static NetTunnel.Service.Packetizer.Constants;
 
 namespace NetTunnel.Service.Packetizer
@@ -161,17 +162,34 @@ namespace NetTunnel.Service.Packetizer
 
                     var packet = ToObject<NtPacket>(packetBody);
 
-                    if (packet.EnclosedPayloadType == "NtPacketPayloadMessage")
-                    {
-                        var message = ToObject<NtPacketPayloadMessage>(packet.Payload);
-                        processPacketCallback(tunnel, message);
-                    }
-
                     //Zero out the consumed portion of the packet buffer - more for fun than anything else.
                     Array.Clear(packetBuffer.PacketBuilder, 0, grossPacketSize);
 
                     Buffer.BlockCopy(packetBuffer.PacketBuilder, grossPacketSize, packetBuffer.PacketBuilder, 0, packetBuffer.PacketBuilderLength - grossPacketSize);
                     packetBuffer.PacketBuilderLength -= grossPacketSize;
+
+                    var genericType = Type.GetType("packet.EnclosedPayloadType);
+                    if (genericType == null)
+                    {
+                        throw new Exception($"Unknown payload type {packet.EnclosedPayloadType}.");
+                    }
+
+                    var toObjectMethod = typeof(NtPacketizer).GetMethod("ToObject");
+                    if (toObjectMethod == null)
+                    {
+                        throw new Exception($"Could not find ToObject().");
+                    }
+
+                    var genericToObjectMethod = toObjectMethod.MakeGenericMethod(genericType);
+
+                    var payload = (IPacketPayload?)genericToObjectMethod.Invoke(null, new object[] { packet.Payload });
+                    if (payload == null)
+                    {
+                        throw new Exception($"Payload can not be null.");
+                    }
+
+                    processPacketCallback(tunnel, payload);
+
                 }
             }
             catch (Exception ex)

@@ -38,13 +38,6 @@ namespace NetTunnel.UI.Forms
 
             try
             {
-                //textBoxName
-                //textBoxListenPort
-                //textBoxTerminationAddress
-                //textBoxTerminationPort
-                //radioButtonLocalEndpoint
-                //radioButtonRemoteEndpoint
-
                 if (textBoxName.Text.Length == 0)
                     throw new Exception("You must specify a name This is for your identification only.");
                 if (textBoxListenPort.Text.Length == 0 || int.TryParse(textBoxListenPort.Text, out var _) == false)
@@ -61,16 +54,18 @@ namespace NetTunnel.UI.Forms
 
                 EnableControl(buttonAdd, false);
 
-                _tunnel.DispatchMessage("TODO: add this endpoint");
-
-                /*
                 var endpointPairId = Guid.NewGuid(); //The endpointId is the same on both services.
 
-                var outgoingEndpoint = new NtEndpointOutboundConfiguration(endpointPairId, textBoxName.Text,
+                var endpointInbound = new NtEndpointInboundConfiguration(endpointPairId, textBoxName.Text, int.Parse(textBoxListenPort.Text));
+
+                var endpointOutbound = new NtEndpointOutboundConfiguration(endpointPairId, textBoxName.Text,
                     textBoxTerminationAddress.Text, int.Parse(textBoxTerminationPort.Text));
 
-                var incomingEndpoint = new NtEndpointInboundConfiguration(endpointPairId, textBoxName.Text, int.Parse(textBoxListenPort.Text));
+                _tunnel.AddEndpoint(endpointInbound, endpointOutbound,
+                    radioButtonLocalEndpoint.Checked ? Library.Constants.EndpointDirection.Inbound : Library.Constants.EndpointDirection.Outbound);
 
+
+                /*
                 NtClient remoteClient;
 
                 try
