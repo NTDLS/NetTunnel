@@ -1,4 +1,4 @@
-﻿namespace NetTunnel.Service.TCPIP
+﻿namespace NetTunnel.Service.Packets
 {
     internal static class CRC16
     {
@@ -11,7 +11,7 @@
             for (int i = 0; i < bytes.Length; ++i)
             {
                 byte index = (byte)(crc ^ bytes[i]);
-                crc = (ushort)((crc >> 8) ^ table[index]);
+                crc = (ushort)(crc >> 8 ^ table[index]);
             }
             return crc;
         }
@@ -22,7 +22,7 @@
             for (int i = offset; i < length + offset; ++i)
             {
                 byte index = (byte)(crc ^ bytes[i]);
-                crc = (ushort)((crc >> 8) ^ table[index]);
+                crc = (ushort)(crc >> 8 ^ table[index]);
             }
             return crc;
         }
@@ -39,7 +39,7 @@
                 {
                     if (((value ^ temp) & 0x0001) != 0)
                     {
-                        value = (ushort)((value >> 1) ^ polynomial);
+                        value = (ushort)(value >> 1 ^ polynomial);
                     }
                     else
                     {

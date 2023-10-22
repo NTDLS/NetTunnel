@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library.Types;
+using NetTunnel.Service.Packets;
 using System.Net.Sockets;
 
 namespace NetTunnel.Service.Engine
@@ -121,13 +122,31 @@ namespace NetTunnel.Service.Engine
                 {
                     Console.WriteLine($"Error: {ex.Message}");
                 }
+                Thread.Sleep(1);
             }
         }
 
         void HandleClient(TcpClient client)
         {
+            using NetworkStream stream = client.GetStream();
+
             while (_keepRunning)
             {
+                NtPacket cmd = new NtPacket()
+                {
+                    PacketType = Constants.NtPacketType.Unspecified,
+                    Message = new NtMessage()
+                    {
+                        Label = "This is the label.",
+                        Message = "This is the message."
+                    }
+                };
+
+                var packetBytes = Packetizer.AssemblePacket(cmd);
+
+                stream.Write(packetBytes, 0, packetBytes.Length);
+
+
                 /*
                 using (NetworkStream stream = client.GetStream())
                 {
@@ -143,7 +162,7 @@ namespace NetTunnel.Service.Engine
                     Console.WriteLine($"Received: {receivedMessage}");
                 }
                 */
-                Thread.Sleep(10);
+                Thread.Sleep(100);
             }
 
             client.Close();

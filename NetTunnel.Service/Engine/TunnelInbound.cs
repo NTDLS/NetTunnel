@@ -1,6 +1,9 @@
 ﻿using NetTunnel.Library.Types;
+using NetTunnel.Service.Packets;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using static NetTunnel.Service.Packets.Constants;
 
 namespace NetTunnel.Service.Engine
 {
@@ -132,29 +135,25 @@ namespace NetTunnel.Service.Engine
 
         void HandleClient(TcpClient client)
         {
+            var stream = client.GetStream();
+
+            byte[] buffer = new byte[Sanity.PACKET_BUFFER_SIZE];
+
+            var packetBuffer = new NtPacketBuffer();
+
             while (_keepRunning)
             {
-                //TODO: Pump tunnel data.
+                int bytesRead = stream.Read(buffer, 0, buffer.Length);
+                packetBuffer.SetSingleBuffer(buffer, bytesRead);
+                Packetizer.ProcessPacketBuffer(this, packetBuffer, PacketPayloadHandler);
                 Thread.Sleep(10);
             }
 
-            // Handle client communication here.
-            // You can read and write data using the client's network stream.
-            // Example:
-            // NetworkStream stream = client.GetStream();
-            // // Read and write data using the stream.
-            // // Remember to close the client's resources when done.
+            void PacketPayloadHandler(ITunnel tunnel, NtPacket packet)
+            {
+                Debug.Print(packet.Message.CreatedTime.ToString());
+            }
 
-            // Example of reading data from the client:
-            // byte[] buffer = new byte[1024];
-            // int bytesRead;
-            // while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
-            // {
-            //     // Process the received data.
-            //     // You can also send data back to the client using stream.Write().
-            // }
-
-            // Close the client when done.
             client.Close();
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace NetTunnel.Service.TCPIP
+﻿namespace NetTunnel.Service.Packets
 {
     internal class Constants
     {
@@ -11,7 +11,7 @@
             public const int ACK_TIMEOUT_MS = 5000;
         }
 
-        internal enum PayloadCommandType
+        internal enum NtPacketType
         {
             Unspecified,
             Hello,

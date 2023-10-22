@@ -1,8 +1,10 @@
 ﻿using ProtoBuf;
 
-namespace NetTunnel.Service.TCPIP
+namespace NetTunnel.Service.Packets
 {
-    internal class NtMessageBase
+    [Serializable]
+    [ProtoContract]
+    internal class NtMessage
     {
         [ProtoMember(1)]
         internal DateTime CreatedTime { get; set; } = DateTime.UtcNow;
