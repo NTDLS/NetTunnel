@@ -66,16 +66,19 @@ namespace NetTunnel.Service.Packetizer
             }
         }
 
-        public static void SendStreamPacketMessage(NetworkStream stream, NtMessage message)
+        public static void SendStreamPacketMessage(NetworkStream stream, NtPacketPayloadMessage message)
         {
             var cmd = new NtPacket()
             {
-                PacketType = NtPacketType.Message,
-                Message = message
+                PayloadType = NtPayloadType.Message,
+                Payload = new NtPayload()
+                {
+                    EnclosedType = message.GetType().Name,
+                    Content = ToByteArray(message)
+                }
             };
 
             var packetBytes = AssemblePacket(cmd);
-
             stream.Write(packetBytes, 0, packetBytes.Length);
         }
 
@@ -167,15 +170,15 @@ namespace NetTunnel.Service.Packetizer
             }
         }
 
-        private static byte[]? ToByteArray(object obj)
+        private static byte[] ToByteArray(object obj)
         {
-            if (obj == null) return null;
+            if (obj == null) return Array.Empty<byte>();
             using var stream = new MemoryStream();
             Serializer.Serialize(stream, obj);
             return stream.ToArray();
         }
 
-        private static T ToObject<T>(byte[] arrBytes)
+        public static T ToObject<T>(byte[] arrBytes)
         {
             using var stream = new MemoryStream();
             stream.Write(arrBytes, 0, arrBytes.Length);

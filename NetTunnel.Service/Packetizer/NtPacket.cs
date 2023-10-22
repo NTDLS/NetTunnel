@@ -11,15 +11,16 @@ namespace NetTunnel.Service.Packetizer
     internal class NtPacket
     {
         /// <summary>
-        /// The enclosed message.
+        /// The enclosed payload.
         /// </summary>
         [ProtoMember(1)]
-        public NtMessage? Message { get; set; }
-
+        public NtPayload Payload { get; set; } = new();
         /// <summary>
         /// The type of command. Tells the engine how to interpret the enclosed message.
         /// </summary>
         [ProtoMember(2)]
-        public NtPacketType PacketType { get; set; }
+        public NtPayloadType PayloadType { get; set; }
+        [ProtoMember(3)]
+        internal DateTime CreatedTime { get; set; } = DateTime.UtcNow;
     }
 }

@@ -137,7 +137,7 @@ namespace NetTunnel.Service.Engine
             }
         }
 
-        internal void SendStreamPacketMessage(NtMessage message)
+        internal void SendStreamPacketMessage(NtPacketPayloadMessage message)
         {
             Utility.EnsureNotNull(_stream);
             NtPacketizer.SendStreamPacketMessage(_stream, message);
@@ -151,7 +151,7 @@ namespace NetTunnel.Service.Engine
 
             while (_keepRunning)
             {
-                SendStreamPacketMessage(new NtMessage()
+                SendStreamPacketMessage(new NtPacketPayloadMessage()
                 {
                     Label = "This is the label.",
                     Message = "Message from inbound."
@@ -166,7 +166,11 @@ namespace NetTunnel.Service.Engine
 
         void ProcessPacketCallbackHandler(ITunnel tunnel, NtPacket packet)
         {
-            Debug.Print($"{packet.Message?.Message}: {packet.Message?.CreatedTime}");
+            if (packet.PayloadType == Packetizer.Constants.NtPayloadType.Message)
+            {
+                var message = NtPacketizer.ToObject<NtPacketPayloadMessage>(packet.Payload.Content);
+                Debug.Print($"{message.Message}: {packet.CreatedTime}");
+            }
         }
     }
 }

@@ -11,7 +11,7 @@
             //public const int ACK_TIMEOUT_MS = 5000;
         }
 
-        internal enum NtPacketType
+        internal enum NtPayloadType
         {
             Unspecified,
             Hello,
