@@ -10,8 +10,10 @@ namespace NetTunnel.Service.Engine
     /// <summary>
     /// This is the class that opens a listening TCP/IP port to wait on connections from a remote tunnel.
     /// </summary>
-    internal class TunnelInbound : BaseTunnel, ITunnel
+    internal class TunnelInbound : ITunnel
     {
+        protected bool _keepRunning = false;
+        protected NetworkStream? _stream;
         private readonly EngineCore _core;
         private Thread? _incomingConnectionThread;
 
@@ -116,7 +118,7 @@ namespace NetTunnel.Service.Engine
 
                     using (_stream = client.GetStream())
                     {
-                        ReseiveTunnelPackets(client);
+                        ReceiveTunnelPackets(client);
                     }
 
                     _core.Logging.Write($"Disconnected incoming tunnel '{Name}' on port {DataPort}");
@@ -135,13 +137,22 @@ namespace NetTunnel.Service.Engine
             }
         }
 
+        void ProcessPacketCallbackHandler(ITunnel tunnel, IPacketPayload packet)
+        {
+            if (packet is NtPacketPayloadMessage)
+            {
+                var message = (NtPacketPayloadMessage)packet;
+                Debug.Print($"{message.Message}");
+            }
+        }
+
         internal void SendStreamPacketMessage(NtPacketPayloadMessage message) =>
             NtPacketizer.SendStreamPacketPayload(_stream, message);
 
         internal void SendStreamPacketBytes(NtPacketPayloadBytes message) =>
             NtPacketizer.SendStreamPacketPayload(_stream, message);
 
-        private void ReseiveTunnelPackets(TcpClient client)
+        private void ReceiveTunnelPackets(TcpClient client)
         {
             var packetBuffer = new NtPacketBuffer();
 
@@ -158,15 +169,6 @@ namespace NetTunnel.Service.Engine
                 Thread.Sleep(1000);
             }
             client.Close();
-        }
-
-        void ProcessPacketCallbackHandler(ITunnel tunnel, IPacketPayload packet)
-        {
-            if (packet is NtPacketPayloadMessage)
-            {
-                var message = (NtPacketPayloadMessage)packet;
-                Debug.Print($"{message.Message}");
-            }
         }
     }
 }

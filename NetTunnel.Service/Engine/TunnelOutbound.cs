@@ -9,8 +9,10 @@ namespace NetTunnel.Service.Engine
     /// <summary>
     /// This is the class that makes an outgoing TCP/IP connection to a listening tunnel.
     /// </summary>
-    internal class TunnelOutbound : BaseTunnel, ITunnel
+    internal class TunnelOutbound : ITunnel
     {
+        protected bool _keepRunning = false;
+        protected NetworkStream? _stream;
         private readonly EngineCore _core;
         private Thread? _outgoingConnectionThread;
 
@@ -129,6 +131,15 @@ namespace NetTunnel.Service.Engine
             }
         }
 
+        void ProcessPacketCallbackHandler(ITunnel tunnel, IPacketPayload packet)
+        {
+            if (packet is NtPacketPayloadMessage)
+            {
+                var message = (NtPacketPayloadMessage)packet;
+                Debug.Print($"{message.Message}");
+            }
+        }
+
         internal void SendStreamPacketMessage(NtPacketPayloadMessage message) =>
             NtPacketizer.SendStreamPacketPayload(_stream, message);
 
@@ -144,7 +155,7 @@ namespace NetTunnel.Service.Engine
                 SendStreamPacketMessage(new NtPacketPayloadMessage()
                 {
                     Label = "This is the label.",
-                    Message = "Message from outbound."
+                    Message = "Message from inbound."
                 });
 
                 NtPacketizer.ReceiveAndProcessStreamPackets(_stream, this, packetBuffer, ProcessPacketCallbackHandler);
@@ -152,15 +163,6 @@ namespace NetTunnel.Service.Engine
                 Thread.Sleep(1000);
             }
             client.Close();
-        }
-
-        void ProcessPacketCallbackHandler(ITunnel tunnel, IPacketPayload packet)
-        {
-            if (packet is NtPacketPayloadMessage)
-            {
-                var message = (NtPacketPayloadMessage)packet;
-                Debug.Print($"{message.Message}");
-            }
         }
     }
 }
