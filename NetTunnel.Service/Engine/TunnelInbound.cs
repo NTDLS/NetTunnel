@@ -10,12 +10,10 @@ namespace NetTunnel.Service.Engine
     /// <summary>
     /// This is the class that opens a listening TCP/IP port to wait on connections from a remote tunnel.
     /// </summary>
-    public class TunnelInbound : ITunnel
+    internal class TunnelInbound : BaseTunnel, ITunnel
     {
         private readonly EngineCore _core;
         private Thread? _incomingConnectionThread;
-        private bool _keepRunning = false;
-        private NetworkStream? _stream;
 
         private readonly List<EndpointInbound> _inboundEndpoints = new();
         private readonly List<EndpointOutbound> _outboundEndpoints = new();

@@ -9,12 +9,10 @@ namespace NetTunnel.Service.Engine
     /// <summary>
     /// This is the class that makes an outgoing TCP/IP connection to a listening tunnel.
     /// </summary>
-    public class TunnelOutbound : ITunnel
+    internal class TunnelOutbound : BaseTunnel, ITunnel
     {
         private readonly EngineCore _core;
         private Thread? _outgoingConnectionThread;
-        private bool _keepRunning = false;
-        private NetworkStream? _stream;
 
         private readonly List<EndpointInbound> _inboundEndpoints = new();
         private readonly List<EndpointOutbound> _outboundEndpoints = new();
@@ -120,7 +118,7 @@ namespace NetTunnel.Service.Engine
 
                     using (_stream = client.GetStream())
                     {
-                        ReseiveTunnelPackets(client);
+                        ReceiveTunnelPackets(client);
                     }
                 }
                 catch (Exception ex)
@@ -137,7 +135,7 @@ namespace NetTunnel.Service.Engine
         internal void SendStreamPacketBytes(NtPacketPayloadBytes message) =>
             NtPacketizer.SendStreamPacketPayload(_stream, message);
 
-        private void ReseiveTunnelPackets(TcpClient client)
+        private void ReceiveTunnelPackets(TcpClient client)
         {
             var packetBuffer = new NtPacketBuffer();
 
