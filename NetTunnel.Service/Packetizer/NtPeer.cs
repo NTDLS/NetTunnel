@@ -1,6 +1,6 @@
 ﻿using NetTunnel.Library.Types;
 
-namespace NetTunnel.Service.Packets
+namespace NetTunnel.Service.Packetizer
 {
     internal class NtPeer
     {

@@ -1,6 +1,6 @@
 ﻿using ProtoBuf;
 
-namespace NetTunnel.Service.Packets
+namespace NetTunnel.Service.Packetizer
 {
     [Serializable]
     [ProtoContract]

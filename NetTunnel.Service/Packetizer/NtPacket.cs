@@ -1,7 +1,7 @@
 ﻿using ProtoBuf;
-using static NetTunnel.Service.Packets.Constants;
+using static NetTunnel.Service.Packetizer.Constants;
 
-namespace NetTunnel.Service.Packets
+namespace NetTunnel.Service.Packetizer
 {
     /// <summary>
     /// Internal packet which allows for lowelevel communication betweeen server and client.

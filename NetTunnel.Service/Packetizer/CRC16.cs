@@ -1,4 +1,4 @@
-﻿namespace NetTunnel.Service.Packets
+﻿namespace NetTunnel.Service.Packetizer
 {
     internal static class CRC16
     {

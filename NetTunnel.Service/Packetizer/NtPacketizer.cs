@@ -1,15 +1,16 @@
 ﻿using NetTunnel.Library.Types;
 using ProtoBuf;
 using System.IO.Compression;
-using static NetTunnel.Service.Packets.Constants;
+using System.Net.Sockets;
+using static NetTunnel.Service.Packetizer.Constants;
 
-namespace NetTunnel.Service.Packets
+namespace NetTunnel.Service.Packetizer
 {
     /// <summary>
     /// TCP packets can be fragmented or combined. The packetizer rebuilds what was originally
     /// sent via the TCP send() call, provides compression and also performs a CRC check.
     /// </summary>
-    internal static class Packetizer
+    internal static class NtPacketizer
     {
         public delegate void ProcessPacketCallback(ITunnel tunnel, NtPacket packet);
 
@@ -19,14 +20,14 @@ namespace NetTunnel.Service.Packets
             {
                 var packetBody = ToByteArray(packet);
                 var packetBytes = Compress(packetBody);
-                var grossPacketSize = packetBytes.Length + Sanity.PACKET_HEADER_SIZE;
+                var grossPacketSize = packetBytes.Length + NtPacketDefaults.PACKET_HEADER_SIZE;
                 var grossPacketBytes = new byte[grossPacketSize];
                 var packetCrc = CRC16.ComputeChecksum(packetBytes);
 
-                Buffer.BlockCopy(BitConverter.GetBytes(Sanity.PACKET_DELIMITER), 0, grossPacketBytes, 0, 4);
+                Buffer.BlockCopy(BitConverter.GetBytes(NtPacketDefaults.PACKET_DELIMITER), 0, grossPacketBytes, 0, 4);
                 Buffer.BlockCopy(BitConverter.GetBytes(grossPacketSize), 0, grossPacketBytes, 4, 4);
                 Buffer.BlockCopy(BitConverter.GetBytes(packetCrc), 0, grossPacketBytes, 8, 2);
-                Buffer.BlockCopy(packetBytes, 0, grossPacketBytes, Sanity.PACKET_HEADER_SIZE, packetBytes.Length);
+                Buffer.BlockCopy(packetBytes, 0, grossPacketBytes, NtPacketDefaults.PACKET_HEADER_SIZE, packetBytes.Length);
 
                 return grossPacketBytes;
             }
@@ -49,7 +50,7 @@ namespace NetTunnel.Service.Packets
 
                     var value = BitConverter.ToInt32(packetDelimiterBytes, 0);
 
-                    if (value == Sanity.PACKET_DELIMITER)
+                    if (value == NtPacketDefaults.PACKET_DELIMITER)
                     {
                         Buffer.BlockCopy(packetBuffer.PacketBuilder, offset, packetBuffer.PacketBuilder, 0, packetBuffer.PacketBuilderLength - offset);
                         packetBuffer.PacketBuilderLength -= offset;
@@ -65,20 +66,40 @@ namespace NetTunnel.Service.Packets
             }
         }
 
+        public static void SendStreamPacketMessage(NetworkStream stream, NtMessage message)
+        {
+            var cmd = new NtPacket()
+            {
+                PacketType = NtPacketType.Message,
+                Message = message
+            };
+
+            var packetBytes = AssemblePacket(cmd);
+
+            stream.Write(packetBytes, 0, packetBytes.Length);
+        }
+
+        public static void ReceiveAndProcessStreamPackets(NetworkStream stream, ITunnel tunnel, NtPacketBuffer packetBuffer, ProcessPacketCallback processPacketCallback)
+        {
+            Array.Clear(packetBuffer.ReceiveBuffer);
+            packetBuffer.ReceiveBufferUsed = stream.Read(packetBuffer.ReceiveBuffer, 0, packetBuffer.ReceiveBuffer.Length);
+            ProcessPacketBuffer(tunnel, packetBuffer, processPacketCallback);
+        }
+
         public static void ProcessPacketBuffer(ITunnel tunnel, NtPacketBuffer packetBuffer, ProcessPacketCallback processPacketCallback)
         {
             try
             {
-                if (packetBuffer.PacketBuilderLength + packetBuffer.SingleBufferUsedLength >= packetBuffer.PacketBuilder.Length)
+                if (packetBuffer.PacketBuilderLength + packetBuffer.ReceiveBufferUsed >= packetBuffer.PacketBuilder.Length)
                 {
-                    Array.Resize(ref packetBuffer.PacketBuilder, packetBuffer.PacketBuilderLength + packetBuffer.SingleBufferUsedLength);
+                    Array.Resize(ref packetBuffer.PacketBuilder, packetBuffer.PacketBuilderLength + packetBuffer.ReceiveBufferUsed);
                 }
 
-                Buffer.BlockCopy(packetBuffer.SingleBuffer, 0, packetBuffer.PacketBuilder, packetBuffer.PacketBuilderLength, packetBuffer.SingleBufferUsedLength);
+                Buffer.BlockCopy(packetBuffer.ReceiveBuffer, 0, packetBuffer.PacketBuilder, packetBuffer.PacketBuilderLength, packetBuffer.ReceiveBufferUsed);
 
-                packetBuffer.PacketBuilderLength = packetBuffer.PacketBuilderLength + packetBuffer.SingleBufferUsedLength;
+                packetBuffer.PacketBuilderLength = packetBuffer.PacketBuilderLength + packetBuffer.ReceiveBufferUsed;
 
-                while (packetBuffer.PacketBuilderLength > Sanity.PACKET_HEADER_SIZE) //[PacketSize] and [CRC16]
+                while (packetBuffer.PacketBuilderLength > NtPacketDefaults.PACKET_HEADER_SIZE) //[PacketSize] and [CRC16]
                 {
                     var packetDelimiterBytes = new byte[4];
                     var packetSizeBytes = new byte[4];
@@ -92,14 +113,14 @@ namespace NetTunnel.Service.Packets
                     var grossPacketSize = BitConverter.ToInt32(packetSizeBytes, 0);
                     var expectedCRC16 = BitConverter.ToUInt16(expectedCRC16Bytes, 0);
 
-                    if (packetDelimiter != Sanity.PACKET_DELIMITER)
+                    if (packetDelimiter != NtPacketDefaults.PACKET_DELIMITER)
                     {
                         //LogException(new Exception("Malformed packet, invalid delimiter."));
                         SkipPacket(ref packetBuffer);
                         continue;
                     }
 
-                    if (grossPacketSize < 0 || grossPacketSize > Sanity.PACKET_MAX_SIZE)
+                    if (grossPacketSize < 0 || grossPacketSize > NtPacketDefaults.PACKET_MAX_SIZE)
                     {
                         //LogException(new Exception("Malformed packet, invalid length."));
                         SkipPacket(ref packetBuffer);
@@ -113,7 +134,7 @@ namespace NetTunnel.Service.Packets
                         break;
                     }
 
-                    var actualCRC16 = CRC16.ComputeChecksum(packetBuffer.PacketBuilder, Sanity.PACKET_HEADER_SIZE, grossPacketSize - Sanity.PACKET_HEADER_SIZE);
+                    var actualCRC16 = CRC16.ComputeChecksum(packetBuffer.PacketBuilder, NtPacketDefaults.PACKET_HEADER_SIZE, grossPacketSize - NtPacketDefaults.PACKET_HEADER_SIZE);
 
                     if (actualCRC16 != expectedCRC16)
                     {
@@ -122,10 +143,10 @@ namespace NetTunnel.Service.Packets
                         continue;
                     }
 
-                    var netPacketSize = grossPacketSize - Sanity.PACKET_HEADER_SIZE;
+                    var netPacketSize = grossPacketSize - NtPacketDefaults.PACKET_HEADER_SIZE;
                     var packetBytes = new byte[netPacketSize];
 
-                    Buffer.BlockCopy(packetBuffer.PacketBuilder, Sanity.PACKET_HEADER_SIZE, packetBytes, 0, netPacketSize);
+                    Buffer.BlockCopy(packetBuffer.PacketBuilder, NtPacketDefaults.PACKET_HEADER_SIZE, packetBytes, 0, netPacketSize);
 
                     var packetBody = Decompress(packetBytes);
 
@@ -149,7 +170,6 @@ namespace NetTunnel.Service.Packets
         private static byte[]? ToByteArray(object obj)
         {
             if (obj == null) return null;
-
             using var stream = new MemoryStream();
             Serializer.Serialize(stream, obj);
             return stream.ToArray();

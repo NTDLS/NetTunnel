@@ -1,9 +1,9 @@
-﻿using NetTunnel.Library.Types;
-using NetTunnel.Service.Packets;
+﻿using NetTunnel.ClientAPI;
+using NetTunnel.Library.Types;
+using NetTunnel.Service.Packetizer;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using static NetTunnel.Service.Packets.Constants;
 
 namespace NetTunnel.Service.Engine
 {
@@ -15,6 +15,7 @@ namespace NetTunnel.Service.Engine
         private readonly EngineCore _core;
         private Thread? _incomingConnectionThread;
         private bool _keepRunning = false;
+        private NetworkStream? _stream;
 
         private readonly List<EndpointInbound> _inboundEndpoints = new();
         private readonly List<EndpointOutbound> _outboundEndpoints = new();
@@ -115,7 +116,10 @@ namespace NetTunnel.Service.Engine
                     var client = listener.AcceptTcpClient();
                     _core.Logging.Write($"Connected on incoming tunnel '{Name}' on port {DataPort}");
 
-                    HandleClient(client);
+                    using (_stream = client.GetStream())
+                    {
+                        ReseiveTunnelPackets(client);
+                    }
 
                     _core.Logging.Write($"Disconnected incoming tunnel '{Name}' on port {DataPort}");
 
@@ -133,28 +137,36 @@ namespace NetTunnel.Service.Engine
             }
         }
 
-        void HandleClient(TcpClient client)
+        internal void SendStreamPacketMessage(NtMessage message)
         {
-            var stream = client.GetStream();
+            Utility.EnsureNotNull(_stream);
+            NtPacketizer.SendStreamPacketMessage(_stream, message);
+        }
 
-            byte[] buffer = new byte[Sanity.PACKET_BUFFER_SIZE];
+        private void ReseiveTunnelPackets(TcpClient client)
+        {
+            Utility.EnsureNotNull(_stream);
 
             var packetBuffer = new NtPacketBuffer();
 
             while (_keepRunning)
             {
-                int bytesRead = stream.Read(buffer, 0, buffer.Length);
-                packetBuffer.SetSingleBuffer(buffer, bytesRead);
-                Packetizer.ProcessPacketBuffer(this, packetBuffer, PacketPayloadHandler);
-                Thread.Sleep(10);
-            }
+                SendStreamPacketMessage(new NtMessage()
+                {
+                    Label = "This is the label.",
+                    Message = "Message from inbound."
+                });
 
-            void PacketPayloadHandler(ITunnel tunnel, NtPacket packet)
-            {
-                Debug.Print(packet.Message.CreatedTime.ToString());
-            }
+                NtPacketizer.ReceiveAndProcessStreamPackets(_stream, this, packetBuffer, ProcessPacketCallbackHandler);
 
+                Thread.Sleep(1000);
+            }
             client.Close();
+        }
+
+        void ProcessPacketCallbackHandler(ITunnel tunnel, NtPacket packet)
+        {
+            Debug.Print($"{packet.Message?.Message}: {packet.Message?.CreatedTime}");
         }
     }
 }
