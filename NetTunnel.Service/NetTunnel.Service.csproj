@@ -28,8 +28,4 @@
     <ProjectReference Include="..\NetTunnel.Library\NetTunnel.Library.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Managers\" />
-  </ItemGroup>
-
 </Project>

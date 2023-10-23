@@ -40,6 +40,43 @@ namespace NetTunnel.Service.Engine.Managers
             });
         }
 
+        public void DispatchAddEndpointInbound(Guid tunnelPairId, NtEndpointInboundConfiguration endpoint)
+        {
+            _collection.Use((o) =>
+            {
+                var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
+                tunnel.DispatchAddEndpointInbound(endpoint);
+            });
+        }
+
+        public void DispatchAddEndpointOutbound(Guid tunnelPairId, NtEndpointOutboundConfiguration endpoint)
+        {
+            _collection.Use((o) =>
+            {
+                var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
+                tunnel.DispatchAddEndpointOutbound(endpoint);
+            });
+        }
+
+
+        public void AddEndpointInbound(Guid tunnelPairId, NtEndpointInboundConfiguration endpoint)
+        {
+            _collection.Use((o) =>
+            {
+                var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
+                tunnel.AddInboundEndpoint(endpoint);
+            });
+        }
+
+        public void AddEndpointOutbound(Guid tunnelPairId, NtEndpointOutboundConfiguration endpoint)
+        {
+            _collection.Use((o) =>
+            {
+                var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
+                tunnel.AddOutboundEndpoint(endpoint);
+                //tunnel.Start();
+            });
+        }
 
         public NtTunnelBasicInfo GetBasicInfo()
         {

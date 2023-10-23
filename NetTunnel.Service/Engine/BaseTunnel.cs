@@ -90,26 +90,5 @@ namespace NetTunnel.Service.Engine
             endpoint.Stop();
             _inboundEndpoints.Remove(endpoint);
         }
-
-        public void AddEndpoint(NtEndpointInboundConfiguration endpointInbound, NtEndpointOutboundConfiguration endpointOutbound, EndpointDirection whichIsLocal)
-        {
-            Utility.EnsureNotNull(_stream);
-
-            if (whichIsLocal == EndpointDirection.Inbound)
-            {
-                var localEndpoint = new EndpointInbound(_core, this, endpointInbound);
-                _inboundEndpoints.Add(localEndpoint);
-
-                DispatchAddEndpointOutbound(endpointOutbound);
-            }
-
-            if (whichIsLocal == EndpointDirection.Outbound)
-            {
-                var localEndpoint = new EndpointOutbound(_core, this, endpointOutbound);
-                _outboundEndpoints.Add(localEndpoint);
-
-                DispatchAddEndpointInbound(endpointInbound);
-            }
-        }
     }
 }

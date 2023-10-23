@@ -10,8 +10,5 @@ namespace NetTunnel.Library.Types
         /// </summary>
         public Guid PairId { get; }
         public string Name { get; }
-
-        public void AddEndpoint(NtEndpointInboundConfiguration endpointInbound,
-            NtEndpointOutboundConfiguration endpointOutbound, EndpointDirection whichIsLocal);
     }
 }
