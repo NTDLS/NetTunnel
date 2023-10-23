@@ -1,27 +1,17 @@
 ﻿using NetTunnel.Library.Types;
-using NetTunnel.Service.Packetizer;
 using NetTunnel.Service.Packetizer.PacketPayloads;
 using System.Diagnostics;
 using System.Net.Sockets;
-using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.Engine
 {
     /// <summary>
     /// This is the class that makes an outgoing TCP/IP connection to a listening tunnel.
     /// </summary>
-    internal class TunnelOutbound : ITunnel
+    internal class TunnelOutbound : BaseTunnel, ITunnel
     {
-        protected bool _keepRunning = false;
-        protected NetworkStream? _stream;
-        private readonly EngineCore _core;
         private Thread? _outgoingConnectionThread;
 
-        private readonly List<EndpointInbound> _inboundEndpoints = new();
-        private readonly List<EndpointOutbound> _outboundEndpoints = new();
-
-        public Guid PairId { get; private set; }
-        public string Name { get; set; }
         public string Address { get; set; }
         public int ManagementPort { get; set; }
         public int DataPort { get; set; }
@@ -29,11 +19,10 @@ namespace NetTunnel.Service.Engine
         public string PasswordHash { get; set; }
 
         public TunnelOutbound(EngineCore core, NtTunnelOutboundConfiguration configuration)
+            : base(core, configuration)
         {
             _core = core;
 
-            PairId = configuration.PairId;
-            Name = configuration.Name;
             Address = configuration.Address;
             ManagementPort = configuration.ManagementPort;
             DataPort = configuration.DataPort;
@@ -43,19 +32,6 @@ namespace NetTunnel.Service.Engine
             configuration.InboundEndpointConfigurations.ForEach(o => _inboundEndpoints.Add(new(_core, this, o)));
             configuration.OutboundEndpointConfigurations.ForEach(o => _outboundEndpoints.Add(new(_core, this, o)));
         }
-
-        public void DispatchMessage(string message)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void AddEndpoint(NtEndpointInboundConfiguration endpointInbound, NtEndpointOutboundConfiguration endpointOutbound, EndpointDirection whichIsLocal)
-        {
-            //SendStreamPacketBytes (NtPacketPayloadAddEndpointInbound message)
-
-
-        }
-
 
         public NtTunnelOutboundConfiguration CloneConfiguration()
         {
@@ -76,29 +52,9 @@ namespace NetTunnel.Service.Engine
             return tunnelConfiguration;
         }
 
-        public void AddInboundEndpoint(NtEndpointInboundConfiguration configuration)
-            => _inboundEndpoints.Add(new EndpointInbound(_core, this, configuration));
-
-        public void AddOutboundEndpoint(NtEndpointOutboundConfiguration configuration)
-            => _outboundEndpoints.Add(new EndpointOutbound(_core, this, configuration));
-
-        public void DeleteInboundEndpoint(Guid endpointPairId)
-        {
-            var endpoint = _inboundEndpoints.Where(o => o.PairId == endpointPairId).Single();
-            endpoint.Stop();
-            _inboundEndpoints.Remove(endpoint);
-        }
-
-        public void DeleteOutboundEndpoint(Guid endpointPairId)
-        {
-            var endpoint = _inboundEndpoints.Where(o => o.PairId == endpointPairId).Single();
-            endpoint.Stop();
-            _inboundEndpoints.Remove(endpoint);
-        }
-
         public void Start()
         {
-            _keepRunning = true;
+            KeepRunning = true;
 
             _core.Logging.Write($"Starting outgoing tunnel '{Name}'");
 
@@ -111,26 +67,28 @@ namespace NetTunnel.Service.Engine
 
         public void Stop()
         {
-            _keepRunning = false;
+            KeepRunning = false;
             //TODO: Wait on thread(s) to stop.
         }
 
         private void OutgoingConnectionThreadProc()
         {
-            while (_keepRunning)
+            while (KeepRunning)
             {
                 try
                 {
                     _core.Logging.Write($"Attempting to connect to outgoing tunnel '{Name}' at {Address}:{DataPort}.");
 
-                    var client = new TcpClient(Address, DataPort);
+                    var tcpClient = new TcpClient(Address, DataPort);
 
                     _core.Logging.Write($"Connection successful for tunnel '{Name}' at {Address}:{DataPort}.");
 
-                    using (_stream = client.GetStream())
+                    using (_stream = tcpClient.GetStream())
                     {
-                        ReceiveTunnelPackets(client);
+                        ExecuteStream(ProcessPacketCallbackHandler);
                     }
+
+                    tcpClient.Close();
                 }
                 catch (Exception ex)
                 {
@@ -146,37 +104,9 @@ namespace NetTunnel.Service.Engine
             {
                 Debug.Print($"{message.Message}");
             }
-        }
-
-        internal void SendStreamPacketMessage(NtPacketPayloadMessage message) =>
-            NtPacketizer.SendStreamPacketPayload(_stream, message);
-
-        internal void SendStreamPacketBytes(NtPacketPayloadBytes message) =>
-            NtPacketizer.SendStreamPacketPayload(_stream, message);
-
-        internal void DispatchAddEndpointInbound(NtEndpointInboundConfiguration configuration) =>
-            NtPacketizer.SendStreamPacketPayload(_stream, new NtPacketPayloadAddEndpointInbound(configuration));
-
-        internal void DispatchAddEndpointOutbound(NtEndpointOutboundConfiguration configuration) =>
-            NtPacketizer.SendStreamPacketPayload(_stream, new NtPacketPayloadAddEndpointOutbound(configuration));
-
-        private void ReceiveTunnelPackets(TcpClient client)
-        {
-            var packetBuffer = new NtPacketBuffer();
-
-            while (_keepRunning)
+            else
             {
-                SendStreamPacketMessage(new NtPacketPayloadMessage()
-                {
-                    Label = "This is the label.",
-                    Message = "Message from inbound."
-                });
-
-                NtPacketizer.ReceiveAndProcessStreamPackets(_stream, this, packetBuffer, ProcessPacketCallbackHandler);
-
-                Thread.Sleep(1000);
             }
-            client.Close();
         }
     }
 }

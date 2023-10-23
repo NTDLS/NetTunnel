@@ -10,7 +10,7 @@ namespace NetTunnel.Service.Packetizer
     internal class NtPacket
     {
         [ProtoMember(1)]
-        public string? EnclosedPayloadType { get; set; }
+        public string EnclosedPayloadType { get; set; } = string.Empty;
         [ProtoMember(2)]
         public byte[] Payload { get; set; } = Array.Empty<byte>();
     }

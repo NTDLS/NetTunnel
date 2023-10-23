@@ -20,42 +20,6 @@ namespace NetTunnel.Service.Engine.Managers
         public void StartAll() => _collection.Use((o) => o.ForEach((o) => o.Start()));
         public void StopAll() => _collection.Use((o) => o.ForEach((o) => o.Stop()));
 
-        public void DeleteInboundEndpoint(Guid tunnelPairId, Guid endpointPairId)
-        {
-            _collection.Use((o) =>
-            {
-                var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
-                tunnel.DeleteInboundEndpoint(endpointPairId);
-            });
-        }
-
-        public void DeleteOutboundEndpoint(Guid tunnelPairId, Guid endpointPairId)
-        {
-            _collection.Use((o) =>
-            {
-                var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
-                tunnel.DeleteOutboundEndpoint(endpointPairId);
-            });
-        }
-
-        public void AddInboundEndpoint(Guid tunnelPairId, NtEndpointInboundConfiguration configuration)
-        {
-            _collection.Use((o) =>
-            {
-                var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
-                tunnel.AddInboundEndpoint(configuration);
-            });
-        }
-
-        public void AddOutboundEndpoint(Guid tunnelPairId, NtEndpointOutboundConfiguration configuration)
-        {
-            _collection.Use((o) =>
-            {
-                var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
-                tunnel.AddOutboundEndpoint(configuration);
-            });
-        }
-
         public void Add(NtTunnelInboundConfiguration config)
         {
             _collection.Use((o) =>
@@ -75,6 +39,7 @@ namespace NetTunnel.Service.Engine.Managers
                 o.Remove(tunnel);
             });
         }
+
 
         public NtTunnelBasicInfo GetBasicInfo()
         {

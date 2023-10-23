@@ -3,7 +3,6 @@ using NetTunnel.Service.Packetizer.PacketPayloads;
 using ProtoBuf;
 using System.IO.Compression;
 using System.Net.Sockets;
-using Topshelf.HostConfigurators;
 using static NetTunnel.Service.Packetizer.Constants;
 
 namespace NetTunnel.Service.Packetizer
@@ -14,7 +13,7 @@ namespace NetTunnel.Service.Packetizer
     /// </summary>
     internal static class NtPacketizer
     {
-        public delegate void ProcessPacketCallback(ITunnel tunnel, IPacketPayload payload);
+        public delegate void ProcessPacketNotification(ITunnel tunnel, IPacketPayload payload);
 
         public static byte[] AssemblePacket(NtPacket packet)
         {
@@ -76,7 +75,7 @@ namespace NetTunnel.Service.Packetizer
             }
             var cmd = new NtPacket()
             {
-                EnclosedPayloadType = payload.GetType().Name,
+                EnclosedPayloadType = payload.GetType()?.FullName ?? string.Empty,
                 Payload = ToByteArray(payload)
             };
 
@@ -84,7 +83,8 @@ namespace NetTunnel.Service.Packetizer
             stream.Write(packetBytes, 0, packetBytes.Length);
         }
 
-        public static void ReceiveAndProcessStreamPackets(NetworkStream? stream, ITunnel tunnel, NtPacketBuffer packetBuffer, ProcessPacketCallback processPacketCallback)
+        public static void ReceiveAndProcessStreamPackets(NetworkStream? stream,
+            ITunnel tunnel, NtPacketBuffer packetBuffer, ProcessPacketNotification processPacketCallback)
         {
             if (stream == null)
             {
@@ -96,7 +96,7 @@ namespace NetTunnel.Service.Packetizer
             ProcessPacketBuffer(tunnel, packetBuffer, processPacketCallback);
         }
 
-        public static void ProcessPacketBuffer(ITunnel tunnel, NtPacketBuffer packetBuffer, ProcessPacketCallback processPacketCallback)
+        public static void ProcessPacketBuffer(ITunnel tunnel, NtPacketBuffer packetBuffer, ProcessPacketNotification processPacketCallback)
         {
             try
             {
@@ -168,25 +168,16 @@ namespace NetTunnel.Service.Packetizer
                     Buffer.BlockCopy(packetBuffer.PacketBuilder, grossPacketSize, packetBuffer.PacketBuilder, 0, packetBuffer.PacketBuilderLength - grossPacketSize);
                     packetBuffer.PacketBuilderLength -= grossPacketSize;
 
-                    var genericType = Type.GetType("packet.EnclosedPayloadType);
-                    if (genericType == null)
-                    {
-                        throw new Exception($"Unknown payload type {packet.EnclosedPayloadType}.");
-                    }
+                    var genericType = Type.GetType(packet.EnclosedPayloadType)
+                        ?? throw new Exception($"Unknown payload type {packet.EnclosedPayloadType}.");
 
-                    var toObjectMethod = typeof(NtPacketizer).GetMethod("ToObject");
-                    if (toObjectMethod == null)
-                    {
-                        throw new Exception($"Could not find ToObject().");
-                    }
+                    var toObjectMethod = typeof(NtPacketizer).GetMethod("ToObject")
+                        ?? throw new Exception($"Could not find ToObject().");
 
                     var genericToObjectMethod = toObjectMethod.MakeGenericMethod(genericType);
 
-                    var payload = (IPacketPayload?)genericToObjectMethod.Invoke(null, new object[] { packet.Payload });
-                    if (payload == null)
-                    {
-                        throw new Exception($"Payload can not be null.");
-                    }
+                    var payload = (IPacketPayload?)genericToObjectMethod.Invoke(null, new object[] { packet.Payload })
+                        ?? throw new Exception($"Payload can not be null.");
 
                     processPacketCallback(tunnel, payload);
 
