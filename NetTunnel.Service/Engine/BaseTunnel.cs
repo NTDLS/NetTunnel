@@ -10,8 +10,6 @@ namespace NetTunnel.Service.Engine
 {
     public class BaseTunnel : ITunnel
     {
-
-
         public bool KeepRunning { get; internal set; } = false;
         public Guid PairId { get; private set; }
         public string Name { get; private set; }

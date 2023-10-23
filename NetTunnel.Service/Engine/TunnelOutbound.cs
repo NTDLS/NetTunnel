@@ -11,7 +11,6 @@ namespace NetTunnel.Service.Engine
     internal class TunnelOutbound : BaseTunnel, ITunnel
     {
         private Thread? _outgoingConnectionThread;
-
         public string Address { get; set; }
         public int ManagementPort { get; set; }
         public int DataPort { get; set; }

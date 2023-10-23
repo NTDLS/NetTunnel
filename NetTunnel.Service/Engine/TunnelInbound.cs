@@ -12,7 +12,6 @@ namespace NetTunnel.Service.Engine
     internal class TunnelInbound : BaseTunnel, ITunnel
     {
         private Thread? _incomingConnectionThread;
-
         public int DataPort { get; private set; }
 
         public TunnelInbound(EngineCore core, NtTunnelInboundConfiguration configuration)
