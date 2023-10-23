@@ -75,15 +75,27 @@ namespace NetTunnel.UI.Forms
                         Utility.EnsureNotNull(_client);
                         Utility.EnsureNotNull(itemUnderMouse);
 
-                        var tunnel = (ITunnel)itemUnderMouse.Tag;
-
-                        using (var formAddEndpoint = new FormAddEndpoint(_client, tunnel))
+                        if (itemUnderMouse.Tag is NtTunnelInboundConfiguration tunnelInbound)
                         {
-                            if (formAddEndpoint.ShowDialog() == DialogResult.OK)
+                            using (var formAddEndpoint = new FormAddEndpoint(_client, tunnelInbound))
                             {
-                                RepopulateTunnelsGrid();
+                                if (formAddEndpoint.ShowDialog() == DialogResult.OK)
+                                {
+                                    RepopulateTunnelsGrid();
+                                }
                             }
                         }
+                        else if (itemUnderMouse.Tag is NtTunnelOutboundConfiguration tunnelOutbound)
+                        {
+                            using (var formAddEndpoint = new FormAddEndpoint(_client, tunnelOutbound))
+                            {
+                                if (formAddEndpoint.ShowDialog() == DialogResult.OK)
+                                {
+                                    RepopulateTunnelsGrid();
+                                }
+                            }
+                        }
+
                     }
                     else if (e.ClickedItem?.Text == "Delete Tunnel")
                     {

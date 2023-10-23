@@ -13,5 +13,10 @@ namespace NetTunnel.Library.Types
 
         public NtEndpointPairConfiguration() { }
 
+        public NtEndpointPairConfiguration(NtEndpointInboundConfiguration inbound, NtEndpointOutboundConfiguration outbound)
+        {
+            Inbound = inbound;
+            Outbound = outbound;
+        }
     }
 }

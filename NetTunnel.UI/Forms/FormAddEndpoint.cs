@@ -6,15 +6,32 @@ namespace NetTunnel.UI.Forms
     public partial class FormAddEndpoint : BaseForm
     {
         private readonly NtClient? _client;
-        private readonly ITunnel? _tunnel;
+        private readonly NtTunnelInboundConfiguration? _tunnelInbound;
+        private readonly NtTunnelOutboundConfiguration? _tunnelOutbound;
 
-        public FormAddEndpoint(NtClient client, ITunnel tunnel)
+        public FormAddEndpoint(NtClient client, NtTunnelInboundConfiguration tunnelInbound)
         {
             InitializeComponent();
 
             _client = client;
-            _tunnel = tunnel;
+            _tunnelInbound = tunnelInbound;
+        }
 
+        public FormAddEndpoint(NtClient client, NtTunnelOutboundConfiguration tunnelOutbound)
+        {
+            InitializeComponent();
+
+            _client = client;
+            _tunnelOutbound = tunnelOutbound;
+        }
+
+        public FormAddEndpoint()
+        {
+            InitializeComponent();
+        }
+
+        private void FormAddEndpoint_Load(object sender, EventArgs e)
+        {
             AcceptButton = buttonAdd;
             CancelButton = buttonCancel;
 
@@ -24,17 +41,9 @@ namespace NetTunnel.UI.Forms
             textBoxTerminationPort.Text = "80";
         }
 
-        public FormAddEndpoint()
-        {
-            InitializeComponent();
-        }
-
-        private void FormAddEndpoint_Load(object sender, EventArgs e) { }
-
         private void buttonAdd_Click(object sender, EventArgs e)
         {
             Utility.EnsureNotNull(_client);
-            Utility.EnsureNotNull(_tunnel);
 
             try
             {
@@ -61,9 +70,32 @@ namespace NetTunnel.UI.Forms
                 var endpointOutbound = new NtEndpointOutboundConfiguration(endpointPairId, textBoxName.Text,
                     textBoxTerminationAddress.Text, int.Parse(textBoxTerminationPort.Text));
 
-                _tunnel.AddEndpoint(endpointInbound, endpointOutbound,
-                    radioButtonLocalEndpoint.Checked ? Library.Constants.EndpointDirection.Inbound : Library.Constants.EndpointDirection.Outbound);
 
+                if (_tunnelInbound != null)
+                {
+                    if (radioButtonLocalEndpoint.Checked)
+                    {
+                        _client.TunnelInbound.AddInboundEndpointPair(endpointPairId, endpointInbound, endpointOutbound).RunSynchronously();
+                    }
+                    else
+                    {
+                        _client.TunnelInbound.AddOutboundEndpointPair(endpointPairId, endpointInbound, endpointOutbound).RunSynchronously();
+                    }
+                }
+                else if (_tunnelOutbound != null)
+                {
+                    if (radioButtonLocalEndpoint.Checked)
+                    {
+                        _client.TunnelOutbound.AddOutboundEndpointPair(endpointPairId, endpointInbound, endpointOutbound).RunSynchronously();
+                    }
+                    else
+                    {
+                        _client.TunnelOutbound.AddInboundEndpointPair(endpointPairId, endpointInbound, endpointOutbound).RunSynchronously();
+                    }
+                }                                
+
+                //_tunnel.AddEndpoint(endpointInbound, endpointOutbound,
+                //radioButtonLocalEndpoint.Checked ? Library.Constants.EndpointDirection.Inbound : Library.Constants.EndpointDirection.Outbound);
 
                 /*
                 NtClient remoteClient;
