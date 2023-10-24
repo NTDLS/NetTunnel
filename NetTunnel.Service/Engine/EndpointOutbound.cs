@@ -1,6 +1,11 @@
-﻿using NetTunnel.Library.Types;
+﻿using NetTunnel.Library;
+using NetTunnel.Library.Types;
+using NetTunnel.Service.PacketFraming.PacketPayloads.Notifications;
 using NetTunnel.Service.Types;
+using NTDLS.Semaphore;
+using System;
 using System.Net.Sockets;
+using static NetTunnel.Service.PacketFraming.Types;
 
 namespace NetTunnel.Service.Engine
 {
@@ -10,7 +15,6 @@ namespace NetTunnel.Service.Engine
     internal class EndpointOutbound : IEndpoint
     {
         private readonly EngineCore _core;
-        private Thread? _outgoingConnectionThread;
         private bool _keepRunning = false;
         private readonly ITunnel _tunnel;
 
@@ -36,8 +40,8 @@ namespace NetTunnel.Service.Engine
 
             _core.Logging.Write($"Starting outgoing endpoint '{Name}'");
 
-            _outgoingConnectionThread = new Thread(OutgoingConnectionThreadProc);
-            _outgoingConnectionThread.Start();
+            //_outgoingConnectionThread = new Thread(OutgoingConnectionThreadProc);
+            //_outgoingConnectionThread.Start();
         }
 
         public void Stop()
@@ -46,45 +50,104 @@ namespace NetTunnel.Service.Engine
             //TODO: Wait on thread(s) to stop.
         }
 
-        void OutgoingConnectionThreadProc()
+        private class OutboundConnection: IDisposable
         {
-            while (_keepRunning)
+            public Guid StreamId { get; set; }
+            public TcpClient TcpClient { get; set; }
+            public Thread Thread { get; set; }
+            public NetworkStream Stream { get; set; }
+
+            public OutboundConnection(Thread thread, TcpClient tcpClient, Guid streamId)
             {
-                try
-                {
-                    _core.Logging.Write($"Attempting to connect to outgoing endpoint '{Name}' at {Address}:{Port}.");
+                Thread = thread;
+                TcpClient = tcpClient;
+                StreamId = streamId;
+                Stream = tcpClient.GetStream();
+            }
 
-                    var client = new TcpClient(Address, Port);
-
-                    _core.Logging.Write($"Connection successful for endpoint '{Name}' at {Address}:{Port}.");
-
-                    HandleClient(client);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
+            public void Dispose()
+            {
+                Stream.Dispose();
             }
         }
 
-        private void HandleClient(TcpClient client)
-        {
-            while (_keepRunning)
-            {
-                /*
-                NetworkStream stream = client.GetStream();
-                byte[] buffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
-                {
-                    //stream.Write().
-                }
-                */
+        CriticalResource<Dictionary<Guid, OutboundConnection>> _activeConnections = new();
 
-                Thread.Sleep(1);
+        public void SendEndpointData(Guid streamId, byte [] buffer)
+        {
+            var outboundConnection = _activeConnections.Use((o) =>
+            {
+                if (o.TryGetValue(streamId, out var outboundConnection))
+                {
+                    return outboundConnection;
+                }
+
+                outboundConnection = StartConnection(streamId);
+
+                o.Add(streamId, outboundConnection);
+
+                return outboundConnection;
+            });
+
+            outboundConnection.Stream.Write(buffer);
+        }
+
+        private OutboundConnection StartConnection(Guid streamId)
+        {
+            var tcpClient = new TcpClient();
+
+            try
+            {
+                _core.Logging.Write($"Connecting outbound endpoint '{Name}' on port {Port}"); ;
+
+                tcpClient.Connect(Address, Port);
+
+                _core.Logging.Write($"Accepted on incoming endpoint '{Name}' on port {Port}");
+
+                var handlerThread = new Thread(HandleClientThreadProc);
+                var param = new OutboundConnection(handlerThread, tcpClient, streamId);
+
+                _activeConnections.Use((o) => o.Add(streamId, param));
+
+                handlerThread.Start(param);
+
+                return param;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                throw;
+            }
+            finally
+            {
+                tcpClient.Close();
+            }
+        }
+
+        private void HandleClientThreadProc(object? obj)
+        {
+            Utility.EnsureNotNull(obj);
+            var param = (OutboundConnection)obj;
+
+            using (var tcpStream = param.TcpClient.GetStream())
+            {
+                //Here we need to tell the remote service to start an outgoing connection for this endpoint and on its owning tunnel.
+
+                while (_keepRunning)
+                {
+                    byte[] buffer = new byte[NtPacketDefaults.PACKET_BUFFER_SIZE];
+                    int bytesRead;
+                    while ((bytesRead = tcpStream.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        var exchnagePayload = new NtPacketPayloadEndpointExchange(_tunnel.PairId, PairId, param.StreamId, buffer);
+                        _tunnel.SendStreamPacketNotification(exchnagePayload);
+                    }
+
+                    Thread.Sleep(1);
+                }
             }
 
-            client.Close();
+            param.TcpClient.Close();
         }
 
     }

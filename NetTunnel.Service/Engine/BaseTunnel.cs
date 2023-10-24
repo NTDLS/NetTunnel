@@ -156,7 +156,7 @@ namespace NetTunnel.Service.Engine
         }
 
         public void AddInboundEndpoint(NtEndpointInboundConfiguration configuration)
-                => _inboundEndpoints.Add(new EndpointInbound(Core, this, configuration));
+            => _inboundEndpoints.Add(new EndpointInbound(Core, this, configuration));
 
         public void AddOutboundEndpoint(NtEndpointOutboundConfiguration configuration)
             => _outboundEndpoints.Add(new EndpointOutbound(Core, this, configuration));

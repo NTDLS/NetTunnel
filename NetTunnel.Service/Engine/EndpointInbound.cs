@@ -1,8 +1,14 @@
-﻿using NetTunnel.Library;
+﻿using NetTunnel.ClientAPI;
+using NetTunnel.Library;
 using NetTunnel.Library.Types;
+using NetTunnel.Service.PacketFraming.PacketPayloads.Notifications;
 using NetTunnel.Service.Types;
+using NTDLS.Semaphore;
+using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
+using static NetTunnel.Service.PacketFraming.Types;
 
 namespace NetTunnel.Service.Engine
 {
@@ -14,7 +20,6 @@ namespace NetTunnel.Service.Engine
         private readonly EngineCore _core;
         private Thread? _incomingConnectionThread;
         private bool _keepRunning = false;
-        private List<Thread> _handlerThreads = new();
         private readonly ITunnel _tunnel;
 
         public Guid PairId { get; private set; }
@@ -49,11 +54,13 @@ namespace NetTunnel.Service.Engine
 
         void IncomingConnectionThreadProc()
         {
-            var listener = new TcpListener(IPAddress.Any, Port);
+            var tcpListener = new TcpListener(IPAddress.Any, Port);
+
+            Guid streamId = Guid.NewGuid();
 
             try
             {
-                listener.Start();
+                tcpListener.Start();
 
                 _core.Logging.Write($"Listening incoming endpoint '{Name}' on port {Port}");
 
@@ -61,13 +68,16 @@ namespace NetTunnel.Service.Engine
                 {
                     _core.Logging.Write($"Waiting for connection for incoming endpoint '{Name}' on port {Port}");
 
-                    var client = listener.AcceptTcpClient();
+                    var tcpClient = tcpListener.AcceptTcpClient();
 
                     _core.Logging.Write($"Accepted on incoming endpoint '{Name}' on port {Port}");
 
+
                     var handlerThread = new Thread(HandleClientThreadProc);
-                    _handlerThreads.Add(handlerThread);
-                    handlerThread.Start();
+
+                    var param = new OutboundConnection(handlerThread, tcpClient, streamId);
+
+                    handlerThread.Start(param);
 
                     Thread.Sleep(1);
                 }
@@ -79,36 +89,71 @@ namespace NetTunnel.Service.Engine
             finally
             {
                 // Stop listening and close the listener when done.
-                listener.Stop();
+                tcpListener.Stop();
             }
+        }
+        private class OutboundConnection : IDisposable
+        {
+            public Guid StreamId { get; set; }
+            public TcpClient TcpClient { get; set; }
+            public Thread Thread { get; set; }
+            public NetworkStream Stream { get; set; }
+
+            public OutboundConnection(Thread thread, TcpClient tcpClient, Guid streamId)
+            {
+                Thread = thread;
+                TcpClient = tcpClient;
+                StreamId = streamId;
+                Stream = tcpClient.GetStream();
+            }
+
+            public void Dispose()
+            {
+                Stream.Dispose();
+            }
+        }
+
+        CriticalResource<Dictionary<Guid, OutboundConnection>> _activeConnections = new();
+
+        public void SendEndpointData(Guid streamId, byte[] buffer)
+        {
+            var outboundConnection = _activeConnections.Use((o) =>
+            {
+                if (o.TryGetValue(streamId, out var outboundConnection))
+                {
+                    return outboundConnection;
+                }
+
+                return outboundConnection;
+            });
+
+            outboundConnection.Stream.Write(buffer);
         }
 
         private void HandleClientThreadProc(object? obj)
         {
             Utility.EnsureNotNull(obj);
-            var client = (TcpClient)obj;
+            var param = (OutboundConnection)obj;
 
-            //Here we need to tell the remote service to start an outgoing connection for this endpoint and on its owning tunnel.
-            //_tunnel.PairId
-            //PairId
-
-            while (_keepRunning)
+            using (var tcpStream = param.TcpClient.GetStream())
             {
-                //TODO: Pump endpoint data.
-                Thread.Sleep(1);
+                //Here we need to tell the remote service to start an outgoing connection for this endpoint and on its owning tunnel.
+
+                while (_keepRunning)
+                {
+                    byte[] buffer = new byte[NtPacketDefaults.PACKET_BUFFER_SIZE];
+                    int bytesRead;
+                    while ((bytesRead = tcpStream.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        var exchnagePayload = new NtPacketPayloadEndpointExchange(_tunnel.PairId, PairId, param.StreamId, buffer);
+                        _tunnel.SendStreamPacketNotification(exchnagePayload);
+                    }
+
+                    Thread.Sleep(1);
+                }
             }
 
-            /*
-            NetworkStream stream = client.GetStream();
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
-            {
-                //stream.Write().
-            }
-            */
-
-            client.Close();
+            param.TcpClient.Close();
         }
     }
 }
