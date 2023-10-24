@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Library.Types;
 using NetTunnel.Service.Packetizer.PacketPayloads;
+using NetTunnel.Service.Types;
 using ProtoBuf;
 using System.IO.Compression;
 using System.Net.Sockets;

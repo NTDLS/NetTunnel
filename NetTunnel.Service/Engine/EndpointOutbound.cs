@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library.Types;
+using NetTunnel.Service.Types;
 using System.Net.Sockets;
 
 namespace NetTunnel.Service.Engine

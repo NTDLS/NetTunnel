@@ -1,9 +1,8 @@
-﻿using NetTunnel.ClientAPI;
-using NetTunnel.Library.Types;
+﻿using NetTunnel.Library.Types;
 using NetTunnel.Service.Packetizer;
 using NetTunnel.Service.Packetizer.PacketPayloads;
+using NetTunnel.Service.Types;
 using System.Net.Sockets;
-using static NetTunnel.Library.Constants;
 using static NetTunnel.Service.Packetizer.NtPacketizer;
 
 namespace NetTunnel.Service.Engine

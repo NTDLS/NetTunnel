@@ -1,5 +1,6 @@
 ﻿using NetTunnel.ClientAPI;
 using NetTunnel.Library.Types;
+using NetTunnel.Service.Types;
 using System.Net;
 using System.Net.Sockets;
 

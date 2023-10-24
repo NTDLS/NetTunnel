@@ -1,6 +1,4 @@
-﻿using static NetTunnel.Library.Constants;
-
-namespace NetTunnel.Library.Types
+﻿namespace NetTunnel.Service.Types
 {
     public interface ITunnel
     {
