@@ -6,8 +6,7 @@ using NetTunnel.Service.PacketFraming.PacketPayloads.Queries;
 using NetTunnel.Service.PacketFraming.PacketPayloads.Replies;
 using NetTunnel.Service.Types;
 using System.Net.Sockets;
-using static NetTunnel.Service.PacketFraming.Constants;
-using static NetTunnel.Service.PacketFraming.NtPacketizer;
+using static NetTunnel.Service.PacketFraming.Types;
 
 namespace NetTunnel.Service.Engine
 {
@@ -74,7 +73,7 @@ namespace NetTunnel.Service.Engine
 
             return await Task.Run(() =>
             {
-                var packetBytes = AssemblePacket(this, cmd);
+                var packetBytes = NtPacketizer.AssemblePacket(this, cmd);
                 _stream.Write(packetBytes, 0, packetBytes.Length);
 
                 //TODO: We need to check received data to see if any of them are replies
@@ -106,7 +105,7 @@ namespace NetTunnel.Service.Engine
                 Payload = Utility.SerializeToByteArray(payload)
             };
 
-            var packetBytes = AssemblePacket(this, cmd);
+            var packetBytes = NtPacketizer.AssemblePacket(this, cmd);
             _stream.Write(packetBytes, 0, packetBytes.Length);
         }
 
@@ -132,7 +131,7 @@ namespace NetTunnel.Service.Engine
                 Payload = Utility.SerializeToByteArray(payload)
             };
 
-            var packetBytes = AssemblePacket(this, cmd);
+            var packetBytes = NtPacketizer.AssemblePacket(this, cmd);
             _stream.Write(packetBytes, 0, packetBytes.Length);
         }
 

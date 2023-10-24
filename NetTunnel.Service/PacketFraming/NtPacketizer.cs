@@ -7,7 +7,7 @@ using NetTunnel.Service.Types;
 using NTDLS.Semaphore;
 using System.Net.Sockets;
 using System.Reflection;
-using static NetTunnel.Service.PacketFraming.Constants;
+using static NetTunnel.Service.PacketFraming.Types;
 
 namespace NetTunnel.Service.PacketFraming
 {
@@ -19,9 +19,6 @@ namespace NetTunnel.Service.PacketFraming
     {
         private static CriticalResource<Dictionary<string, MethodInfo>> _reflectioncache = new();
 
-        public delegate void ProcessPacketNotification(ITunnel tunnel, IPacketPayloadNotification payload);
-
-        public delegate IPacketPayloadReply ProcessPacketQuery(ITunnel tunnel, IPacketPayloadQuery payload);
 
         public static byte[] AssemblePacket(ITunnel tunnel, NtPacket packet)
         {

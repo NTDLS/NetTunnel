@@ -1,4 +1,4 @@
-﻿using static NetTunnel.Service.PacketFraming.Constants;
+﻿using static NetTunnel.Service.PacketFraming.Types;
 
 namespace NetTunnel.Service.PacketFraming
 {
