@@ -120,32 +120,5 @@ namespace NetTunnel.Service.Engine
 
             return new NtPacketPayloadBoolean(false);
         }
-
-        private void ProcessPacketNotificationCallback(ITunnel tunnel, IPacketPayloadNotification packet)
-        {
-            if (packet is NtPacketPayloadMessage message)
-            {
-                Debug.Print($"{message.Message}");
-            }
-            else if (packet is NtPacketPayloadEndpointExchange exchange)
-            {
-                var inboundEndpoint = _inboundEndpoints.Where(o => o.PairId == exchange.EndpointPairId).FirstOrDefault();
-                if (inboundEndpoint != null)
-                {
-                    inboundEndpoint.SendEndpointData(exchange.StreamId, exchange.Bytes);
-                    return;
-                }
-
-                var outboundEndpoint = _outboundEndpoints.Where(o => o.PairId == exchange.EndpointPairId).FirstOrDefault();
-                if (outboundEndpoint != null)
-                {
-                    outboundEndpoint.SendEndpointData(exchange.StreamId, exchange.Bytes);
-                    return;
-                }
-            }
-            else
-            {
-            }
-        }
     }
 }

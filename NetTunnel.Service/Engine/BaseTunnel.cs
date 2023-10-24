@@ -5,6 +5,7 @@ using NetTunnel.Service.PacketFraming.PacketPayloads.Notifications;
 using NetTunnel.Service.PacketFraming.PacketPayloads.Queries;
 using NetTunnel.Service.PacketFraming.PacketPayloads.Replies;
 using NetTunnel.Service.Types;
+using System.Diagnostics;
 using System.Net.Sockets;
 using static NetTunnel.Service.PacketFraming.Types;
 
@@ -47,6 +48,58 @@ namespace NetTunnel.Service.Engine
         }
 
         #region TCP/IP Packet and Stream interactions.
+
+        public void ProcessPacketNotificationCallback(ITunnel tunnel, IPacketPayloadNotification packet)
+        {
+            if (packet is NtPacketPayloadMessage message)
+            {
+                Debug.Print($"{message.Message}");
+            }
+            else if (packet is NtPacketPayloadEndpointConnect connectEndpoint)
+            {
+                var outboundEndpoint = _outboundEndpoints.Where(o => o.PairId == connectEndpoint.EndpointPairId).FirstOrDefault();
+                if (outboundEndpoint != null)
+                {
+                    outboundEndpoint.StartConnection(connectEndpoint.StreamId);
+                    return;
+                }
+            }
+            else if (packet is NtPacketPayloadEndpointDisconnect disconnectEndpoint)
+            {
+                var inboundEndpoint = _inboundEndpoints.Where(o => o.PairId == disconnectEndpoint.EndpointPairId).FirstOrDefault();
+                if (inboundEndpoint != null)
+                {
+                    inboundEndpoint.Disconnect(disconnectEndpoint.StreamId);
+                    return;
+                }
+
+                var outboundEndpoint = _outboundEndpoints.Where(o => o.PairId == disconnectEndpoint.EndpointPairId).FirstOrDefault();
+                if (outboundEndpoint != null)
+                {
+                    outboundEndpoint.Disconnect(disconnectEndpoint.StreamId);
+                    return;
+                }
+            }
+            else if (packet is NtPacketPayloadEndpointExchange exchange)
+            {
+                var inboundEndpoint = _inboundEndpoints.Where(o => o.PairId == exchange.EndpointPairId).FirstOrDefault();
+                if (inboundEndpoint != null)
+                {
+                    inboundEndpoint.SendEndpointData(exchange.StreamId, exchange.Bytes);
+                    return;
+                }
+
+                var outboundEndpoint = _outboundEndpoints.Where(o => o.PairId == exchange.EndpointPairId).FirstOrDefault();
+                if (outboundEndpoint != null)
+                {
+                    outboundEndpoint.SendEndpointData(exchange.StreamId, exchange.Bytes);
+                    return;
+                }
+            }
+            else
+            {
+            }
+        }
 
         /// <summary>
         /// Sends a IPacketPayloadQuery that expects a IPacketPayloadReply in return.
