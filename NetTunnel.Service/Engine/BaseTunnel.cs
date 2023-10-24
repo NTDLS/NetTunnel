@@ -47,9 +47,26 @@ namespace NetTunnel.Service.Engine
             configuration.OutboundEndpointConfigurations.ForEach(o => _outboundEndpoints.Add(new(Core, this, o)));
         }
 
+        public IEndpoint? GetEndpointById(Guid pairId)
+        {
+            var inboundEndpoint = _inboundEndpoints.Where(o => o.PairId == pairId).FirstOrDefault();
+            if (inboundEndpoint != null)
+            {
+                return inboundEndpoint;
+            }
+
+            var outboundEndpoint = _outboundEndpoints.Where(o => o.PairId == pairId).FirstOrDefault();
+            if (outboundEndpoint != null)
+            {
+                return outboundEndpoint;
+            }
+
+            return null;
+        }
+
         #region TCP/IP Packet and Stream interactions.
 
-        public void ProcessPacketNotificationCallback(ITunnel tunnel, IPacketPayloadNotification packet)
+        internal void ProcessPacketNotificationCallback(ITunnel tunnel, IPacketPayloadNotification packet)
         {
             if (packet is NtPacketPayloadMessage message)
             {
@@ -57,47 +74,42 @@ namespace NetTunnel.Service.Engine
             }
             else if (packet is NtPacketPayloadEndpointConnect connectEndpoint)
             {
-                var outboundEndpoint = _outboundEndpoints.Where(o => o.PairId == connectEndpoint.EndpointPairId).FirstOrDefault();
-                if (outboundEndpoint != null)
-                {
-                    outboundEndpoint.StartConnection(connectEndpoint.StreamId);
-                    return;
-                }
+                _outboundEndpoints.Where(o => o.PairId == connectEndpoint.EndpointPairId).FirstOrDefault()?
+                    .StartConnection(connectEndpoint.StreamId);
             }
             else if (packet is NtPacketPayloadEndpointDisconnect disconnectEndpoint)
             {
-                var inboundEndpoint = _inboundEndpoints.Where(o => o.PairId == disconnectEndpoint.EndpointPairId).FirstOrDefault();
-                if (inboundEndpoint != null)
-                {
-                    inboundEndpoint.Disconnect(disconnectEndpoint.StreamId);
-                    return;
-                }
-
-                var outboundEndpoint = _outboundEndpoints.Where(o => o.PairId == disconnectEndpoint.EndpointPairId).FirstOrDefault();
-                if (outboundEndpoint != null)
-                {
-                    outboundEndpoint.Disconnect(disconnectEndpoint.StreamId);
-                    return;
-                }
+                GetEndpointById(disconnectEndpoint.EndpointPairId)?
+                    .Disconnect(disconnectEndpoint.StreamId);
             }
             else if (packet is NtPacketPayloadEndpointExchange exchange)
             {
-                var inboundEndpoint = _inboundEndpoints.Where(o => o.PairId == exchange.EndpointPairId).FirstOrDefault();
-                if (inboundEndpoint != null)
-                {
-                    inboundEndpoint.SendEndpointData(exchange.StreamId, exchange.Bytes);
-                    return;
-                }
-
-                var outboundEndpoint = _outboundEndpoints.Where(o => o.PairId == exchange.EndpointPairId).FirstOrDefault();
-                if (outboundEndpoint != null)
-                {
-                    outboundEndpoint.SendEndpointData(exchange.StreamId, exchange.Bytes);
-                    return;
-                }
+                GetEndpointById(exchange.EndpointPairId)?
+                    .SendEndpointData(exchange.StreamId, exchange.Bytes);
             }
             else
             {
+                throw new Exception("Unhandled notification packet.");
+            }
+        }
+
+        internal IPacketPayloadReply ProcessPacketQueryCallback(ITunnel tunnel, IPacketPayloadQuery packet)
+        {
+            if (packet is NtPacketPayloadAddEndpointInbound inboundEndpoint)
+            {
+                AddInboundEndpoint(inboundEndpoint.Configuration);
+                Core.InboundTunnels.SaveToDisk();
+                return new NtPacketPayloadBoolean(true);
+            }
+            else if (packet is NtPacketPayloadAddEndpointOutbound outboundEndpoint)
+            {
+                AddOutboundEndpoint(outboundEndpoint.Configuration);
+                Core.InboundTunnels.SaveToDisk();
+                return new NtPacketPayloadBoolean(true);
+            }
+            else
+            {
+                throw new Exception("Unhandled query packet.");
             }
         }
 

@@ -1,6 +1,4 @@
 ﻿using NetTunnel.Library.Types;
-using NetTunnel.Service.PacketFraming.PacketPayloads.Queries;
-using NetTunnel.Service.PacketFraming.PacketPayloads.Replies;
 using NetTunnel.Service.Types;
 using System.Net.Sockets;
 
@@ -95,24 +93,6 @@ namespace NetTunnel.Service.Engine
                     Console.WriteLine($"Error: {ex.Message}");
                 }
             }
-        }
-
-        private IPacketPayloadReply ProcessPacketQueryCallback(ITunnel tunnel, IPacketPayloadQuery packet)
-        {
-            if (packet is NtPacketPayloadAddEndpointInbound inboundEndpoint)
-            {
-                AddInboundEndpoint(inboundEndpoint.Configuration);
-                Core.OutboundTunnels.SaveToDisk();
-                return new NtPacketPayloadBoolean(true);
-            }
-            else if (packet is NtPacketPayloadAddEndpointOutbound outboundEndpoint)
-            {
-                AddOutboundEndpoint(outboundEndpoint.Configuration);
-                Core.OutboundTunnels.SaveToDisk();
-                return new NtPacketPayloadBoolean(true);
-            }
-
-            return new NtPacketPayloadBoolean(false);
         }
     }
 }

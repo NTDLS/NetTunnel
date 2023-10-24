@@ -21,12 +21,8 @@ namespace NetTunnel.Service.Engine
 
         public void Start()
         {
-            _keepRunning = true;
-
             _core.Logging.Write($"Starting outgoing endpoint '{Name}'");
-
-            //_outgoingConnectionThread = new Thread(OutgoingConnectionThreadProc);
-            //_outgoingConnectionThread.Start();
+            _keepRunning = true;
         }
 
         public void Stop()

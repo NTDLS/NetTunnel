@@ -22,9 +22,9 @@ namespace NetTunnel.Service.Engine
 
         public void Start()
         {
-            _keepRunning = true;
-
             _core.Logging.Write($"Starting incoming endpoint '{Name}' on port {Port}");
+
+            _keepRunning = true;
 
             _incomingConnectionThread = new Thread(IncomingConnectionThreadProc);
             _incomingConnectionThread.Start();
@@ -48,21 +48,18 @@ namespace NetTunnel.Service.Engine
 
                 while (_keepRunning)
                 {
-                    Guid streamId = Guid.NewGuid();
+                    var tcpClient = tcpListener.AcceptTcpClient(); //Wait for an incomming connection.
 
-                    _core.Logging.Write($"Waiting for connection for incoming endpoint '{Name}' on port {Port}");
+                    if (tcpClient.Connected)
+                    {
+                        var handlerThread = new Thread(HandleClientThreadProc);
 
-                    var tcpClient = tcpListener.AcceptTcpClient();
+                        //Keep track of the connection.
+                        var activeConnection = new ActiveEndpointConnection(handlerThread, tcpClient, Guid.NewGuid());
+                        _activeConnections.Use((o) => o.Add(activeConnection.StreamId, activeConnection));
 
-                    _core.Logging.Write($"Accepted on incoming endpoint '{Name}' on port {Port}");
-
-                    var handlerThread = new Thread(HandleClientThreadProc);
-
-                    var activeConnection = new ActiveEndpointConnection(handlerThread, tcpClient, streamId);
-
-                    _activeConnections.Use((o) => o.Add(streamId, activeConnection));
-
-                    handlerThread.Start(activeConnection);
+                        handlerThread.Start(activeConnection);
+                    }
                 }
             }
             catch (Exception ex)

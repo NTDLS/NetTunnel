@@ -6,7 +6,7 @@ using static NetTunnel.Service.PacketFraming.Types;
 
 namespace NetTunnel.Service.Engine
 {
-    internal class BaseEndpoint
+    internal class BaseEndpoint : IEndpoint
     {
         public Guid PairId { get; private set; }
         public string Name { get; private set; }
@@ -43,7 +43,7 @@ namespace NetTunnel.Service.Engine
             });
         }
 
-        internal void SendEndpointData(Guid streamId, byte[] buffer)
+        public void SendEndpointData(Guid streamId, byte[] buffer)
         {
             var outboundConnection = _activeConnections.Use((o) =>
             {
