@@ -6,6 +6,6 @@ namespace NetTunnel.Service.Packetizer
     {
         public Guid PacketId { get; set; }
         public AutoResetEvent WaitEvent { get; set; } = new(false);
-        public IPacketPayload? ReplyPayload { get; set; }
+        public IPacketPayloadReply? ReplyPayload { get; set; }
     }
 }

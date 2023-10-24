@@ -3,7 +3,7 @@ using NetTunnel.ClientAPI;
 using NetTunnel.ClientAPI.Payload;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.Engine;
-using NetTunnel.Service.Packetizer.PacketPayloads;
+using NetTunnel.Service.Packetizer.PacketPayloads.Replies;
 using Newtonsoft.Json;
 
 namespace NetTunnel.Service.Controllers

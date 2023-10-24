@@ -1,10 +1,10 @@
 ﻿using ProtoBuf;
 
-namespace NetTunnel.Service.Packetizer.PacketPayloads
+namespace NetTunnel.Service.Packetizer.PacketPayloads.Notifications
 {
     [Serializable]
     [ProtoContract]
-    public class NtPacketPayloadBytes : IPacketPayload
+    public class NtPacketPayloadBytes : IPacketPayloadNotification
     {
         [ProtoMember(1)]
         public string Label { get; set; } = string.Empty;

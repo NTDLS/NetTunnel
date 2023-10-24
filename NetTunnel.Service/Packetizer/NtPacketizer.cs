@@ -15,9 +15,9 @@ namespace NetTunnel.Service.Packetizer
     {
         private static readonly List<QueriesAwaitingReply> _queriesAwaitingReplies = new();
 
-        public delegate void ProcessPacketNotification(ITunnel tunnel, IPacketPayload payload);
+        public delegate void ProcessPacketNotification(ITunnel tunnel, IPacketPayloadNotification payload);
 
-        public delegate IPacketPayload ProcessPacketQuery(ITunnel tunnel, IPacketPayload payload);
+        public delegate IPacketPayloadReply ProcessPacketQuery(ITunnel tunnel, IPacketPayloadQuery payload);
 
         public static byte[] AssemblePacket(NtPacket packet)
         {
@@ -71,7 +71,7 @@ namespace NetTunnel.Service.Packetizer
             }
         }
 
-        public static async Task<T?> SendStreamPacketPayloadQuery<T>(NetworkStream? stream, IPacketPayload payload)
+        public static async Task<T?> SendStreamPacketPayloadQuery<T>(NetworkStream? stream, IPacketPayloadQuery payload)
         {
             if (stream == null)
             {
@@ -81,13 +81,12 @@ namespace NetTunnel.Service.Packetizer
             var cmd = new NtPacket()
             {
                 EnclosedPayloadType = payload.GetType()?.FullName ?? string.Empty,
-                Payload = ToByteArray(payload),
-                IsQuery = true
+                Payload = ToByteArray(payload)
             };
 
             var queriesAwaitingReply = new QueriesAwaitingReply()
             {
-                PacketId = cmd.PacketId,
+                PacketId = cmd.Id,
             };
 
             _queriesAwaitingReplies.Add(queriesAwaitingReply);
@@ -110,7 +109,7 @@ namespace NetTunnel.Service.Packetizer
             });
         }
 
-        public static void SendStreamPacketPayloadReply(NetworkStream? stream, NtPacket queryPacket, IPacketPayload payload)
+        public static void SendStreamPacketPayloadReply(NetworkStream? stream, NtPacket queryPacket, IPacketPayloadReply payload)
         {
             if (stream == null)
             {
@@ -118,17 +117,16 @@ namespace NetTunnel.Service.Packetizer
             }
             var cmd = new NtPacket()
             {
-                PacketId = queryPacket.PacketId,
+                Id = queryPacket.Id,
                 EnclosedPayloadType = payload.GetType()?.FullName ?? string.Empty,
-                Payload = ToByteArray(payload),
-                IsReply = true
+                Payload = ToByteArray(payload)
             };
 
             var packetBytes = AssemblePacket(cmd);
             stream.Write(packetBytes, 0, packetBytes.Length);
         }
 
-        public static void SendStreamPacketPayload(NetworkStream? stream, IPacketPayload payload)
+        public static void SendStreamPacketPayload(NetworkStream? stream, IPacketPayloadNotification payload)
         {
             if (stream == null)
             {
@@ -247,20 +245,24 @@ namespace NetTunnel.Service.Packetizer
                     var payload = (IPacketPayload?)genericToObjectMethod.Invoke(null, new object[] { packet.Payload })
                         ?? throw new Exception($"Payload can not be null.");
 
-                    if (packet.IsQuery)
+                    if (payload is IPacketPayloadQuery query)
                     {
-                        var replyPayload = processPacketQueryCallback(tunnel, payload);
+                        var replyPayload = processPacketQueryCallback(tunnel, query);
                         SendStreamPacketPayloadReply(stream, packet, replyPayload);
                     }
-                    else if (packet.IsReply)
+                    else if (payload is IPacketPayloadReply reply)
                     {
-                        var waitingQuery = _queriesAwaitingReplies.Where(o => o.PacketId == packet.PacketId).Single();
-                        waitingQuery.ReplyPayload = payload;
+                        var waitingQuery = _queriesAwaitingReplies.Where(o => o.PacketId == packet.Id).Single();
+                        waitingQuery.ReplyPayload = reply;
                         waitingQuery.WaitEvent.Set();
+                    }
+                    else if (payload is IPacketPayloadNotification notification)
+                    {
+                        processNotificationCallback(tunnel, notification);
                     }
                     else
                     {
-                        processNotificationCallback(tunnel, payload);
+                        throw new Exception("????????????");
                     }
                 }
             }

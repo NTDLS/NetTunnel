@@ -1,6 +1,7 @@
 ﻿using NetTunnel.Library.Types;
 using NetTunnel.Service.Packetizer;
-using NetTunnel.Service.Packetizer.PacketPayloads;
+using NetTunnel.Service.Packetizer.PacketPayloads.Notifications;
+using NetTunnel.Service.Packetizer.PacketPayloads.Queries;
 using NetTunnel.Service.Types;
 using System.Net.Sockets;
 using static NetTunnel.Service.Packetizer.NtPacketizer;

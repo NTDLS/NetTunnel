@@ -1,10 +1,10 @@
 ﻿using ProtoBuf;
 
-namespace NetTunnel.Service.Packetizer.PacketPayloads
+namespace NetTunnel.Service.Packetizer.PacketPayloads.Replies
 {
     [Serializable]
     [ProtoContract]
-    public class NtPacketPayloadBoolean : IPacketPayload
+    public class NtPacketPayloadBoolean : IPacketPayloadReply
     {
         [ProtoMember(1)]
         public bool Value { get; set; }

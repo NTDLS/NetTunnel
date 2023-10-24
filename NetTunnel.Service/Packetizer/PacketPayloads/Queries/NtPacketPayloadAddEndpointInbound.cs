@@ -1,11 +1,11 @@
 ﻿using NetTunnel.Library.Types;
 using ProtoBuf;
 
-namespace NetTunnel.Service.Packetizer.PacketPayloads
+namespace NetTunnel.Service.Packetizer.PacketPayloads.Queries
 {
     [Serializable]
     [ProtoContract]
-    public class NtPacketPayloadAddEndpointInbound : IPacketPayload
+    public class NtPacketPayloadAddEndpointInbound : IPacketPayloadQuery
     {
         [ProtoMember(1)]
         public string Label { get; set; } = string.Empty;

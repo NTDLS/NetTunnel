@@ -10,15 +10,13 @@ namespace NetTunnel.Service.Packetizer
     internal class NtPacket
     {
         [ProtoMember(1)]
-        public string EnclosedPayloadType { get; set; } = string.Empty;
-        [ProtoMember(2)]
-        public byte[] Payload { get; set; } = Array.Empty<byte>();
-        [ProtoMember(3)]
-        public bool IsQuery { get; set; } = false;
-        [ProtoMember(4)]
-        public bool IsReply { get; set; } = false;
+        public Guid Id { get; set; } = Guid.NewGuid();
 
-        [ProtoMember(5)]
-        public Guid PacketId { get; set; } = Guid.NewGuid();
+        [ProtoMember(2)]
+        public string EnclosedPayloadType { get; set; } = string.Empty;
+
+        [ProtoMember(3)]
+        public byte[] Payload { get; set; } = Array.Empty<byte>();
+
     }
 }

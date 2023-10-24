@@ -1,5 +1,8 @@
 ﻿using NetTunnel.Library.Types;
 using NetTunnel.Service.Packetizer.PacketPayloads;
+using NetTunnel.Service.Packetizer.PacketPayloads.Notifications;
+using NetTunnel.Service.Packetizer.PacketPayloads.Queries;
+using NetTunnel.Service.Packetizer.PacketPayloads.Replies;
 using NetTunnel.Service.Types;
 using System.Diagnostics;
 using System.Net;
@@ -105,7 +108,7 @@ namespace NetTunnel.Service.Engine
             }
         }
 
-        private IPacketPayload ProcessPacketQueryCallback(ITunnel tunnel, IPacketPayload packet)
+        private IPacketPayloadReply ProcessPacketQueryCallback(ITunnel tunnel, IPacketPayloadQuery packet)
         {
             if (packet is NtPacketPayloadAddEndpointInbound inboundEndpoint)
             {
@@ -123,7 +126,7 @@ namespace NetTunnel.Service.Engine
             return new NtPacketPayloadBoolean(false);
         }
 
-        private void ProcessPacketNotificationCallback(ITunnel tunnel, IPacketPayload packet)
+        private void ProcessPacketNotificationCallback(ITunnel tunnel, IPacketPayloadNotification packet)
         {
             if (packet is NtPacketPayloadMessage message)
             {
