@@ -46,13 +46,13 @@ namespace NetTunnel.Service.Engine
         public void DispatchStreamPacketBytes(NtPacketPayloadBytes message) =>
             NtPacketizer.SendStreamPacketPayload(_stream, message);
 
-        public void DispatchAddEndpointInbound(NtEndpointInboundConfiguration configuration) =>
-            NtPacketizer.SendStreamPacketPayload(_stream, new NtPacketPayloadAddEndpointInbound(configuration));
+        public async Task<T?> DispatchAddEndpointInbound<T>(NtEndpointInboundConfiguration configuration)
+             => await NtPacketizer.SendStreamPacketPayloadQuery<T>(_stream, new NtPacketPayloadAddEndpointInbound(configuration));
 
-        public void DispatchAddEndpointOutbound(NtEndpointOutboundConfiguration configuration) =>
-            NtPacketizer.SendStreamPacketPayload(_stream, new NtPacketPayloadAddEndpointOutbound(configuration));
+        public async Task<T?> DispatchAddEndpointOutbound<T>(NtEndpointOutboundConfiguration configuration)
+            => await NtPacketizer.SendStreamPacketPayloadQuery<T>(_stream, new NtPacketPayloadAddEndpointOutbound(configuration));
 
-        internal void ExecuteStream(ProcessPacketNotification processPacketNotification)
+        internal void ExecuteStream(ProcessPacketNotification processPacketNotificationCallback, ProcessPacketQuery processPacketQueryCallback)
         {
             var packetBuffer = new NtPacketBuffer();
 
@@ -64,7 +64,7 @@ namespace NetTunnel.Service.Engine
                     Message = "Message from...???."
                 });
 
-                NtPacketizer.ReceiveAndProcessStreamPackets(_stream, this, packetBuffer, processPacketNotification);
+                NtPacketizer.ReceiveAndProcessStreamPackets(_stream, this, packetBuffer, processPacketNotificationCallback, processPacketQueryCallback);
 
                 Thread.Sleep(1000);
             }

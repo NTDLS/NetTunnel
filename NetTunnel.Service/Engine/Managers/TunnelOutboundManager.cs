@@ -43,24 +43,23 @@ namespace NetTunnel.Service.Engine.Managers
             });
         }
 
-        public void DispatchAddEndpointInbound(Guid tunnelPairId, NtEndpointInboundConfiguration endpoint)
+        public async Task<T?> DispatchAddEndpointInbound<T>(Guid tunnelPairId, NtEndpointInboundConfiguration endpoint)
         {
-            _collection.Use((o) =>
+            return await _collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
-                tunnel.DispatchAddEndpointInbound(endpoint);
+                return tunnel.DispatchAddEndpointInbound<T>(endpoint);
             });
         }
 
-        public void DispatchAddEndpointOutbound(Guid tunnelPairId, NtEndpointOutboundConfiguration endpoint)
+        public async Task<T?> DispatchAddEndpointOutbound<T>(Guid tunnelPairId, NtEndpointOutboundConfiguration endpoint)
         {
-            _collection.Use((o) =>
+            return await _collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
-                tunnel.DispatchAddEndpointOutbound(endpoint);
+                return tunnel.DispatchAddEndpointOutbound<T>(endpoint);
             });
         }
-
 
         public void AddEndpointInbound(Guid tunnelPairId, NtEndpointInboundConfiguration endpoint)
         {

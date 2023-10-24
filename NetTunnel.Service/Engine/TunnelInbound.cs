@@ -84,7 +84,7 @@ namespace NetTunnel.Service.Engine
 
                     using (_stream = tcpClient.GetStream())
                     {
-                        ExecuteStream(ProcessPacketCallbackHandler);
+                        ExecuteStream(ProcessPacketNotificationCallback, ProcessPacketQueryCallback);
                     }
 
                     tcpClient.Close();
@@ -105,12 +105,31 @@ namespace NetTunnel.Service.Engine
             }
         }
 
-        void ProcessPacketCallbackHandler(ITunnel tunnel, IPacketPayload packet)
+        private IPacketPayload ProcessPacketQueryCallback(ITunnel tunnel, IPacketPayload packet)
+        {
+            if (packet is NtPacketPayloadAddEndpointInbound inboundEndpoint)
+            {
+                AddInboundEndpoint(inboundEndpoint.Configuration);
+                _core.InboundTunnels.SaveToDisk();
+                return new NtPacketPayloadBoolean(true);
+            }
+            else if (packet is NtPacketPayloadAddEndpointOutbound outboundEndpoint)
+            {
+                AddOutboundEndpoint(outboundEndpoint.Configuration);
+                _core.InboundTunnels.SaveToDisk();
+                return new NtPacketPayloadBoolean(true);
+            }
+
+            return new NtPacketPayloadBoolean(false);
+        }
+
+        private void ProcessPacketNotificationCallback(ITunnel tunnel, IPacketPayload packet)
         {
             if (packet is NtPacketPayloadMessage message)
             {
                 Debug.Print($"{message.Message}");
             }
+            /*
             else if (packet is NtPacketPayloadAddEndpointInbound inboundEndpoint)
             {
                 AddInboundEndpoint(inboundEndpoint.Configuration);
@@ -121,9 +140,9 @@ namespace NetTunnel.Service.Engine
                 AddOutboundEndpoint(outboundEndpoint.Configuration);
                 _core.InboundTunnels.SaveToDisk();
             }
+            */
             else
             {
-
             }
         }
     }

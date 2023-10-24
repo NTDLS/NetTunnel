@@ -76,12 +76,25 @@ namespace NetTunnel.UI.Forms
                     {
                         _client.TunnelInbound.AddInboundEndpointPair(_tunnelInbound.PairId, endpointInbound, endpointOutbound).ContinueWith((o) =>
                         {
+                            if (!o.IsCompletedSuccessfully)
+                            {
+                                EnableControl(buttonAdd, false);
+                                throw new Exception("Failed to add inbound endpoint pair to inbound tunnel.");
+                            }
+                            CloseFormWithResult(DialogResult.OK);
+
                         });
                     }
                     else
                     {
                         _client.TunnelInbound.AddOutboundEndpointPair(_tunnelInbound.PairId, endpointInbound, endpointOutbound).ContinueWith((o) =>
                         {
+                            if (!o.IsCompletedSuccessfully)
+                            {
+                                EnableControl(buttonAdd, false);
+                                throw new Exception("Failed to add outbound endpoint pair to inbound tunnel.");
+                            }
+                            CloseFormWithResult(DialogResult.OK);
                         });
                     }
                 }
@@ -91,71 +104,27 @@ namespace NetTunnel.UI.Forms
                     {
                         _client.TunnelOutbound.AddOutboundEndpointPair(_tunnelOutbound.PairId, endpointInbound, endpointOutbound).ContinueWith((o) =>
                         {
+                            if (!o.IsCompletedSuccessfully)
+                            {
+                                EnableControl(buttonAdd, false);
+                                throw new Exception("Failed to add outbound endpoint pair to outbound tunnel.");
+                            }
+                            CloseFormWithResult(DialogResult.OK);
                         });
                     }
                     else
                     {
                         _client.TunnelOutbound.AddInboundEndpointPair(_tunnelOutbound.PairId, endpointInbound, endpointOutbound).ContinueWith((o) =>
                         {
+                            if (!o.IsCompletedSuccessfully)
+                            {
+                                EnableControl(buttonAdd, false);
+                                throw new Exception("Failed to add outbound endpoint pair to outbound tunnel.");
+                            }
+                            CloseFormWithResult(DialogResult.OK);
                         });
                     }
                 }
-
-                //_tunnel.AddEndpoint(endpointInbound, endpointOutbound,
-                //radioButtonLocalEndpoint.Checked ? Library.Constants.EndpointDirection.Inbound : Library.Constants.EndpointDirection.Outbound);
-
-                /*
-                NtClient remoteClient;
-
-                try
-                {
-                    //Connect to the remote endpoint.
-                    remoteClient = new NtClient($"https://{outgoingEndpoint.Address}:{outgoingEndpoint.ManagementPort}/");
-                }
-                catch (Exception ex)
-                {
-                    EnableControl(buttonAdd, false);
-                    throw new Exception($"Failed to connect to the remote endpoint: {ex.Message}.");
-                }
-
-                try
-                {
-                    //Log into the remote endpoint.
-                    remoteClient.Security.Login(outgoingEndpoint.Username, outgoingEndpoint.PasswordHash);
-                }
-                catch (Exception ex)
-                {
-                    EnableControl(buttonAdd, false);
-                    throw new Exception($"Failed to login to the remote endpoint: {ex.Message}.");
-                }
-
-                //Add the outgoing endpoint config to the local endpoint instance.
-                _client.OutgoingEndpoint.Add(outgoingEndpoint).ContinueWith(t =>
-                {
-                    if (!t.IsCompletedSuccessfully)
-                    {
-                        EnableControl(buttonAdd, false);
-                        throw new Exception("Failed to create local outgoing endpoint.");
-                    }
-
-                    //Add the incoming endpoint config to the remote endpoint instance.
-                    remoteClient.IncomingEndpoint.Add(incomingEndpoint).ContinueWith(t =>
-                    {
-                        if (!t.IsCompletedSuccessfully)
-                        {
-                            //If we failed to create the remote endpoint config, remove the local config.
-                            _client.OutgoingEndpoint.Delete(outgoingEndpoint.PairId).ContinueWith(t =>
-                            {
-                                EnableControl(buttonAdd, false);
-                                throw new Exception("Failed to create remote incoming endpoint.");
-                            });
-                        }
-
-                        CloseFormWithResult(DialogResult.OK);
-                    });
-                });
-                */
-
             }
             catch (Exception ex)
             {

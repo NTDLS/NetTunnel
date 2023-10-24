@@ -3,6 +3,7 @@ using NetTunnel.ClientAPI;
 using NetTunnel.ClientAPI.Payload;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.Engine;
+using NetTunnel.Service.Packetizer.PacketPayloads;
 using Newtonsoft.Json;
 
 namespace NetTunnel.Service.Controllers
@@ -121,7 +122,7 @@ namespace NetTunnel.Service.Controllers
 
         [HttpPost]
         [Route("{sessionId}/AddEndpointInboundPair/{tunnelId}")]
-        public NtActionResponse AddEndpointInboundPair(Guid sessionId, Guid tunnelId, [FromBody] string value)
+        public async Task<NtActionResponse> AddEndpointInboundPair(Guid sessionId, Guid tunnelId, [FromBody] string value)
         {
             try
             {
@@ -134,9 +135,9 @@ namespace NetTunnel.Service.Controllers
                 Singletons.Core.InboundTunnels.AddEndpointInbound(tunnelId, endpoints.Inbound);
                 Singletons.Core.InboundTunnels.SaveToDisk();
 
-                Singletons.Core.InboundTunnels.DispatchAddEndpointOutbound(tunnelId, endpoints.Outbound);
+                var result = await Singletons.Core.InboundTunnels.DispatchAddEndpointOutbound<NtPacketPayloadBoolean>(tunnelId, endpoints.Outbound);
 
-                return new NtActionResponse { Success = true };
+                return new NtActionResponse { Success = result?.Value ?? false };
             }
             catch (Exception ex)
             {
@@ -146,7 +147,7 @@ namespace NetTunnel.Service.Controllers
 
         [HttpPost]
         [Route("{sessionId}/AddEndpointOutboundPair/{tunnelId}")]
-        public NtActionResponse AddEndpointOutboundPair(Guid sessionId, Guid tunnelId, [FromBody] string value)
+        public async Task<NtActionResponse> AddEndpointOutboundPair(Guid sessionId, Guid tunnelId, [FromBody] string value)
         {
             try
             {
@@ -159,9 +160,9 @@ namespace NetTunnel.Service.Controllers
                 Singletons.Core.OutboundTunnels.AddEndpointOutbound(tunnelId, endpoints.Outbound);
                 Singletons.Core.OutboundTunnels.SaveToDisk();
 
-                Singletons.Core.OutboundTunnels.DispatchAddEndpointOutbound(tunnelId, endpoints.Outbound);
+                var result = await Singletons.Core.OutboundTunnels.DispatchAddEndpointOutbound<NtPacketPayloadBoolean>(tunnelId, endpoints.Outbound);
 
-                return new NtActionResponse { Success = true };
+                return new NtActionResponse { Success = result?.Value ?? false };
             }
             catch (Exception ex)
             {

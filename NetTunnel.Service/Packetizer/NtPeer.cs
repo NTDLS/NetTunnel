@@ -1,5 +1,4 @@
-﻿using NetTunnel.Library.Types;
-using NetTunnel.Service.Types;
+﻿using NetTunnel.Service.Types;
 
 namespace NetTunnel.Service.Packetizer
 {

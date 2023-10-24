@@ -1,5 +1,4 @@
-﻿using NetTunnel.Library.Types;
-using NetTunnel.Service.Packetizer.PacketPayloads;
+﻿using NetTunnel.Service.Packetizer.PacketPayloads;
 using NetTunnel.Service.Types;
 using ProtoBuf;
 using System.IO.Compression;
@@ -14,7 +13,11 @@ namespace NetTunnel.Service.Packetizer
     /// </summary>
     internal static class NtPacketizer
     {
+        private static readonly List<QueriesAwaitingReply> _queriesAwaitingReplies = new();
+
         public delegate void ProcessPacketNotification(ITunnel tunnel, IPacketPayload payload);
+
+        public delegate IPacketPayload ProcessPacketQuery(ITunnel tunnel, IPacketPayload payload);
 
         public static byte[] AssemblePacket(NtPacket packet)
         {
@@ -68,7 +71,64 @@ namespace NetTunnel.Service.Packetizer
             }
         }
 
-        public static void SendStreamPacketPayload<T>(NetworkStream? stream, T payload) where T : class
+        public static async Task<T?> SendStreamPacketPayloadQuery<T>(NetworkStream? stream, IPacketPayload payload)
+        {
+            if (stream == null)
+            {
+                throw new Exception("SendStreamPacketPayload stream can not be null.");
+            }
+
+            var cmd = new NtPacket()
+            {
+                EnclosedPayloadType = payload.GetType()?.FullName ?? string.Empty,
+                Payload = ToByteArray(payload),
+                IsQuery = true
+            };
+
+            var queriesAwaitingReply = new QueriesAwaitingReply()
+            {
+                PacketId = cmd.PacketId,
+            };
+
+            _queriesAwaitingReplies.Add(queriesAwaitingReply);
+
+            return await Task.Run(() =>
+            {
+                var packetBytes = AssemblePacket(cmd);
+                stream.Write(packetBytes, 0, packetBytes.Length);
+
+                //TODO: We need to check received data to see if any of them are replies
+                if (queriesAwaitingReply.WaitEvent.WaitOne(NtPacketDefaults.QUERY_TIMEOUT_MS) == false)
+                {
+                    _queriesAwaitingReplies.Remove(queriesAwaitingReply);
+                    throw new Exception("Query timeout expired while waiting on reply.");
+                }
+
+                _queriesAwaitingReplies.Remove(queriesAwaitingReply);
+
+                return (T?)queriesAwaitingReply.ReplyPayload;
+            });
+        }
+
+        public static void SendStreamPacketPayloadReply(NetworkStream? stream, NtPacket queryPacket, IPacketPayload payload)
+        {
+            if (stream == null)
+            {
+                throw new Exception("SendStreamPacketPayload stream can not be null.");
+            }
+            var cmd = new NtPacket()
+            {
+                PacketId = queryPacket.PacketId,
+                EnclosedPayloadType = payload.GetType()?.FullName ?? string.Empty,
+                Payload = ToByteArray(payload),
+                IsReply = true
+            };
+
+            var packetBytes = AssemblePacket(cmd);
+            stream.Write(packetBytes, 0, packetBytes.Length);
+        }
+
+        public static void SendStreamPacketPayload(NetworkStream? stream, IPacketPayload payload)
         {
             if (stream == null)
             {
@@ -85,7 +145,8 @@ namespace NetTunnel.Service.Packetizer
         }
 
         public static void ReceiveAndProcessStreamPackets(NetworkStream? stream,
-            ITunnel tunnel, NtPacketBuffer packetBuffer, ProcessPacketNotification processPacketCallback)
+            ITunnel tunnel, NtPacketBuffer packetBuffer, ProcessPacketNotification
+            processNotificationCallback, ProcessPacketQuery processPacketQueryCallback)
         {
             if (stream == null)
             {
@@ -94,11 +155,17 @@ namespace NetTunnel.Service.Packetizer
 
             Array.Clear(packetBuffer.ReceiveBuffer);
             packetBuffer.ReceiveBufferUsed = stream.Read(packetBuffer.ReceiveBuffer, 0, packetBuffer.ReceiveBuffer.Length);
-            ProcessPacketBuffer(tunnel, packetBuffer, processPacketCallback);
+            ProcessPacketBuffer(stream, tunnel, packetBuffer, processNotificationCallback, processPacketQueryCallback);
         }
 
-        public static void ProcessPacketBuffer(ITunnel tunnel, NtPacketBuffer packetBuffer, ProcessPacketNotification processPacketCallback)
+        public static void ProcessPacketBuffer(NetworkStream? stream, ITunnel tunnel, NtPacketBuffer packetBuffer, ProcessPacketNotification processNotificationCallback,
+             ProcessPacketQuery processPacketQueryCallback)
         {
+            if (stream == null)
+            {
+                throw new Exception("ReceiveAndProcessStreamPackets stream can not be null.");
+            }
+
             try
             {
                 if (packetBuffer.PacketBuilderLength + packetBuffer.ReceiveBufferUsed >= packetBuffer.PacketBuilder.Length)
@@ -180,8 +247,21 @@ namespace NetTunnel.Service.Packetizer
                     var payload = (IPacketPayload?)genericToObjectMethod.Invoke(null, new object[] { packet.Payload })
                         ?? throw new Exception($"Payload can not be null.");
 
-                    processPacketCallback(tunnel, payload);
-
+                    if (packet.IsQuery)
+                    {
+                        var replyPayload = processPacketQueryCallback(tunnel, payload);
+                        SendStreamPacketPayloadReply(stream, packet, replyPayload);
+                    }
+                    else if (packet.IsReply)
+                    {
+                        var waitingQuery = _queriesAwaitingReplies.Where(o => o.PacketId == packet.PacketId).Single();
+                        waitingQuery.ReplyPayload = payload;
+                        waitingQuery.WaitEvent.Set();
+                    }
+                    else
+                    {
+                        processNotificationCallback(tunnel, payload);
+                    }
                 }
             }
             catch (Exception ex)
