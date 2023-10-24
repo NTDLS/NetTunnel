@@ -134,7 +134,6 @@ namespace NetTunnel.Service.Controllers
                 Singletons.Core.InboundTunnels.AddEndpointInbound(tunnelId, endpoints.Inbound);
                 Singletons.Core.InboundTunnels.SaveToDisk();
 
-
                 Singletons.Core.InboundTunnels.DispatchAddEndpointOutbound(tunnelId, endpoints.Outbound);
 
                 return new NtActionResponse { Success = true };
@@ -159,7 +158,6 @@ namespace NetTunnel.Service.Controllers
                 //Add the Outbound endpoint to the local tunnel.
                 Singletons.Core.OutboundTunnels.AddEndpointOutbound(tunnelId, endpoints.Outbound);
                 Singletons.Core.OutboundTunnels.SaveToDisk();
-
 
                 Singletons.Core.OutboundTunnels.DispatchAddEndpointOutbound(tunnelId, endpoints.Outbound);
 
