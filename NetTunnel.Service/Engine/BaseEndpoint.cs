@@ -31,7 +31,12 @@ namespace NetTunnel.Service.Engine
             {
                 if (o.TryGetValue(streamId, out var activeEndpointConnection))
                 {
-                    activeEndpointConnection.Dispose();
+                    try
+                    {
+                        activeEndpointConnection.Disconnect();
+                        activeEndpointConnection.Dispose();
+                    }
+                    catch { }
 
                     o.Remove(streamId);
                 }
@@ -62,7 +67,7 @@ namespace NetTunnel.Service.Engine
             {
                 _tunnel.SendStreamPacketNotification(new NtPacketPayloadEndpointConnect(_tunnel.PairId, PairId, activeConnection.StreamId));
 
-                while (_keepRunning)
+                while (_keepRunning && activeConnection.IsConnected)
                 {
                     byte[] buffer = new byte[NtPacketDefaults.PACKET_BUFFER_SIZE];
                     while (activeConnection.Read(ref buffer))
@@ -78,10 +83,14 @@ namespace NetTunnel.Service.Engine
             }
             finally
             {
-                activeConnection.TcpClient.Close();
+                activeConnection.Disconnect();
             }
 
-            _tunnel.SendStreamPacketNotification(new NtPacketPayloadEndpointDisconnect(_tunnel.PairId, PairId, activeConnection.StreamId));
+            try
+            {
+                _tunnel.SendStreamPacketNotification(new NtPacketPayloadEndpointDisconnect(_tunnel.PairId, PairId, activeConnection.StreamId));
+            }
+            catch { }
         }
     }
 }

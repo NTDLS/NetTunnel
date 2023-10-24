@@ -58,11 +58,11 @@ namespace NetTunnel.Service.Engine
 
                     var handlerThread = new Thread(HandleClientThreadProc);
 
-                    var param = new ActiveEndpointConnection(handlerThread, tcpClient, streamId);
+                    var activeConnection = new ActiveEndpointConnection(handlerThread, tcpClient, streamId);
 
-                    _activeConnections.Use((o) => o.Add(streamId, param));
+                    _activeConnections.Use((o) => o.Add(streamId, activeConnection));
 
-                    handlerThread.Start(param);
+                    handlerThread.Start(activeConnection);
                 }
             }
             catch (Exception ex)
