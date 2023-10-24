@@ -20,8 +20,6 @@ namespace NetTunnel.Service.Engine
         public TunnelInbound(EngineCore core, NtTunnelInboundConfiguration configuration)
             : base(core, configuration)
         {
-            _core = core;
-
             DataPort = configuration.DataPort;
         }
 
@@ -52,7 +50,7 @@ namespace NetTunnel.Service.Engine
             }
             KeepRunning = true;
 
-            _core.Logging.Write($"Starting incoming tunnel '{Name}' on port {DataPort}");
+            Core.Logging.Write($"Starting incoming tunnel '{Name}' on port {DataPort}");
 
             _incomingConnectionThread = new Thread(IncomingConnectionThreadProc);
             _incomingConnectionThread.Start();
@@ -75,14 +73,14 @@ namespace NetTunnel.Service.Engine
             {
                 listener.Start();
 
-                _core.Logging.Write($"Listening incoming tunnel '{Name}' on port {DataPort}");
+                Core.Logging.Write($"Listening incoming tunnel '{Name}' on port {DataPort}");
 
                 while (KeepRunning)
                 {
-                    _core.Logging.Write($"Waiting for connection for incoming tunnel '{Name}' on port {DataPort}");
+                    Core.Logging.Write($"Waiting for connection for incoming tunnel '{Name}' on port {DataPort}");
 
                     var tcpClient = listener.AcceptTcpClient();
-                    _core.Logging.Write($"Connected on incoming tunnel '{Name}' on port {DataPort}");
+                    Core.Logging.Write($"Connected on incoming tunnel '{Name}' on port {DataPort}");
 
                     using (_stream = tcpClient.GetStream())
                     {
@@ -91,7 +89,7 @@ namespace NetTunnel.Service.Engine
 
                     tcpClient.Close();
 
-                    _core.Logging.Write($"Disconnected incoming tunnel '{Name}' on port {DataPort}");
+                    Core.Logging.Write($"Disconnected incoming tunnel '{Name}' on port {DataPort}");
 
                     Thread.Sleep(1000);
                 }
@@ -112,13 +110,13 @@ namespace NetTunnel.Service.Engine
             if (packet is NtPacketPayloadAddEndpointInbound inboundEndpoint)
             {
                 AddInboundEndpoint(inboundEndpoint.Configuration);
-                _core.InboundTunnels.SaveToDisk();
+                Core.InboundTunnels.SaveToDisk();
                 return new NtPacketPayloadBoolean(true);
             }
             else if (packet is NtPacketPayloadAddEndpointOutbound outboundEndpoint)
             {
                 AddOutboundEndpoint(outboundEndpoint.Configuration);
-                _core.InboundTunnels.SaveToDisk();
+                Core.InboundTunnels.SaveToDisk();
                 return new NtPacketPayloadBoolean(true);
             }
 

@@ -17,50 +17,37 @@ namespace NetTunnel.Service.Engine
 
         protected NetworkStream? _stream { get; set; }
 
+        public EngineCore Core { get; private set; }
         public bool KeepRunning { get; internal set; } = false;
         public Guid PairId { get; private set; }
         public string Name { get; private set; }
 
-        internal EngineCore _core;
         internal readonly List<EndpointInbound> _inboundEndpoints = new();
         internal readonly List<EndpointOutbound> _outboundEndpoints = new();
 
         public BaseTunnel(EngineCore core, NtTunnelInboundConfiguration configuration)
         {
-            _core = core;
+            Core = core;
 
             PairId = configuration.PairId;
             Name = configuration.Name;
 
-            configuration.InboundEndpointConfigurations.ForEach(o => _inboundEndpoints.Add(new(_core, this, o)));
-            configuration.OutboundEndpointConfigurations.ForEach(o => _outboundEndpoints.Add(new(_core, this, o)));
+            configuration.InboundEndpointConfigurations.ForEach(o => _inboundEndpoints.Add(new(Core, this, o)));
+            configuration.OutboundEndpointConfigurations.ForEach(o => _outboundEndpoints.Add(new(Core, this, o)));
         }
 
         public BaseTunnel(EngineCore core, NtTunnelOutboundConfiguration configuration)
         {
-            _core = core;
+            Core = core;
 
             PairId = configuration.PairId;
             Name = configuration.Name;
 
-            configuration.InboundEndpointConfigurations.ForEach(o => _inboundEndpoints.Add(new(_core, this, o)));
-            configuration.OutboundEndpointConfigurations.ForEach(o => _outboundEndpoints.Add(new(_core, this, o)));
+            configuration.InboundEndpointConfigurations.ForEach(o => _inboundEndpoints.Add(new(Core, this, o)));
+            configuration.OutboundEndpointConfigurations.ForEach(o => _outboundEndpoints.Add(new(Core, this, o)));
         }
 
-
         #region TCP/IP Packet and Stream interactions.
-
-        public void DispatchStreamPacketMessage(NtPacketPayloadMessage message) =>
-            SendStreamPacketNotification(message);
-
-        public void DispatchStreamPacketBytes(NtPacketPayloadBytes message) =>
-            SendStreamPacketNotification(message);
-
-        public async Task<T?> DispatchAddEndpointInbound<T>(NtEndpointInboundConfiguration configuration)
-             => await SendStreamPacketPayloadQuery<T>(new NtPacketPayloadAddEndpointInbound(configuration));
-
-        public async Task<T?> DispatchAddEndpointOutbound<T>(NtEndpointOutboundConfiguration configuration)
-            => await SendStreamPacketPayloadQuery<T>(new NtPacketPayloadAddEndpointOutbound(configuration));
 
         /// <summary>
         /// Sends a IPacketPayloadQuery that expects a IPacketPayloadReply in return.
@@ -87,7 +74,7 @@ namespace NetTunnel.Service.Engine
 
             return await Task.Run(() =>
             {
-                var packetBytes = AssemblePacket(cmd);
+                var packetBytes = AssemblePacket(this, cmd);
                 _stream.Write(packetBytes, 0, packetBytes.Length);
 
                 //TODO: We need to check received data to see if any of them are replies
@@ -119,7 +106,7 @@ namespace NetTunnel.Service.Engine
                 Payload = Utility.SerializeToByteArray(payload)
             };
 
-            var packetBytes = AssemblePacket(cmd);
+            var packetBytes = AssemblePacket(this, cmd);
             _stream.Write(packetBytes, 0, packetBytes.Length);
         }
 
@@ -145,7 +132,7 @@ namespace NetTunnel.Service.Engine
                 Payload = Utility.SerializeToByteArray(payload)
             };
 
-            var packetBytes = AssemblePacket(cmd);
+            var packetBytes = AssemblePacket(this, cmd);
             _stream.Write(packetBytes, 0, packetBytes.Length);
         }
 
@@ -157,7 +144,7 @@ namespace NetTunnel.Service.Engine
 
             while (KeepRunning)
             {
-                DispatchStreamPacketMessage(new NtPacketPayloadMessage()
+                SendStreamPacketNotification(new NtPacketPayloadMessage()
                 {
                     Label = "This is the label.",
                     Message = "Message from...???."
@@ -170,10 +157,10 @@ namespace NetTunnel.Service.Engine
         }
 
         public void AddInboundEndpoint(NtEndpointInboundConfiguration configuration)
-                => _inboundEndpoints.Add(new EndpointInbound(_core, this, configuration));
+                => _inboundEndpoints.Add(new EndpointInbound(Core, this, configuration));
 
         public void AddOutboundEndpoint(NtEndpointOutboundConfiguration configuration)
-            => _outboundEndpoints.Add(new EndpointOutbound(_core, this, configuration));
+            => _outboundEndpoints.Add(new EndpointOutbound(Core, this, configuration));
 
         public void DeleteInboundEndpoint(Guid endpointPairId)
         {

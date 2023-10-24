@@ -4,7 +4,9 @@ using NetTunnel.Service.PacketFraming.PacketPayloads.Notifications;
 using NetTunnel.Service.PacketFraming.PacketPayloads.Queries;
 using NetTunnel.Service.PacketFraming.PacketPayloads.Replies;
 using NetTunnel.Service.Types;
+using NTDLS.Semaphore;
 using System.Net.Sockets;
+using System.Reflection;
 using static NetTunnel.Service.PacketFraming.Constants;
 
 namespace NetTunnel.Service.PacketFraming
@@ -15,12 +17,13 @@ namespace NetTunnel.Service.PacketFraming
     /// </summary>
     internal static class NtPacketizer
     {
+        private static CriticalResource<Dictionary<string, MethodInfo>> _reflectioncache = new();
 
         public delegate void ProcessPacketNotification(ITunnel tunnel, IPacketPayloadNotification payload);
 
         public delegate IPacketPayloadReply ProcessPacketQuery(ITunnel tunnel, IPacketPayloadQuery payload);
 
-        public static byte[] AssemblePacket(NtPacket packet)
+        public static byte[] AssemblePacket(ITunnel tunnel, NtPacket packet)
         {
             try
             {
@@ -39,12 +42,12 @@ namespace NetTunnel.Service.PacketFraming
             }
             catch (Exception ex)
             {
-                //LogException(ex);
+                tunnel.Core.Logging.Write(ex.Message);
                 throw;
             }
         }
 
-        private static void SkipPacket(ref NtPacketBuffer packetBuffer)
+        private static void SkipPacket(ITunnel tunnel, ref NtPacketBuffer packetBuffer)
         {
             try
             {
@@ -68,7 +71,7 @@ namespace NetTunnel.Service.PacketFraming
             }
             catch (Exception ex)
             {
-                //LogException(ex);
+                tunnel.Core.Logging.Write(ex.Message);
             }
         }
 
@@ -122,14 +125,14 @@ namespace NetTunnel.Service.PacketFraming
                     if (packetDelimiter != NtPacketDefaults.PACKET_DELIMITER)
                     {
                         //LogException(new Exception("Malformed packet, invalid delimiter."));
-                        SkipPacket(ref packetBuffer);
+                        SkipPacket(tunnel, ref packetBuffer);
                         continue;
                     }
 
                     if (grossPacketSize < 0 || grossPacketSize > NtPacketDefaults.PACKET_MAX_SIZE)
                     {
                         //LogException(new Exception("Malformed packet, invalid length."));
-                        SkipPacket(ref packetBuffer);
+                        SkipPacket(tunnel, ref packetBuffer);
                         continue;
                     }
 
@@ -145,7 +148,7 @@ namespace NetTunnel.Service.PacketFraming
                     if (actualCRC16 != expectedCRC16)
                     {
                         //LogException(new Exception("Malformed packet, invalid CRC."));
-                        SkipPacket(ref packetBuffer);
+                        SkipPacket(tunnel, ref packetBuffer);
                         continue;
                     }
 
@@ -164,16 +167,7 @@ namespace NetTunnel.Service.PacketFraming
                     Buffer.BlockCopy(packetBuffer.PacketBuilder, grossPacketSize, packetBuffer.PacketBuilder, 0, packetBuffer.PacketBuilderLength - grossPacketSize);
                     packetBuffer.PacketBuilderLength -= grossPacketSize;
 
-                    var genericType = Type.GetType(packet.EnclosedPayloadType)
-                        ?? throw new Exception($"Unknown payload type {packet.EnclosedPayloadType}.");
-
-                    var toObjectMethod = typeof(Utility).GetMethod("DeserializeToObject")
-                        ?? throw new Exception($"Could not find ToObject().");
-
-                    var genericToObjectMethod = toObjectMethod.MakeGenericMethod(genericType);
-
-                    var payload = (IPacketPayload?)genericToObjectMethod.Invoke(null, new object[] { packet.Payload })
-                        ?? throw new Exception($"Payload can not be null.");
+                    var payload = ExtractPacketPayload(packet);
 
                     if (payload is IPacketPayloadQuery query)
                     {
@@ -190,14 +184,45 @@ namespace NetTunnel.Service.PacketFraming
                     }
                     else
                     {
-                        throw new Exception("????????????");
+                        throw new Exception("Encountered undefined packet payload type.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                //LogException(ex);
+                tunnel.Core.Logging.Write(ex.Message);
             }
+        }
+
+        internal static IPacketPayload ExtractPacketPayload(NtPacket packet)
+        {
+            var genericToObjectMethod = _reflectioncache.Use((o) =>
+            {
+                if (o.TryGetValue(packet.EnclosedPayloadType, out var method))
+                {
+                    return method;
+                }
+                return null;
+            });
+
+            if (genericToObjectMethod != null)
+            {
+                return (IPacketPayload?)genericToObjectMethod.Invoke(null, new object[] { packet.Payload })
+                    ?? throw new Exception($"Payload can not be null.");
+            }
+
+            var genericType = Type.GetType(packet.EnclosedPayloadType)
+                ?? throw new Exception($"Unknown payload type {packet.EnclosedPayloadType}.");
+
+            var toObjectMethod = typeof(Utility).GetMethod("DeserializeToObject")
+                ?? throw new Exception($"Could not find ToObject().");
+
+            genericToObjectMethod = toObjectMethod.MakeGenericMethod(genericType);
+
+            _reflectioncache.Use((o) => o.TryAdd(packet.EnclosedPayloadType, genericToObjectMethod));
+
+            return (IPacketPayload?)genericToObjectMethod.Invoke(null, new object[] { packet.Payload })
+                ?? throw new Exception($"Payload can not be null.");
         }
     }
 }

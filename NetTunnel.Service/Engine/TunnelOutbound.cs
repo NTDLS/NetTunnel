@@ -23,8 +23,6 @@ namespace NetTunnel.Service.Engine
         public TunnelOutbound(EngineCore core, NtTunnelOutboundConfiguration configuration)
             : base(core, configuration)
         {
-            _core = core;
-
             Address = configuration.Address;
             ManagementPort = configuration.ManagementPort;
             DataPort = configuration.DataPort;
@@ -60,7 +58,7 @@ namespace NetTunnel.Service.Engine
 
             KeepRunning = true;
 
-            _core.Logging.Write($"Starting outgoing tunnel '{Name}'");
+            Core.Logging.Write($"Starting outgoing tunnel '{Name}'");
 
             _outgoingConnectionThread = new Thread(OutgoingConnectionThreadProc);
             _outgoingConnectionThread.Start();
@@ -81,11 +79,11 @@ namespace NetTunnel.Service.Engine
             {
                 try
                 {
-                    _core.Logging.Write($"Attempting to connect to outgoing tunnel '{Name}' at {Address}:{DataPort}.");
+                    Core.Logging.Write($"Attempting to connect to outgoing tunnel '{Name}' at {Address}:{DataPort}.");
 
                     var tcpClient = new TcpClient(Address, DataPort);
 
-                    _core.Logging.Write($"Connection successful for tunnel '{Name}' at {Address}:{DataPort}.");
+                    Core.Logging.Write($"Connection successful for tunnel '{Name}' at {Address}:{DataPort}.");
 
                     using (_stream = tcpClient.GetStream())
                     {
@@ -107,13 +105,13 @@ namespace NetTunnel.Service.Engine
             if (packet is NtPacketPayloadAddEndpointInbound inboundEndpoint)
             {
                 AddInboundEndpoint(inboundEndpoint.Configuration);
-                _core.OutboundTunnels.SaveToDisk();
+                Core.OutboundTunnels.SaveToDisk();
                 return new NtPacketPayloadBoolean(true);
             }
             else if (packet is NtPacketPayloadAddEndpointOutbound outboundEndpoint)
             {
                 AddOutboundEndpoint(outboundEndpoint.Configuration);
-                _core.OutboundTunnels.SaveToDisk();
+                Core.OutboundTunnels.SaveToDisk();
                 return new NtPacketPayloadBoolean(true);
             }
 

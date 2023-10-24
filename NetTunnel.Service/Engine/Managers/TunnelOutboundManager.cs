@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
+using NetTunnel.Service.PacketFraming.PacketPayloads.Queries;
 using NTDLS.Semaphore;
 
 namespace NetTunnel.Service.Engine.Managers
@@ -48,7 +49,7 @@ namespace NetTunnel.Service.Engine.Managers
             return await _collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
-                return tunnel.DispatchAddEndpointInbound<T>(endpoint);
+                return tunnel.SendStreamPacketPayloadQuery<T>(new NtPacketPayloadAddEndpointInbound(endpoint));
             });
         }
 
@@ -57,7 +58,7 @@ namespace NetTunnel.Service.Engine.Managers
             return await _collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
-                return tunnel.DispatchAddEndpointOutbound<T>(endpoint);
+                return tunnel.SendStreamPacketPayloadQuery<T>(new NtPacketPayloadAddEndpointOutbound(endpoint));
             });
         }
 
