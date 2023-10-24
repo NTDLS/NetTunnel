@@ -96,7 +96,6 @@ namespace NetTunnel.Service.Engine
                 {
                     Console.WriteLine($"Error: {ex.Message}");
                 }
-                Thread.Sleep(1);
             }
         }
 

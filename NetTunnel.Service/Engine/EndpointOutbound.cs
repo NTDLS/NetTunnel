@@ -137,8 +137,6 @@ namespace NetTunnel.Service.Engine
                         var exchnagePayload = new NtPacketPayloadEndpointExchange(_tunnel.PairId, PairId, param.StreamId, buffer);
                         _tunnel.SendStreamPacketNotification(exchnagePayload);
                     }
-
-                    Thread.Sleep(1);
                 }
             }
             catch

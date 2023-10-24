@@ -143,15 +143,15 @@ namespace NetTunnel.Service.Engine
 
             while (KeepRunning)
             {
+                /*
                 SendStreamPacketNotification(new NtPacketPayloadMessage()
                 {
                     Label = "This is the label.",
                     Message = "Message from...???."
                 });
-
+                */
                 NtPacketizer.ReceiveAndProcessStreamPackets(_stream, this, packetBuffer, processPacketNotificationCallback, processPacketQueryCallback);
-
-                Thread.Sleep(1000);
+                //Thread.Sleep(1000);
             }
         }
 

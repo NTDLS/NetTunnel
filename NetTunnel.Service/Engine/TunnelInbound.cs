@@ -90,8 +90,6 @@ namespace NetTunnel.Service.Engine
                     tcpClient.Close();
 
                     Core.Logging.Write($"Disconnected incoming tunnel '{Name}' on port {DataPort}");
-
-                    Thread.Sleep(1000);
                 }
             }
             catch (Exception ex)

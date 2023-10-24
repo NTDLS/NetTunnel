@@ -56,8 +56,6 @@ namespace NetTunnel.Service.Engine
         {
             var tcpListener = new TcpListener(IPAddress.Any, Port);
 
-            Guid streamId = Guid.NewGuid();
-
             try
             {
                 tcpListener.Start();
@@ -66,20 +64,21 @@ namespace NetTunnel.Service.Engine
 
                 while (_keepRunning)
                 {
+                    Guid streamId = Guid.NewGuid();
+
                     _core.Logging.Write($"Waiting for connection for incoming endpoint '{Name}' on port {Port}");
 
                     var tcpClient = tcpListener.AcceptTcpClient();
 
                     _core.Logging.Write($"Accepted on incoming endpoint '{Name}' on port {Port}");
 
-
                     var handlerThread = new Thread(HandleClientThreadProc);
 
                     var param = new OutboundConnection(handlerThread, tcpClient, streamId);
 
-                    handlerThread.Start(param);
+                    _activeConnections.Use((o) => o.Add(streamId, param));
 
-                    Thread.Sleep(1);
+                    handlerThread.Start(param);
                 }
             }
             catch (Exception ex)
@@ -146,8 +145,6 @@ namespace NetTunnel.Service.Engine
                     var exchnagePayload = new NtPacketPayloadEndpointExchange(_tunnel.PairId, PairId, param.StreamId, buffer);
                     _tunnel.SendStreamPacketNotification(exchnagePayload);
                 }
-
-                Thread.Sleep(1);
             }
 
             param.TcpClient.Close();
