@@ -1,4 +1,5 @@
 ﻿using NetTunnel.ClientAPI;
+using NetTunnel.Library;
 
 namespace NetTunnel.UI.Forms
 {

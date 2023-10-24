@@ -1,6 +1,11 @@
-﻿namespace NetTunnel.Service.Types
+﻿using NetTunnel.Service.PacketFraming;
+using NetTunnel.Service.PacketFraming.PacketPayloads.Notifications;
+using NetTunnel.Service.PacketFraming.PacketPayloads.Queries;
+using NetTunnel.Service.PacketFraming.PacketPayloads.Replies;
+
+namespace NetTunnel.Service.Types
 {
-    public interface ITunnel
+    internal interface ITunnel
     {
         public bool KeepRunning { get; }
         /// <summary>
@@ -8,5 +13,19 @@
         /// </summary>
         public Guid PairId { get; }
         public string Name { get; }
+
+        public Task<T?> SendStreamPacketPayloadQuery<T>(IPacketPayloadQuery payload);
+
+        /// <summary>
+        /// Sends a reply to a IPacketPayloadQuery
+        /// </summary>
+        public void SendStreamPacketPayloadReply(NtPacket queryPacket, IPacketPayloadReply payload);
+
+        /// <summary>
+        /// Sends a one way (fire and forget) IPacketPayloadNotification.
+        /// </summary>
+        public void SendStreamPacketNotification(IPacketPayloadNotification payload);
+
+        public void ApplyQueryReply(Guid packetId, IPacketPayloadReply replyPayload);
     }
 }

@@ -1,11 +1,13 @@
-﻿using NetTunnel.Service.Packetizer.PacketPayloads;
+﻿using NetTunnel.Library;
+using NetTunnel.Service.PacketFraming.PacketPayloads;
+using NetTunnel.Service.PacketFraming.PacketPayloads.Notifications;
+using NetTunnel.Service.PacketFraming.PacketPayloads.Queries;
+using NetTunnel.Service.PacketFraming.PacketPayloads.Replies;
 using NetTunnel.Service.Types;
-using ProtoBuf;
-using System.IO.Compression;
 using System.Net.Sockets;
-using static NetTunnel.Service.Packetizer.Constants;
+using static NetTunnel.Service.PacketFraming.Constants;
 
-namespace NetTunnel.Service.Packetizer
+namespace NetTunnel.Service.PacketFraming
 {
     /// <summary>
     /// TCP packets can be fragmented or combined. The packetizer rebuilds what was originally
@@ -13,7 +15,6 @@ namespace NetTunnel.Service.Packetizer
     /// </summary>
     internal static class NtPacketizer
     {
-        private static readonly List<QueriesAwaitingReply> _queriesAwaitingReplies = new();
 
         public delegate void ProcessPacketNotification(ITunnel tunnel, IPacketPayloadNotification payload);
 
@@ -23,8 +24,8 @@ namespace NetTunnel.Service.Packetizer
         {
             try
             {
-                var packetBody = ToByteArray(packet);
-                var packetBytes = Compress(packetBody);
+                var packetBody = Utility.SerializeToByteArray(packet);
+                var packetBytes = Utility.Compress(packetBody);
                 var grossPacketSize = packetBytes.Length + NtPacketDefaults.PACKET_HEADER_SIZE;
                 var grossPacketBytes = new byte[grossPacketSize];
                 var packetCrc = CRC16.ComputeChecksum(packetBytes);
@@ -69,77 +70,6 @@ namespace NetTunnel.Service.Packetizer
             {
                 //LogException(ex);
             }
-        }
-
-        public static async Task<T?> SendStreamPacketPayloadQuery<T>(NetworkStream? stream, IPacketPayloadQuery payload)
-        {
-            if (stream == null)
-            {
-                throw new Exception("SendStreamPacketPayload stream can not be null.");
-            }
-
-            var cmd = new NtPacket()
-            {
-                EnclosedPayloadType = payload.GetType()?.FullName ?? string.Empty,
-                Payload = ToByteArray(payload)
-            };
-
-            var queriesAwaitingReply = new QueriesAwaitingReply()
-            {
-                PacketId = cmd.Id,
-            };
-
-            _queriesAwaitingReplies.Add(queriesAwaitingReply);
-
-            return await Task.Run(() =>
-            {
-                var packetBytes = AssemblePacket(cmd);
-                stream.Write(packetBytes, 0, packetBytes.Length);
-
-                //TODO: We need to check received data to see if any of them are replies
-                if (queriesAwaitingReply.WaitEvent.WaitOne(NtPacketDefaults.QUERY_TIMEOUT_MS) == false)
-                {
-                    _queriesAwaitingReplies.Remove(queriesAwaitingReply);
-                    throw new Exception("Query timeout expired while waiting on reply.");
-                }
-
-                _queriesAwaitingReplies.Remove(queriesAwaitingReply);
-
-                return (T?)queriesAwaitingReply.ReplyPayload;
-            });
-        }
-
-        public static void SendStreamPacketPayloadReply(NetworkStream? stream, NtPacket queryPacket, IPacketPayloadReply payload)
-        {
-            if (stream == null)
-            {
-                throw new Exception("SendStreamPacketPayload stream can not be null.");
-            }
-            var cmd = new NtPacket()
-            {
-                Id = queryPacket.Id,
-                EnclosedPayloadType = payload.GetType()?.FullName ?? string.Empty,
-                Payload = ToByteArray(payload)
-            };
-
-            var packetBytes = AssemblePacket(cmd);
-            stream.Write(packetBytes, 0, packetBytes.Length);
-        }
-
-        public static void SendStreamPacketPayload(NetworkStream? stream, IPacketPayloadNotification payload)
-        {
-            if (stream == null)
-            {
-                throw new Exception("SendStreamPacketPayload stream can not be null.");
-            }
-            var cmd = new NtPacket()
-            {
-                EnclosedPayloadType = payload.GetType()?.FullName ?? string.Empty,
-                Payload = ToByteArray(payload)
-            };
-
-            var packetBytes = AssemblePacket(cmd);
-            stream.Write(packetBytes, 0, packetBytes.Length);
         }
 
         public static void ReceiveAndProcessStreamPackets(NetworkStream? stream,
@@ -224,9 +154,9 @@ namespace NetTunnel.Service.Packetizer
 
                     Buffer.BlockCopy(packetBuffer.PacketBuilder, NtPacketDefaults.PACKET_HEADER_SIZE, packetBytes, 0, netPacketSize);
 
-                    var packetBody = Decompress(packetBytes);
+                    var packetBody = Utility.Decompress(packetBytes);
 
-                    var packet = ToObject<NtPacket>(packetBody);
+                    var packet = Utility.DeserializeToObject<NtPacket>(packetBody);
 
                     //Zero out the consumed portion of the packet buffer - more for fun than anything else.
                     Array.Clear(packetBuffer.PacketBuilder, 0, grossPacketSize);
@@ -237,7 +167,7 @@ namespace NetTunnel.Service.Packetizer
                     var genericType = Type.GetType(packet.EnclosedPayloadType)
                         ?? throw new Exception($"Unknown payload type {packet.EnclosedPayloadType}.");
 
-                    var toObjectMethod = typeof(NtPacketizer).GetMethod("ToObject")
+                    var toObjectMethod = typeof(Utility).GetMethod("DeserializeToObject")
                         ?? throw new Exception($"Could not find ToObject().");
 
                     var genericToObjectMethod = toObjectMethod.MakeGenericMethod(genericType);
@@ -248,13 +178,11 @@ namespace NetTunnel.Service.Packetizer
                     if (payload is IPacketPayloadQuery query)
                     {
                         var replyPayload = processPacketQueryCallback(tunnel, query);
-                        SendStreamPacketPayloadReply(stream, packet, replyPayload);
+                        tunnel.SendStreamPacketPayloadReply(packet, replyPayload);
                     }
                     else if (payload is IPacketPayloadReply reply)
                     {
-                        var waitingQuery = _queriesAwaitingReplies.Where(o => o.PacketId == packet.Id).Single();
-                        waitingQuery.ReplyPayload = reply;
-                        waitingQuery.WaitEvent.Set();
+                        tunnel.ApplyQueryReply(packet.Id, reply);
                     }
                     else if (payload is IPacketPayloadNotification notification)
                     {
@@ -270,46 +198,6 @@ namespace NetTunnel.Service.Packetizer
             {
                 //LogException(ex);
             }
-        }
-
-        private static byte[] ToByteArray(object obj)
-        {
-            if (obj == null) return Array.Empty<byte>();
-            using var stream = new MemoryStream();
-            Serializer.Serialize(stream, obj);
-            return stream.ToArray();
-        }
-
-        public static T ToObject<T>(byte[] arrBytes)
-        {
-            using var stream = new MemoryStream();
-            stream.Write(arrBytes, 0, arrBytes.Length);
-            stream.Seek(0, SeekOrigin.Begin);
-            return Serializer.Deserialize<T>(stream);
-        }
-
-        private static byte[] Compress(byte[]? bytes)
-        {
-            if (bytes == null) return Array.Empty<byte>();
-
-            using var msi = new MemoryStream(bytes);
-            using var mso = new MemoryStream();
-            using (var gs = new GZipStream(mso, CompressionMode.Compress))
-            {
-                msi.CopyTo(gs);
-            }
-            return mso.ToArray();
-        }
-
-        private static byte[] Decompress(byte[] bytes)
-        {
-            using var msi = new MemoryStream(bytes);
-            using var mso = new MemoryStream();
-            using (var gs = new GZipStream(msi, CompressionMode.Decompress))
-            {
-                gs.CopyTo(mso);
-            }
-            return mso.ToArray();
         }
     }
 }

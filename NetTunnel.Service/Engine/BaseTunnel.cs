@@ -1,20 +1,26 @@
-﻿using NetTunnel.Library.Types;
-using NetTunnel.Service.Packetizer;
-using NetTunnel.Service.Packetizer.PacketPayloads.Notifications;
-using NetTunnel.Service.Packetizer.PacketPayloads.Queries;
+﻿using NetTunnel.Library;
+using NetTunnel.Library.Types;
+using NetTunnel.Service.PacketFraming;
+using NetTunnel.Service.PacketFraming.PacketPayloads.Notifications;
+using NetTunnel.Service.PacketFraming.PacketPayloads.Queries;
+using NetTunnel.Service.PacketFraming.PacketPayloads.Replies;
 using NetTunnel.Service.Types;
 using System.Net.Sockets;
-using static NetTunnel.Service.Packetizer.NtPacketizer;
+using static NetTunnel.Service.PacketFraming.Constants;
+using static NetTunnel.Service.PacketFraming.NtPacketizer;
 
 namespace NetTunnel.Service.Engine
 {
-    public class BaseTunnel : ITunnel
+    internal class BaseTunnel : ITunnel
     {
+        private List<QueriesAwaitingReply> _queriesAwaitingReplies = new();
+
+        protected NetworkStream? _stream { get; set; }
+
         public bool KeepRunning { get; internal set; } = false;
         public Guid PairId { get; private set; }
         public string Name { get; private set; }
 
-        internal NetworkStream? _stream { get; set; }
         internal EngineCore _core;
         internal readonly List<EndpointInbound> _inboundEndpoints = new();
         internal readonly List<EndpointOutbound> _outboundEndpoints = new();
@@ -41,17 +47,109 @@ namespace NetTunnel.Service.Engine
             configuration.OutboundEndpointConfigurations.ForEach(o => _outboundEndpoints.Add(new(_core, this, o)));
         }
 
+
+        #region TCP/IP Packet and Stream interactions.
+
         public void DispatchStreamPacketMessage(NtPacketPayloadMessage message) =>
-            NtPacketizer.SendStreamPacketPayload(_stream, message);
+            SendStreamPacketNotification(message);
 
         public void DispatchStreamPacketBytes(NtPacketPayloadBytes message) =>
-            NtPacketizer.SendStreamPacketPayload(_stream, message);
+            SendStreamPacketNotification(message);
 
         public async Task<T?> DispatchAddEndpointInbound<T>(NtEndpointInboundConfiguration configuration)
-             => await NtPacketizer.SendStreamPacketPayloadQuery<T>(_stream, new NtPacketPayloadAddEndpointInbound(configuration));
+             => await SendStreamPacketPayloadQuery<T>(new NtPacketPayloadAddEndpointInbound(configuration));
 
         public async Task<T?> DispatchAddEndpointOutbound<T>(NtEndpointOutboundConfiguration configuration)
-            => await NtPacketizer.SendStreamPacketPayloadQuery<T>(_stream, new NtPacketPayloadAddEndpointOutbound(configuration));
+            => await SendStreamPacketPayloadQuery<T>(new NtPacketPayloadAddEndpointOutbound(configuration));
+
+        /// <summary>
+        /// Sends a IPacketPayloadQuery that expects a IPacketPayloadReply in return.
+        /// </summary>
+        public async Task<T?> SendStreamPacketPayloadQuery<T>(IPacketPayloadQuery payload)
+        {
+            if (_stream == null)
+            {
+                throw new Exception("SendStreamPacketPayload stream can not be null.");
+            }
+
+            var cmd = new NtPacket()
+            {
+                EnclosedPayloadType = payload.GetType()?.FullName ?? string.Empty,
+                Payload = Utility.SerializeToByteArray(payload)
+            };
+
+            var queriesAwaitingReply = new QueriesAwaitingReply()
+            {
+                PacketId = cmd.Id,
+            };
+
+            _queriesAwaitingReplies.Add(queriesAwaitingReply);
+
+            return await Task.Run(() =>
+            {
+                var packetBytes = AssemblePacket(cmd);
+                _stream.Write(packetBytes, 0, packetBytes.Length);
+
+                //TODO: We need to check received data to see if any of them are replies
+                if (queriesAwaitingReply.WaitEvent.WaitOne(NtPacketDefaults.QUERY_TIMEOUT_MS) == false)
+                {
+                    _queriesAwaitingReplies.Remove(queriesAwaitingReply);
+                    throw new Exception("Query timeout expired while waiting on reply.");
+                }
+
+                _queriesAwaitingReplies.Remove(queriesAwaitingReply);
+
+                return (T?)queriesAwaitingReply.ReplyPayload;
+            });
+        }
+
+        /// <summary>
+        /// Sends a reply to a IPacketPayloadQuery
+        /// </summary>
+        public void SendStreamPacketPayloadReply(NtPacket queryPacket, IPacketPayloadReply payload)
+        {
+            if (_stream == null)
+            {
+                throw new Exception("SendStreamPacketPayload stream can not be null.");
+            }
+            var cmd = new NtPacket()
+            {
+                Id = queryPacket.Id,
+                EnclosedPayloadType = payload.GetType()?.FullName ?? string.Empty,
+                Payload = Utility.SerializeToByteArray(payload)
+            };
+
+            var packetBytes = AssemblePacket(cmd);
+            _stream.Write(packetBytes, 0, packetBytes.Length);
+        }
+
+        public void ApplyQueryReply(Guid packetId, IPacketPayloadReply replyPayload)
+        {
+            var waitingQuery = _queriesAwaitingReplies.Where(o => o.PacketId == packetId).Single();
+            waitingQuery.ReplyPayload = replyPayload;
+            waitingQuery.WaitEvent.Set();
+        }
+
+        /// <summary>
+        /// Sends a one way (fire and forget) IPacketPayloadNotification.
+        /// </summary>
+        public void SendStreamPacketNotification(IPacketPayloadNotification payload)
+        {
+            if (_stream == null)
+            {
+                throw new Exception("SendStreamPacketPayload stream can not be null.");
+            }
+            var cmd = new NtPacket()
+            {
+                EnclosedPayloadType = payload.GetType()?.FullName ?? string.Empty,
+                Payload = Utility.SerializeToByteArray(payload)
+            };
+
+            var packetBytes = AssemblePacket(cmd);
+            _stream.Write(packetBytes, 0, packetBytes.Length);
+        }
+
+        #endregion
 
         internal void ExecuteStream(ProcessPacketNotification processPacketNotificationCallback, ProcessPacketQuery processPacketQueryCallback)
         {

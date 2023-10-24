@@ -1,5 +1,5 @@
-﻿using NetTunnel.ClientAPI.Exceptions;
-using NetTunnel.ClientAPI.Payload;
+﻿using NetTunnel.ClientAPI.Payload;
+using NetTunnel.Library.Exceptions;
 using Newtonsoft.Json;
 
 namespace NetTunnel.ClientAPI

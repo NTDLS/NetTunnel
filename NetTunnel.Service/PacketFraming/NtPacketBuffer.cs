@@ -1,6 +1,6 @@
-﻿using static NetTunnel.Service.Packetizer.Constants;
+﻿using static NetTunnel.Service.PacketFraming.Constants;
 
-namespace NetTunnel.Service.Packetizer
+namespace NetTunnel.Service.PacketFraming
 {
     internal class NtPacketBuffer
     {

@@ -1,8 +1,7 @@
 ﻿using NetTunnel.Library.Types;
-using NetTunnel.Service.Packetizer.PacketPayloads;
-using NetTunnel.Service.Packetizer.PacketPayloads.Notifications;
-using NetTunnel.Service.Packetizer.PacketPayloads.Queries;
-using NetTunnel.Service.Packetizer.PacketPayloads.Replies;
+using NetTunnel.Service.PacketFraming.PacketPayloads.Notifications;
+using NetTunnel.Service.PacketFraming.PacketPayloads.Queries;
+using NetTunnel.Service.PacketFraming.PacketPayloads.Replies;
 using NetTunnel.Service.Types;
 using System.Diagnostics;
 using System.Net;

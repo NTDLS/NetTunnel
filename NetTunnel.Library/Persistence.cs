@@ -7,7 +7,7 @@ namespace NetTunnel.Library
         public static void SaveToDisk<T>(T obj)
         {
             var commonAppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            var dataFolder = Path.Combine(commonAppDataFolder, Library.Constants.FriendlyName);
+            var dataFolder = Path.Combine(commonAppDataFolder, Constants.FriendlyName);
 
             if (!Directory.Exists(dataFolder))
             {
@@ -25,7 +25,7 @@ namespace NetTunnel.Library
         public static T? LoadFromDisk<T>()
         {
             var commonAppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            var dataFolder = Path.Combine(commonAppDataFolder, Library.Constants.FriendlyName);
+            var dataFolder = Path.Combine(commonAppDataFolder, Constants.FriendlyName);
 
             if (!Directory.Exists(dataFolder))
             {

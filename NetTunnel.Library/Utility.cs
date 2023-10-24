@@ -1,11 +1,14 @@
-﻿using NetTunnel.ClientAPI.Exceptions;
+﻿
+using NetTunnel.Library.Exceptions;
+using ProtoBuf;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.IO.Compression;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace NetTunnel.ClientAPI
+namespace NetTunnel.Library
 {
     public static class Utility
     {
@@ -86,6 +89,46 @@ namespace NetTunnel.ClientAPI
             {
                 throw new NtAssertException(message);
             }
+        }
+
+        public static byte[] SerializeToByteArray(object obj)
+        {
+            if (obj == null) return Array.Empty<byte>();
+            using var stream = new MemoryStream();
+            Serializer.Serialize(stream, obj);
+            return stream.ToArray();
+        }
+
+        public static T DeserializeToObject<T>(byte[] arrBytes)
+        {
+            using var stream = new MemoryStream();
+            stream.Write(arrBytes, 0, arrBytes.Length);
+            stream.Seek(0, SeekOrigin.Begin);
+            return Serializer.Deserialize<T>(stream);
+        }
+
+        public static byte[] Compress(byte[]? bytes)
+        {
+            if (bytes == null) return Array.Empty<byte>();
+
+            using var msi = new MemoryStream(bytes);
+            using var mso = new MemoryStream();
+            using (var gs = new GZipStream(mso, CompressionMode.Compress))
+            {
+                msi.CopyTo(gs);
+            }
+            return mso.ToArray();
+        }
+
+        public static byte[] Decompress(byte[] bytes)
+        {
+            using var msi = new MemoryStream(bytes);
+            using var mso = new MemoryStream();
+            using (var gs = new GZipStream(msi, CompressionMode.Decompress))
+            {
+                gs.CopyTo(mso);
+            }
+            return mso.ToArray();
         }
     }
 }

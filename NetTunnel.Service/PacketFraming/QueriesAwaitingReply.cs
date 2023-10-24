@@ -1,6 +1,6 @@
-﻿using NetTunnel.Service.Packetizer.PacketPayloads;
+﻿using NetTunnel.Service.PacketFraming.PacketPayloads.Replies;
 
-namespace NetTunnel.Service.Packetizer
+namespace NetTunnel.Service.PacketFraming
 {
     internal class QueriesAwaitingReply
     {

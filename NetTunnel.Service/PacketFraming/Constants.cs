@@ -1,4 +1,4 @@
-﻿namespace NetTunnel.Service.Packetizer
+﻿namespace NetTunnel.Service.PacketFraming
 {
     internal class Constants
     {

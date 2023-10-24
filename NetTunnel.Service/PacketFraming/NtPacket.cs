@@ -1,6 +1,6 @@
 ﻿using ProtoBuf;
 
-namespace NetTunnel.Service.Packetizer
+namespace NetTunnel.Service.PacketFraming
 {
     /// <summary>
     /// Internal packet which allows for lowelevel communication betweeen server and client.

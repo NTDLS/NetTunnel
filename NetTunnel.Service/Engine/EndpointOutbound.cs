@@ -7,7 +7,7 @@ namespace NetTunnel.Service.Engine
     /// <summary>
     /// This is the class that makes an outgoing TCP/IP connection to a listening endpoint.
     /// </summary>
-    public class EndpointOutbound : IEndpoint
+    internal class EndpointOutbound : IEndpoint
     {
         private readonly EngineCore _core;
         private Thread? _outgoingConnectionThread;

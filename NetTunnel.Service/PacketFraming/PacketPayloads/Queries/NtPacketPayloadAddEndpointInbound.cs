@@ -1,7 +1,7 @@
 ﻿using NetTunnel.Library.Types;
 using ProtoBuf;
 
-namespace NetTunnel.Service.Packetizer.PacketPayloads.Queries
+namespace NetTunnel.Service.PacketFraming.PacketPayloads.Queries
 {
     [Serializable]
     [ProtoContract]

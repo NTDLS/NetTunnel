@@ -1,6 +1,6 @@
-﻿using static NetTunnel.ClientAPI.Constants;
+﻿using static NetTunnel.Library.Constants;
 
-namespace NetTunnel.ClientAPI.Exceptions
+namespace NetTunnel.Library.Exceptions
 {
     public class NtAPIResponseException : NtExceptionBase
     {

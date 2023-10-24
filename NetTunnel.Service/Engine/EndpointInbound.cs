@@ -1,4 +1,4 @@
-﻿using NetTunnel.ClientAPI;
+﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.Types;
 using System.Net;
@@ -9,7 +9,7 @@ namespace NetTunnel.Service.Engine
     /// <summary>
     /// This is the class that opens a listening TCP/IP port to wait on connections from a remote tunnel.
     /// </summary>
-    public class EndpointInbound
+    internal class EndpointInbound
     {
         private readonly EngineCore _core;
         private Thread? _incomingConnectionThread;

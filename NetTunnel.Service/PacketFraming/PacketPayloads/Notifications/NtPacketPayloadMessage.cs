@@ -1,6 +1,6 @@
 ﻿using ProtoBuf;
 
-namespace NetTunnel.Service.Packetizer.PacketPayloads.Notifications
+namespace NetTunnel.Service.PacketFraming.PacketPayloads.Notifications
 {
     [Serializable]
     [ProtoContract]

@@ -1,5 +1,4 @@
-﻿using NetTunnel.ClientAPI;
-using NetTunnel.Library;
+﻿using NetTunnel.Library;
 using NTDLS.Semaphore;
 
 namespace NetTunnel.Service.Engine.Managers

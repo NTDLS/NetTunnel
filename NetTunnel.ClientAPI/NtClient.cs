@@ -1,4 +1,5 @@
-﻿using NetTunnel.ClientAPI.Exceptions;
+﻿using NetTunnel.Library;
+using NetTunnel.Library.Exceptions;
 
 namespace NetTunnel.ClientAPI
 {
