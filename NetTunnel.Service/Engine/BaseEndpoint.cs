@@ -50,25 +50,24 @@ namespace NetTunnel.Service.Engine
                 return outboundConnection;
             });
 
-            outboundConnection?.Stream.Write(buffer);
+            outboundConnection?.Write(buffer);
         }
 
         internal void HandleClientThreadProc(object? obj)
         {
             Utility.EnsureNotNull(obj);
-            var param = (ActiveEndpointConnection)obj;
+            var activeConnection = (ActiveEndpointConnection)obj;
 
             try
             {
-                _tunnel.SendStreamPacketNotification(new NtPacketPayloadEndpointConnect(_tunnel.PairId, PairId, param.StreamId));
+                _tunnel.SendStreamPacketNotification(new NtPacketPayloadEndpointConnect(_tunnel.PairId, PairId, activeConnection.StreamId));
 
                 while (_keepRunning)
                 {
                     byte[] buffer = new byte[NtPacketDefaults.PACKET_BUFFER_SIZE];
-                    int bytesRead;
-                    while ((bytesRead = param.Stream.Read(buffer, 0, buffer.Length)) > 0)
+                    while (activeConnection.Read(ref buffer))
                     {
-                        var exchnagePayload = new NtPacketPayloadEndpointExchange(_tunnel.PairId, PairId, param.StreamId, buffer);
+                        var exchnagePayload = new NtPacketPayloadEndpointExchange(_tunnel.PairId, PairId, activeConnection.StreamId, buffer);
                         _tunnel.SendStreamPacketNotification(exchnagePayload);
                     }
                 }
@@ -79,10 +78,10 @@ namespace NetTunnel.Service.Engine
             }
             finally
             {
-                param.TcpClient.Close();
+                activeConnection.TcpClient.Close();
             }
 
-            _tunnel.SendStreamPacketNotification(new NtPacketPayloadEndpointDisconnect(_tunnel.PairId, PairId, param.StreamId));
+            _tunnel.SendStreamPacketNotification(new NtPacketPayloadEndpointDisconnect(_tunnel.PairId, PairId, activeConnection.StreamId));
         }
     }
 }
