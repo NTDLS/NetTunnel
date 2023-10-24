@@ -120,23 +120,26 @@ namespace NetTunnel.Service.Engine
 
         private void ProcessPacketNotificationCallback(ITunnel tunnel, IPacketPayloadNotification packet)
         {
-
             if (packet is NtPacketPayloadMessage message)
             {
                 Debug.Print($"{message.Message}");
             }
-            /*
-            else if (packet is NtPacketPayloadAddEndpointInbound inboundEndpoint)
+            else if (packet is NtPacketPayloadEndpointExchange exchange)
             {
-                AddInboundEndpoint(inboundEndpoint.Configuration);
-                _core.OutboundTunnels.SaveToDisk();
+                var inboundEndpoint = _inboundEndpoints.Where(o=>o.PairId == exchange.EndpointPairId).FirstOrDefault();
+                if (inboundEndpoint != null)
+                {
+                    inboundEndpoint.SendEndpointData(exchange.StreamId, exchange.Bytes);
+                    return;
+                }
+
+                var outboundEndpoint = _outboundEndpoints.Where(o => o.PairId == exchange.EndpointPairId).FirstOrDefault();
+                if (outboundEndpoint != null)
+                {
+                    outboundEndpoint.SendEndpointData(exchange.StreamId, exchange.Bytes);
+                    return;
+                }
             }
-            else if (packet is NtPacketPayloadAddEndpointOutbound outboundEndpoint)
-            {
-                AddOutboundEndpoint(outboundEndpoint.Configuration);
-                _core.OutboundTunnels.SaveToDisk();
-            }
-            */
             else
             {
             }

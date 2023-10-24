@@ -4,6 +4,7 @@ using NetTunnel.Service.PacketFraming.PacketPayloads.Notifications;
 using NetTunnel.Service.Types;
 using NTDLS.Semaphore;
 using System;
+using System.Linq.Expressions;
 using System.Net.Sockets;
 using static NetTunnel.Service.PacketFraming.Types;
 
@@ -50,7 +51,7 @@ namespace NetTunnel.Service.Engine
             //TODO: Wait on thread(s) to stop.
         }
 
-        private class OutboundConnection: IDisposable
+        private class OutboundConnection : IDisposable
         {
             public Guid StreamId { get; set; }
             public TcpClient TcpClient { get; set; }
@@ -73,7 +74,7 @@ namespace NetTunnel.Service.Engine
 
         CriticalResource<Dictionary<Guid, OutboundConnection>> _activeConnections = new();
 
-        public void SendEndpointData(Guid streamId, byte [] buffer)
+        public void SendEndpointData(Guid streamId, byte[] buffer)
         {
             var outboundConnection = _activeConnections.Use((o) =>
             {
@@ -107,8 +108,6 @@ namespace NetTunnel.Service.Engine
                 var handlerThread = new Thread(HandleClientThreadProc);
                 var param = new OutboundConnection(handlerThread, tcpClient, streamId);
 
-                _activeConnections.Use((o) => o.Add(streamId, param));
-
                 handlerThread.Start(param);
 
                 return param;
@@ -118,10 +117,6 @@ namespace NetTunnel.Service.Engine
                 Console.WriteLine($"Error: {ex.Message}");
                 throw;
             }
-            finally
-            {
-                tcpClient.Close();
-            }
         }
 
         private void HandleClientThreadProc(object? obj)
@@ -129,7 +124,7 @@ namespace NetTunnel.Service.Engine
             Utility.EnsureNotNull(obj);
             var param = (OutboundConnection)obj;
 
-            using (var tcpStream = param.TcpClient.GetStream())
+            try
             {
                 //Here we need to tell the remote service to start an outgoing connection for this endpoint and on its owning tunnel.
 
@@ -137,7 +132,7 @@ namespace NetTunnel.Service.Engine
                 {
                     byte[] buffer = new byte[NtPacketDefaults.PACKET_BUFFER_SIZE];
                     int bytesRead;
-                    while ((bytesRead = tcpStream.Read(buffer, 0, buffer.Length)) > 0)
+                    while ((bytesRead = param.Stream.Read(buffer, 0, buffer.Length)) > 0)
                     {
                         var exchnagePayload = new NtPacketPayloadEndpointExchange(_tunnel.PairId, PairId, param.StreamId, buffer);
                         _tunnel.SendStreamPacketNotification(exchnagePayload);
@@ -146,9 +141,14 @@ namespace NetTunnel.Service.Engine
                     Thread.Sleep(1);
                 }
             }
-
-            param.TcpClient.Close();
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                param.TcpClient.Close();
+            }
         }
-
     }
 }

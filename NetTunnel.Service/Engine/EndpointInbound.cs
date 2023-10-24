@@ -135,22 +135,19 @@ namespace NetTunnel.Service.Engine
             Utility.EnsureNotNull(obj);
             var param = (OutboundConnection)obj;
 
-            using (var tcpStream = param.TcpClient.GetStream())
+            //Here we need to tell the remote service to start an outgoing connection for this endpoint and on its owning tunnel.
+
+            while (_keepRunning)
             {
-                //Here we need to tell the remote service to start an outgoing connection for this endpoint and on its owning tunnel.
-
-                while (_keepRunning)
+                byte[] buffer = new byte[NtPacketDefaults.PACKET_BUFFER_SIZE];
+                int bytesRead;
+                while ((bytesRead = param.Stream.Read(buffer, 0, buffer.Length)) > 0)
                 {
-                    byte[] buffer = new byte[NtPacketDefaults.PACKET_BUFFER_SIZE];
-                    int bytesRead;
-                    while ((bytesRead = tcpStream.Read(buffer, 0, buffer.Length)) > 0)
-                    {
-                        var exchnagePayload = new NtPacketPayloadEndpointExchange(_tunnel.PairId, PairId, param.StreamId, buffer);
-                        _tunnel.SendStreamPacketNotification(exchnagePayload);
-                    }
-
-                    Thread.Sleep(1);
+                    var exchnagePayload = new NtPacketPayloadEndpointExchange(_tunnel.PairId, PairId, param.StreamId, buffer);
+                    _tunnel.SendStreamPacketNotification(exchnagePayload);
                 }
+
+                Thread.Sleep(1);
             }
 
             param.TcpClient.Close();

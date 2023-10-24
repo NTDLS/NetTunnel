@@ -129,18 +129,22 @@ namespace NetTunnel.Service.Engine
             {
                 Debug.Print($"{message.Message}");
             }
-            /*
-            else if (packet is NtPacketPayloadAddEndpointInbound inboundEndpoint)
+            else if (packet is NtPacketPayloadEndpointExchange exchange)
             {
-                AddInboundEndpoint(inboundEndpoint.Configuration);
-                _core.InboundTunnels.SaveToDisk();
+                var inboundEndpoint = _inboundEndpoints.Where(o => o.PairId == exchange.EndpointPairId).FirstOrDefault();
+                if (inboundEndpoint != null)
+                {
+                    inboundEndpoint.SendEndpointData(exchange.StreamId, exchange.Bytes);
+                    return;
+                }
+
+                var outboundEndpoint = _outboundEndpoints.Where(o => o.PairId == exchange.EndpointPairId).FirstOrDefault();
+                if (outboundEndpoint != null)
+                {
+                    outboundEndpoint.SendEndpointData(exchange.StreamId, exchange.Bytes);
+                    return;
+                }
             }
-            else if (packet is NtPacketPayloadAddEndpointOutbound outboundEndpoint)
-            {
-                AddOutboundEndpoint(outboundEndpoint.Configuration);
-                _core.InboundTunnels.SaveToDisk();
-            }
-            */
             else
             {
             }
