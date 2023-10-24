@@ -10,13 +10,13 @@ namespace NetTunnel.Library.Types
     public class NtEndpointOutboundConfiguration
     {
         [ProtoMember(1)]
-        public Guid PairId { get; private set; }
+        public Guid PairId { get; set; }
         [ProtoMember(2)]
-        public string Name { get; private set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
         [ProtoMember(3)]
-        public string Address { get; private set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
         [ProtoMember(4)]
-        public int Port { get; private set; }
+        public int Port { get; set; }
 
         public NtEndpointOutboundConfiguration() { }
 

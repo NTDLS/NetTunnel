@@ -20,9 +20,6 @@ namespace NetTunnel.Service.Engine
             _core = core;
 
             DataPort = configuration.DataPort;
-
-            configuration.InboundEndpointConfigurations.ForEach(o => _inboundEndpoints.Add(new(_core, this, o)));
-            configuration.OutboundEndpointConfigurations.ForEach(o => _outboundEndpoints.Add(new(_core, this, o)));
         }
 
         public NtTunnelInboundConfiguration CloneConfiguration()
@@ -46,6 +43,10 @@ namespace NetTunnel.Service.Engine
 
         public void Start()
         {
+            if (KeepRunning == true)
+            {
+                return;
+            }
             KeepRunning = true;
 
             _core.Logging.Write($"Starting incoming tunnel '{Name}' on port {DataPort}");
@@ -105,13 +106,23 @@ namespace NetTunnel.Service.Engine
 
         void ProcessPacketCallbackHandler(ITunnel tunnel, IPacketPayload packet)
         {
-            if (packet is NtPacketPayloadMessage)
+            if (packet is NtPacketPayloadMessage message)
             {
-                var message = (NtPacketPayloadMessage)packet;
                 Debug.Print($"{message.Message}");
+            }
+            else if (packet is NtPacketPayloadAddEndpointInbound inboundEndpoint)
+            {
+                AddInboundEndpoint(inboundEndpoint.Configuration);
+                _core.InboundTunnels.SaveToDisk();
+            }
+            else if (packet is NtPacketPayloadAddEndpointOutbound outboundEndpoint)
+            {
+                AddOutboundEndpoint(outboundEndpoint.Configuration);
+                _core.InboundTunnels.SaveToDisk();
             }
             else
             {
+
             }
         }
     }

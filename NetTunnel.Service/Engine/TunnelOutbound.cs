@@ -27,9 +27,6 @@ namespace NetTunnel.Service.Engine
             DataPort = configuration.DataPort;
             Username = configuration.Username;
             PasswordHash = configuration.PasswordHash;
-
-            configuration.InboundEndpointConfigurations.ForEach(o => _inboundEndpoints.Add(new(_core, this, o)));
-            configuration.OutboundEndpointConfigurations.ForEach(o => _outboundEndpoints.Add(new(_core, this, o)));
         }
 
         public NtTunnelOutboundConfiguration CloneConfiguration()
@@ -53,6 +50,11 @@ namespace NetTunnel.Service.Engine
 
         public void Start()
         {
+            if (KeepRunning == true)
+            {
+                return;
+            }
+
             KeepRunning = true;
 
             _core.Logging.Write($"Starting outgoing tunnel '{Name}'");
@@ -103,8 +105,19 @@ namespace NetTunnel.Service.Engine
             {
                 Debug.Print($"{message.Message}");
             }
+            else if (packet is NtPacketPayloadAddEndpointInbound inboundEndpoint)
+            {
+                AddInboundEndpoint(inboundEndpoint.Configuration);
+                _core.OutboundTunnels.SaveToDisk();
+            }
+            else if (packet is NtPacketPayloadAddEndpointOutbound outboundEndpoint)
+            {
+                AddOutboundEndpoint(outboundEndpoint.Configuration);
+                _core.OutboundTunnels.SaveToDisk();
+            }
             else
             {
+
             }
         }
     }

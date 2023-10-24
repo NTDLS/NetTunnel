@@ -55,6 +55,42 @@ namespace NetTunnel.Service.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("{sessionId}/Start/{tunnelPairId}")]
+        public NtActionResponse Start(Guid sessionId, Guid tunnelPairId)
+        {
+            try
+            {
+                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+
+                Singletons.Core.OutboundTunnels.Start(tunnelPairId);
+
+                return new NtActionResponse { Success = true };
+            }
+            catch (Exception ex)
+            {
+                return new NtActionResponseTunnelsInbound(ex);
+            }
+        }
+
+        [HttpGet]
+        [Route("{sessionId}/Stop/{tunnelPairId}")]
+        public NtActionResponse Stop(Guid sessionId, Guid tunnelPairId)
+        {
+            try
+            {
+                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+
+                Singletons.Core.OutboundTunnels.Stop(tunnelPairId);
+
+                return new NtActionResponse { Success = true };
+            }
+            catch (Exception ex)
+            {
+                return new NtActionResponseTunnelsInbound(ex);
+            }
+        }
+
         /// <summary>
         /// This is called locally to add a local listening tunnel. This is the tunnel that may be behind a firewall.
         /// </summary>
@@ -83,10 +119,9 @@ namespace NetTunnel.Service.Controllers
             }
         }
 
-
         [HttpPost]
-        [Route("{sessionId}/Add/{tunnelId}/Endpoint/Inbound")]
-        public NtActionResponse AddInboundEndpointPair(Guid sessionId, Guid tunnelId, [FromBody] string value)
+        [Route("{sessionId}/AddEndpointInboundPair/{tunnelId}")]
+        public NtActionResponse AddEndpointInboundPair(Guid sessionId, Guid tunnelId, [FromBody] string value)
         {
             try
             {
@@ -111,8 +146,8 @@ namespace NetTunnel.Service.Controllers
         }
 
         [HttpPost]
-        [Route("{sessionId}/Add/{tunnelId}/Endpoint/Outbound")]
-        public NtActionResponse AddOutboundEndpointPair(Guid sessionId, Guid tunnelId, [FromBody] string value)
+        [Route("{sessionId}/AddEndpointOutboundPair/{tunnelId}")]
+        public NtActionResponse AddEndpointOutboundPair(Guid sessionId, Guid tunnelId, [FromBody] string value)
         {
             try
             {

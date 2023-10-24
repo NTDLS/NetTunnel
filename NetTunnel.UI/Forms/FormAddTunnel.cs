@@ -108,6 +108,12 @@ namespace NetTunnel.UI.Forms
                             });
                         }
 
+                        //Start the listening tunnel:
+                        remoteClient.TunnelInbound.Start(incomingTunnel.PairId).Wait();
+
+                        //Start the outbound-connecting tunnel:
+                        _client.TunnelOutbound.Start(outgoingTunnel.PairId).Wait();
+
                         CloseFormWithResult(DialogResult.OK);
                     });
                 });

@@ -2,15 +2,15 @@
 {
     public class NtTunnelOutboundConfiguration
     {
-        public Guid PairId { get; private set; }
+        public Guid PairId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
         public int ManagementPort { get; set; }
         public int DataPort { get; set; }
         public string Username { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
-        public List<NtEndpointOutboundConfiguration> OutboundEndpointConfigurations { get; private set; } = new();
-        public List<NtEndpointInboundConfiguration> InboundEndpointConfigurations { get; private set; } = new();
+        public List<NtEndpointOutboundConfiguration> OutboundEndpointConfigurations { get; set; } = new();
+        public List<NtEndpointInboundConfiguration> InboundEndpointConfigurations { get; set; } = new();
 
         public NtTunnelOutboundConfiguration() { }
 

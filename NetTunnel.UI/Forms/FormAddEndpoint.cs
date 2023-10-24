@@ -70,29 +70,36 @@ namespace NetTunnel.UI.Forms
                 var endpointOutbound = new NtEndpointOutboundConfiguration(endpointPairId, textBoxName.Text,
                     textBoxTerminationAddress.Text, int.Parse(textBoxTerminationPort.Text));
 
-
                 if (_tunnelInbound != null)
                 {
                     if (radioButtonLocalEndpoint.Checked)
                     {
-                        _client.TunnelInbound.AddInboundEndpointPair(endpointPairId, endpointInbound, endpointOutbound).RunSynchronously();
+                        _client.TunnelInbound.AddInboundEndpointPair(_tunnelInbound.PairId, endpointInbound, endpointOutbound).ContinueWith((o) =>
+                        {
+                        });
                     }
                     else
                     {
-                        _client.TunnelInbound.AddOutboundEndpointPair(endpointPairId, endpointInbound, endpointOutbound).RunSynchronously();
+                        _client.TunnelInbound.AddOutboundEndpointPair(_tunnelInbound.PairId, endpointInbound, endpointOutbound).ContinueWith((o) =>
+                        {
+                        });
                     }
                 }
                 else if (_tunnelOutbound != null)
                 {
                     if (radioButtonLocalEndpoint.Checked)
                     {
-                        _client.TunnelOutbound.AddOutboundEndpointPair(endpointPairId, endpointInbound, endpointOutbound).RunSynchronously();
+                        _client.TunnelOutbound.AddOutboundEndpointPair(_tunnelOutbound.PairId, endpointInbound, endpointOutbound).ContinueWith((o) =>
+                        {
+                        });
                     }
                     else
                     {
-                        _client.TunnelOutbound.AddInboundEndpointPair(endpointPairId, endpointInbound, endpointOutbound).RunSynchronously();
+                        _client.TunnelOutbound.AddInboundEndpointPair(_tunnelOutbound.PairId, endpointInbound, endpointOutbound).ContinueWith((o) =>
+                        {
+                        });
                     }
-                }                                
+                }
 
                 //_tunnel.AddEndpoint(endpointInbound, endpointOutbound,
                 //radioButtonLocalEndpoint.Checked ? Library.Constants.EndpointDirection.Inbound : Library.Constants.EndpointDirection.Outbound);

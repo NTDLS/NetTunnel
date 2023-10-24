@@ -17,6 +17,9 @@ namespace NetTunnel.Service.Engine.Managers
             LoadFromDisk();
         }
 
+        public void Start(Guid tunnelPairId) => _collection.Use((o) => o.Where(o => o.PairId == tunnelPairId).Single().Start());
+        public void Stop(Guid tunnelPairId) => _collection.Use((o) => o.Where(o => o.PairId == tunnelPairId).Single().Stop());
+
         public void StartAll() => _collection.Use((o) => o.ForEach((o) => o.Start()));
         public void StopAll() => _collection.Use((o) => o.ForEach((o) => o.Stop()));
 
@@ -34,7 +37,7 @@ namespace NetTunnel.Service.Engine.Managers
         {
             _collection.Use((o) =>
             {
-                var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
+                var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
                 tunnel.Stop();
                 o.Remove(tunnel);
             });
@@ -44,7 +47,7 @@ namespace NetTunnel.Service.Engine.Managers
         {
             _collection.Use((o) =>
             {
-                var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
+                var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
                 tunnel.DispatchAddEndpointInbound(endpoint);
             });
         }
@@ -53,7 +56,7 @@ namespace NetTunnel.Service.Engine.Managers
         {
             _collection.Use((o) =>
             {
-                var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
+                var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
                 tunnel.DispatchAddEndpointOutbound(endpoint);
             });
         }
@@ -63,7 +66,7 @@ namespace NetTunnel.Service.Engine.Managers
         {
             _collection.Use((o) =>
             {
-                var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
+                var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
                 tunnel.AddInboundEndpoint(endpoint);
             });
         }
@@ -72,7 +75,7 @@ namespace NetTunnel.Service.Engine.Managers
         {
             _collection.Use((o) =>
             {
-                var tunnel = o.Where(o => o.PairId == tunnelPairId).First();
+                var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
                 tunnel.AddOutboundEndpoint(endpoint);
                 //tunnel.Start();
             });
