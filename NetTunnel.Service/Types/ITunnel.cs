@@ -17,18 +17,18 @@ namespace NetTunnel.Service.Types
         public Guid PairId { get; }
         public string Name { get; }
 
-        public Task<T?> SendStreamPacketPayloadQuery<T>(IPacketPayloadQuery payload);
+        public Task<T?> SendStreamFramePayloadQuery<T>(INtFramePayloadQuery payload);
 
         /// <summary>
-        /// Sends a reply to a IPacketPayloadQuery
+        /// Sends a reply to a INtFramePayloadQuery
         /// </summary>
-        public void SendStreamPacketPayloadReply(NtPacket queryPacket, IPacketPayloadReply payload);
+        public void SendStreamFramePayloadReply(NtFrame queryFrame, INtFramePayloadReply payload);
 
         /// <summary>
-        /// Sends a one way (fire and forget) IPacketPayloadNotification.
+        /// Sends a one way (fire and forget) INtFramePayloadNotification.
         /// </summary>
-        public void SendStreamPacketNotification(IPacketPayloadNotification payload);
+        public void SendStreamFrameNotification(INtFramePayloadNotification payload);
 
-        public void ApplyQueryReply(Guid packetId, IPacketPayloadReply replyPayload);
+        public void ApplyQueryReply(Guid frameId, INtFramePayloadReply replyPayload);
     }
 }

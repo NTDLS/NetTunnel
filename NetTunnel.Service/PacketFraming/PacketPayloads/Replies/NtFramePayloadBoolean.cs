@@ -4,16 +4,16 @@ namespace NetTunnel.Service.PacketFraming.PacketPayloads.Replies
 {
     [Serializable]
     [ProtoContract]
-    public class NtPacketPayloadBoolean : IPacketPayloadReply
+    public class NtFramePayloadBoolean : INtFramePayloadReply
     {
         [ProtoMember(1)]
         public bool Value { get; set; }
 
-        public NtPacketPayloadBoolean()
+        public NtFramePayloadBoolean()
         {
         }
 
-        public NtPacketPayloadBoolean(bool value)
+        public NtFramePayloadBoolean(bool value)
         {
             Value = value;
         }

@@ -1,6 +1,6 @@
 ﻿namespace NetTunnel.Service.PacketFraming.PacketPayloads.Queries
 {
-    public interface IPacketPayloadQuery : IPacketPayload
+    public interface INtFramePayloadQuery : INtFramePayload
     {
     }
 }

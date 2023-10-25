@@ -4,7 +4,7 @@ namespace NetTunnel.Service.PacketFraming.PacketPayloads.Notifications
 {
     [Serializable]
     [ProtoContract]
-    public class NtPacketPayloadEndpointDisconnect : IPacketPayloadNotification
+    public class NtFramePayloadEndpointDisconnect : INtFramePayloadNotification
     {
         [ProtoMember(1)]
         public Guid StreamId { get; set; }
@@ -16,14 +16,14 @@ namespace NetTunnel.Service.PacketFraming.PacketPayloads.Notifications
         public Guid EndpointPairId { get; set; }
 
 
-        public NtPacketPayloadEndpointDisconnect(Guid tunnelPairId, Guid endpointPairId, Guid streamId)
+        public NtFramePayloadEndpointDisconnect(Guid tunnelPairId, Guid endpointPairId, Guid streamId)
         {
             StreamId = streamId;
             TunnelPairId = tunnelPairId;
             EndpointPairId = endpointPairId;
         }
 
-        public NtPacketPayloadEndpointDisconnect()
+        public NtFramePayloadEndpointDisconnect()
         {
         }
     }

@@ -4,7 +4,7 @@ namespace NetTunnel.Service.PacketFraming.PacketPayloads.Notifications
 {
     [Serializable]
     [ProtoContract]
-    public class NtPacketPayloadMessage : IPacketPayloadNotification
+    public class NtFramePayloadMessage : INtFramePayloadNotification
     {
         [ProtoMember(1)]
         public string Label { get; set; } = string.Empty;

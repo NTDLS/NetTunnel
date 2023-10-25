@@ -4,7 +4,7 @@ namespace NetTunnel.Service.PacketFraming.PacketPayloads.Notifications
 {
     [Serializable]
     [ProtoContract]
-    public class NtPacketPayloadEndpointExchange : IPacketPayloadNotification
+    public class NtFramePayloadEndpointExchange : INtFramePayloadNotification
     {
         [ProtoMember(1)]
         public Guid StreamId { get; set; }
@@ -18,7 +18,7 @@ namespace NetTunnel.Service.PacketFraming.PacketPayloads.Notifications
         [ProtoMember(4)]
         public byte[] Bytes { get; set; }
 
-        public NtPacketPayloadEndpointExchange(Guid tunnelPairId, Guid endpointPairId, Guid streamId, byte[] bytes)
+        public NtFramePayloadEndpointExchange(Guid tunnelPairId, Guid endpointPairId, Guid streamId, byte[] bytes)
         {
             StreamId = streamId;
             TunnelPairId = tunnelPairId;
@@ -26,7 +26,7 @@ namespace NetTunnel.Service.PacketFraming.PacketPayloads.Notifications
             Bytes = bytes;
         }
 
-        public NtPacketPayloadEndpointExchange()
+        public NtFramePayloadEndpointExchange()
         {
             Bytes = Array.Empty<byte>();
         }

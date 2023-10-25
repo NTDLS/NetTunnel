@@ -3,11 +3,11 @@
 namespace NetTunnel.Service.PacketFraming
 {
     /// <summary>
-    /// Internal packet which allows for lowelevel communication betweeen server and client.
+    /// Internal frame which allows for lowelevel communication betweeen server and client.
     /// </summary>
     [Serializable]
     [ProtoContract]
-    internal class NtPacket
+    internal class NtFrame
     {
         [ProtoMember(1)]
         public Guid Id { get; set; } = Guid.NewGuid();

@@ -47,24 +47,24 @@ namespace NetTunnel.Service.Engine
             configuration.EndpointOutboundConfigurations.ForEach(o => _outboundEndpoints.Add(new(Core, this, o)));
         }
 
-        #region TCP/IP Packet and Stream interactions.
+        #region TCP/IP frame and Stream interactions.
 
         /// <summary>
-        /// Receive a message on the TCP/IP connection, parse and process the packets.
+        /// Receive a message on the TCP/IP connection, parse and process the frames.
         /// </summary>
-        internal void ReceiveAndProcessStreamPackets(ProcessPacketNotification processPacketNotificationCallback, ProcessPacketQuery processPacketQueryCallback)
+        internal void ReceiveAndProcessStreamFrames(ProcessFrameNotification processFrameNotificationCallback, ProcessFrameQuery processFrameQueryCallback)
         {
             try
             {
-                var packetBuffer = new NtPacketBuffer();
+                var frameBuffer = new NtFrameBuffer();
                 while (KeepRunning)
                 {
-                    NtPacketizer.ReceiveAndProcessStreamPackets(_stream, this, packetBuffer, processPacketNotificationCallback, processPacketQueryCallback);
+                    NtFraming.ReceiveAndProcessStreamFrames(_stream, this, frameBuffer, processFrameNotificationCallback, processFrameQueryCallback);
                 }
             }
             catch (Exception ex)
             {
-                Core.Logging.Write($"Exception in ReceiveAndProcessStreamPackets: {ex.Message}");
+                Core.Logging.Write($"Exception in ReceiveAndProcessStreamFrames: {ex.Message}");
             }
         }
 
@@ -72,32 +72,32 @@ namespace NetTunnel.Service.Engine
         /// We received a fire-and-forget message on the tunnel.
         /// </summary>
         /// <param name="tunnel"></param>
-        /// <param name="packet"></param>
+        /// <param name="frame"></param>
         /// <exception cref="Exception"></exception>
-        internal void ProcessPacketNotificationCallback(ITunnel tunnel, IPacketPayloadNotification packet)
+        internal void ProcessFrameNotificationCallback(ITunnel tunnel, INtFramePayloadNotification frame)
         {
-            if (packet is NtPacketPayloadMessage message)
+            if (frame is NtFramePayloadMessage message)
             {
                 Debug.Print($"{message.Message}");
             }
-            else if (packet is NtPacketPayloadEndpointConnect connectEndpoint)
+            else if (frame is NtFramePayloadEndpointConnect connectEndpoint)
             {
                 _outboundEndpoints.Where(o => o.PairId == connectEndpoint.EndpointPairId).FirstOrDefault()?
                     .StartConnection(connectEndpoint.StreamId);
             }
-            else if (packet is NtPacketPayloadEndpointDisconnect disconnectEndpoint)
+            else if (frame is NtFramePayloadEndpointDisconnect disconnectEndpoint)
             {
                 GetEndpointById(disconnectEndpoint.EndpointPairId)?
                     .Disconnect(disconnectEndpoint.StreamId);
             }
-            else if (packet is NtPacketPayloadEndpointExchange exchange)
+            else if (frame is NtFramePayloadEndpointExchange exchange)
             {
                 GetEndpointById(exchange.EndpointPairId)?
                     .SendEndpointData(exchange.StreamId, exchange.Bytes);
             }
             else
             {
-                throw new Exception("Unhandled notification packet.");
+                throw new Exception("Unhandled notification frame.");
             }
         }
 
@@ -105,38 +105,38 @@ namespace NetTunnel.Service.Engine
         /// We recevied a query on the tunnel. Reply to it.
         /// </summary>
         /// <param name="tunnel"></param>
-        /// <param name="packet"></param>
+        /// <param name="frame"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        internal IPacketPayloadReply ProcessPacketQueryCallback(ITunnel tunnel, IPacketPayloadQuery packet)
+        internal INtFramePayloadReply ProcessFrameQueryCallback(ITunnel tunnel, INtFramePayloadQuery frame)
         {
-            if (packet is NtPacketPayloadAddEndpointInbound inboundEndpoint)
+            if (frame is NtFramePayloadAddEndpointInbound inboundEndpoint)
             {
                 AddInboundEndpoint(inboundEndpoint.Configuration);
-                return new NtPacketPayloadBoolean(true);
+                return new NtFramePayloadBoolean(true);
             }
-            else if (packet is NtPacketPayloadAddEndpointOutbound outboundEndpoint)
+            else if (frame is NtFramePayloadAddEndpointOutbound outboundEndpoint)
             {
                 AddOutboundEndpoint(outboundEndpoint.Configuration);
-                return new NtPacketPayloadBoolean(true);
+                return new NtFramePayloadBoolean(true);
             }
             else
             {
-                throw new Exception("Unhandled query packet.");
+                throw new Exception("Unhandled query frame.");
             }
         }
 
         /// <summary>
-        /// Sends a IPacketPayloadQuery that expects a IPacketPayloadReply in return.
+        /// Sends a INtFramePayloadQuery that expects a INtFramePayloadReply in return.
         /// </summary>
-        public async Task<T?> SendStreamPacketPayloadQuery<T>(IPacketPayloadQuery payload)
+        public async Task<T?> SendStreamFramePayloadQuery<T>(INtFramePayloadQuery payload)
         {
             if (_stream == null)
             {
-                throw new Exception("SendStreamPacketPayload stream can not be null.");
+                throw new Exception("SendStreamFramePayload stream can not be null.");
             }
 
-            var cmd = new NtPacket()
+            var cmd = new NtFrame()
             {
                 EnclosedPayloadType = payload.GetType()?.FullName ?? string.Empty,
                 Payload = Utility.SerializeToByteArray(payload)
@@ -144,18 +144,18 @@ namespace NetTunnel.Service.Engine
 
             var queriesAwaitingReply = new QueriesAwaitingReply()
             {
-                PacketId = cmd.Id,
+                FrameId = cmd.Id,
             };
 
             _queriesAwaitingReplies.Add(queriesAwaitingReply);
 
             return await Task.Run(() =>
             {
-                var packetBytes = NtPacketizer.AssemblePacket(this, cmd);
-                _stream.Write(packetBytes, 0, packetBytes.Length);
+                var frameBytes = NtFraming.AssembleFrame(this, cmd);
+                _stream.Write(frameBytes, 0, frameBytes.Length);
 
                 //TODO: We need to check received data to see if any of them are replies
-                if (queriesAwaitingReply.WaitEvent.WaitOne(NtPacketDefaults.QUERY_TIMEOUT_MS) == false)
+                if (queriesAwaitingReply.WaitEvent.WaitOne(NtFrameDefaults.QUERY_TIMEOUT_MS) == false)
                 {
                     _queriesAwaitingReplies.Remove(queriesAwaitingReply);
                     throw new Exception("Query timeout expired while waiting on reply.");
@@ -168,49 +168,49 @@ namespace NetTunnel.Service.Engine
         }
 
         /// <summary>
-        /// Sends a reply to a IPacketPayloadQuery
+        /// Sends a reply to a INtFramePayloadQuery
         /// </summary>
-        public void SendStreamPacketPayloadReply(NtPacket queryPacket, IPacketPayloadReply payload)
+        public void SendStreamFramePayloadReply(NtFrame queryFrame, INtFramePayloadReply payload)
         {
             if (_stream == null)
             {
-                throw new Exception("SendStreamPacketPayload stream can not be null.");
+                throw new Exception("SendStreamFramePayload stream can not be null.");
             }
-            var cmd = new NtPacket()
+            var cmd = new NtFrame()
             {
-                Id = queryPacket.Id,
+                Id = queryFrame.Id,
                 EnclosedPayloadType = payload.GetType()?.FullName ?? string.Empty,
                 Payload = Utility.SerializeToByteArray(payload)
             };
 
-            var packetBytes = NtPacketizer.AssemblePacket(this, cmd);
-            _stream.Write(packetBytes, 0, packetBytes.Length);
+            var frameBytes = NtFraming.AssembleFrame(this, cmd);
+            _stream.Write(frameBytes, 0, frameBytes.Length);
         }
 
-        public void ApplyQueryReply(Guid packetId, IPacketPayloadReply replyPayload)
+        public void ApplyQueryReply(Guid frameId, INtFramePayloadReply replyPayload)
         {
-            var waitingQuery = _queriesAwaitingReplies.Where(o => o.PacketId == packetId).Single();
+            var waitingQuery = _queriesAwaitingReplies.Where(o => o.FrameId == frameId).Single();
             waitingQuery.ReplyPayload = replyPayload;
             waitingQuery.WaitEvent.Set();
         }
 
         /// <summary>
-        /// Sends a one way (fire and forget) IPacketPayloadNotification.
+        /// Sends a one way (fire and forget) INtFramePayloadNotification.
         /// </summary>
-        public void SendStreamPacketNotification(IPacketPayloadNotification payload)
+        public void SendStreamFrameNotification(INtFramePayloadNotification payload)
         {
             if (_stream == null)
             {
-                throw new Exception("SendStreamPacketPayload stream can not be null.");
+                throw new Exception("SendStreamFramePayload stream can not be null.");
             }
-            var cmd = new NtPacket()
+            var cmd = new NtFrame()
             {
                 EnclosedPayloadType = payload.GetType()?.FullName ?? string.Empty,
                 Payload = Utility.SerializeToByteArray(payload)
             };
 
-            var packetBytes = NtPacketizer.AssemblePacket(this, cmd);
-            _stream.Write(packetBytes, 0, packetBytes.Length);
+            var frameBytes = NtFraming.AssembleFrame(this, cmd);
+            _stream.Write(frameBytes, 0, frameBytes.Length);
         }
 
         #endregion

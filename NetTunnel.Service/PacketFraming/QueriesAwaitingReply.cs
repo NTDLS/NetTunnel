@@ -4,8 +4,8 @@ namespace NetTunnel.Service.PacketFraming
 {
     internal class QueriesAwaitingReply
     {
-        public Guid PacketId { get; set; }
+        public Guid FrameId { get; set; }
         public AutoResetEvent WaitEvent { get; set; } = new(false);
-        public IPacketPayloadReply? ReplyPayload { get; set; }
+        public INtFramePayloadReply? ReplyPayload { get; set; }
     }
 }

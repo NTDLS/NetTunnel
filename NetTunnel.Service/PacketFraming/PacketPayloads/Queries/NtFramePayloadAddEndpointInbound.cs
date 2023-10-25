@@ -5,16 +5,16 @@ namespace NetTunnel.Service.PacketFraming.PacketPayloads.Queries
 {
     [Serializable]
     [ProtoContract]
-    public class NtPacketPayloadAddEndpointOutbound : IPacketPayloadQuery
+    public class NtFramePayloadAddEndpointInbound : INtFramePayloadQuery
     {
         [ProtoMember(1)]
         public string Label { get; set; } = string.Empty;
         [ProtoMember(2)]
-        public NtEndpointOutboundConfiguration Configuration { get; set; } = new();
+        public NtEndpointInboundConfiguration Configuration { get; set; } = new();
 
-        public NtPacketPayloadAddEndpointOutbound() { }
+        public NtFramePayloadAddEndpointInbound() { }
 
-        public NtPacketPayloadAddEndpointOutbound(NtEndpointOutboundConfiguration configuration)
+        public NtFramePayloadAddEndpointInbound(NtEndpointInboundConfiguration configuration)
         {
             Configuration = configuration;
         }

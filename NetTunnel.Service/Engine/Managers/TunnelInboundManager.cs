@@ -55,7 +55,7 @@ namespace NetTunnel.Service.Engine.Managers
             return await _collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
-                return tunnel.SendStreamPacketPayloadQuery<T>(new NtPacketPayloadAddEndpointInbound(endpoint));
+                return tunnel.SendStreamFramePayloadQuery<T>(new NtFramePayloadAddEndpointInbound(endpoint));
             });
         }
 
@@ -71,7 +71,7 @@ namespace NetTunnel.Service.Engine.Managers
             return await _collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
-                return tunnel.SendStreamPacketPayloadQuery<T>(new NtPacketPayloadAddEndpointOutbound(endpoint));
+                return tunnel.SendStreamFramePayloadQuery<T>(new NtFramePayloadAddEndpointOutbound(endpoint));
             });
         }
 

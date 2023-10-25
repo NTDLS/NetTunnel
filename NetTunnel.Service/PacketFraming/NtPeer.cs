@@ -10,6 +10,5 @@ namespace NetTunnel.Service.PacketFraming
         }
 
         public ITunnel Tunnel { get; private set; }
-        public NtPacketBuffer Packet { get; internal set; } = new NtPacketBuffer();
     }
 }

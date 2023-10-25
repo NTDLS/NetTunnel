@@ -135,7 +135,7 @@ namespace NetTunnel.Service.Controllers
                 Singletons.Core.OutboundTunnels.AddEndpointInbound(tunnelId, endpoints.Inbound);
                 Singletons.Core.OutboundTunnels.SaveToDisk();
 
-                var result = await Singletons.Core.OutboundTunnels.DispatchAddEndpointOutbound<NtPacketPayloadBoolean>(tunnelId, endpoints.Outbound);
+                var result = await Singletons.Core.OutboundTunnels.DispatchAddEndpointOutbound<NtFramePayloadBoolean>(tunnelId, endpoints.Outbound);
 
                 return new NtActionResponse { Success = result?.Value ?? false };
             }
@@ -160,7 +160,7 @@ namespace NetTunnel.Service.Controllers
                 Singletons.Core.InboundTunnels.AddEndpointOutbound(tunnelId, endpoints.Outbound);
                 Singletons.Core.InboundTunnels.SaveToDisk();
 
-                var result = await Singletons.Core.InboundTunnels.DispatchAddEndpointInboundToAssociatedTunnelService<NtPacketPayloadBoolean>(tunnelId, endpoints.Inbound);
+                var result = await Singletons.Core.InboundTunnels.DispatchAddEndpointInboundToAssociatedTunnelService<NtFramePayloadBoolean>(tunnelId, endpoints.Inbound);
 
                 return new NtActionResponse { Success = result?.Value ?? false };
             }
