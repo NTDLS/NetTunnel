@@ -1,6 +1,6 @@
 ﻿namespace NetTunnel.Library.Types
 {
-    public class NtTunnelOutboundConfiguration: INtTunnelConfiguration
+    public class NtTunnelOutboundConfiguration : INtTunnelConfiguration
     {
         public Guid PairId { get; set; }
         public string Name { get; set; } = string.Empty;
