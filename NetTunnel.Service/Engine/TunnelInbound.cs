@@ -26,13 +26,13 @@ namespace NetTunnel.Service.Engine
             foreach (var endpoint in _inboundEndpoints)
             {
                 var endpointConfiguration = new NtEndpointInboundConfiguration(endpoint.PairId, endpoint.Name, endpoint.Port);
-                tunnelConfiguration.InboundEndpointConfigurations.Add(endpointConfiguration);
+                tunnelConfiguration.EndpointInboundConfigurations.Add(endpointConfiguration);
             }
 
             foreach (var endpoint in _outboundEndpoints)
             {
                 var endpointConfiguration = new NtEndpointOutboundConfiguration(endpoint.PairId, endpoint.Name, endpoint.Address, endpoint.Port);
-                tunnelConfiguration.OutboundEndpointConfigurations.Add(endpointConfiguration);
+                tunnelConfiguration.EndpointOutboundConfigurations.Add(endpointConfiguration);
             }
 
             return tunnelConfiguration;

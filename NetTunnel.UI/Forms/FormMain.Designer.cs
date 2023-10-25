@@ -30,10 +30,10 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             listViewTunnels = new ListView();
-            columnHeaderName = new ColumnHeader();
-            columnDirection = new ColumnHeader();
-            columnHeaderAddress = new ColumnHeader();
-            columnHeaderEndpoints = new ColumnHeader();
+            columnHeaderTunnelName = new ColumnHeader();
+            columnHeaderTunnelDirection = new ColumnHeader();
+            columnHeaderTunnelAddress = new ColumnHeader();
+            columnHeaderTunnelEndpoints = new ColumnHeader();
             menuStripBody = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
             connectToolStripMenuItem = new ToolStripMenuItem();
@@ -41,42 +41,53 @@
             securityToolStripMenuItem = new ToolStripMenuItem();
             usersToolStripMenuItem = new ToolStripMenuItem();
             statusStripBody = new StatusStrip();
+            splitContainer1 = new SplitContainer();
+            labelTunnels = new Label();
+            listViewEndpoints = new ListView();
+            columnHeaderEndpointName = new ColumnHeader();
+            columnHeaderEndpointDirection = new ColumnHeader();
+            columnHeaderEndpointAddress = new ColumnHeader();
+            labelEndpoints = new Label();
             menuStripBody.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
+            splitContainer1.Panel1.SuspendLayout();
+            splitContainer1.Panel2.SuspendLayout();
+            splitContainer1.SuspendLayout();
             SuspendLayout();
             // 
             // listViewTunnels
             // 
-            listViewTunnels.Columns.AddRange(new ColumnHeader[] { columnHeaderName, columnDirection, columnHeaderAddress, columnHeaderEndpoints });
+            listViewTunnels.Columns.AddRange(new ColumnHeader[] { columnHeaderTunnelName, columnHeaderTunnelDirection, columnHeaderTunnelAddress, columnHeaderTunnelEndpoints });
             listViewTunnels.Dock = DockStyle.Fill;
             listViewTunnels.FullRowSelect = true;
             listViewTunnels.GridLines = true;
             listViewTunnels.HeaderStyle = ColumnHeaderStyle.Nonclickable;
-            listViewTunnels.Location = new Point(0, 24);
+            listViewTunnels.Location = new Point(0, 15);
             listViewTunnels.Name = "listViewTunnels";
-            listViewTunnels.Size = new Size(751, 417);
+            listViewTunnels.Size = new Size(751, 192);
             listViewTunnels.TabIndex = 0;
             listViewTunnels.UseCompatibleStateImageBehavior = false;
             listViewTunnels.View = View.Details;
             // 
-            // columnHeaderName
+            // columnHeaderTunnelName
             // 
-            columnHeaderName.Text = "Name";
-            columnHeaderName.Width = 250;
+            columnHeaderTunnelName.Text = "Name";
+            columnHeaderTunnelName.Width = 250;
             // 
-            // columnDirection
+            // columnHeaderTunnelDirection
             // 
-            columnDirection.Text = "Direction";
-            columnDirection.Width = 115;
+            columnHeaderTunnelDirection.Text = "Direction";
+            columnHeaderTunnelDirection.Width = 115;
             // 
-            // columnHeaderAddress
+            // columnHeaderTunnelAddress
             // 
-            columnHeaderAddress.Text = "Address";
-            columnHeaderAddress.Width = 100;
+            columnHeaderTunnelAddress.Text = "Address";
+            columnHeaderTunnelAddress.Width = 100;
             // 
-            // columnHeaderEndpoints
+            // columnHeaderTunnelEndpoints
             // 
-            columnHeaderEndpoints.Text = "Endpoints";
-            columnHeaderEndpoints.Width = 80;
+            columnHeaderTunnelEndpoints.Text = "Endpoints";
+            columnHeaderTunnelEndpoints.Width = 80;
             // 
             // menuStripBody
             // 
@@ -130,12 +141,81 @@
             statusStripBody.TabIndex = 2;
             statusStripBody.Text = "statusStrip1";
             // 
+            // splitContainer1
+            // 
+            splitContainer1.Dock = DockStyle.Fill;
+            splitContainer1.Location = new Point(0, 24);
+            splitContainer1.Name = "splitContainer1";
+            splitContainer1.Orientation = Orientation.Horizontal;
+            // 
+            // splitContainer1.Panel1
+            // 
+            splitContainer1.Panel1.Controls.Add(listViewTunnels);
+            splitContainer1.Panel1.Controls.Add(labelTunnels);
+            // 
+            // splitContainer1.Panel2
+            // 
+            splitContainer1.Panel2.Controls.Add(listViewEndpoints);
+            splitContainer1.Panel2.Controls.Add(labelEndpoints);
+            splitContainer1.Size = new Size(751, 417);
+            splitContainer1.SplitterDistance = 207;
+            splitContainer1.TabIndex = 3;
+            // 
+            // labelTunnels
+            // 
+            labelTunnels.AutoSize = true;
+            labelTunnels.Dock = DockStyle.Top;
+            labelTunnels.Location = new Point(0, 0);
+            labelTunnels.Name = "labelTunnels";
+            labelTunnels.Size = new Size(48, 15);
+            labelTunnels.TabIndex = 1;
+            labelTunnels.Text = "Tunnels";
+            // 
+            // listViewEndpoints
+            // 
+            listViewEndpoints.Columns.AddRange(new ColumnHeader[] { columnHeaderEndpointName, columnHeaderEndpointDirection, columnHeaderEndpointAddress });
+            listViewEndpoints.Dock = DockStyle.Fill;
+            listViewEndpoints.FullRowSelect = true;
+            listViewEndpoints.GridLines = true;
+            listViewEndpoints.HeaderStyle = ColumnHeaderStyle.Nonclickable;
+            listViewEndpoints.Location = new Point(0, 15);
+            listViewEndpoints.Name = "listViewEndpoints";
+            listViewEndpoints.Size = new Size(751, 191);
+            listViewEndpoints.TabIndex = 1;
+            listViewEndpoints.UseCompatibleStateImageBehavior = false;
+            listViewEndpoints.View = View.Details;
+            // 
+            // columnHeaderEndpointName
+            // 
+            columnHeaderEndpointName.Text = "Name";
+            columnHeaderEndpointName.Width = 250;
+            // 
+            // columnHeaderEndpointDirection
+            // 
+            columnHeaderEndpointDirection.Text = "Direction";
+            columnHeaderEndpointDirection.Width = 115;
+            // 
+            // columnHeaderEndpointAddress
+            // 
+            columnHeaderEndpointAddress.Text = "Address";
+            columnHeaderEndpointAddress.Width = 100;
+            // 
+            // labelEndpoints
+            // 
+            labelEndpoints.AutoSize = true;
+            labelEndpoints.Dock = DockStyle.Top;
+            labelEndpoints.Location = new Point(0, 0);
+            labelEndpoints.Name = "labelEndpoints";
+            labelEndpoints.Size = new Size(202, 15);
+            labelEndpoints.TabIndex = 2;
+            labelEndpoints.Text = "Endpoints (of selected Tunnel above)";
+            // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(751, 463);
-            Controls.Add(listViewTunnels);
+            Controls.Add(splitContainer1);
             Controls.Add(menuStripBody);
             Controls.Add(statusStripBody);
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -146,6 +226,12 @@
             Load += FormMain_Load;
             menuStripBody.ResumeLayout(false);
             menuStripBody.PerformLayout();
+            splitContainer1.Panel1.ResumeLayout(false);
+            splitContainer1.Panel1.PerformLayout();
+            splitContainer1.Panel2.ResumeLayout(false);
+            splitContainer1.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
+            splitContainer1.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -153,10 +239,10 @@
         #endregion
 
         private ListView listViewTunnels;
-        private ColumnHeader columnHeaderName;
-        private ColumnHeader columnDirection;
-        private ColumnHeader columnHeaderAddress;
-        private ColumnHeader columnHeaderEndpoints;
+        private ColumnHeader columnHeaderTunnelName;
+        private ColumnHeader columnHeaderTunnelDirection;
+        private ColumnHeader columnHeaderTunnelAddress;
+        private ColumnHeader columnHeaderTunnelEndpoints;
         private MenuStrip menuStripBody;
         private ToolStripMenuItem fileToolStripMenuItem;
         private ToolStripMenuItem connectToolStripMenuItem;
@@ -164,5 +250,12 @@
         private ToolStripMenuItem securityToolStripMenuItem;
         private ToolStripMenuItem usersToolStripMenuItem;
         private StatusStrip statusStripBody;
+        private SplitContainer splitContainer1;
+        private Label labelTunnels;
+        private ListView listViewEndpoints;
+        private ColumnHeader columnHeaderEndpointName;
+        private ColumnHeader columnHeaderEndpointDirection;
+        private ColumnHeader columnHeaderEndpointAddress;
+        private Label labelEndpoints;
     }
 }

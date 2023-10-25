@@ -1,6 +1,6 @@
 ﻿namespace NetTunnel.Library.Types
 {
-    public class NtTunnelOutboundConfiguration
+    public class NtTunnelOutboundConfiguration: INtTunnelConfiguration
     {
         public Guid PairId { get; set; }
         public string Name { get; set; } = string.Empty;
@@ -9,8 +9,8 @@
         public int DataPort { get; set; }
         public string Username { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
-        public List<NtEndpointOutboundConfiguration> OutboundEndpointConfigurations { get; set; } = new();
-        public List<NtEndpointInboundConfiguration> InboundEndpointConfigurations { get; set; } = new();
+        public List<NtEndpointOutboundConfiguration> EndpointOutboundConfigurations { get; set; } = new();
+        public List<NtEndpointInboundConfiguration> EndpointInboundConfigurations { get; set; } = new();
 
         public NtTunnelOutboundConfiguration() { }
 

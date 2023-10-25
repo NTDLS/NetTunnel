@@ -32,8 +32,8 @@ namespace NetTunnel.Service.Engine
             PairId = configuration.PairId;
             Name = configuration.Name;
 
-            configuration.InboundEndpointConfigurations.ForEach(o => _inboundEndpoints.Add(new(Core, this, o)));
-            configuration.OutboundEndpointConfigurations.ForEach(o => _outboundEndpoints.Add(new(Core, this, o)));
+            configuration.EndpointInboundConfigurations.ForEach(o => _inboundEndpoints.Add(new(Core, this, o)));
+            configuration.EndpointOutboundConfigurations.ForEach(o => _outboundEndpoints.Add(new(Core, this, o)));
         }
 
         public BaseTunnel(EngineCore core, NtTunnelOutboundConfiguration configuration)
@@ -43,8 +43,8 @@ namespace NetTunnel.Service.Engine
             PairId = configuration.PairId;
             Name = configuration.Name;
 
-            configuration.InboundEndpointConfigurations.ForEach(o => _inboundEndpoints.Add(new(Core, this, o)));
-            configuration.OutboundEndpointConfigurations.ForEach(o => _outboundEndpoints.Add(new(Core, this, o)));
+            configuration.EndpointInboundConfigurations.ForEach(o => _inboundEndpoints.Add(new(Core, this, o)));
+            configuration.EndpointOutboundConfigurations.ForEach(o => _outboundEndpoints.Add(new(Core, this, o)));
         }
 
         public IEndpoint? GetEndpointById(Guid pairId)
@@ -104,7 +104,7 @@ namespace NetTunnel.Service.Engine
             else if (packet is NtPacketPayloadAddEndpointOutbound outboundEndpoint)
             {
                 AddOutboundEndpoint(outboundEndpoint.Configuration);
-                Core.InboundTunnels.SaveToDisk();
+                Core.OutboundTunnels.SaveToDisk();
                 return new NtPacketPayloadBoolean(true);
             }
             else

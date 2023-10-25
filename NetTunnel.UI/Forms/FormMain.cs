@@ -31,7 +31,63 @@ namespace NetTunnel.UI.Forms
             };
 
             listViewTunnels.MouseUp += ListViewTunnels_MouseUp;
+            listViewTunnels.SelectedIndexChanged += ListViewTunnels_SelectedIndexChanged;
+        }
 
+        private void ListViewTunnels_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            Utility.EnsureNotNull(_client);
+
+            if (listViewTunnels.SelectedItems.Count == 1)
+            {
+                var selectedRow = listViewTunnels.SelectedItems[0];
+
+                if (selectedRow.Tag is INtTunnelConfiguration tunnel)
+                {
+                    RepopulateEndpointsGrid(tunnel);
+                }
+            }
+        }
+
+        private void RepopulateEndpointsGrid(INtTunnelConfiguration tunnelInbound)
+        {
+            Utility.EnsureNotNull(_client);
+            listViewEndpoints.Items.Clear();
+
+            tunnelInbound.EndpointInboundConfigurations.ForEach(x => AddEndpointInboundToGrid(x));
+            tunnelInbound.EndpointOutboundConfigurations.ForEach(x => AddEndpointOutboundToGrid(x));
+
+            void AddEndpointInboundToGrid(NtEndpointInboundConfiguration endpoint)
+            {
+                if (listViewEndpoints.InvokeRequired)
+                {
+                    listViewEndpoints.Invoke(AddEndpointInboundToGrid, endpoint);
+                }
+                else
+                {
+                    var item = new ListViewItem(endpoint.Name);
+                    item.Tag = endpoint;
+                    item.SubItems.Add("Inbound");
+                    item.SubItems.Add($"*:{endpoint.Port}");
+                    listViewEndpoints.Items.Add(item);
+                }
+            }
+
+            void AddEndpointOutboundToGrid(NtEndpointOutboundConfiguration endpoint)
+            {
+                if (listViewEndpoints.InvokeRequired)
+                {
+                    listViewEndpoints.Invoke(AddEndpointOutboundToGrid, endpoint);
+                }
+                else
+                {
+                    var item = new ListViewItem(endpoint.Name);
+                    item.Tag = endpoint;
+                    item.SubItems.Add("Outbound");
+                    item.SubItems.Add($"{endpoint.Address}{endpoint.Port}");
+                    listViewEndpoints.Items.Add(item);
+                }
+            }
         }
 
         private void ListViewTunnels_MouseUp(object? sender, MouseEventArgs e)
@@ -96,7 +152,6 @@ namespace NetTunnel.UI.Forms
                                 }
                             }
                         }
-
                     }
                     else if (e.ClickedItem?.Text == "Delete Tunnel")
                     {
@@ -135,43 +190,51 @@ namespace NetTunnel.UI.Forms
 
             _client.TunnelInbound.List().ContinueWith(t =>
             {
-                t.Result.Collection.ForEach(t => AddIncomingTunnelToGrid(t));
+                t.Result.Collection.ForEach(t => AddInboundTunnelToGrid(t));
             });
 
             _client.TunnelOutbound.List().ContinueWith(t =>
             {
-                t.Result.Collection.ForEach(t => AddOutgoingTunnelToGrid(t));
+                t.Result.Collection.ForEach(t => AddOutboundTunnelToGrid(t));
             });
 
-            void AddIncomingTunnelToGrid(NtTunnelInboundConfiguration tunnel)
+            void AddInboundTunnelToGrid(NtTunnelInboundConfiguration tunnel)
             {
                 if (listViewTunnels.InvokeRequired)
                 {
-                    listViewTunnels.Invoke(AddIncomingTunnelToGrid, tunnel);
+                    listViewTunnels.Invoke(AddInboundTunnelToGrid, tunnel);
                 }
                 else
                 {
+                    int endpointCount = tunnel.EndpointOutboundConfigurations.Count
+                        + tunnel.EndpointInboundConfigurations.Count;
+
                     var item = new ListViewItem(tunnel.Name);
                     item.Tag = tunnel;
                     item.SubItems.Add("Inbound");
                     item.SubItems.Add($"*:{tunnel.DataPort}");
+                    item.SubItems.Add($"{endpointCount:n0}");
 
                     listViewTunnels.Items.Add(item);
                 }
             }
 
-            void AddOutgoingTunnelToGrid(NtTunnelOutboundConfiguration tunnel)
+            void AddOutboundTunnelToGrid(NtTunnelOutboundConfiguration tunnel)
             {
                 if (listViewTunnels.InvokeRequired)
                 {
-                    listViewTunnels.Invoke(AddOutgoingTunnelToGrid, tunnel);
+                    listViewTunnels.Invoke(AddOutboundTunnelToGrid, tunnel);
                 }
                 else
                 {
+                    int endpointCount = tunnel.EndpointOutboundConfigurations.Count
+                        + tunnel.EndpointInboundConfigurations.Count;
+
                     var item = new ListViewItem(tunnel.Name);
                     item.Tag = tunnel;
                     item.SubItems.Add("Outbound");
                     item.SubItems.Add($"{tunnel.Address}{tunnel.DataPort}");
+                    item.SubItems.Add($"{endpointCount:n0}");
 
                     listViewTunnels.Items.Add(item);
 

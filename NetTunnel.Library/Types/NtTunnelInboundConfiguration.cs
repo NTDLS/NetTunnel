@@ -4,7 +4,7 @@ namespace NetTunnel.Library.Types
 {
     [Serializable]
     [ProtoContract]
-    public class NtTunnelInboundConfiguration
+    public class NtTunnelInboundConfiguration : INtTunnelConfiguration
     {
         [ProtoMember(1)]
         public Guid PairId { get; set; }
@@ -13,9 +13,9 @@ namespace NetTunnel.Library.Types
         [ProtoMember(3)]
         public int DataPort { get; set; }
         [ProtoMember(4)]
-        public List<NtEndpointOutboundConfiguration> OutboundEndpointConfigurations { get; set; } = new();
+        public List<NtEndpointOutboundConfiguration> EndpointOutboundConfigurations { get; set; } = new();
         [ProtoMember(5)]
-        public List<NtEndpointInboundConfiguration> InboundEndpointConfigurations { get; set; } = new();
+        public List<NtEndpointInboundConfiguration> EndpointInboundConfigurations { get; set; } = new();
 
         public NtTunnelInboundConfiguration() { }
 
