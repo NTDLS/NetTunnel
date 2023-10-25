@@ -108,9 +108,9 @@
             labelRemotePort.AutoSize = true;
             labelRemotePort.Location = new Point(180, 30);
             labelRemotePort.Name = "labelRemotePort";
-            labelRemotePort.Size = new Size(29, 15);
+            labelRemotePort.Size = new Size(68, 15);
             labelRemotePort.TabIndex = 4;
-            labelRemotePort.Text = "Port";
+            labelRemotePort.Text = "Mgmt. Port";
             // 
             // buttonAdd
             // 
@@ -148,10 +148,10 @@
             labelName.TabIndex = 6;
             labelName.Text = "Name or description";
             // 
-            // textBoxEndpointDataPort
+            // textBoxTunnelDataPort
             // 
             textBoxTunnelDataPort.Location = new Point(17, 79);
-            textBoxTunnelDataPort.Name = "textBoxEndpointDataPort";
+            textBoxTunnelDataPort.Name = "textBoxTunnelDataPort";
             textBoxTunnelDataPort.Size = new Size(77, 23);
             textBoxTunnelDataPort.TabIndex = 1;
             // 
@@ -160,9 +160,9 @@
             labelEndpointDataPort.AutoSize = true;
             labelEndpointDataPort.Location = new Point(17, 61);
             labelEndpointDataPort.Name = "labelEndpointDataPort";
-            labelEndpointDataPort.Size = new Size(56, 15);
+            labelEndpointDataPort.Size = new Size(106, 15);
             labelEndpointDataPort.TabIndex = 8;
-            labelEndpointDataPort.Text = "Data port";
+            labelEndpointDataPort.Text = "Endpoint data port";
             // 
             // groupBoxLoginInfo
             // 
@@ -179,7 +179,7 @@
             groupBoxLoginInfo.Size = new Size(278, 196);
             groupBoxLoginInfo.TabIndex = 9;
             groupBoxLoginInfo.TabStop = false;
-            groupBoxLoginInfo.Text = "Remote Login";
+            groupBoxLoginInfo.Text = "Remote Service Login";
             // 
             // FormAddTunnel
             // 
