@@ -10,7 +10,7 @@ namespace NetTunnel.Service.Engine
     /// </summary>
     internal class EndpointInbound : BaseEndpoint, IEndpoint
     {
-        private Thread? _incomingConnectionThread;
+        private Thread? _inboundConnectionThread;
 
         public int Port { get; private set; }
 
@@ -22,12 +22,12 @@ namespace NetTunnel.Service.Engine
 
         public void Start()
         {
-            _core.Logging.Write($"Starting incoming endpoint '{Name}' on port {Port}");
+            _core.Logging.Write($"Starting inbound endpoint '{Name}' on port {Port}");
 
             _keepRunning = true;
 
-            _incomingConnectionThread = new Thread(IncomingConnectionThreadProc);
-            _incomingConnectionThread.Start();
+            _inboundConnectionThread = new Thread(InboundConnectionThreadProc);
+            _inboundConnectionThread.Start();
         }
 
         public void Stop()
@@ -36,7 +36,7 @@ namespace NetTunnel.Service.Engine
             //TODO: Wait on thread(s) to stop.
         }
 
-        void IncomingConnectionThreadProc()
+        void InboundConnectionThreadProc()
         {
             var tcpListener = new TcpListener(IPAddress.Any, Port);
 
@@ -44,11 +44,11 @@ namespace NetTunnel.Service.Engine
             {
                 tcpListener.Start();
 
-                _core.Logging.Write($"Listening incoming endpoint '{Name}' on port {Port}");
+                _core.Logging.Write($"Listening inbound endpoint '{Name}' on port {Port}");
 
                 while (_keepRunning)
                 {
-                    var tcpClient = tcpListener.AcceptTcpClient(); //Wait for an incomming connection.
+                    var tcpClient = tcpListener.AcceptTcpClient(); //Wait for an inbound connection.
 
                     if (tcpClient.Connected)
                     {

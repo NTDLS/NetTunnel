@@ -10,7 +10,7 @@ namespace NetTunnel.Service.Engine
     /// </summary>
     internal class TunnelInbound : BaseTunnel, ITunnel
     {
-        private Thread? _incomingConnectionThread;
+        private Thread? _inboundConnectionThread;
         public int DataPort { get; private set; }
 
         public TunnelInbound(EngineCore core, NtTunnelInboundConfiguration configuration)
@@ -46,10 +46,10 @@ namespace NetTunnel.Service.Engine
             }
             KeepRunning = true;
 
-            Core.Logging.Write($"Starting incoming tunnel '{Name}' on port {DataPort}");
+            Core.Logging.Write($"Starting inbound tunnel '{Name}' on port {DataPort}");
 
-            _incomingConnectionThread = new Thread(IncomingConnectionThreadProc);
-            _incomingConnectionThread.Start();
+            _inboundConnectionThread = new Thread(InboundConnectionThreadProc);
+            _inboundConnectionThread.Start();
 
             _inboundEndpoints.ForEach(x => x.Start());
             _outboundEndpoints.ForEach(x => x.Start());
@@ -61,7 +61,7 @@ namespace NetTunnel.Service.Engine
             //TODO: Wait on thread(s) to stop.
         }
 
-        private void IncomingConnectionThreadProc()
+        private void InboundConnectionThreadProc()
         {
             var listener = new TcpListener(IPAddress.Any, DataPort);
 
@@ -69,14 +69,14 @@ namespace NetTunnel.Service.Engine
             {
                 listener.Start();
 
-                Core.Logging.Write($"Listening incoming tunnel '{Name}' on port {DataPort}");
+                Core.Logging.Write($"Listening inbound tunnel '{Name}' on port {DataPort}");
 
                 while (KeepRunning)
                 {
-                    Core.Logging.Write($"Waiting for connection for incoming tunnel '{Name}' on port {DataPort}");
+                    Core.Logging.Write($"Waiting for connection for inbound tunnel '{Name}' on port {DataPort}");
 
                     var tcpClient = listener.AcceptTcpClient();
-                    Core.Logging.Write($"Connected on incoming tunnel '{Name}' on port {DataPort}");
+                    Core.Logging.Write($"Connected on inbound tunnel '{Name}' on port {DataPort}");
 
                     using (_stream = tcpClient.GetStream())
                     {
@@ -87,7 +87,7 @@ namespace NetTunnel.Service.Engine
                     try { tcpClient.Close(); } catch { }
                     try { tcpClient.Dispose(); } catch { }
 
-                    Core.Logging.Write($"Disconnected incoming tunnel '{Name}' on port {DataPort}");
+                    Core.Logging.Write($"Disconnected inbound tunnel '{Name}' on port {DataPort}");
                 }
             }
             catch (Exception ex)

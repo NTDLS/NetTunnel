@@ -5,11 +5,11 @@ using System.Net.Sockets;
 namespace NetTunnel.Service.Engine
 {
     /// <summary>
-    /// This is the class that makes an outgoing TCP/IP connection to a listening tunnel.
+    /// This is the class that makes an outbound TCP/IP connection to a listening tunnel.
     /// </summary>
     internal class TunnelOutbound : BaseTunnel, ITunnel
     {
-        private Thread? _outgoingConnectionThread;
+        private Thread? _outboundConnectionThread;
         public string Address { get; set; }
         public int ManagementPort { get; set; }
         public int DataPort { get; set; }
@@ -54,10 +54,10 @@ namespace NetTunnel.Service.Engine
 
             KeepRunning = true;
 
-            Core.Logging.Write($"Starting outgoing tunnel '{Name}'");
+            Core.Logging.Write($"Starting outbound tunnel '{Name}'");
 
-            _outgoingConnectionThread = new Thread(OutgoingConnectionThreadProc);
-            _outgoingConnectionThread.Start();
+            _outboundConnectionThread = new Thread(OutboundConnectionThreadProc);
+            _outboundConnectionThread.Start();
 
             _inboundEndpoints.ForEach(x => x.Start());
             _outboundEndpoints.ForEach(x => x.Start());
@@ -69,13 +69,13 @@ namespace NetTunnel.Service.Engine
             //TODO: Wait on thread(s) to stop.
         }
 
-        private void OutgoingConnectionThreadProc()
+        private void OutboundConnectionThreadProc()
         {
             while (KeepRunning)
             {
                 try
                 {
-                    Core.Logging.Write($"Attempting to connect to outgoing tunnel '{Name}' at {Address}:{DataPort}.");
+                    Core.Logging.Write($"Attempting to connect to outbound tunnel '{Name}' at {Address}:{DataPort}.");
 
                     var tcpClient = new TcpClient(Address, DataPort);
 

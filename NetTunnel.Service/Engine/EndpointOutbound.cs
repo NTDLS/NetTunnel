@@ -5,7 +5,7 @@ using System.Net.Sockets;
 namespace NetTunnel.Service.Engine
 {
     /// <summary>
-    /// This is the class that makes an outgoing TCP/IP connection to a listening endpoint.
+    /// This is the class that makes an outbound TCP/IP connection to a listening endpoint.
     /// </summary>
     internal class EndpointOutbound : BaseEndpoint, IEndpoint
     {
@@ -21,7 +21,7 @@ namespace NetTunnel.Service.Engine
 
         public void Start()
         {
-            _core.Logging.Write($"Starting outgoing endpoint '{Name}'");
+            _core.Logging.Write($"Starting outbound endpoint '{Name}'");
             _keepRunning = true;
         }
 
@@ -41,7 +41,7 @@ namespace NetTunnel.Service.Engine
 
                 tcpClient.Connect(Address, Port);
 
-                _core.Logging.Write($"Accepted on incoming endpoint '{Name}' on port {Port}");
+                _core.Logging.Write($"Accepted on inbound endpoint '{Name}' on port {Port}");
 
                 var handlerThread = new Thread(HandleClientThreadProc);
                 var param = new ActiveEndpointConnection(handlerThread, tcpClient, streamId);
