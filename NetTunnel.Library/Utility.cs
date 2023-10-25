@@ -35,6 +35,26 @@ namespace NetTunnel.Library
             return (new StackTrace())?.GetFrame(1)?.GetMethod()?.Name ?? "{unknown frame}";
         }
 
+        public delegate void TryAndIgnoreProc();
+        public delegate T TryAndIgnoreProc<T>();
+
+        /// <summary>
+        /// We didnt need that exception! Did we?... DID WE?!
+        /// </summary>
+        public static void TryAndIgnore(TryAndIgnoreProc func)
+        {
+            try { func(); } catch { }
+        }
+
+        /// <summary>
+        /// We didnt need that exception! Did we?... DID WE?!
+        /// </summary>
+        public static T? TryAndIgnore<T>(TryAndIgnoreProc<T> func)
+        {
+            try { return func(); } catch { }
+            return default;
+        }
+
         public static void EnsureNotNull<T>([NotNull] T? value, string? message = null, [CallerArgumentExpression(nameof(value))] string strName = "")
         {
             if (value == null)

@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using NetTunnel.Library;
+using System.Net.Sockets;
 
 namespace NetTunnel.Service.Engine
 {
@@ -13,6 +14,9 @@ namespace NetTunnel.Service.Engine
 
         private NetworkStream _stream;
 
+        public double ActivityAgeInMiliseconds => (DateTime.UtcNow - LastActivityDateTime).TotalMilliseconds;
+        public double StartAgeInMiliseconds => (DateTime.UtcNow - StartDateTime).TotalMilliseconds;
+
         public ActiveEndpointConnection(Thread thread, TcpClient tcpClient, Guid streamId)
         {
             Thread = thread;
@@ -24,8 +28,8 @@ namespace NetTunnel.Service.Engine
 
         public void Disconnect()
         {
-            try { _stream.Close(); } catch { }
-            try { TcpClient.Close(); } catch { }
+            Utility.TryAndIgnore(_stream.Close);
+            Utility.TryAndIgnore(TcpClient.Close);
             IsConnected = false;
         }
 
@@ -45,8 +49,8 @@ namespace NetTunnel.Service.Engine
         {
             Disconnect();
 
-            try { _stream.Dispose(); } catch { }
-            try { TcpClient.Dispose(); } catch { }
+            Utility.TryAndIgnore(_stream.Dispose);
+            Utility.TryAndIgnore(TcpClient.Dispose);
         }
     }
 }

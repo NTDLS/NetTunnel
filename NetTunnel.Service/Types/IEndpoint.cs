@@ -7,7 +7,7 @@
         /// </summary>
         public Guid PairId { get; }
         public string Name { get; }
-
+        public bool KeepRunning { get; }
         public void Disconnect(Guid streamId);
         public void SendEndpointData(Guid streamId, byte[] buffer);
     }

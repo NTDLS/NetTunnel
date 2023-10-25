@@ -1,4 +1,5 @@
-﻿using NetTunnel.Library.Types;
+﻿using NetTunnel.Library;
+using NetTunnel.Library.Types;
 using NetTunnel.Service.Types;
 using System.Net;
 using System.Net.Sockets;
@@ -20,20 +21,32 @@ namespace NetTunnel.Service.Engine
             Port = configuration.Port;
         }
 
-        public void Start()
+        public override void Start()
         {
-            _core.Logging.Write($"Starting inbound endpoint '{Name}' on port {Port}");
+            base.Start();
 
-            _keepRunning = true;
+            _tunnel.Core.Logging.Write($"Starting inbound endpoint '{Name}' on port {Port}.");
 
             _inboundConnectionThread = new Thread(InboundConnectionThreadProc);
             _inboundConnectionThread.Start();
         }
 
-        public void Stop()
+        public override void Stop()
         {
-            _keepRunning = false;
-            //TODO: Wait on thread(s) to stop.
+            base.Stop();
+
+            _tunnel.Core.Logging.Write($"Stopping inbound endpoint '{Name}' on port {Port}.");
+
+            _activeConnections.Use((o) =>
+            {
+                foreach (var activeConnection in o)
+                {
+                    Utility.TryAndIgnore(activeConnection.Value.Disconnect);
+                }
+                o.Clear();
+            });
+
+            _tunnel.Core.Logging.Write($"Stopped inbound endpoint '{Name}' on port {Port}.");
         }
 
         void InboundConnectionThreadProc()
@@ -46,30 +59,32 @@ namespace NetTunnel.Service.Engine
 
                 _core.Logging.Write($"Listening inbound endpoint '{Name}' on port {Port}");
 
-                while (_keepRunning)
+                while (KeepRunning)
                 {
                     var tcpClient = tcpListener.AcceptTcpClient(); //Wait for an inbound connection.
 
                     if (tcpClient.Connected)
                     {
-                        var handlerThread = new Thread(HandleClientThreadProc);
+                        if (KeepRunning) //Check again, we may have received a connection while shutting down.
+                        {
+                            var handlerThread = new Thread(HandleClientThreadProc);
 
-                        //Keep track of the connection.
-                        var activeConnection = new ActiveEndpointConnection(handlerThread, tcpClient, Guid.NewGuid());
-                        _activeConnections.Use((o) => o.Add(activeConnection.StreamId, activeConnection));
+                            //Keep track of the connection. ActiveEndpointConnection will handle closing and disposing of the client and its stream.
+                            var activeConnection = new ActiveEndpointConnection(handlerThread, tcpClient, Guid.NewGuid());
+                            _activeConnections.Use((o) => o.Add(activeConnection.StreamId, activeConnection));
 
-                        handlerThread.Start(activeConnection);
+                            handlerThread.Start(activeConnection);
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                Console.WriteLine($"Exception[InboundConnectionThreadProc]: {ex.Message}");
             }
             finally
             {
-                // Stop listening and close the listener when done.
-                tcpListener.Stop();
+                Utility.TryAndIgnore(tcpListener.Stop);
             }
         }
     }

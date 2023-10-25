@@ -45,28 +45,32 @@ namespace NetTunnel.Service.Engine
             return tunnelConfiguration;
         }
 
-        public void Start()
+        public override void Start()
         {
             if (KeepRunning == true)
             {
                 return;
             }
 
-            KeepRunning = true;
-
-            Core.Logging.Write($"Starting outbound tunnel '{Name}'");
+            Core.Logging.Write($"Starting outbound tunnel '{Name}'.");
+            base.Start();
 
             _outboundConnectionThread = new Thread(OutboundConnectionThreadProc);
             _outboundConnectionThread.Start();
 
+            Core.Logging.Write($"Starting inbound endpoints for outbound tunnel '{Name}'.");
             _inboundEndpoints.ForEach(x => x.Start());
+
+            Core.Logging.Write($"Starting outbound endpoints for outbound tunnel '{Name}'.");
             _outboundEndpoints.ForEach(x => x.Start());
         }
 
-        public void Stop()
+        public override void Stop()
         {
-            KeepRunning = false;
-            //TODO: Wait on thread(s) to stop.
+            Core.Logging.Write($"Stopping outbound tunnel '{Name}'.");
+            base.Stop();
+            _outboundConnectionThread?.Join(); //Wait on thread to finish.
+            Core.Logging.Write($"Stopped outbound tunnel '{Name}'.");
         }
 
         private void OutboundConnectionThreadProc()
@@ -75,22 +79,24 @@ namespace NetTunnel.Service.Engine
             {
                 try
                 {
-                    Core.Logging.Write($"Attempting to connect to outbound tunnel '{Name}' at {Address}:{DataPort}.");
+                    Core.Logging.Write($"Outbound tunnel '{Name}' connecting to remote at {Address}:{DataPort}.");
 
                     var tcpClient = new TcpClient(Address, DataPort);
 
-                    Core.Logging.Write($"Connection successful for tunnel '{Name}' at {Address}:{DataPort}.");
+                    Core.Logging.Write($"Outbound tunnel '{Name}' connection successful.");
 
-                    using (_stream = tcpClient.GetStream())
+                    using (Stream = tcpClient.GetStream())
                     {
                         ReceiveAndProcessStreamFrames(ProcessFrameNotificationCallback, ProcessFrameQueryCallback);
                     }
+
+                    Core.Logging.Write($"Outbound tunnel '{Name}' disconnected.");
 
                     tcpClient.Close();
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error: {ex.Message}");
+                    Console.WriteLine($"Exception[OutboundConnectionThreadProc]: {ex.Message}");
                 }
             }
         }

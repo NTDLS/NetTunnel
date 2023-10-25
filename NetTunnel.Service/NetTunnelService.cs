@@ -69,12 +69,15 @@ namespace NetTunnel.Service
 
             var app = builder.Build();
 
+            /*
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
                 Console.WriteLine($"https://localhost:{Singletons.Configuration.ManagementPort}/swagger/index.html");
+                Singletons.Core.Logging.Write($"Listening on {Singletons.Configuration.ManagementPort}.");
             }
+            */
 
             app.UseAuthorization();
             app.MapControllers();
@@ -84,8 +87,6 @@ namespace NetTunnel.Service
             {
                 //System.Diagnostics.Process.Start("explorer", $"{Configuration.BaseAddress}swagger/index.html");
             }
-
-            Singletons.Core.Logging.Write($"Listening on {Singletons.Configuration.ManagementPort}.");
 
             while (true)
             {

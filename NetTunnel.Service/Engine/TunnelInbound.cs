@@ -1,4 +1,5 @@
-﻿using NetTunnel.Library.Types;
+﻿using NetTunnel.Library;
+using NetTunnel.Library.Types;
 using NetTunnel.Service.Types;
 using System.Net;
 using System.Net.Sockets;
@@ -38,27 +39,32 @@ namespace NetTunnel.Service.Engine
             return tunnelConfiguration;
         }
 
-        public void Start()
+        public override void Start()
         {
             if (KeepRunning == true)
             {
                 return;
             }
-            KeepRunning = true;
 
-            Core.Logging.Write($"Starting inbound tunnel '{Name}' on port {DataPort}");
+            Core.Logging.Write($"Starting inbound tunnel '{Name}' on port {DataPort}.");
+            base.Start();
 
             _inboundConnectionThread = new Thread(InboundConnectionThreadProc);
             _inboundConnectionThread.Start();
 
+            Core.Logging.Write($"Starting inbound endpoints for inbound tunnel '{Name}'.");
             _inboundEndpoints.ForEach(x => x.Start());
+
+            Core.Logging.Write($"Starting outbound endpoints for inbound tunnel '{Name}'.");
             _outboundEndpoints.ForEach(x => x.Start());
         }
 
-        public void Stop()
+        public override void Stop()
         {
-            KeepRunning = false;
-            //TODO: Wait on thread(s) to stop.
+            Core.Logging.Write($"Stopping inbound tunnel '{Name}' on port {DataPort}.");
+            base.Stop();
+            _inboundConnectionThread?.Join(); //Wait on thread to finish.
+            Core.Logging.Write($"Stopped inbound tunnel '{Name}'.");
         }
 
         private void InboundConnectionThreadProc()
@@ -69,35 +75,34 @@ namespace NetTunnel.Service.Engine
             {
                 listener.Start();
 
-                Core.Logging.Write($"Listening inbound tunnel '{Name}' on port {DataPort}");
+                Core.Logging.Write($"Started listiening for inbound tunnel '{Name}' on port {DataPort}.");
 
                 while (KeepRunning)
                 {
-                    Core.Logging.Write($"Waiting for connection for inbound tunnel '{Name}' on port {DataPort}");
+                    Core.Logging.Write($"Waiting on connection for inbound tunnel '{Name}' on port {DataPort}.");
 
                     var tcpClient = listener.AcceptTcpClient();
-                    Core.Logging.Write($"Connected on inbound tunnel '{Name}' on port {DataPort}");
+                    Core.Logging.Write($"Accepted connection for inbound tunnel '{Name}' on port {DataPort}.");
 
-                    using (_stream = tcpClient.GetStream())
+                    using (Stream = tcpClient.GetStream())
                     {
                         ReceiveAndProcessStreamFrames(ProcessFrameNotificationCallback, ProcessFrameQueryCallback);
-                        try { _stream.Close(); } catch { }
+                        Utility.TryAndIgnore(Stream.Close);
                     }
 
-                    try { tcpClient.Close(); } catch { }
-                    try { tcpClient.Dispose(); } catch { }
-
                     Core.Logging.Write($"Disconnected inbound tunnel '{Name}' on port {DataPort}");
+
+                    Utility.TryAndIgnore(tcpClient.Close);
+                    Utility.TryAndIgnore(tcpClient.Dispose);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                Console.WriteLine($"Exception[InboundConnectionThreadProc]: {ex.Message}");
             }
             finally
             {
-                // Stop listening and close the listener when done.
-                listener.Stop();
+                Utility.TryAndIgnore(listener.Stop);
             }
         }
     }

@@ -13,9 +13,9 @@ namespace NetTunnel.Service.Engine
 {
     internal class BaseTunnel : ITunnel
     {
-        private List<QueriesAwaitingReply> _queriesAwaitingReplies = new();
+        private readonly List<QueriesAwaitingReply> _queriesAwaitingReplies = new();
 
-        protected NetworkStream? _stream { get; set; }
+        protected NetworkStream? Stream { get; set; }
 
         public EngineCore Core { get; private set; }
         public bool KeepRunning { get; internal set; } = false;
@@ -24,6 +24,8 @@ namespace NetTunnel.Service.Engine
 
         internal readonly List<EndpointInbound> _inboundEndpoints = new();
         internal readonly List<EndpointOutbound> _outboundEndpoints = new();
+
+        private readonly Thread _heartbeatThread;
 
         public BaseTunnel(EngineCore core, NtTunnelInboundConfiguration configuration)
         {
@@ -34,6 +36,9 @@ namespace NetTunnel.Service.Engine
 
             configuration.EndpointInboundConfigurations.ForEach(o => _inboundEndpoints.Add(new(Core, this, o)));
             configuration.EndpointOutboundConfigurations.ForEach(o => _outboundEndpoints.Add(new(Core, this, o)));
+
+            _heartbeatThread = new Thread(HeartbeatThreadProc);
+            _heartbeatThread.Start();
         }
 
         public BaseTunnel(EngineCore core, NtTunnelOutboundConfiguration configuration)
@@ -45,6 +50,35 @@ namespace NetTunnel.Service.Engine
 
             configuration.EndpointInboundConfigurations.ForEach(o => _inboundEndpoints.Add(new(Core, this, o)));
             configuration.EndpointOutboundConfigurations.ForEach(o => _outboundEndpoints.Add(new(Core, this, o)));
+
+            _heartbeatThread = new Thread(HeartbeatThreadProc);
+            _heartbeatThread.Start();
+        }
+
+        public virtual void Start()
+        {
+            KeepRunning = true;
+        }
+
+        public virtual void Stop()
+        {
+            KeepRunning = false;
+            _heartbeatThread.Join();
+        }
+
+        private void HeartbeatThreadProc()
+        {
+            DateTime lastheartBeat = DateTime.UtcNow;
+
+            while (KeepRunning)
+            {
+                if ((DateTime.UtcNow - lastheartBeat).TotalMilliseconds > 10000)
+                {
+                    lastheartBeat = DateTime.UtcNow;
+                }
+
+                Thread.Sleep(100);
+            }
         }
 
         #region TCP/IP frame and Stream interactions.
@@ -59,7 +93,7 @@ namespace NetTunnel.Service.Engine
                 var frameBuffer = new NtFrameBuffer();
                 while (KeepRunning)
                 {
-                    NtFraming.ReceiveAndProcessStreamFrames(_stream, this, frameBuffer, processFrameNotificationCallback, processFrameQueryCallback);
+                    NtFraming.ReceiveAndProcessStreamFrames(Stream, this, frameBuffer, processFrameNotificationCallback, processFrameQueryCallback);
                 }
             }
             catch (Exception ex)
@@ -83,7 +117,7 @@ namespace NetTunnel.Service.Engine
             else if (frame is NtFramePayloadEndpointConnect connectEndpoint)
             {
                 _outboundEndpoints.Where(o => o.PairId == connectEndpoint.EndpointPairId).FirstOrDefault()?
-                    .StartConnection(connectEndpoint.StreamId);
+                    .EstablishOutboundEndpointConnection(connectEndpoint.StreamId);
             }
             else if (frame is NtFramePayloadEndpointDisconnect disconnectEndpoint)
             {
@@ -131,7 +165,7 @@ namespace NetTunnel.Service.Engine
         /// </summary>
         public async Task<T?> SendStreamFramePayloadQuery<T>(INtFramePayloadQuery payload)
         {
-            if (_stream == null)
+            if (Stream == null)
             {
                 throw new Exception("SendStreamFramePayload stream can not be null.");
             }
@@ -152,7 +186,7 @@ namespace NetTunnel.Service.Engine
             return await Task.Run(() =>
             {
                 var frameBytes = NtFraming.AssembleFrame(this, cmd);
-                _stream.Write(frameBytes, 0, frameBytes.Length);
+                Stream.Write(frameBytes, 0, frameBytes.Length);
 
                 //TODO: We need to check received data to see if any of them are replies
                 if (queriesAwaitingReply.WaitEvent.WaitOne(NtFrameDefaults.QUERY_TIMEOUT_MS) == false)
@@ -172,7 +206,7 @@ namespace NetTunnel.Service.Engine
         /// </summary>
         public void SendStreamFramePayloadReply(NtFrame queryFrame, INtFramePayloadReply payload)
         {
-            if (_stream == null)
+            if (Stream == null)
             {
                 throw new Exception("SendStreamFramePayload stream can not be null.");
             }
@@ -184,7 +218,7 @@ namespace NetTunnel.Service.Engine
             };
 
             var frameBytes = NtFraming.AssembleFrame(this, cmd);
-            _stream.Write(frameBytes, 0, frameBytes.Length);
+            Stream.Write(frameBytes, 0, frameBytes.Length);
         }
 
         public void ApplyQueryReply(Guid frameId, INtFramePayloadReply replyPayload)
@@ -199,7 +233,7 @@ namespace NetTunnel.Service.Engine
         /// </summary>
         public void SendStreamFrameNotification(INtFramePayloadNotification payload)
         {
-            if (_stream == null)
+            if (Stream == null)
             {
                 throw new Exception("SendStreamFramePayload stream can not be null.");
             }
@@ -210,7 +244,7 @@ namespace NetTunnel.Service.Engine
             };
 
             var frameBytes = NtFraming.AssembleFrame(this, cmd);
-            _stream.Write(frameBytes, 0, frameBytes.Length);
+            Stream.Write(frameBytes, 0, frameBytes.Length);
         }
 
         #endregion

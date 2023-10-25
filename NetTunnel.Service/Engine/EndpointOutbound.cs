@@ -1,4 +1,5 @@
-﻿using NetTunnel.Library.Types;
+﻿using NetTunnel.Library;
+using NetTunnel.Library.Types;
 using NetTunnel.Service.Types;
 using System.Net.Sockets;
 
@@ -19,41 +20,54 @@ namespace NetTunnel.Service.Engine
             Port = configuration.Port;
         }
 
-        public void Start()
+        public override void Start()
         {
-            _core.Logging.Write($"Starting outbound endpoint '{Name}'");
-            _keepRunning = true;
+            base.Start();
+
+            _tunnel.Core.Logging.Write($"Starting outbound endpoint '{Name}' on port {Port}.");
         }
 
-        public void Stop()
+        public override void Stop()
         {
-            _keepRunning = false;
-            //TODO: Wait on thread(s) to stop.
+            base.Stop();
+
+            _tunnel.Core.Logging.Write($"Stopping outbound endpoint '{Name}' on port {Port}.");
+
+            _activeConnections.Use((o) =>
+            {
+                foreach (var activeConnection in o)
+                {
+                    Utility.TryAndIgnore(activeConnection.Value.Disconnect);
+                }
+                o.Clear();
+            });
+
+            _tunnel.Core.Logging.Write($"Stopped outbound endpoint '{Name}' on port {Port}.");
         }
 
-        public void StartConnection(Guid streamId)
+        public void EstablishOutboundEndpointConnection(Guid streamId)
         {
-            var tcpClient = new TcpClient();
-
-            try
+            if (KeepRunning)
             {
-                _core.Logging.Write($"Connecting outbound endpoint '{Name}' on port {Port}"); ;
+                var tcpClient = new TcpClient();
 
-                tcpClient.Connect(Address, Port);
-
-                _core.Logging.Write($"Accepted on inbound endpoint '{Name}' on port {Port}");
-
-                var handlerThread = new Thread(HandleClientThreadProc);
-                var param = new ActiveEndpointConnection(handlerThread, tcpClient, streamId);
-
-                var outboundConnection = _activeConnections.Use((o) => o.TryAdd(streamId, param));
-
-                handlerThread.Start(param);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-                throw;
+                try
+                {
+                    tcpClient.Connect(Address, Port);
+                    if (KeepRunning) //Check again, we may have received a connection while shutting down.
+                    {
+                        var handlerThread = new Thread(HandleClientThreadProc);
+                        //Keep track of the connection. ActiveEndpointConnection will handle closing and disposing of the client and its stream.
+                        var activeConnection = new ActiveEndpointConnection(handlerThread, tcpClient, streamId);
+                        var outboundConnection = _activeConnections.Use((o) => o.TryAdd(streamId, activeConnection));
+                        handlerThread.Start(activeConnection);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Exception[EstablishOutboundEndpointConnection]: {ex.Message}");
+                    throw;
+                }
             }
         }
     }
