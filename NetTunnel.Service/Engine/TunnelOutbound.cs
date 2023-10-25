@@ -83,7 +83,7 @@ namespace NetTunnel.Service.Engine
 
                     using (_stream = tcpClient.GetStream())
                     {
-                        ExecuteStream(ProcessPacketNotificationCallback, ProcessPacketQueryCallback);
+                        ReceiveAndProcessStreamPackets(ProcessPacketNotificationCallback, ProcessPacketQueryCallback);
                     }
 
                     tcpClient.Close();

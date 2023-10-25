@@ -47,25 +47,33 @@ namespace NetTunnel.Service.Engine
             configuration.EndpointOutboundConfigurations.ForEach(o => _outboundEndpoints.Add(new(Core, this, o)));
         }
 
-        public IEndpoint? GetEndpointById(Guid pairId)
-        {
-            var inboundEndpoint = _inboundEndpoints.Where(o => o.PairId == pairId).FirstOrDefault();
-            if (inboundEndpoint != null)
-            {
-                return inboundEndpoint;
-            }
-
-            var outboundEndpoint = _outboundEndpoints.Where(o => o.PairId == pairId).FirstOrDefault();
-            if (outboundEndpoint != null)
-            {
-                return outboundEndpoint;
-            }
-
-            return null;
-        }
-
         #region TCP/IP Packet and Stream interactions.
 
+        /// <summary>
+        /// Receive a message on the TCP/IP connection, parse and process the packets.
+        /// </summary>
+        internal void ReceiveAndProcessStreamPackets(ProcessPacketNotification processPacketNotificationCallback, ProcessPacketQuery processPacketQueryCallback)
+        {
+            try
+            {
+                var packetBuffer = new NtPacketBuffer();
+                while (KeepRunning)
+                {
+                    NtPacketizer.ReceiveAndProcessStreamPackets(_stream, this, packetBuffer, processPacketNotificationCallback, processPacketQueryCallback);
+                }
+            }
+            catch (Exception ex)
+            {
+                Core.Logging.Write($"Exception in ReceiveAndProcessStreamPackets: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// We received a fire-and-forget message on the tunnel.
+        /// </summary>
+        /// <param name="tunnel"></param>
+        /// <param name="packet"></param>
+        /// <exception cref="Exception"></exception>
         internal void ProcessPacketNotificationCallback(ITunnel tunnel, IPacketPayloadNotification packet)
         {
             if (packet is NtPacketPayloadMessage message)
@@ -93,18 +101,23 @@ namespace NetTunnel.Service.Engine
             }
         }
 
+        /// <summary>
+        /// We recevied a query on the tunnel. Reply to it.
+        /// </summary>
+        /// <param name="tunnel"></param>
+        /// <param name="packet"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         internal IPacketPayloadReply ProcessPacketQueryCallback(ITunnel tunnel, IPacketPayloadQuery packet)
         {
             if (packet is NtPacketPayloadAddEndpointInbound inboundEndpoint)
             {
                 AddInboundEndpoint(inboundEndpoint.Configuration);
-                Core.InboundTunnels.SaveToDisk();
                 return new NtPacketPayloadBoolean(true);
             }
             else if (packet is NtPacketPayloadAddEndpointOutbound outboundEndpoint)
             {
                 AddOutboundEndpoint(outboundEndpoint.Configuration);
-                Core.OutboundTunnels.SaveToDisk();
                 return new NtPacketPayloadBoolean(true);
             }
             else
@@ -202,35 +215,46 @@ namespace NetTunnel.Service.Engine
 
         #endregion
 
-        internal void ExecuteStream(ProcessPacketNotification processPacketNotificationCallback, ProcessPacketQuery processPacketQueryCallback)
+        public IEndpoint? GetEndpointById(Guid pairId)
         {
-            var packetBuffer = new NtPacketBuffer();
-
-            while (KeepRunning)
+            var inboundEndpoint = _inboundEndpoints.Where(o => o.PairId == pairId).FirstOrDefault();
+            if (inboundEndpoint != null)
             {
-                /*
-                SendStreamPacketNotification(new NtPacketPayloadMessage()
-                {
-                    Label = "This is the label.",
-                    Message = "Message from...???."
-                });
-                */
-                NtPacketizer.ReceiveAndProcessStreamPackets(_stream, this, packetBuffer, processPacketNotificationCallback, processPacketQueryCallback);
-                //Thread.Sleep(1000);
+                return inboundEndpoint;
             }
+
+            var outboundEndpoint = _outboundEndpoints.Where(o => o.PairId == pairId).FirstOrDefault();
+            if (outboundEndpoint != null)
+            {
+                return outboundEndpoint;
+            }
+
+            return null;
         }
 
+        #region Endpoint CRUD helpers.
+
         public void AddInboundEndpoint(NtEndpointInboundConfiguration configuration)
-            => _inboundEndpoints.Add(new EndpointInbound(Core, this, configuration));
+        {
+            _inboundEndpoints.Add(new EndpointInbound(Core, this, configuration));
+            if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
+            if (this is TunnelOutbound) Core.OutboundTunnels.SaveToDisk();
+        }
 
         public void AddOutboundEndpoint(NtEndpointOutboundConfiguration configuration)
-            => _outboundEndpoints.Add(new EndpointOutbound(Core, this, configuration));
+        {
+            _outboundEndpoints.Add(new EndpointOutbound(Core, this, configuration));
+            if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
+            if (this is TunnelOutbound) Core.OutboundTunnels.SaveToDisk();
+        }
 
         public void DeleteInboundEndpoint(Guid endpointPairId)
         {
             var endpoint = _inboundEndpoints.Where(o => o.PairId == endpointPairId).Single();
             endpoint.Stop();
             _inboundEndpoints.Remove(endpoint);
+            if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
+            if (this is TunnelOutbound) Core.OutboundTunnels.SaveToDisk();
         }
 
         public void DeleteOutboundEndpoint(Guid endpointPairId)
@@ -238,6 +262,10 @@ namespace NetTunnel.Service.Engine
             var endpoint = _inboundEndpoints.Where(o => o.PairId == endpointPairId).Single();
             endpoint.Stop();
             _inboundEndpoints.Remove(endpoint);
+            if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
+            if (this is TunnelOutbound) Core.OutboundTunnels.SaveToDisk();
         }
+
+        #endregion
     }
 }

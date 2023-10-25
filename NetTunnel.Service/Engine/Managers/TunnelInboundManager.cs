@@ -43,7 +43,14 @@ namespace NetTunnel.Service.Engine.Managers
             });
         }
 
-        public async Task<T?> DispatchAddEndpointInbound<T>(Guid tunnelPairId, NtEndpointInboundConfiguration endpoint)
+        /// <summary>
+        /// Tell the remote tunnel service to add the inbound endpoint.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tunnelPairId"></param>
+        /// <param name="endpoint"></param>
+        /// <returns></returns>
+        public async Task<T?> DispatchAddEndpointInboundToAssociatedTunnelService<T>(Guid tunnelPairId, NtEndpointInboundConfiguration endpoint)
         {
             return await _collection.Use((o) =>
             {
@@ -52,7 +59,14 @@ namespace NetTunnel.Service.Engine.Managers
             });
         }
 
-        public async Task<T?> DispatchAddEndpointOutbound<T>(Guid tunnelPairId, NtEndpointOutboundConfiguration endpoint)
+        /// <summary>
+        /// Tell the remote tunnel service to add the outbound endpoint.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tunnelPairId"></param>
+        /// <param name="endpoint"></param>
+        /// <returns></returns>
+        public async Task<T?> DispatchAddEndpointOutboundToAssociatedTunnelService<T>(Guid tunnelPairId, NtEndpointOutboundConfiguration endpoint)
         {
             return await _collection.Use((o) =>
             {
@@ -60,17 +74,6 @@ namespace NetTunnel.Service.Engine.Managers
                 return tunnel.SendStreamPacketPayloadQuery<T>(new NtPacketPayloadAddEndpointOutbound(endpoint));
             });
         }
-
-        /*
-        public void DispatchAddEndpointOutbound(Guid tunnelPairId, NtEndpointOutboundConfiguration endpoint)
-        {
-            _collection.Use((o) =>
-            {
-                var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
-                tunnel.DispatchAddEndpointOutbound(endpoint);
-            });
-        }
-        */
 
         public void AddEndpointInbound(Guid tunnelPairId, NtEndpointInboundConfiguration endpoint)
         {

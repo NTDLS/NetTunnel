@@ -135,7 +135,7 @@ namespace NetTunnel.Service.Controllers
                 Singletons.Core.InboundTunnels.AddEndpointInbound(tunnelId, endpoints.Inbound);
                 Singletons.Core.InboundTunnels.SaveToDisk();
 
-                var result = await Singletons.Core.InboundTunnels.DispatchAddEndpointOutbound<NtPacketPayloadBoolean>(tunnelId, endpoints.Outbound);
+                var result = await Singletons.Core.InboundTunnels.DispatchAddEndpointOutboundToAssociatedTunnelService<NtPacketPayloadBoolean>(tunnelId, endpoints.Outbound);
 
                 return new NtActionResponse { Success = result?.Value ?? false };
             }

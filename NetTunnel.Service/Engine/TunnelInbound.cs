@@ -80,10 +80,12 @@ namespace NetTunnel.Service.Engine
 
                     using (_stream = tcpClient.GetStream())
                     {
-                        ExecuteStream(ProcessPacketNotificationCallback, ProcessPacketQueryCallback);
+                        ReceiveAndProcessStreamPackets(ProcessPacketNotificationCallback, ProcessPacketQueryCallback);
+                        try { _stream.Close(); } catch { }
                     }
 
-                    tcpClient.Close();
+                    try { tcpClient.Close(); } catch { }
+                    try { tcpClient.Dispose(); } catch { }
 
                     Core.Logging.Write($"Disconnected incoming tunnel '{Name}' on port {DataPort}");
                 }
