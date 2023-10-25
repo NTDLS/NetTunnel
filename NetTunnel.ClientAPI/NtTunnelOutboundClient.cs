@@ -47,7 +47,7 @@ namespace NetTunnel.ClientAPI
 
         public async Task Start(Guid tunnelPairId)
         {
-            string url = $"api/TunnelInbound/{_client.SessionId}/Start/{tunnelPairId}";
+            string url = $"api/TunnelOutbound/{_client.SessionId}/Start/{tunnelPairId}";
 
             using var response = await _client.Connection.GetAsync(url);
             string resultText = await response.Content.ReadAsStringAsync();
@@ -60,7 +60,7 @@ namespace NetTunnel.ClientAPI
 
         public async Task Stop(Guid tunnelPairId)
         {
-            string url = $"api/TunnelInbound/{_client.SessionId}/Stop/{tunnelPairId}";
+            string url = $"api/TunnelOutbound/{_client.SessionId}/Stop/{tunnelPairId}";
 
             using var response = await _client.Connection.GetAsync(url);
             string resultText = await response.Content.ReadAsStringAsync();
@@ -93,7 +93,7 @@ namespace NetTunnel.ClientAPI
         /// <exception cref="NtAPIResponseException"></exception>
         public async Task AddInboundEndpointPair(Guid tunnelPairId, NtEndpointInboundConfiguration inboundEndpoint, NtEndpointOutboundConfiguration outboundEndpoint)
         {
-            string url = $"api/TunnelInbound/{_client.SessionId}/AddEndpointInboundPair/{tunnelPairId}";
+            string url = $"api/TunnelOutbound/{_client.SessionId}/AddEndpointInboundPair/{tunnelPairId}";
 
             var postContent = new StringContent(JsonConvert.SerializeObject(
                 new NtEndpointPairConfiguration(inboundEndpoint, outboundEndpoint)), Encoding.UTF8, "text/plain");
@@ -116,7 +116,7 @@ namespace NetTunnel.ClientAPI
         /// <exception cref="NtAPIResponseException"></exception>
         public async Task AddOutboundEndpointPair(Guid tunnelPairId, NtEndpointInboundConfiguration inboundEndpoint, NtEndpointOutboundConfiguration outboundEndpoint)
         {
-            string url = $"api/TunnelInbound/{_client.SessionId}/AddEndpointOutboundPair/{tunnelPairId}";
+            string url = $"api/TunnelOutbound/{_client.SessionId}/AddEndpointOutboundPair/{tunnelPairId}";
 
             var postContent = new StringContent(JsonConvert.SerializeObject(
                 new NtEndpointPairConfiguration(inboundEndpoint, outboundEndpoint)), Encoding.UTF8, "text/plain");

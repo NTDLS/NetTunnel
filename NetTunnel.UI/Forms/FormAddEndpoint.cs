@@ -103,7 +103,7 @@ namespace NetTunnel.UI.Forms
                 {
                     if (radioButtonLocalEndpoint.Checked)
                     {
-                        _client.TunnelOutbound.AddOutboundEndpointPair(_tunnelOutbound.PairId, endpointInbound, endpointOutbound).ContinueWith((o) =>
+                        _client.TunnelOutbound.AddInboundEndpointPair(_tunnelOutbound.PairId, endpointInbound, endpointOutbound).ContinueWith((o) =>
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
@@ -115,7 +115,7 @@ namespace NetTunnel.UI.Forms
                     }
                     else
                     {
-                        _client.TunnelOutbound.AddInboundEndpointPair(_tunnelOutbound.PairId, endpointInbound, endpointOutbound).ContinueWith((o) =>
+                        _client.TunnelOutbound.AddOutboundEndpointPair(_tunnelOutbound.PairId, endpointInbound, endpointOutbound).ContinueWith((o) =>
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
