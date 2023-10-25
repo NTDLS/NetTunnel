@@ -1,11 +1,11 @@
 [Setup]
 ;-- Main Setup Information
  AppName                          = NetTunnel
- AppVerName                       = NetTunnel 1.0.4.0
+ AppVerName                       = NetTunnel 1.0.0.0
  AppCopyright                     = Copyright © 1995-2023 NetworkDLS.
  DefaultDirName                   = {commonpf}\NetworkDLS\NetTunnel\Service
  DefaultGroupName                 = NetworkDLS\NetTunnel
- UninstallDisplayIcon             = {app}\NetTunnel.UI.exe
+ UninstallDisplayIcon             = {app}\UI\NetTunnel.UI.exe
  SetupIconFile                    = "..\Images\Multi.ico"
  PrivilegesRequired               = admin
  Uninstallable                    = Yes
@@ -19,7 +19,7 @@
  AppPublisher    = NetworkDLS
  AppPublisherURL = http://www.NetworkDLS.com/
  AppUpdatesURL   = http://www.NetworkDLS.com/
- AppVersion      = 1.0.4.0
+ AppVersion      = 1.0.0.0
 
 [Files]
  Source: "..\NetTunnel.Service\bin\Release\net7.0\runtimes\*.*"; DestDir: "{app}\Service\runtimes";  Flags: IgnoreVersion recursesubdirs;
