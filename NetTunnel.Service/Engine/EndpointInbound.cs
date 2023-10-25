@@ -15,10 +15,14 @@ namespace NetTunnel.Service.Engine
 
         public int Port { get; private set; }
 
+        private TcpListener _listener;
+
         public EndpointInbound(EngineCore core, ITunnel tunnel, NtEndpointInboundConfiguration configuration)
             : base(core, tunnel, configuration.PairId, configuration.Name)
         {
             Port = configuration.Port;
+
+            _listener = new TcpListener(IPAddress.Any, Port);
         }
 
         public override void Start()
@@ -34,6 +38,8 @@ namespace NetTunnel.Service.Engine
         public override void Stop()
         {
             base.Stop();
+
+            Utility.TryAndIgnore(_listener.Stop);
 
             _tunnel.Core.Logging.Write($"Stopping inbound endpoint '{Name}' on port {Port}.");
 
@@ -51,17 +57,15 @@ namespace NetTunnel.Service.Engine
 
         void InboundConnectionThreadProc()
         {
-            var tcpListener = new TcpListener(IPAddress.Any, Port);
-
             try
             {
-                tcpListener.Start();
+                _listener.Start();
 
                 _core.Logging.Write($"Listening inbound endpoint '{Name}' on port {Port}");
 
                 while (KeepRunning)
                 {
-                    var tcpClient = tcpListener.AcceptTcpClient(); //Wait for an inbound connection.
+                    var tcpClient = _listener.AcceptTcpClient(); //Wait for an inbound connection.
 
                     if (tcpClient.Connected)
                     {
@@ -84,7 +88,7 @@ namespace NetTunnel.Service.Engine
             }
             finally
             {
-                Utility.TryAndIgnore(tcpListener.Stop);
+                Utility.TryAndIgnore(_listener.Stop);
             }
         }
     }

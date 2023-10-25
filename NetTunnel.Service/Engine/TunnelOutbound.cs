@@ -1,5 +1,7 @@
-﻿using NetTunnel.Library.Types;
+﻿using NetTunnel.Library;
+using NetTunnel.Library.Types;
 using NetTunnel.Service.Types;
+using System.Net.Http;
 using System.Net.Sockets;
 
 namespace NetTunnel.Service.Engine
@@ -15,6 +17,8 @@ namespace NetTunnel.Service.Engine
         public int DataPort { get; set; }
         public string Username { get; set; }
         public string PasswordHash { get; set; }
+
+        private TcpClient? _tcpClient;
 
         public TunnelOutbound(EngineCore core, NtTunnelOutboundConfiguration configuration)
             : base(core, configuration)
@@ -69,6 +73,10 @@ namespace NetTunnel.Service.Engine
         {
             Core.Logging.Write($"Stopping outbound tunnel '{Name}'.");
             base.Stop();
+
+            Utility.TryAndIgnore(() => _tcpClient?.Client?.Close());
+            Utility.TryAndIgnore(() => _tcpClient?.Close());
+
             _outboundConnectionThread?.Join(); //Wait on thread to finish.
             Core.Logging.Write($"Stopped outbound tunnel '{Name}'.");
         }
@@ -81,18 +89,18 @@ namespace NetTunnel.Service.Engine
                 {
                     Core.Logging.Write($"Outbound tunnel '{Name}' connecting to remote at {Address}:{DataPort}.");
 
-                    var tcpClient = new TcpClient(Address, DataPort);
+                    _tcpClient = new TcpClient(Address, DataPort);
 
                     Core.Logging.Write($"Outbound tunnel '{Name}' connection successful.");
 
-                    using (Stream = tcpClient.GetStream())
+                    using (Stream = _tcpClient.GetStream())
                     {
                         ReceiveAndProcessStreamFrames(ProcessFrameNotificationCallback, ProcessFrameQueryCallback);
                     }
 
                     Core.Logging.Write($"Outbound tunnel '{Name}' disconnected.");
 
-                    tcpClient.Close();
+                    _tcpClient.Close();
                 }
                 catch (Exception ex)
                 {

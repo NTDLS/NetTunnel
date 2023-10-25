@@ -23,9 +23,9 @@ namespace NetTunnel.Service
                 });
                 x.RunAsLocalSystem();
 
-                x.SetDescription("Omni-directional network tunneling endpoint.");
-                x.SetDisplayName("NetTunnel.EndPoint");
-                x.SetServiceName("NetTunnel.EndPoint");
+                x.SetDescription("Omni-directional network tunneling service.");
+                x.SetDisplayName("NetowrkDLS NetTunnel");
+                x.SetServiceName("NtNetTunnel");
             });
         }
     }

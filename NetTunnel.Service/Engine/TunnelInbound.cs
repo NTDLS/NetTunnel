@@ -14,10 +14,14 @@ namespace NetTunnel.Service.Engine
         private Thread? _inboundConnectionThread;
         public int DataPort { get; private set; }
 
+        private readonly TcpListener _listener;
+
         public TunnelInbound(EngineCore core, NtTunnelInboundConfiguration configuration)
             : base(core, configuration)
         {
             DataPort = configuration.DataPort;
+
+            _listener = new TcpListener(IPAddress.Any, DataPort);
         }
 
         public NtTunnelInboundConfiguration CloneConfiguration()
@@ -63,17 +67,19 @@ namespace NetTunnel.Service.Engine
         {
             Core.Logging.Write($"Stopping inbound tunnel '{Name}' on port {DataPort}.");
             base.Stop();
+
+            Utility.TryAndIgnore(_listener.Stop);
+            Utility.TryAndIgnore(_listener.Stop);
+
             _inboundConnectionThread?.Join(); //Wait on thread to finish.
             Core.Logging.Write($"Stopped inbound tunnel '{Name}'.");
         }
 
         private void InboundConnectionThreadProc()
         {
-            var listener = new TcpListener(IPAddress.Any, DataPort);
-
             try
             {
-                listener.Start();
+                _listener.Start();
 
                 Core.Logging.Write($"Started listiening for inbound tunnel '{Name}' on port {DataPort}.");
 
@@ -81,7 +87,7 @@ namespace NetTunnel.Service.Engine
                 {
                     Core.Logging.Write($"Waiting on connection for inbound tunnel '{Name}' on port {DataPort}.");
 
-                    var tcpClient = listener.AcceptTcpClient();
+                    var tcpClient = _listener.AcceptTcpClient();
                     Core.Logging.Write($"Accepted connection for inbound tunnel '{Name}' on port {DataPort}.");
 
                     using (Stream = tcpClient.GetStream())
@@ -102,7 +108,7 @@ namespace NetTunnel.Service.Engine
             }
             finally
             {
-                Utility.TryAndIgnore(listener.Stop);
+                Utility.TryAndIgnore(_listener.Stop);
             }
         }
     }

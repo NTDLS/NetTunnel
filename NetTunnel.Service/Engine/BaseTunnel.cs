@@ -62,6 +62,11 @@ namespace NetTunnel.Service.Engine
 
         public virtual void Stop()
         {
+            Utility.TryAndIgnore(() => Stream?.Close());
+
+            _inboundEndpoints.ForEach(o => o.Stop());
+            _outboundEndpoints.ForEach(o => o.Stop());
+
             KeepRunning = false;
             _heartbeatThread.Join();
         }
