@@ -39,7 +39,7 @@ namespace NetTunnel.Service.PacketFraming
             }
             catch (Exception ex)
             {
-                tunnel.Core.Logging.Write(ex.Message);
+                tunnel.Core.Logging.Write(Constants.NtLogSeverity.Exception, $"AssembleFrame: {ex.Message}");
                 throw;
             }
         }
@@ -68,7 +68,7 @@ namespace NetTunnel.Service.PacketFraming
             }
             catch (Exception ex)
             {
-                tunnel.Core.Logging.Write(ex.Message);
+                tunnel.Core.Logging.Write(Constants.NtLogSeverity.Exception, $"SkipFrame: {ex.Message}");
             }
         }
 
@@ -187,7 +187,7 @@ namespace NetTunnel.Service.PacketFraming
             }
             catch (Exception ex)
             {
-                tunnel.Core.Logging.Write(ex.Message);
+                tunnel.Core.Logging.Write(Constants.NtLogSeverity.Exception, $"ProcessFrameBuffer: {ex.Message}");
             }
         }
 

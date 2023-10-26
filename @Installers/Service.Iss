@@ -3,7 +3,7 @@
  AppName                          = NetTunnel
  AppVerName                       = NetTunnel 1.0.0.0
  AppCopyright                     = Copyright © 1995-2023 NetworkDLS.
- DefaultDirName                   = {commonpf}\NetworkDLS\NetTunnel\Service
+ DefaultDirName                   = {commonpf}\NetworkDLS\NetTunnel
  DefaultGroupName                 = NetworkDLS\NetTunnel
  UninstallDisplayIcon             = {app}\UI\NetTunnel.UI.exe
  SetupIconFile                    = "..\Images\Multi.ico"

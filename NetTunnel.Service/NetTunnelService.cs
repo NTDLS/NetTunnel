@@ -1,4 +1,5 @@
-﻿using NetTunnel.Service.Engine;
+﻿using NetTunnel.Library;
+using NetTunnel.Service.Engine;
 using NetTunnel.Service.Extensions;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -75,7 +76,7 @@ namespace NetTunnel.Service
                 app.UseSwagger();
                 app.UseSwaggerUI();
                 Console.WriteLine($"https://localhost:{Singletons.Configuration.ManagementPort}/swagger/index.html");
-                Singletons.Core.Logging.Write($"Listening on {Singletons.Configuration.ManagementPort}.");
+                Singletons.Core.Logging.Write(Constants.NtLogSeverity.Verbose,$"Listening on {Singletons.Configuration.ManagementPort}.");
             }
             */
 
@@ -92,7 +93,7 @@ namespace NetTunnel.Service
             {
                 if (_semaphoreToRequestStop.Wait(500))
                 {
-                    Singletons.Core.Logging.Write($"Stopping...");
+                    Singletons.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopping...");
                     app.StopAsync();
                     Singletons.Core.Stop();
                     break;

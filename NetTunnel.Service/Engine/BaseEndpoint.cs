@@ -2,7 +2,6 @@
 using NetTunnel.Service.PacketFraming.PacketPayloads.Notifications;
 using NetTunnel.Service.Types;
 using NTDLS.Semaphore;
-using System.Collections.Generic;
 using static NetTunnel.Service.PacketFraming.Types;
 
 namespace NetTunnel.Service.Engine
@@ -143,7 +142,7 @@ namespace NetTunnel.Service.Engine
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Exception, $"HandleClientThreadProc: {ex.Message}");
             }
             finally
             {

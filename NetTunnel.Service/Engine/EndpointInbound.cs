@@ -29,7 +29,7 @@ namespace NetTunnel.Service.Engine
         {
             base.Start();
 
-            _tunnel.Core.Logging.Write($"Starting inbound endpoint '{Name}' on port {Port}.");
+            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Starting inbound endpoint '{Name}' on port {Port}.");
 
             _inboundConnectionThread = new Thread(InboundConnectionThreadProc);
             _inboundConnectionThread.Start();
@@ -41,7 +41,7 @@ namespace NetTunnel.Service.Engine
 
             Utility.TryAndIgnore(_listener.Stop);
 
-            _tunnel.Core.Logging.Write($"Stopping inbound endpoint '{Name}' on port {Port}.");
+            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopping inbound endpoint '{Name}' on port {Port}.");
 
             _activeConnections.Use((o) =>
             {
@@ -52,7 +52,7 @@ namespace NetTunnel.Service.Engine
                 o.Clear();
             });
 
-            _tunnel.Core.Logging.Write($"Stopped inbound endpoint '{Name}' on port {Port}.");
+            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopped inbound endpoint '{Name}' on port {Port}.");
         }
 
         void InboundConnectionThreadProc()
@@ -61,7 +61,7 @@ namespace NetTunnel.Service.Engine
             {
                 _listener.Start();
 
-                _core.Logging.Write($"Listening inbound endpoint '{Name}' on port {Port}");
+                _core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Listening inbound endpoint '{Name}' on port {Port}");
 
                 while (KeepRunning)
                 {
@@ -77,6 +77,7 @@ namespace NetTunnel.Service.Engine
                             var activeConnection = new ActiveEndpointConnection(handlerThread, tcpClient, Guid.NewGuid());
                             _activeConnections.Use((o) => o.Add(activeConnection.StreamId, activeConnection));
 
+                            _core.Logging.Write(Constants.NtLogSeverity.Debug, $"Accepted inbound endpoint connection: {activeConnection.StreamId}");
                             handlerThread.Start(activeConnection);
                         }
                     }
@@ -84,7 +85,7 @@ namespace NetTunnel.Service.Engine
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception[InboundConnectionThreadProc]: {ex.Message}");
+                _core.Logging.Write(Constants.NtLogSeverity.Exception, $"InboundConnectionThreadProc: {ex.Message}");
             }
             finally
             {

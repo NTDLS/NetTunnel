@@ -24,14 +24,14 @@ namespace NetTunnel.Service.Engine
         {
             base.Start();
 
-            _tunnel.Core.Logging.Write($"Starting outbound endpoint '{Name}' on port {Port}.");
+            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Starting outbound endpoint '{Name}' on port {Port}.");
         }
 
         public override void Stop()
         {
             base.Stop();
 
-            _tunnel.Core.Logging.Write($"Stopping outbound endpoint '{Name}' on port {Port}.");
+            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopping outbound endpoint '{Name}' on port {Port}.");
 
             _activeConnections.Use((o) =>
             {
@@ -42,7 +42,7 @@ namespace NetTunnel.Service.Engine
                 o.Clear();
             });
 
-            _tunnel.Core.Logging.Write($"Stopped outbound endpoint '{Name}' on port {Port}.");
+            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopped outbound endpoint '{Name}' on port {Port}.");
         }
 
         public void EstablishOutboundEndpointConnection(Guid streamId)
@@ -60,12 +60,15 @@ namespace NetTunnel.Service.Engine
                         //Keep track of the connection. ActiveEndpointConnection will handle closing and disposing of the client and its stream.
                         var activeConnection = new ActiveEndpointConnection(handlerThread, tcpClient, streamId);
                         var outboundConnection = _activeConnections.Use((o) => o.TryAdd(streamId, activeConnection));
+
+                        _core.Logging.Write(Constants.NtLogSeverity.Debug, $"Established outbound endpoint connection: {activeConnection.StreamId}");
+
                         handlerThread.Start(activeConnection);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Exception[EstablishOutboundEndpointConnection]: {ex.Message}");
+                    _core.Logging.Write(Constants.NtLogSeverity.Exception, $"EstablishOutboundEndpointConnection: {ex.Message}");
                     throw;
                 }
             }

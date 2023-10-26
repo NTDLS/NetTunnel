@@ -103,7 +103,7 @@ namespace NetTunnel.Service.Engine
             }
             catch (Exception ex)
             {
-                Core.Logging.Write($"Exception in ReceiveAndProcessStreamFrames: {ex.Message}");
+                Core.Logging.Write(Constants.NtLogSeverity.Exception, $"ReceiveAndProcessStreamFrames: {ex.Message}");
             }
         }
 
