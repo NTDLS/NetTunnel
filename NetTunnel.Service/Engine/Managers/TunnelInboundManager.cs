@@ -75,22 +75,23 @@ namespace NetTunnel.Service.Engine.Managers
             });
         }
 
-        public void AddEndpointInbound(Guid tunnelPairId, NtEndpointInboundConfiguration endpoint)
+        public void AddEndpointInbound(Guid tunnelPairId, NtEndpointInboundConfiguration endpointConfiguration)
         {
             _collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
-                tunnel.AddInboundEndpoint(endpoint);
+                var endpoint = tunnel.AddInboundEndpoint(endpointConfiguration);
+                endpoint.Start();
             });
         }
 
-        public void AddEndpointOutbound(Guid tunnelPairId, NtEndpointOutboundConfiguration endpoint)
+        public void AddEndpointOutbound(Guid tunnelPairId, NtEndpointOutboundConfiguration endpointConfiguration)
         {
             _collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
-                tunnel.AddOutboundEndpoint(endpoint);
-                //tunnel.Start();
+                var endpoint = tunnel.AddOutboundEndpoint(endpointConfiguration);
+                endpoint.Start();
             });
         }
 

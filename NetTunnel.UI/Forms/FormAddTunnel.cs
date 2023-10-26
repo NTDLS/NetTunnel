@@ -22,14 +22,17 @@ namespace NetTunnel.UI.Forms
             AcceptButton = buttonAdd;
             CancelButton = buttonCancel;
 
+            textBoxRemotePort.Text = $"{client?.BaseAddress?.Port}"; //The port that is used to manage the remote tunnel.
+
+#if DEBUG
             textBoxName.Text = "My First Tunnel";
 
             textBoxRemoteAddress.Text = "127.0.0.1";
-            textBoxRemotePort.Text = "52845"; //The port that is used to manage the remote tunnel.
             textBoxTunnelDataPort.Text = "52846"; //This is the port that is used to move tunnel data between tunnels
 
-            textBoxRemoteUsername.Text = "admin";
-            textBoxRemotePassword.Text = "abcdefgh";
+            textBoxRemoteUsername.Text = "root";
+            textBoxRemotePassword.Text = Environment.MachineName.ToLower();
+#endif
         }
 
         private void FormAddTunnel_Load(object sender, EventArgs e) { }
@@ -48,8 +51,8 @@ namespace NetTunnel.UI.Forms
                     throw new Exception("You must specify a valid remote tunnel port.");
                 if (textBoxRemoteUsername.Text.Length == 0)
                     throw new Exception("You must specify a remote tunnel username.");
-                if (textBoxRemotePassword.Text.Length < 8)
-                    throw new Exception("You must specify a valid remote tunnel password (8 character or more).");
+                if (textBoxRemotePassword.Text.Length == 0)
+                    throw new Exception("You must specify a valid remote tunnel password.");
                 if (textBoxTunnelDataPort.Text.Length == 0 || int.TryParse(textBoxTunnelDataPort.Text, out var _) == false)
                     throw new Exception("You must specify a valid tunnel data port.");
 
@@ -72,7 +75,7 @@ namespace NetTunnel.UI.Forms
                 }
                 catch (Exception ex)
                 {
-                    this.EnableControl(buttonAdd, false);
+                    this.EnableControl(buttonAdd, true);
                     throw new Exception($"Failed to connect to the remote tunnel: {ex.Message}.");
                 }
 
@@ -83,7 +86,7 @@ namespace NetTunnel.UI.Forms
                 }
                 catch (Exception ex)
                 {
-                    this.EnableControl(buttonAdd, false);
+                    this.EnableControl(buttonAdd, true);
                     throw new Exception($"Failed to login to the remote tunnel: {ex.Message}.");
                 }
 
@@ -92,7 +95,7 @@ namespace NetTunnel.UI.Forms
                 {
                     if (!t.IsCompletedSuccessfully)
                     {
-                        this.EnableControl(buttonAdd, false);
+                        this.EnableControl(buttonAdd, true);
                         throw new Exception("Failed to create local outbound tunnel.");
                     }
 
@@ -104,7 +107,7 @@ namespace NetTunnel.UI.Forms
                             //If we failed to create the remote tunnel config, remove the local config.
                             _client.TunnelOutbound.Delete(outboundTunnel.PairId).ContinueWith(t =>
                             {
-                                this.EnableControl(buttonAdd, false);
+                                this.EnableControl(buttonAdd, true);
                                 throw new Exception("Failed to create remote inbound tunnel.");
                             });
                         }

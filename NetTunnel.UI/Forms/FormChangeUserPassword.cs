@@ -36,8 +36,8 @@ namespace NetTunnel.UI.Forms
             {
                 if (textBoxUsername.Text.Length == 0)
                     throw new Exception("You must specify a username.");
-                if (textBoxPassword.Text.Length < 8)
-                    throw new Exception("You must specify a password of at least 8 characters.");
+                if (textBoxPassword.Text.Length == 0)
+                    throw new Exception("You must specify a password.");
                 if (textBoxPassword.Text != textBoxConfirmPassword.Text)
                     throw new Exception("The password and confirm-passwords must match.");
 

@@ -36,10 +36,13 @@ namespace NetTunnel.UI.Forms
             AcceptButton = buttonAdd;
             CancelButton = buttonCancel;
 
+#if DEBUG
+
             textBoxName.Text = "Website Redirector Endpoint";
             textBoxListenPort.Text = "8080";
             textBoxTerminationAddress.Text = "127.0.0.1";
             textBoxTerminationPort.Text = "80";
+#endif
         }
 
         private void buttonAdd_Click(object sender, EventArgs e)
@@ -79,7 +82,7 @@ namespace NetTunnel.UI.Forms
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
-                                this.EnableControl(buttonAdd, false);
+                                this.EnableControl(buttonAdd, true);
                                 throw new Exception("Failed to add inbound endpoint pair to inbound tunnel.");
                             }
                             this.CloseFormWithResult(DialogResult.OK);
@@ -92,7 +95,7 @@ namespace NetTunnel.UI.Forms
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
-                                this.EnableControl(buttonAdd, false);
+                                this.EnableControl(buttonAdd, true);
                                 throw new Exception("Failed to add outbound endpoint pair to inbound tunnel.");
                             }
                             this.CloseFormWithResult(DialogResult.OK);
@@ -107,7 +110,7 @@ namespace NetTunnel.UI.Forms
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
-                                this.EnableControl(buttonAdd, false);
+                                this.EnableControl(buttonAdd, true);
                                 throw new Exception("Failed to add outbound endpoint pair to outbound tunnel.");
                             }
                             this.CloseFormWithResult(DialogResult.OK);
@@ -119,7 +122,7 @@ namespace NetTunnel.UI.Forms
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
-                                this.EnableControl(buttonAdd, false);
+                                this.EnableControl(buttonAdd, true);
                                 throw new Exception("Failed to add outbound endpoint pair to outbound tunnel.");
                             }
                             this.CloseFormWithResult(DialogResult.OK);

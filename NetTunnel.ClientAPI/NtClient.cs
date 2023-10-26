@@ -7,7 +7,9 @@ namespace NetTunnel.ClientAPI
     {
         public bool AutoAcceptSSLCertificate { get; set; } = true;
         public bool IsConnected => _connection != null;
-        public string BaseAddress { get; private set; }
+        public string Address { get; private set; }
+        public Uri? BaseAddress { get => Connection.BaseAddress; }
+
         public TimeSpan Timeout { get; private set; } = new TimeSpan(0, 8, 0, 0, 0);
         public HttpClient Connection
         {
@@ -29,10 +31,10 @@ namespace NetTunnel.ClientAPI
         /// <summary>
         /// Connects to the server using a URL.
         /// </summary>
-        /// <param name="baseAddress">Base address should be in the form http://host:port/</param>
-        public NtClient(string baseAddress)
+        /// <param name="address">Base address should be in the form http://host:port/</param>
+        public NtClient(string address)
         {
-            BaseAddress = baseAddress;
+            Address = address;
 
             TunnelInbound = new(this);
             TunnelOutbound = new(this);
@@ -41,9 +43,9 @@ namespace NetTunnel.ClientAPI
             Connect();
         }
 
-        public NtClient(string baseAddress, string username, string passwordHash)
+        public NtClient(string address, string username, string passwordHash)
         {
-            BaseAddress = baseAddress;
+            Address = address;
 
             TunnelInbound = new(this);
             TunnelOutbound = new(this);
@@ -57,10 +59,10 @@ namespace NetTunnel.ClientAPI
         /// <summary>
         /// Connects to the server using a URL and a non-default timeout.
         /// </summary>
-        /// <param name="baseAddress">Base address should be in the form http://host:port/</param>
-        public NtClient(string baseAddress, TimeSpan timeout)
+        /// <param name="address">Base address should be in the form http://host:port/</param>
+        public NtClient(string address, TimeSpan timeout)
         {
-            BaseAddress = baseAddress;
+            Address = address;
             Timeout = timeout;
 
             TunnelInbound = new(this);
@@ -90,7 +92,7 @@ namespace NetTunnel.ClientAPI
 
                 _connection = new HttpClient(handler)
                 {
-                    BaseAddress = new Uri(BaseAddress),
+                    BaseAddress = new Uri(Address),
                     Timeout = Timeout
                 };
             }

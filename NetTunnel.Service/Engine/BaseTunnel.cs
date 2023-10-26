@@ -150,12 +150,14 @@ namespace NetTunnel.Service.Engine
         {
             if (frame is NtFramePayloadAddEndpointInbound inboundEndpoint)
             {
-                AddInboundEndpoint(inboundEndpoint.Configuration);
+                var endpoint = AddInboundEndpoint(inboundEndpoint.Configuration);
+                endpoint.Start();
                 return new NtFramePayloadBoolean(true);
             }
             else if (frame is NtFramePayloadAddEndpointOutbound outboundEndpoint)
             {
-                AddOutboundEndpoint(outboundEndpoint.Configuration);
+                var endpoint = AddOutboundEndpoint(outboundEndpoint.Configuration);
+                endpoint.Start();
                 return new NtFramePayloadBoolean(true);
             }
             else
@@ -276,18 +278,22 @@ namespace NetTunnel.Service.Engine
 
         #region Endpoint CRUD helpers.
 
-        public void AddInboundEndpoint(NtEndpointInboundConfiguration configuration)
+        public EndpointInbound AddInboundEndpoint(NtEndpointInboundConfiguration configuration)
         {
-            _inboundEndpoints.Add(new EndpointInbound(Core, this, configuration));
+            var endpoint = new EndpointInbound(Core, this, configuration);
+            _inboundEndpoints.Add(endpoint);
             if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
             if (this is TunnelOutbound) Core.OutboundTunnels.SaveToDisk();
+            return endpoint;
         }
 
-        public void AddOutboundEndpoint(NtEndpointOutboundConfiguration configuration)
+        public EndpointOutbound AddOutboundEndpoint(NtEndpointOutboundConfiguration configuration)
         {
-            _outboundEndpoints.Add(new EndpointOutbound(Core, this, configuration));
+            var endpoint = new EndpointOutbound(Core, this, configuration);
+            _outboundEndpoints.Add(endpoint);
             if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
             if (this is TunnelOutbound) Core.OutboundTunnels.SaveToDisk();
+            return endpoint;
         }
 
         public void DeleteInboundEndpoint(Guid endpointPairId)
