@@ -7,6 +7,9 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
     internal class BaseEndpoint : IEndpoint
     {
+        public ulong BytesReceived { get; private set; }
+        public ulong BytesSent { get; private set; }
+
         public Guid PairId { get; private set; }
         public string Name { get; private set; }
 
@@ -93,6 +96,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         public void SendEndpointData(Guid streamId, byte[] buffer)
         {
+            BytesSent += (ulong)buffer.Length;
+
             var outboundConnection = _activeConnections.Use((o) =>
             {
                 if (o.TryGetValue(streamId, out var outboundConnection))
@@ -120,6 +125,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 {
                     while (activeConnection.Read(ref buffer, out int length))
                     {
+                        BytesReceived += (ulong)buffer.Length;
+
                         var exchnagePayload = new NtFramePayloadEndpointExchange(_tunnel.PairId, PairId, activeConnection.StreamId, buffer, length);
                         _tunnel.SendStreamFrameNotification(exchnagePayload);
                     }

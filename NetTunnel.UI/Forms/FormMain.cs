@@ -8,6 +8,9 @@ namespace NetTunnel.UI.Forms
     {
         private NtClient? _client;
 
+        private System.Windows.Forms.Timer? _timer;
+        private readonly List<NtEndpointStatistics> _latestStats = new();
+
         #region Constructor / Deconstructor.
 
         public FormMain()
@@ -30,8 +33,43 @@ namespace NetTunnel.UI.Forms
                 if (!ChangeConnection()) Close();
             };
 
+            _timer = new System.Windows.Forms.Timer()
+            {
+                Enabled = true,
+                Interval = 1000
+            };
+
+            _timer.Tick += _timer_Tick;
+            _timer.Start();
+
             listViewTunnels.MouseUp += ListViewTunnels_MouseUp;
             listViewTunnels.SelectedIndexChanged += ListViewTunnels_SelectedIndexChanged;
+        }
+
+        private void _timer_Tick(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (_client != null && _client.IsConnected)
+                {
+                    _client.TunnelInbound.EndpointStatistics().ContinueWith(inboundStats =>
+                    {
+                        _client.TunnelOutbound.EndpointStatistics().ContinueWith(outboundStats =>
+                        {
+                            lock (_latestStats)
+                            {
+                                _latestStats.Clear();
+
+                                _latestStats.AddRange(inboundStats.Result.Statistics);
+                                _latestStats.AddRange(outboundStats.Result.Statistics);
+
+                                throw new Exception("Fill in the stats of the grids??");
+                            }
+                        });
+                    });
+                }
+            }
+            catch { }
         }
 
         private void ListViewTunnels_SelectedIndexChanged(object? sender, EventArgs e)

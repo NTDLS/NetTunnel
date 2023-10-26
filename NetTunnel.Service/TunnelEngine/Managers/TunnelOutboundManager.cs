@@ -1,6 +1,7 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
+using NetTunnel.Service.TunnelEngine.Endpoints;
 using NetTunnel.Service.TunnelEngine.Tunnels;
 using NTDLS.Semaphore;
 
@@ -82,24 +83,30 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-        public NtTunnelBasicInfo GetBasicInfo()
+        public List<NtEndpointStatistics> GetEndpointStatistics()
         {
-            return _collection.Use((o) =>
-            {
-                return new NtTunnelBasicInfo
-                {
-                    //Name = o._con
-                };
-            });
-        }
+            var statictics = new List<NtEndpointStatistics>();
 
-        public NtTunnelOutboundConfiguration CloneConfiguration(Guid tunnerPairId)
-        {
-            return _collection.Use((o) =>
+            _collection.Use((o) =>
             {
-                var tunnel = o.Where(o => o.PairId == tunnerPairId).Single();
-                return tunnel.CloneConfiguration();
+                foreach (var tunnel in o)
+                {
+                    foreach (var endpoint in tunnel.Endpoints)
+                    {
+                        var stats = new NtEndpointStatistics()
+                        {
+                            Direction = endpoint is EndpointInbound ? Constants.NtDirection.Inbound : Constants.NtDirection.Outbound,
+                            BytesReceived = endpoint.BytesReceived,
+                            BytesSent = endpoint.BytesSent,
+                            EndpointPairId = endpoint.PairId,
+                            TunnelPairId = tunnel.PairId
+                        };
+                        statictics.Add(stats);
+                    }
+                }
             });
+
+            return statictics;
         }
 
         public List<NtTunnelOutboundConfiguration> CloneConfigurations()

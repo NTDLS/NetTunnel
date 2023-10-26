@@ -28,7 +28,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         {
             var tunnelConfiguration = new NtTunnelInboundConfiguration(PairId, Name, DataPort);
 
-            foreach (var endpoint in _endpoints)
+            foreach (var endpoint in Endpoints)
             {
                 if (endpoint is EndpointInbound inboundEndpoint)
                 {
@@ -59,7 +59,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             _inboundConnectionThread.Start();
 
             Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Starting endpoints for inbound tunnel '{Name}'.");
-            _endpoints.ForEach(x => x.Start());
+            Endpoints.ForEach(x => x.Start());
         }
 
         public override void Stop()

@@ -15,6 +15,21 @@ namespace NetTunnel.ClientAPI
             _client = client;
         }
 
+        public async Task<NtActionResponseEndpointStatistics> EndpointStatistics()
+        {
+            string url = $"api/TunnelInbound/{_client.SessionId}/EndpointStatistics";
+
+            using var response = await _client.Connection.GetAsync(url);
+            string resultText = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<NtActionResponseEndpointStatistics>(resultText);
+            if (result == null || result.Success == false)
+            {
+                throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
+            }
+
+            return result;
+        }
+
         public async Task<NtActionResponseTunnelsInbound> List()
         {
             string url = $"api/TunnelInbound/{_client.SessionId}/List";

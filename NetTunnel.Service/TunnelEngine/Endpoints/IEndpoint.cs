@@ -12,5 +12,7 @@
         public void SendEndpointData(Guid streamId, byte[] buffer);
         public void Start();
         public void Stop();
+        public ulong BytesReceived { get; }
+        public ulong BytesSent { get; }
     }
 }

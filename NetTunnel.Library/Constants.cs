@@ -4,6 +4,12 @@
     {
         public const string FriendlyName = "NetTunnel";
 
+        public enum NtDirection
+        {
+            Inbound,
+            Outbound
+        }
+
         public enum NtLogSeverity
         {
             Debug = 0, //Super-verbose, debug information.

@@ -18,6 +18,26 @@ namespace NetTunnel.Service.Controllers
         }
 
         [HttpGet]
+        [Route("{sessionId}/EndpointStatistics")]
+        public NtActionResponseEndpointStatistics EndpointStatistics(Guid sessionId)
+        {
+            try
+            {
+                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+
+                return new NtActionResponseEndpointStatistics
+                {
+                    Statistics = Singletons.Core.OutboundTunnels.GetEndpointStatistics(),
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new NtActionResponseEndpointStatistics(ex);
+            }
+        }
+
+        [HttpGet]
         [Route("{sessionId}/List")]
         public NtActionResponseTunnelsOutbound List(Guid sessionId)
         {

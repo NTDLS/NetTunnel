@@ -1,5 +1,4 @@
-﻿using NetTunnel.Library.Types;
-using NetTunnel.Service.TunnelEngine.Managers;
+﻿using NetTunnel.Service.TunnelEngine.Managers;
 
 namespace NetTunnel.Service.TunnelEngine
 {
