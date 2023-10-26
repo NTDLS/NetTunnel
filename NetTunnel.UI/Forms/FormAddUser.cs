@@ -4,7 +4,7 @@ using NetTunnel.Service;
 
 namespace NetTunnel.UI.Forms
 {
-    public partial class FormAddUser : BaseForm
+    public partial class FormAddUser : Form
     {
         private readonly NtClient? _client;
         public NtUser? CreatedUser { get; set; }
@@ -39,17 +39,17 @@ namespace NetTunnel.UI.Forms
 
                 CreatedUser = new NtUser(textBoxUsername.Text, Utility.CalculateSHA256(textBoxUsername.Text));
 
-                EnableControl(buttonSave, false);
+                this.EnableControl(buttonSave, false);
 
                 _client.Security.CreateUser(CreatedUser).ContinueWith(t =>
                 {
                     if (!t.IsCompletedSuccessfully)
                     {
-                        EnableControl(buttonSave, true);
+                        this.EnableControl(buttonSave, true);
                         throw new Exception("Failed to create new user.");
                     }
 
-                    CloseFormWithResult(DialogResult.OK);
+                    this.CloseFormWithResult(DialogResult.OK);
                 });
             }
             catch (Exception ex)

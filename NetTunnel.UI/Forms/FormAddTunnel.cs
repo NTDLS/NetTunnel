@@ -4,7 +4,7 @@ using NetTunnel.Library.Types;
 
 namespace NetTunnel.UI.Forms
 {
-    public partial class FormAddTunnel : BaseForm
+    public partial class FormAddTunnel : Form
     {
         private readonly NtClient? _client;
 
@@ -53,7 +53,7 @@ namespace NetTunnel.UI.Forms
                 if (textBoxTunnelDataPort.Text.Length == 0 || int.TryParse(textBoxTunnelDataPort.Text, out var _) == false)
                     throw new Exception("You must specify a valid tunnel data port.");
 
-                EnableControl(buttonAdd, false);
+                this.EnableControl(buttonAdd, false);
 
                 var tunnelPairId = Guid.NewGuid(); //The TunnelId is the same on both services.
 
@@ -72,7 +72,7 @@ namespace NetTunnel.UI.Forms
                 }
                 catch (Exception ex)
                 {
-                    EnableControl(buttonAdd, false);
+                    this.EnableControl(buttonAdd, false);
                     throw new Exception($"Failed to connect to the remote tunnel: {ex.Message}.");
                 }
 
@@ -83,7 +83,7 @@ namespace NetTunnel.UI.Forms
                 }
                 catch (Exception ex)
                 {
-                    EnableControl(buttonAdd, false);
+                    this.EnableControl(buttonAdd, false);
                     throw new Exception($"Failed to login to the remote tunnel: {ex.Message}.");
                 }
 
@@ -92,7 +92,7 @@ namespace NetTunnel.UI.Forms
                 {
                     if (!t.IsCompletedSuccessfully)
                     {
-                        EnableControl(buttonAdd, false);
+                        this.EnableControl(buttonAdd, false);
                         throw new Exception("Failed to create local outbound tunnel.");
                     }
 
@@ -104,7 +104,7 @@ namespace NetTunnel.UI.Forms
                             //If we failed to create the remote tunnel config, remove the local config.
                             _client.TunnelOutbound.Delete(outboundTunnel.PairId).ContinueWith(t =>
                             {
-                                EnableControl(buttonAdd, false);
+                                this.EnableControl(buttonAdd, false);
                                 throw new Exception("Failed to create remote inbound tunnel.");
                             });
                         }
@@ -115,7 +115,7 @@ namespace NetTunnel.UI.Forms
                         //Start the outbound-connecting tunnel:
                         _client.TunnelOutbound.Start(outboundTunnel.PairId).Wait();
 
-                        CloseFormWithResult(DialogResult.OK);
+                        this.CloseFormWithResult(DialogResult.OK);
                     });
                 });
             }
@@ -128,7 +128,7 @@ namespace NetTunnel.UI.Forms
         private void buttonCancel_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
-            Close();
+            this.Close();
         }
     }
 }

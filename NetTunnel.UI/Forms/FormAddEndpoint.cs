@@ -4,7 +4,7 @@ using NetTunnel.Library.Types;
 
 namespace NetTunnel.UI.Forms
 {
-    public partial class FormAddEndpoint : BaseForm
+    public partial class FormAddEndpoint : Form
     {
         private readonly NtClient? _client;
         private readonly NtTunnelInboundConfiguration? _tunnelInbound;
@@ -62,7 +62,7 @@ namespace NetTunnel.UI.Forms
                     throw new Exception("You must select a single listen endpoint location.");
                 }
 
-                EnableControl(buttonAdd, false);
+                this.EnableControl(buttonAdd, false);
 
                 var endpointPairId = Guid.NewGuid(); //The endpointId is the same on both services.
 
@@ -79,10 +79,10 @@ namespace NetTunnel.UI.Forms
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
-                                EnableControl(buttonAdd, false);
+                                this.EnableControl(buttonAdd, false);
                                 throw new Exception("Failed to add inbound endpoint pair to inbound tunnel.");
                             }
-                            CloseFormWithResult(DialogResult.OK);
+                            this.CloseFormWithResult(DialogResult.OK);
 
                         });
                     }
@@ -92,10 +92,10 @@ namespace NetTunnel.UI.Forms
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
-                                EnableControl(buttonAdd, false);
+                                this.EnableControl(buttonAdd, false);
                                 throw new Exception("Failed to add outbound endpoint pair to inbound tunnel.");
                             }
-                            CloseFormWithResult(DialogResult.OK);
+                            this.CloseFormWithResult(DialogResult.OK);
                         });
                     }
                 }
@@ -107,10 +107,10 @@ namespace NetTunnel.UI.Forms
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
-                                EnableControl(buttonAdd, false);
+                                this.EnableControl(buttonAdd, false);
                                 throw new Exception("Failed to add outbound endpoint pair to outbound tunnel.");
                             }
-                            CloseFormWithResult(DialogResult.OK);
+                            this.CloseFormWithResult(DialogResult.OK);
                         });
                     }
                     else
@@ -119,10 +119,10 @@ namespace NetTunnel.UI.Forms
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
-                                EnableControl(buttonAdd, false);
+                                this.EnableControl(buttonAdd, false);
                                 throw new Exception("Failed to add outbound endpoint pair to outbound tunnel.");
                             }
-                            CloseFormWithResult(DialogResult.OK);
+                            this.CloseFormWithResult(DialogResult.OK);
                         });
                     }
                 }

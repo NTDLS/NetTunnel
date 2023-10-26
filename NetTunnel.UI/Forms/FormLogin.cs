@@ -43,7 +43,6 @@ namespace NetTunnel.UI.Forms
 
                 using var _ = new NtClient(Address, Username, Password);
 
-
                 var preferences = new UIPreferences()
                 {
                     Address = textBoxAddress.Text,
