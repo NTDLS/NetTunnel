@@ -1,7 +1,7 @@
 ﻿using NetTunnel.Service.MessageFraming.FramePayloads.Notifications;
 using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
 using NetTunnel.Service.MessageFraming.FramePayloads.Replies;
-using NetTunnel.Service.Types;
+using NetTunnel.Service.TunnelEngine.Tunnels;
 
 namespace NetTunnel.Service.MessageFraming
 {

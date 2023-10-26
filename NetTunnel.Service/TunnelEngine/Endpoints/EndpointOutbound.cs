@@ -1,9 +1,9 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NetTunnel.Service.Types;
+using NetTunnel.Service.TunnelEngine.Tunnels;
 using System.Net.Sockets;
 
-namespace NetTunnel.Service.TunnelEngine
+namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
     /// <summary>
     /// This is the class that makes an outbound TCP/IP connection to a listening endpoint.

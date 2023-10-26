@@ -1,9 +1,9 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Service.MessageFraming.FramePayloads.Notifications;
-using NetTunnel.Service.Types;
+using NetTunnel.Service.TunnelEngine.Tunnels;
 using NTDLS.Semaphore;
 
-namespace NetTunnel.Service.TunnelEngine
+namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
     internal class BaseEndpoint : IEndpoint
     {
@@ -35,7 +35,7 @@ namespace NetTunnel.Service.TunnelEngine
 
             while (KeepRunning)
             {
-                if ((DateTime.UtcNow - lastheartBeat).TotalMilliseconds > _core.Configuration.HeartbeatDelayMs)
+                if ((DateTime.UtcNow - lastheartBeat).TotalMilliseconds > Singletons.Configuration.HeartbeatDelayMs)
                 {
                     _activeConnections.Use((o) =>
                     {
@@ -46,7 +46,7 @@ namespace NetTunnel.Service.TunnelEngine
                             Utility.TryAndIgnore(() =>
                             {
                                 //We've are connected but havent done much in a while.
-                                if (connection.Value.ActivityAgeInMiliseconds > _core.Configuration.MaxStaleConnectionAgeMs)
+                                if (connection.Value.ActivityAgeInMiliseconds > Singletons.Configuration.MaxStaleConnectionAgeMs)
                                 {
                                     connectionsToClose.Add(connection.Value);
                                 }
@@ -115,7 +115,7 @@ namespace NetTunnel.Service.TunnelEngine
             {
                 _tunnel.SendStreamFrameNotification(new NtFramePayloadEndpointConnect(_tunnel.PairId, PairId, activeConnection.StreamId));
 
-                byte[] buffer = new byte[_core.Configuration.FramebufferSize];
+                byte[] buffer = new byte[Singletons.Configuration.FramebufferSize];
                 while (KeepRunning && activeConnection.IsConnected)
                 {
                     while (activeConnection.Read(ref buffer, out int length))

@@ -3,7 +3,8 @@ using NetTunnel.Service.MessageFraming.FramePayloads;
 using NetTunnel.Service.MessageFraming.FramePayloads.Notifications;
 using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
 using NetTunnel.Service.MessageFraming.FramePayloads.Replies;
-using NetTunnel.Service.Types;
+using NetTunnel.Service.TunnelEngine;
+using NetTunnel.Service.TunnelEngine.Tunnels;
 using NTDLS.Semaphore;
 using System.Net.Sockets;
 using System.Reflection;
@@ -125,7 +126,7 @@ namespace NetTunnel.Service.MessageFraming
                         continue;
                     }
 
-                    if (grossFrameSize < 0 || grossFrameSize > tunnel.Core.Configuration.MaxFrameSize)
+                    if (grossFrameSize < 0 || grossFrameSize > Singletons.Configuration.MaxFrameSize)
                     {
                         tunnel.Core.Logging.Write(Constants.NtLogSeverity.Warning, "ProcessFrameBuffer: Malformed frame, invalid length.");
                         SkipFrame(tunnel, ref frameBuffer);

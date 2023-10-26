@@ -1,6 +1,7 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
+using NetTunnel.Service.TunnelEngine.Tunnels;
 using NTDLS.Semaphore;
 
 namespace NetTunnel.Service.TunnelEngine.Managers

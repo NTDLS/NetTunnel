@@ -10,11 +10,9 @@ namespace NetTunnel.Service.TunnelEngine
         public TunnelOutboundManager OutboundTunnels { get; set; }
         public TunnelInboundManager InboundTunnels { get; set; }
         public UserManager Users { get; set; }
-        public NtServiceApplicationConfiguration Configuration { get; private set; }
 
-        public TunnelEngineCore(NtServiceApplicationConfiguration configuration)
+        public TunnelEngineCore()
         {
-            Configuration = configuration;
             Logging = new(this);
             Sessions = new(this);
             OutboundTunnels = new(this);

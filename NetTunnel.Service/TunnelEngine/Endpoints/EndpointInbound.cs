@@ -1,10 +1,10 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NetTunnel.Service.Types;
+using NetTunnel.Service.TunnelEngine.Tunnels;
 using System.Net;
 using System.Net.Sockets;
 
-namespace NetTunnel.Service.TunnelEngine
+namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
     /// <summary>
     /// This is the class that opens a listening TCP/IP port to wait on connections from a remote tunnel.

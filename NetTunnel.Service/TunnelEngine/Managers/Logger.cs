@@ -14,7 +14,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         public void Write(NtLogSeverity severity, string text)
         {
-            if (severity == NtLogSeverity.Debug && _core.Configuration.DebugLogging == false)
+            if (severity == NtLogSeverity.Debug && Singletons.Configuration.DebugLogging == false)
             {
                 return;
             }

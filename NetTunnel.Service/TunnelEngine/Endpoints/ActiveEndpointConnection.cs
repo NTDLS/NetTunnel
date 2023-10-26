@@ -1,7 +1,7 @@
 ﻿using NetTunnel.Library;
 using System.Net.Sockets;
 
-namespace NetTunnel.Service.TunnelEngine
+namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
     internal class ActiveEndpointConnection : IDisposable
     {

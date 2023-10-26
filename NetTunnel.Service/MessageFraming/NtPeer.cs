@@ -1,4 +1,4 @@
-﻿using NetTunnel.Service.Types;
+﻿using NetTunnel.Service.TunnelEngine.Tunnels;
 
 namespace NetTunnel.Service.MessageFraming
 {

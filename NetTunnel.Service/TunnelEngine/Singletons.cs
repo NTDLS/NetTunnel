@@ -9,7 +9,7 @@ namespace NetTunnel.Service.TunnelEngine
         {
             get
             {
-                _core ??= new TunnelEngineCore(Configuration);
+                _core ??= new TunnelEngineCore();
                 return _core;
             }
         }

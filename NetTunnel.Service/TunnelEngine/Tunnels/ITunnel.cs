@@ -2,9 +2,8 @@
 using NetTunnel.Service.MessageFraming.FramePayloads.Notifications;
 using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
 using NetTunnel.Service.MessageFraming.FramePayloads.Replies;
-using NetTunnel.Service.TunnelEngine;
 
-namespace NetTunnel.Service.Types
+namespace NetTunnel.Service.TunnelEngine.Tunnels
 {
     internal interface ITunnel
     {

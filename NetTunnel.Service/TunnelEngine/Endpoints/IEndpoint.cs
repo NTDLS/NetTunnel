@@ -1,4 +1,4 @@
-﻿namespace NetTunnel.Service.Types
+﻿namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
     public interface IEndpoint
     {

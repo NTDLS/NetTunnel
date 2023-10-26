@@ -4,12 +4,12 @@ using NetTunnel.Service.MessageFraming;
 using NetTunnel.Service.MessageFraming.FramePayloads.Notifications;
 using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
 using NetTunnel.Service.MessageFraming.FramePayloads.Replies;
-using NetTunnel.Service.Types;
+using NetTunnel.Service.TunnelEngine.Endpoints;
 using System.Diagnostics;
 using System.Net.Sockets;
 using static NetTunnel.Service.MessageFraming.Types;
 
-namespace NetTunnel.Service.TunnelEngine
+namespace NetTunnel.Service.TunnelEngine.Tunnels
 {
     internal class BaseTunnel : ITunnel
     {
@@ -75,7 +75,7 @@ namespace NetTunnel.Service.TunnelEngine
 
             while (KeepRunning)
             {
-                if ((DateTime.UtcNow - lastheartBeat).TotalMilliseconds > Core.Configuration.HeartbeatDelayMs)
+                if ((DateTime.UtcNow - lastheartBeat).TotalMilliseconds > Singletons.Configuration.HeartbeatDelayMs)
                 {
                     lastheartBeat = DateTime.UtcNow;
                 }
@@ -94,7 +94,7 @@ namespace NetTunnel.Service.TunnelEngine
         {
             try
             {
-                var frameBuffer = new NtFrameBuffer(Core.Configuration.FramebufferSize);
+                var frameBuffer = new NtFrameBuffer(Singletons.Configuration.FramebufferSize);
                 while (KeepRunning)
                 {
                     NtFraming.ReceiveAndProcessStreamFrames(Stream, this, frameBuffer, processFrameNotificationCallback, processFrameQueryCallback);
@@ -195,7 +195,7 @@ namespace NetTunnel.Service.TunnelEngine
 
                 //Wait for a reply. When a reply is received, it will be routed to the correct query via ApplyQueryReply().
                 //ApplyQueryReply() will apply the payload data to queryAwaitingReply and trigger the wait event.
-                if (queryAwaitingReply.WaitEvent.WaitOne(Core.Configuration.FrameQueryTimeoutMs) == false)
+                if (queryAwaitingReply.WaitEvent.WaitOne(Singletons.Configuration.FrameQueryTimeoutMs) == false)
                 {
                     _queriesAwaitingReplies.Remove(queryAwaitingReply);
                     throw new Exception("Query timeout expired while waiting on reply.");
