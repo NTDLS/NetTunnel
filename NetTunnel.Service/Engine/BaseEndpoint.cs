@@ -2,7 +2,6 @@
 using NetTunnel.Service.PacketFraming.PacketPayloads.Notifications;
 using NetTunnel.Service.Types;
 using NTDLS.Semaphore;
-using static NetTunnel.Service.PacketFraming.Types;
 
 namespace NetTunnel.Service.Engine
 {
@@ -36,7 +35,7 @@ namespace NetTunnel.Service.Engine
 
             while (KeepRunning)
             {
-                if ((DateTime.UtcNow - lastheartBeat).TotalMilliseconds > 10000)
+                if ((DateTime.UtcNow - lastheartBeat).TotalMilliseconds > _core.Configuration.HeartbeatDelayMs)
                 {
                     _activeConnections.Use((o) =>
                     {
@@ -47,16 +46,7 @@ namespace NetTunnel.Service.Engine
                             Utility.TryAndIgnore(() =>
                             {
                                 //We've are connected but havent done much in a while.
-                                if (connection.Value.ActivityAgeInMiliseconds > 600 * 1000)
-                                {
-                                    connectionsToClose.Add(connection.Value);
-                                }
-                            });
-
-                            Utility.TryAndIgnore(() =>
-                            {
-                                //We've been in the queue for more than 10 seconds and we still arent connected.
-                                if (connection.Value.StartAgeInMiliseconds > 10 * 1000 && connection.Value.IsConnected == false)
+                                if (connection.Value.ActivityAgeInMiliseconds > _core.Configuration.MaxStaleConnectionAgeMs)
                                 {
                                     connectionsToClose.Add(connection.Value);
                                 }
@@ -94,13 +84,8 @@ namespace NetTunnel.Service.Engine
             {
                 if (o.TryGetValue(streamId, out var activeEndpointConnection))
                 {
-                    try
-                    {
-                        activeEndpointConnection.Disconnect();
-                        activeEndpointConnection.Dispose();
-                    }
-                    catch { }
-
+                    Utility.TryAndIgnore(activeEndpointConnection.Disconnect);
+                    Utility.TryAndIgnore(activeEndpointConnection.Dispose);
                     o.Remove(streamId);
                 }
             });
@@ -130,9 +115,9 @@ namespace NetTunnel.Service.Engine
             {
                 _tunnel.SendStreamFrameNotification(new NtFramePayloadEndpointConnect(_tunnel.PairId, PairId, activeConnection.StreamId));
 
+                byte[] buffer = new byte[_core.Configuration.FramebufferSize];
                 while (KeepRunning && activeConnection.IsConnected)
                 {
-                    byte[] buffer = new byte[NtFrameDefaults.FRAME_BUFFER_SIZE];
                     while (activeConnection.Read(ref buffer, out int length))
                     {
                         var exchnagePayload = new NtFramePayloadEndpointExchange(_tunnel.PairId, PairId, activeConnection.StreamId, buffer, length);
@@ -154,11 +139,8 @@ namespace NetTunnel.Service.Engine
                 });
             }
 
-            try
-            {
-                _tunnel.SendStreamFrameNotification(new NtFramePayloadEndpointDisconnect(_tunnel.PairId, PairId, activeConnection.StreamId));
-            }
-            catch { }
+            Utility.TryAndIgnore(() =>
+                _tunnel.SendStreamFrameNotification(new NtFramePayloadEndpointDisconnect(_tunnel.PairId, PairId, activeConnection.StreamId)));
         }
     }
 }

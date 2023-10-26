@@ -77,7 +77,7 @@ namespace NetTunnel.Service.Engine
 
             while (KeepRunning)
             {
-                if ((DateTime.UtcNow - lastheartBeat).TotalMilliseconds > 10000)
+                if ((DateTime.UtcNow - lastheartBeat).TotalMilliseconds > Core.Configuration.HeartbeatDelayMs)
                 {
                     lastheartBeat = DateTime.UtcNow;
                 }
@@ -95,7 +95,7 @@ namespace NetTunnel.Service.Engine
         {
             try
             {
-                var frameBuffer = new NtFrameBuffer();
+                var frameBuffer = new NtFrameBuffer(Core.Configuration.FramebufferSize);
                 while (KeepRunning)
                 {
                     NtFraming.ReceiveAndProcessStreamFrames(Stream, this, frameBuffer, processFrameNotificationCallback, processFrameQueryCallback);
@@ -110,9 +110,6 @@ namespace NetTunnel.Service.Engine
         /// <summary>
         /// We received a fire-and-forget message on the tunnel.
         /// </summary>
-        /// <param name="tunnel"></param>
-        /// <param name="frame"></param>
-        /// <exception cref="Exception"></exception>
         internal void ProcessFrameNotificationCallback(ITunnel tunnel, INtFramePayloadNotification frame)
         {
             if (frame is NtFramePayloadMessage message)
@@ -121,21 +118,21 @@ namespace NetTunnel.Service.Engine
             }
             else if (frame is NtFramePayloadEndpointConnect connectEndpoint)
             {
-                Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Recevied endpoint connection notification.");
+                //Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Recevied endpoint connection notification.");
 
                 _outboundEndpoints.Where(o => o.PairId == connectEndpoint.EndpointPairId).FirstOrDefault()?
                     .EstablishOutboundEndpointConnection(connectEndpoint.StreamId);
             }
             else if (frame is NtFramePayloadEndpointDisconnect disconnectEndpoint)
             {
-                Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Recevied endpoint disconnection notification.");
+                //Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Recevied endpoint disconnection notification.");
 
                 GetEndpointById(disconnectEndpoint.EndpointPairId)?
                     .Disconnect(disconnectEndpoint.StreamId);
             }
             else if (frame is NtFramePayloadEndpointExchange exchange)
             {
-                Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Exchanging {exchange.Bytes.Length} bytes.");
+                //Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Exchanging {exchange.Bytes.Length} bytes.");
 
                 GetEndpointById(exchange.EndpointPairId)?
                     .SendEndpointData(exchange.StreamId, exchange.Bytes);
@@ -149,10 +146,6 @@ namespace NetTunnel.Service.Engine
         /// <summary>
         /// We recevied a query on the tunnel. Reply to it.
         /// </summary>
-        /// <param name="tunnel"></param>
-        /// <param name="frame"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
         internal INtFramePayloadReply ProcessFrameQueryCallback(ITunnel tunnel, INtFramePayloadQuery frame)
         {
             if (frame is NtFramePayloadAddEndpointInbound inboundEndpoint)
@@ -167,7 +160,7 @@ namespace NetTunnel.Service.Engine
             }
             else
             {
-                throw new Exception("Unhandled query frame.");
+                throw new Exception("ProcessFrameQueryCallback: Unhandled query frame type.");
             }
         }
 
@@ -187,28 +180,29 @@ namespace NetTunnel.Service.Engine
                 Payload = Utility.SerializeToByteArray(payload)
             };
 
-            var queriesAwaitingReply = new QueriesAwaitingReply()
+            var queryAwaitingReply = new QueriesAwaitingReply()
             {
                 FrameId = cmd.Id,
             };
 
-            _queriesAwaitingReplies.Add(queriesAwaitingReply);
+            _queriesAwaitingReplies.Add(queryAwaitingReply);
 
             return await Task.Run(() =>
             {
                 var frameBytes = NtFraming.AssembleFrame(this, cmd);
                 Stream.Write(frameBytes, 0, frameBytes.Length);
 
-                //TODO: We need to check received data to see if any of them are replies
-                if (queriesAwaitingReply.WaitEvent.WaitOne(NtFrameDefaults.QUERY_TIMEOUT_MS) == false)
+                //Wait for a reply. When a reply is received, it will be routed to the correct query via ApplyQueryReply().
+                //ApplyQueryReply() will apply the payload data to queryAwaitingReply and trigger the wait event.
+                if (queryAwaitingReply.WaitEvent.WaitOne(Core.Configuration.FrameQueryTimeoutMs) == false)
                 {
-                    _queriesAwaitingReplies.Remove(queriesAwaitingReply);
+                    _queriesAwaitingReplies.Remove(queryAwaitingReply);
                     throw new Exception("Query timeout expired while waiting on reply.");
                 }
 
-                _queriesAwaitingReplies.Remove(queriesAwaitingReply);
+                _queriesAwaitingReplies.Remove(queryAwaitingReply);
 
-                return (T?)queriesAwaitingReply.ReplyPayload;
+                return (T?)queryAwaitingReply.ReplyPayload;
             });
         }
 
@@ -232,6 +226,9 @@ namespace NetTunnel.Service.Engine
             Stream.Write(frameBytes, 0, frameBytes.Length);
         }
 
+        /// <summary>
+        /// A reply to a query was received, we need to find the waiting query - set the reply payload data and trigger the wait event.
+        /// </summary>
         public void ApplyQueryReply(Guid frameId, INtFramePayloadReply replyPayload)
         {
             var waitingQuery = _queriesAwaitingReplies.Where(o => o.FrameId == frameId).Single();

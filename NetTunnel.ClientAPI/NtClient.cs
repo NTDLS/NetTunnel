@@ -98,11 +98,7 @@ namespace NetTunnel.ClientAPI
             {
                 if (_connection != null)
                 {
-                    try
-                    {
-                        _connection.Dispose();
-                    }
-                    catch { }
+                    Utility.TryAndIgnore(_connection.Dispose);
                 }
 
                 SessionId = Guid.Empty;
@@ -166,11 +162,7 @@ namespace NetTunnel.ClientAPI
             {
                 if (IsConnected)
                 {
-                    try
-                    {
-                        Disconnect();
-                    }
-                    catch { }
+                    Utility.TryAndIgnore(Disconnect);
                 }
             }
 

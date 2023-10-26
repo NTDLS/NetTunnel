@@ -16,11 +16,17 @@ namespace NetTunnel.UI.Forms
             AcceptButton = buttonLogin;
             CancelButton = buttonCancel;
 
-            textBoxAddress.Text = "127.0.0.1";
-            textBoxPort.Text = "52845";
+            var preferences = Persistence.LoadFromDisk<UIPreferences>();
+            if (preferences != null)
+            {
+                textBoxAddress.Text = preferences.Address;
+                textBoxPort.Text = preferences.Port;
+                textBoxUsername.Text = preferences.Username;
+            }
 
-            textBoxUsername.Text = "admin";
-            textBoxPassword.Text = "abcdefgh";
+#if DEBUG
+            textBoxPassword.Text = Environment.MachineName.ToLower();
+#endif
         }
 
         private void buttonLogin_Click(object sender, EventArgs e)
@@ -36,6 +42,16 @@ namespace NetTunnel.UI.Forms
                 Address = $"https://{textBoxAddress.Text}:{port}/";
 
                 using var _ = new NtClient(Address, Username, Password);
+
+
+                var preferences = new UIPreferences()
+                {
+                    Address = textBoxAddress.Text,
+                    Port = textBoxPort.Text,
+                    Username = textBoxUsername.Text,
+                };
+
+                Persistence.SaveToDisk(preferences);
 
                 DialogResult = DialogResult.OK;
                 Close();

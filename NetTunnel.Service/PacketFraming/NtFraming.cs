@@ -19,7 +19,6 @@ namespace NetTunnel.Service.PacketFraming
     {
         private static CriticalResource<Dictionary<string, MethodInfo>> _reflectioncache = new();
 
-
         public static byte[] AssembleFrame(ITunnel tunnel, NtFrame frame)
         {
             try
@@ -78,7 +77,7 @@ namespace NetTunnel.Service.PacketFraming
         {
             if (stream == null)
             {
-                throw new Exception("ReceiveAndProcessStreamFrames stream can not be null.");
+                throw new Exception("ReceiveAndProcessStreamFrames: stream can not be null.");
             }
 
             Array.Clear(frameBuffer.ReceiveBuffer);
@@ -91,7 +90,7 @@ namespace NetTunnel.Service.PacketFraming
         {
             if (stream == null)
             {
-                throw new Exception("ReceiveAndProcessStreamFrames stream can not be null.");
+                throw new Exception("ProcessFrameBuffer: stream can not be null.");
             }
 
             try
@@ -121,14 +120,14 @@ namespace NetTunnel.Service.PacketFraming
 
                     if (frameDelimiter != NtFrameDefaults.FRAME_DELIMITER)
                     {
-                        //LogException(new Exception("Malformed frame, invalid delimiter."));
+                        tunnel.Core.Logging.Write(Constants.NtLogSeverity.Warning, "ProcessFrameBuffer: Malformed frame, invalid delimiter.");
                         SkipFrame(tunnel, ref frameBuffer);
                         continue;
                     }
 
-                    if (grossFrameSize < 0 || grossFrameSize > NtFrameDefaults.FRAME_MAX_SIZE)
+                    if (grossFrameSize < 0 || grossFrameSize > tunnel.Core.Configuration.MaxFrameSize)
                     {
-                        //LogException(new Exception("Malformed frame, invalid length."));
+                        tunnel.Core.Logging.Write(Constants.NtLogSeverity.Warning, "ProcessFrameBuffer: Malformed frame, invalid length.");
                         SkipFrame(tunnel, ref frameBuffer);
                         continue;
                     }
@@ -144,7 +143,7 @@ namespace NetTunnel.Service.PacketFraming
 
                     if (actualCRC16 != expectedCRC16)
                     {
-                        //LogException(new Exception("Malformed frame, invalid CRC."));
+                        tunnel.Core.Logging.Write(Constants.NtLogSeverity.Warning, "ProcessFrameBuffer: Malformed frame, invalid CRC.");
                         SkipFrame(tunnel, ref frameBuffer);
                         continue;
                     }
@@ -181,7 +180,7 @@ namespace NetTunnel.Service.PacketFraming
                     }
                     else
                     {
-                        throw new Exception("Encountered undefined frame payload type.");
+                        throw new Exception("ProcessFrameBuffer: Encountered undefined frame payload type.");
                     }
                 }
             }
@@ -205,21 +204,21 @@ namespace NetTunnel.Service.PacketFraming
             if (genericToObjectMethod != null)
             {
                 return (INtFramePayload?)genericToObjectMethod.Invoke(null, new object[] { frame.Payload })
-                    ?? throw new Exception($"Payload can not be null.");
+                    ?? throw new Exception($"ExtractFramePayload: Payload can not be null.");
             }
 
             var genericType = Type.GetType(frame.EnclosedPayloadType)
-                ?? throw new Exception($"Unknown payload type {frame.EnclosedPayloadType}.");
+                ?? throw new Exception($"ExtractFramePayload: Unknown payload type {frame.EnclosedPayloadType}.");
 
             var toObjectMethod = typeof(Utility).GetMethod("DeserializeToObject")
-                ?? throw new Exception($"Could not find ToObject().");
+                ?? throw new Exception($"ExtractFramePayload: Could not find ToObject().");
 
             genericToObjectMethod = toObjectMethod.MakeGenericMethod(genericType);
 
             _reflectioncache.Use((o) => o.TryAdd(frame.EnclosedPayloadType, genericToObjectMethod));
 
             return (INtFramePayload?)genericToObjectMethod.Invoke(null, new object[] { frame.Payload })
-                ?? throw new Exception($"Payload can not be null.");
+                ?? throw new Exception($"ExtractFramePayload: Payload can not be null.");
         }
     }
 }

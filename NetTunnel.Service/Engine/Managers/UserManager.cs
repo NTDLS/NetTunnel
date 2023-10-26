@@ -52,15 +52,11 @@ namespace NetTunnel.Service.Engine.Managers
 
                 Persistence.LoadFromDisk<List<NtUser>>()?.ForEach(o => Add(o));
 
-#if DEBUG
                 if (o.Count == 0)//Add debugging users:
                 {
-                    Add("admin", Utility.CalculateSHA256("abcdefgh"));
-                    Add("root", Utility.CalculateSHA256("12345678"));
+                    Add("root", Utility.CalculateSHA256(Environment.MachineName.ToLower()));
                     SaveToDisk();
                 }
-#endif
-
             });
         }
     }

@@ -14,6 +14,11 @@ namespace NetTunnel.Service.Engine.Managers
 
         public void Write(NtLogSeverity severity, string text)
         {
+            if (severity == NtLogSeverity.Debug && _core.Configuration.DebugLogging == false)
+            {
+                return;
+            }
+
             DateTime dt = DateTime.Now;
             lock (_lock)
             {
