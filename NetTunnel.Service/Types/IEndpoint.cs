@@ -10,5 +10,7 @@
         public bool KeepRunning { get; }
         public void Disconnect(Guid streamId);
         public void SendEndpointData(Guid streamId, byte[] buffer);
+        public void Start();
+        public void Stop();
     }
 }

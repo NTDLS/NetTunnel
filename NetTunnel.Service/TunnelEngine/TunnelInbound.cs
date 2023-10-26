@@ -28,16 +28,18 @@ namespace NetTunnel.Service.TunnelEngine
         {
             var tunnelConfiguration = new NtTunnelInboundConfiguration(PairId, Name, DataPort);
 
-            foreach (var endpoint in _inboundEndpoints)
+            foreach (var endpoint in _endpoints)
             {
-                var endpointConfiguration = new NtEndpointInboundConfiguration(endpoint.PairId, endpoint.Name, endpoint.Port);
-                tunnelConfiguration.EndpointInboundConfigurations.Add(endpointConfiguration);
-            }
-
-            foreach (var endpoint in _outboundEndpoints)
-            {
-                var endpointConfiguration = new NtEndpointOutboundConfiguration(endpoint.PairId, endpoint.Name, endpoint.Address, endpoint.Port);
-                tunnelConfiguration.EndpointOutboundConfigurations.Add(endpointConfiguration);
+                if (endpoint is EndpointInbound inboundEndpoint)
+                {
+                    var endpointConfiguration = new NtEndpointInboundConfiguration(inboundEndpoint.PairId, inboundEndpoint.Name, inboundEndpoint.Port);
+                    tunnelConfiguration.EndpointInboundConfigurations.Add(endpointConfiguration);
+                }
+                else if (endpoint is EndpointOutbound outboundEndpoint)
+                {
+                    var endpointConfiguration = new NtEndpointOutboundConfiguration(outboundEndpoint.PairId, outboundEndpoint.Name, outboundEndpoint.Address, outboundEndpoint.Port);
+                    tunnelConfiguration.EndpointOutboundConfigurations.Add(endpointConfiguration);
+                }
             }
 
             return tunnelConfiguration;
@@ -56,11 +58,8 @@ namespace NetTunnel.Service.TunnelEngine
             _inboundConnectionThread = new Thread(InboundConnectionThreadProc);
             _inboundConnectionThread.Start();
 
-            Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Starting inbound endpoints for inbound tunnel '{Name}'.");
-            _inboundEndpoints.ForEach(x => x.Start());
-
-            Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Starting outbound endpoints for inbound tunnel '{Name}'.");
-            _outboundEndpoints.ForEach(x => x.Start());
+            Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Starting endpoints for inbound tunnel '{Name}'.");
+            _endpoints.ForEach(x => x.Start());
         }
 
         public override void Stop()
