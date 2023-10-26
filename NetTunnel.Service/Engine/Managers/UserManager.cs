@@ -7,7 +7,7 @@ namespace NetTunnel.Service.Engine.Managers
     {
         private readonly EngineCore _core;
 
-        private CriticalResource<List<NtUser>> _collection = new();
+        private readonly CriticalResource<List<NtUser>> _collection = new();
 
         public UserManager(EngineCore core)
         {
@@ -17,8 +17,21 @@ namespace NetTunnel.Service.Engine.Managers
         }
 
         public void Add(string username, string passwordHash) => Add(new NtUser(username, passwordHash));
-
         public void Add(NtUser user) => _collection.Use((o) => o.Add(user));
+        public void Delete(NtUser user) => _collection.Use((o) => o.RemoveAll(t => t.Username == user.Username));
+
+        public void ChangePassword(NtUser user)
+        {
+            _collection.Use((o) =>
+            {
+                var foundUser = o.Where(x => x.Username == user.Username).FirstOrDefault();
+                if (foundUser != null)
+                {
+                    foundUser.SetPasswordHash(user.PasswordHash);
+                }
+                o.Add(user);
+            });
+        }
 
         public bool ValidateLogin(string username, string passwordHash)
         {

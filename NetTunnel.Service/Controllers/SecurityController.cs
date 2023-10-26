@@ -60,6 +60,56 @@ namespace NetTunnel.Service.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("{sessionId}/ChangeUserPassword")]
+        public NtActionResponse ChangeUserPassword(Guid sessionId, [FromBody] string value)
+        {
+            try
+            {
+                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+
+                var content = JsonConvert.DeserializeObject<NtUser>(value);
+                Utility.EnsureNotNull(content);
+
+                Singletons.Core.Users.ChangePassword(content);
+                Singletons.Core.Users.SaveToDisk();
+
+                return new NtActionResponse
+                {
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new NtActionResponse(ex);
+            }
+        }
+
+        [HttpPost]
+        [Route("{sessionId}/DeleteUser")]
+        public NtActionResponse DeleteUser(Guid sessionId, [FromBody] string value)
+        {
+            try
+            {
+                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+
+                var content = JsonConvert.DeserializeObject<NtUser>(value);
+                Utility.EnsureNotNull(content);
+
+                Singletons.Core.Users.Delete(content);
+                Singletons.Core.Users.SaveToDisk();
+
+                return new NtActionResponse
+                {
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new NtActionResponse(ex);
+            }
+        }
+
         [HttpGet]
         [Route("{username}/{passwordHash}/Login")]
         public NtActionResponse Login(string username, string passwordHash)

@@ -58,6 +58,36 @@ namespace NetTunnel.ClientAPI
             return result;
         }
 
+        public async Task ChangeUserPassword(NtUser user)
+        {
+            string url = $"api/Security/{_client.SessionId}/ChangeUserPassword";
+
+            var postContent = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "text/plain");
+
+            using var response = _client.Connection.PostAsync(url, postContent);
+            string resultText = await response.Result.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<NtActionResponse>(resultText);
+            if (result == null || result.Success == false)
+            {
+                throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
+            }
+        }
+
+        public async Task DeleteUser(NtUser user)
+        {
+            string url = $"api/Security/{_client.SessionId}/DeleteUser";
+
+            var postContent = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "text/plain");
+
+            using var response = _client.Connection.PostAsync(url, postContent);
+            string resultText = await response.Result.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<NtActionResponse>(resultText);
+            if (result == null || result.Success == false)
+            {
+                throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
+            }
+        }
+
         public async Task CreateUser(NtUser user)
         {
             string url = $"api/Security/{_client.SessionId}/CreateUser";

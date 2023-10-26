@@ -11,6 +11,12 @@
             PasswordHash = passwordHash.ToLower();
         }
 
+
+        public void SetPasswordHash(string passwordHash)
+        {
+            PasswordHash = passwordHash.ToLower();
+        }
+
         public NtUser Clone()
         {
             return new NtUser(Username, "");
