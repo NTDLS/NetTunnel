@@ -1,14 +1,14 @@
-﻿using NetTunnel.Service.Engine;
-using NetTunnel.Service.PacketFraming;
-using NetTunnel.Service.PacketFraming.PacketPayloads.Notifications;
-using NetTunnel.Service.PacketFraming.PacketPayloads.Queries;
-using NetTunnel.Service.PacketFraming.PacketPayloads.Replies;
+﻿using NetTunnel.Service.MessageFraming;
+using NetTunnel.Service.MessageFraming.FramePayloads.Notifications;
+using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
+using NetTunnel.Service.MessageFraming.FramePayloads.Replies;
+using NetTunnel.Service.TunnelEngine;
 
 namespace NetTunnel.Service.Types
 {
     internal interface ITunnel
     {
-        public EngineCore Core { get; }
+        public TunnelEngineCore Core { get; }
 
         public bool KeepRunning { get; }
         /// <summary>
