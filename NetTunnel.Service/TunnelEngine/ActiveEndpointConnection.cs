@@ -12,7 +12,7 @@ namespace NetTunnel.Service.TunnelEngine
         public Thread Thread { get; private set; }
         public bool IsConnected { get; private set; }
 
-        private NetworkStream _stream;
+        private readonly NetworkStream _stream;
 
         public double ActivityAgeInMiliseconds => (DateTime.UtcNow - LastActivityDateTime).TotalMilliseconds;
         public double StartAgeInMiliseconds => (DateTime.UtcNow - StartDateTime).TotalMilliseconds;

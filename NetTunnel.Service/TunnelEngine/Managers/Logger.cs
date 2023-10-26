@@ -5,7 +5,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
     public class Logger
     {
         private readonly TunnelEngineCore _core;
-        private readonly object _lock = new object();
+        private readonly object _lock = new();
 
         public Logger(TunnelEngineCore core)
         {
