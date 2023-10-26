@@ -24,12 +24,8 @@ namespace NetTunnel.Service.Engine.Managers
         {
             _collection.Use((o) =>
             {
-                var foundUser = o.Where(x => x.Username == user.Username).FirstOrDefault();
-                if (foundUser != null)
-                {
-                    foundUser.SetPasswordHash(user.PasswordHash);
-                }
-                o.Add(user);
+                o.Where(x => x.Username == user.Username).FirstOrDefault()?
+                    .SetPasswordHash(user.PasswordHash);
             });
         }
 

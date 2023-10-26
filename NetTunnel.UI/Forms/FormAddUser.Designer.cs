@@ -97,6 +97,7 @@
             // 
             textBoxPassword.Location = new Point(16, 98);
             textBoxPassword.Name = "textBoxPassword";
+            textBoxPassword.PasswordChar = '*';
             textBoxPassword.Size = new Size(232, 23);
             textBoxPassword.TabIndex = 1;
             // 
@@ -104,6 +105,7 @@
             // 
             textBoxConfirmPassword.Location = new Point(16, 146);
             textBoxConfirmPassword.Name = "textBoxConfirmPassword";
+            textBoxConfirmPassword.PasswordChar = '*';
             textBoxConfirmPassword.Size = new Size(232, 23);
             textBoxConfirmPassword.TabIndex = 2;
             // 

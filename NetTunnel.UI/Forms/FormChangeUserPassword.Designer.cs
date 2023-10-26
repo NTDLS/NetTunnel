@@ -91,6 +91,7 @@
             textBoxUsername.Enabled = false;
             textBoxUsername.Location = new Point(16, 31);
             textBoxUsername.Name = "textBoxUsername";
+            textBoxUsername.ReadOnly = true;
             textBoxUsername.Size = new Size(232, 23);
             textBoxUsername.TabIndex = 10;
             // 
@@ -98,6 +99,7 @@
             // 
             textBoxPassword.Location = new Point(16, 98);
             textBoxPassword.Name = "textBoxPassword";
+            textBoxPassword.PasswordChar = '*';
             textBoxPassword.Size = new Size(232, 23);
             textBoxPassword.TabIndex = 0;
             // 
@@ -105,6 +107,7 @@
             // 
             textBoxConfirmPassword.Location = new Point(16, 146);
             textBoxConfirmPassword.Name = "textBoxConfirmPassword";
+            textBoxConfirmPassword.PasswordChar = '*';
             textBoxConfirmPassword.Size = new Size(232, 23);
             textBoxConfirmPassword.TabIndex = 1;
             // 

@@ -11,7 +11,6 @@
             PasswordHash = passwordHash.ToLower();
         }
 
-
         public void SetPasswordHash(string passwordHash)
         {
             PasswordHash = passwordHash.ToLower();
