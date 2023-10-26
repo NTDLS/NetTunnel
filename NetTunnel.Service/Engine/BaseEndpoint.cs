@@ -133,9 +133,9 @@ namespace NetTunnel.Service.Engine
                 while (KeepRunning && activeConnection.IsConnected)
                 {
                     byte[] buffer = new byte[NtFrameDefaults.FRAME_BUFFER_SIZE];
-                    while (activeConnection.Read(ref buffer))
+                    while (activeConnection.Read(ref buffer, out int length))
                     {
-                        var exchnagePayload = new NtFramePayloadEndpointExchange(_tunnel.PairId, PairId, activeConnection.StreamId, buffer);
+                        var exchnagePayload = new NtFramePayloadEndpointExchange(_tunnel.PairId, PairId, activeConnection.StreamId, buffer, length);
                         _tunnel.SendStreamFrameNotification(exchnagePayload);
                     }
                 }

@@ -39,10 +39,11 @@ namespace NetTunnel.Service.Engine
             _stream.Write(buffer);
         }
 
-        public bool Read(ref byte[] buffer)
+        public bool Read(ref byte[] buffer, out int length)
         {
             LastActivityDateTime = DateTime.UtcNow;
-            return _stream.Read(buffer, 0, buffer.Length) > 0;
+            length = _stream.Read(buffer, 0, buffer.Length);
+            return length > 0;
         }
 
         public void Dispose()

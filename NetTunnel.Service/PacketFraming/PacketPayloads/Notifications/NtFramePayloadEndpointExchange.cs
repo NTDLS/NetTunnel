@@ -18,12 +18,14 @@ namespace NetTunnel.Service.PacketFraming.PacketPayloads.Notifications
         [ProtoMember(4)]
         public byte[] Bytes { get; set; }
 
-        public NtFramePayloadEndpointExchange(Guid tunnelPairId, Guid endpointPairId, Guid streamId, byte[] bytes)
+        public NtFramePayloadEndpointExchange(Guid tunnelPairId, Guid endpointPairId, Guid streamId, byte[] bytes, int length)
         {
             StreamId = streamId;
             TunnelPairId = tunnelPairId;
             EndpointPairId = endpointPairId;
-            Bytes = bytes;
+            Bytes = new byte[length];
+
+            Array.Copy(bytes, Bytes, length);
         }
 
         public NtFramePayloadEndpointExchange()

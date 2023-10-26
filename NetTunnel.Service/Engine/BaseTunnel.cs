@@ -121,22 +121,28 @@ namespace NetTunnel.Service.Engine
             }
             else if (frame is NtFramePayloadEndpointConnect connectEndpoint)
             {
+                Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Recevied endpoint connection notification.");
+
                 _outboundEndpoints.Where(o => o.PairId == connectEndpoint.EndpointPairId).FirstOrDefault()?
                     .EstablishOutboundEndpointConnection(connectEndpoint.StreamId);
             }
             else if (frame is NtFramePayloadEndpointDisconnect disconnectEndpoint)
             {
+                Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Recevied endpoint disconnection notification.");
+
                 GetEndpointById(disconnectEndpoint.EndpointPairId)?
                     .Disconnect(disconnectEndpoint.StreamId);
             }
             else if (frame is NtFramePayloadEndpointExchange exchange)
             {
+                Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Exchanging {exchange.Bytes.Length} bytes.");
+
                 GetEndpointById(exchange.EndpointPairId)?
                     .SendEndpointData(exchange.StreamId, exchange.Bytes);
             }
             else
             {
-                throw new Exception("Unhandled notification frame.");
+                throw new Exception("ProcessFrameNotificationCallback: Unhandled notification frame type.");
             }
         }
 
