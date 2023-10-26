@@ -64,7 +64,7 @@
             listViewTunnels.HeaderStyle = ColumnHeaderStyle.Nonclickable;
             listViewTunnels.Location = new Point(0, 15);
             listViewTunnels.Name = "listViewTunnels";
-            listViewTunnels.Size = new Size(751, 192);
+            listViewTunnels.Size = new Size(784, 240);
             listViewTunnels.TabIndex = 0;
             listViewTunnels.UseCompatibleStateImageBehavior = false;
             listViewTunnels.View = View.Details;
@@ -94,7 +94,7 @@
             menuStripBody.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, securityToolStripMenuItem });
             menuStripBody.Location = new Point(0, 0);
             menuStripBody.Name = "menuStripBody";
-            menuStripBody.Size = new Size(751, 24);
+            menuStripBody.Size = new Size(784, 24);
             menuStripBody.TabIndex = 1;
             menuStripBody.Text = "menuStrip1";
             // 
@@ -135,9 +135,9 @@
             // 
             // statusStripBody
             // 
-            statusStripBody.Location = new Point(0, 441);
+            statusStripBody.Location = new Point(0, 539);
             statusStripBody.Name = "statusStripBody";
-            statusStripBody.Size = new Size(751, 22);
+            statusStripBody.Size = new Size(784, 22);
             statusStripBody.TabIndex = 2;
             statusStripBody.Text = "statusStrip1";
             // 
@@ -157,8 +157,8 @@
             // 
             splitContainer1.Panel2.Controls.Add(listViewEndpoints);
             splitContainer1.Panel2.Controls.Add(labelEndpoints);
-            splitContainer1.Size = new Size(751, 417);
-            splitContainer1.SplitterDistance = 207;
+            splitContainer1.Size = new Size(784, 515);
+            splitContainer1.SplitterDistance = 255;
             splitContainer1.TabIndex = 3;
             // 
             // labelTunnels
@@ -180,7 +180,7 @@
             listViewEndpoints.HeaderStyle = ColumnHeaderStyle.Nonclickable;
             listViewEndpoints.Location = new Point(0, 15);
             listViewEndpoints.Name = "listViewEndpoints";
-            listViewEndpoints.Size = new Size(751, 191);
+            listViewEndpoints.Size = new Size(784, 241);
             listViewEndpoints.TabIndex = 1;
             listViewEndpoints.UseCompatibleStateImageBehavior = false;
             listViewEndpoints.View = View.Details;
@@ -214,12 +214,13 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(751, 463);
+            ClientSize = new Size(784, 561);
             Controls.Add(splitContainer1);
             Controls.Add(menuStripBody);
             Controls.Add(statusStripBody);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStripBody;
+            MinimumSize = new Size(600, 300);
             Name = "FormMain";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "NetTunnel";
