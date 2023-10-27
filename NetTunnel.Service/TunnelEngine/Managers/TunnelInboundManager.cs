@@ -7,22 +7,10 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 {
     internal class TunnelInboundManager : BaseTunnelManager<TunnelInbound, NtTunnelInboundConfiguration>
     {
-        private readonly TunnelEngineCore Core;
-
         public TunnelInboundManager(TunnelEngineCore core)
+            : base(core)
         {
-            Core = core;
             LoadFromDisk();
-        }
-
-        public void Add(NtTunnelInboundConfiguration config)
-        {
-            Collection.Use((o) =>
-            {
-                var tunnel = new TunnelInbound(Core, config);
-                o.Add(tunnel);
-                //tunnel.Start(); //We do not want to start the tunnels at construction, but rather by the engine Start() function.
-            });
         }
 
         /// <summary>
@@ -76,8 +64,6 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 endpoint.Start();
             });
         }
-
-
 
         public List<NtTunnelInboundConfiguration> CloneConfigurations()
         {

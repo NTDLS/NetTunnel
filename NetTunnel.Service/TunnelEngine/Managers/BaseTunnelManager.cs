@@ -6,14 +6,31 @@ using NTDLS.Semaphore;
 
 namespace NetTunnel.Service.TunnelEngine.Managers
 {
-    internal class BaseTunnelManager<T,C> where T : ITunnel where C : INtTunnelConfiguration
+    internal class BaseTunnelManager<T, C> where T : ITunnel where C : INtTunnelConfiguration
     {
+        public TunnelEngineCore Core { get; private set; }
+
         protected readonly CriticalResource<List<T>> Collection = new();
 
         public void Start(Guid tunnelPairId) => Collection.Use((o) => o.Where(o => o.PairId == tunnelPairId).Single().Start());
         public void Stop(Guid tunnelPairId) => Collection.Use((o) => o.Where(o => o.PairId == tunnelPairId).Single().Stop());
         public void StartAll() => Collection.Use((o) => o.ForEach((o) => o.Start()));
         public void StopAll() => Collection.Use((o) => o.ForEach((o) => o.Stop()));
+
+        public BaseTunnelManager(TunnelEngineCore core)
+        {
+            Core = core;
+        }
+
+        public void Add(C config)
+        {
+            Collection.Use((o) =>
+            {
+                var tunnel = (T?)Activator.CreateInstance(typeof(T), Core, config);
+                Utility.EnsureNotNull(tunnel);
+                o.Add(tunnel);
+            });
+        }
 
         public void Delete(Guid tunnelPairId)
         {
@@ -35,7 +52,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 {
                     var tunnelStats = new NtTunnelStatistics()
                     {
-                        Direction = Constants.NtDirection.Inbound,
+                        Direction = typeof(T) == typeof(TunnelOutbound) ? Constants.NtDirection.Inbound : Constants.NtDirection.Outbound,
                         TunnelPairId = tunnel.PairId,
                         BytesReceived = tunnel.BytesReceived,
                         BytesSent = tunnel.BytesSent,

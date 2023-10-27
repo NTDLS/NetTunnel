@@ -7,21 +7,10 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 {
     internal class TunnelOutboundManager : BaseTunnelManager<TunnelOutbound, NtTunnelOutboundConfiguration>
     {
-        private readonly TunnelEngineCore _core;
-
         public TunnelOutboundManager(TunnelEngineCore core)
+            : base(core)
         {
-            _core = core;
             LoadFromDisk();
-        }
-
-        public void Add(NtTunnelOutboundConfiguration config)
-        {
-            Collection.Use((o) =>
-            {
-                var tunnel = new TunnelOutbound(_core, config);
-                o.Add(tunnel);
-            });
         }
 
         public async Task<T?> DispatchAddEndpointInbound<T>(Guid tunnelPairId, NtEndpointInboundConfiguration endpoint)
