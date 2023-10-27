@@ -1,5 +1,7 @@
-﻿using NetTunnel.Library;
+﻿using NetTunnel.ClientAPI.Payload;
+using NetTunnel.Library;
 using NetTunnel.Library.Exceptions;
+using Newtonsoft.Json;
 
 namespace NetTunnel.ClientAPI
 {
@@ -107,6 +109,21 @@ namespace NetTunnel.ClientAPI
                 _connection = null;
                 throw;
             }
+        }
+
+        public async Task<NtActionResponseStatistics> GetStatistics()
+        {
+            string url = $"api/Service/{SessionId}/GetStatistics";
+
+            using var response = await Connection.GetAsync(url);
+            string resultText = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<NtActionResponseStatistics>(resultText);
+            if (result == null || result.Success == false)
+            {
+                throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
+            }
+
+            return result;
         }
 
         void Disconnect()

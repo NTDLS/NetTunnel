@@ -83,30 +83,44 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-        public List<NtEndpointStatistics> GetEndpointStatistics()
+        public List<NtTunnelStatistics> GetStatistics() //TODO: This should not be duplicated in both managers.
         {
-            var statictics = new List<NtEndpointStatistics>();
+            var result = new List<NtTunnelStatistics>();
 
             _collection.Use((o) =>
             {
                 foreach (var tunnel in o)
                 {
+                    var tunnelStats = new NtTunnelStatistics()
+                    {
+                        Direction = Constants.NtDirection.Outbound,
+                        TunnelPairId = tunnel.PairId,
+                        BytesReceived = 0, //TODO: Fill me in.
+                        BytesSent = 0, //TODO: Fill me in.
+                        CurrentConnections = 0, //TODO: Fill me in.
+                        TotalConnections = 0 //TODO: Fill me in.
+                    };
+
                     foreach (var endpoint in tunnel.Endpoints)
                     {
-                        var stats = new NtEndpointStatistics()
+                        var endpointStats = new NtEndpointStatistics()
                         {
                             Direction = endpoint is EndpointInbound ? Constants.NtDirection.Inbound : Constants.NtDirection.Outbound,
                             BytesReceived = endpoint.BytesReceived,
                             BytesSent = endpoint.BytesSent,
                             EndpointPairId = endpoint.PairId,
-                            TunnelPairId = tunnel.PairId
+                            TunnelPairId = tunnel.PairId,
+                            CurrentConnections = 0, //TODO: Fill me in.
+                            TotalConnections = 0 //TODO: Fill me in.
                         };
-                        statictics.Add(stats);
+                        tunnelStats.EndpointStatistics.Add(endpointStats);
                     }
+
+                    result.Add(tunnelStats);
                 }
             });
 
-            return statictics;
+            return result;
         }
 
         public List<NtTunnelOutboundConfiguration> CloneConfigurations()

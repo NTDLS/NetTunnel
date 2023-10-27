@@ -9,7 +9,7 @@ namespace NetTunnel.UI.Forms
         private NtClient? _client;
 
         private System.Windows.Forms.Timer? _timer;
-        private readonly List<NtEndpointStatistics> _latestStats = new();
+        private readonly List<NtTunnelStatistics> _latestStats = new();
 
         #region Constructor / Deconstructor.
 
@@ -52,20 +52,16 @@ namespace NetTunnel.UI.Forms
             {
                 if (_client != null && _client.IsConnected)
                 {
-                    _client.TunnelInbound.EndpointStatistics().ContinueWith(inboundStats =>
+                    _client.GetStatistics().ContinueWith(inboundStats =>
                     {
-                        _client.TunnelOutbound.EndpointStatistics().ContinueWith(outboundStats =>
+                        lock (_latestStats)
                         {
-                            lock (_latestStats)
-                            {
-                                _latestStats.Clear();
+                            _latestStats.Clear();
+                            _latestStats.AddRange(inboundStats.Result.TunnelStatistics);
 
-                                _latestStats.AddRange(inboundStats.Result.Statistics);
-                                _latestStats.AddRange(outboundStats.Result.Statistics);
+                            throw new Exception("Fill in the stats of the grids??");
+                        }
 
-                                throw new Exception("Fill in the stats of the grids??");
-                            }
-                        });
                     });
                 }
             }
