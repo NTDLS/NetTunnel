@@ -7,7 +7,7 @@ namespace NetTunnel.Library.Types
     /// <summary>
     /// The inbound endpoint contains information that defines an inbound/listening connection for an established endpoint.
     /// </summary>
-    public class NtEndpointInboundConfiguration: INtEndpointConfiguration
+    public class NtEndpointInboundConfiguration : INtEndpointConfiguration
     {
         [ProtoMember(1)]
         public Guid PairId { get; set; }

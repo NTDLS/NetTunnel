@@ -1,6 +1,7 @@
 using NetTunnel.ClientAPI;
 using NetTunnel.Library;
 using NetTunnel.Library.Types;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms
 {
@@ -9,7 +10,6 @@ namespace NetTunnel.UI.Forms
         private NtClient? _client;
 
         private System.Windows.Forms.Timer? _timer;
-        private readonly List<NtTunnelStatistics> _latestStats = new();
 
         #region Constructor / Deconstructor.
 
@@ -52,19 +52,78 @@ namespace NetTunnel.UI.Forms
             {
                 if (_client != null && _client.IsConnected)
                 {
-                    _client.GetStatistics().ContinueWith(inboundStats =>
+                    _client.GetStatistics().ContinueWith(o =>
                     {
-                        lock (_latestStats)
+                        if (o.Result.Success)
                         {
-                            _latestStats.Clear();
-                            _latestStats.AddRange(inboundStats.Result.TunnelStatistics);
+                            lock (listViewEndpoints)
+                            {
+                                PopulateEndpointStatistics(o.Result.Statistics);
+                            }
 
-                            throw new Exception("Fill in the stats of the grids??");
+                            lock (listViewTunnels)
+                            {
+                                PopulateTunnelStatistics(o.Result.Statistics);
+                            }
                         }
-
                     });
                 }
+
+                void PopulateEndpointStatistics(List<NtTunnelStatistics> statistics)
+                {
+                    if (listViewEndpoints.InvokeRequired)
+                    {
+                        listViewEndpoints.Invoke(PopulateEndpointStatistics, statistics);
+                    }
+                    else
+                    {
+                        foreach (ListViewItem item in listViewEndpoints.Items)
+                        {
+                            var endpoint = (INtEndpointConfiguration)item.Tag;
+                            var direction = (endpoint is NtEndpointInboundConfiguration) ? NtDirection.Inbound : NtDirection.Outbound;
+
+                            var tunnelStats = statistics.Where(o => o.TunnelPairId == endpoint.TunnelPairId && o.Direction == direction).SingleOrDefault();
+                            if (tunnelStats != null)
+                            {
+                                var endpointStats = tunnelStats.EndpointStatistics.Where(o => o.EndpointPairId == endpoint.PairId && o.Direction == direction).SingleOrDefault();
+                                if (endpointStats != null)
+                                {
+                                    item.SubItems[columnHeaderEndpointBytesSent.Index].Text = $"{endpointStats.BytesSent:n0}";
+                                    item.SubItems[columnHeaderEndpointBytesReceived.Index].Text = $"{endpointStats.BytesReceived:n0}";
+                                    item.SubItems[columnHeaderEndpointTotalConnections.Index].Text = $"{endpointStats.TotalConnections:n0}";
+                                    item.SubItems[columnHeaderEndpointCurrentConenctions.Index].Text = $"{endpointStats.CurrentConnections:n0}";
+                                }
+                            }
+                        }
+                    }
+                }
+
+                void PopulateTunnelStatistics(List<NtTunnelStatistics> statistics)
+                {
+                    if (listViewTunnels.InvokeRequired)
+                    {
+                        listViewTunnels.Invoke(PopulateTunnelStatistics, statistics);
+                    }
+                    else
+                    {
+                        foreach (ListViewItem item in listViewTunnels.Items)
+                        {
+                            var tunnel = (INtTunnelConfiguration)item.Tag;
+                            var direction = (tunnel is NtTunnelInboundConfiguration) ? NtDirection.Inbound : NtDirection.Outbound;
+
+                            var tunnelStats = statistics.Where(o => o.TunnelPairId == tunnel.PairId && o.Direction == direction).SingleOrDefault();
+                            if (tunnelStats != null)
+                            {
+                                item.SubItems[columnHeaderTunnelBytesSent.Index].Text = $"{tunnelStats.BytesSent:n0}";
+                                item.SubItems[columnHeaderTunnelBytesReceived.Index].Text = $"{tunnelStats.BytesReceived:n0}";
+                                item.SubItems[columnHeaderTunnelTotalConnections.Index].Text = $"{tunnelStats.TotalConnections:n0}";
+                                item.SubItems[columnHeaderTunnelCurrentConenctions.Index].Text = $"{tunnelStats.CurrentConnections:n0}";
+                            }
+                        }
+                    }
+                }
             }
+
             catch { }
         }
 
@@ -78,48 +137,10 @@ namespace NetTunnel.UI.Forms
 
                 if (selectedRow.Tag is INtTunnelConfiguration tunnel)
                 {
-                    RepopulateEndpointsGrid(tunnel);
-                }
-            }
-        }
-
-        private void RepopulateEndpointsGrid(INtTunnelConfiguration tunnelInbound)
-        {
-            Utility.EnsureNotNull(_client);
-            listViewEndpoints.Items.Clear();
-
-            tunnelInbound.EndpointInboundConfigurations.ForEach(x => AddEndpointInboundToGrid(x));
-            tunnelInbound.EndpointOutboundConfigurations.ForEach(x => AddEndpointOutboundToGrid(x));
-
-            void AddEndpointInboundToGrid(NtEndpointInboundConfiguration endpoint)
-            {
-                if (listViewEndpoints.InvokeRequired)
-                {
-                    listViewEndpoints.Invoke(AddEndpointInboundToGrid, endpoint);
-                }
-                else
-                {
-                    var item = new ListViewItem(endpoint.Name);
-                    item.Tag = endpoint;
-                    item.SubItems.Add("Inbound");
-                    item.SubItems.Add($"*:{endpoint.Port}");
-                    listViewEndpoints.Items.Add(item);
-                }
-            }
-
-            void AddEndpointOutboundToGrid(NtEndpointOutboundConfiguration endpoint)
-            {
-                if (listViewEndpoints.InvokeRequired)
-                {
-                    listViewEndpoints.Invoke(AddEndpointOutboundToGrid, endpoint);
-                }
-                else
-                {
-                    var item = new ListViewItem(endpoint.Name);
-                    item.Tag = endpoint;
-                    item.SubItems.Add("Outbound");
-                    item.SubItems.Add($"{endpoint.Address}{endpoint.Port}");
-                    listViewEndpoints.Items.Add(item);
+                    lock (listViewEndpoints)
+                    {
+                        RepopulateEndpointsGrid(tunnel);
+                    }
                 }
             }
         }
@@ -216,7 +237,17 @@ namespace NetTunnel.UI.Forms
             return false;
         }
 
+        #region Populate Grids.
+
         private void RepopulateTunnelsGrid()
+        {
+            lock (listViewTunnels)
+            {
+                RepopulateTunnelsGrid_LockRequired();
+            }
+        }
+
+        private void RepopulateTunnelsGrid_LockRequired()
         {
             Utility.EnsureNotNull(_client);
 
@@ -248,7 +279,10 @@ namespace NetTunnel.UI.Forms
                     item.SubItems.Add("Inbound");
                     item.SubItems.Add($"*:{tunnel.DataPort}");
                     item.SubItems.Add($"{endpointCount:n0}");
-
+                    item.SubItems.Add("~");
+                    item.SubItems.Add("~");
+                    item.SubItems.Add("~");
+                    item.SubItems.Add("~");
                     listViewTunnels.Items.Add(item);
                 }
             }
@@ -269,12 +303,73 @@ namespace NetTunnel.UI.Forms
                     item.SubItems.Add("Outbound");
                     item.SubItems.Add($"{tunnel.Address}{tunnel.DataPort}");
                     item.SubItems.Add($"{endpointCount:n0}");
-
+                    item.SubItems.Add("~");
+                    item.SubItems.Add("~");
+                    item.SubItems.Add("~");
+                    item.SubItems.Add("~");
                     listViewTunnels.Items.Add(item);
-
                 }
             }
         }
+
+        private void RepopulateEndpointsGrid(INtTunnelConfiguration tunnel)
+        {
+            lock (listViewEndpoints)
+            {
+                RepopulateEndpointsGrid_LockRequired(tunnel);
+            }
+        }
+
+        private void RepopulateEndpointsGrid_LockRequired(INtTunnelConfiguration tunnelInbound)
+        {
+            Utility.EnsureNotNull(_client);
+            listViewEndpoints.Items.Clear();
+
+            tunnelInbound.EndpointInboundConfigurations.ForEach(x => AddEndpointInboundToGrid(x));
+            tunnelInbound.EndpointOutboundConfigurations.ForEach(x => AddEndpointOutboundToGrid(x));
+
+            void AddEndpointInboundToGrid(NtEndpointInboundConfiguration endpoint)
+            {
+                if (listViewEndpoints.InvokeRequired)
+                {
+                    listViewEndpoints.Invoke(AddEndpointInboundToGrid, endpoint);
+                }
+                else
+                {
+                    var item = new ListViewItem(endpoint.Name);
+                    item.Tag = endpoint;
+                    item.SubItems.Add("Inbound");
+                    item.SubItems.Add($"*:{endpoint.Port}");
+                    item.SubItems.Add("~");
+                    item.SubItems.Add("~");
+                    item.SubItems.Add("~");
+                    item.SubItems.Add("~");
+                    listViewEndpoints.Items.Add(item);
+                }
+            }
+
+            void AddEndpointOutboundToGrid(NtEndpointOutboundConfiguration endpoint)
+            {
+                if (listViewEndpoints.InvokeRequired)
+                {
+                    listViewEndpoints.Invoke(AddEndpointOutboundToGrid, endpoint);
+                }
+                else
+                {
+                    var item = new ListViewItem(endpoint.Name);
+                    item.Tag = endpoint;
+                    item.SubItems.Add("Outbound");
+                    item.SubItems.Add($"{endpoint.Address}{endpoint.Port}");
+                    item.SubItems.Add("~");
+                    item.SubItems.Add("~");
+                    item.SubItems.Add("~");
+                    item.SubItems.Add("~");
+                    listViewEndpoints.Items.Add(item);
+                }
+            }
+        }
+
+        #endregion
 
         #region Body menu click.
 

@@ -34,6 +34,10 @@
             columnHeaderTunnelDirection = new ColumnHeader();
             columnHeaderTunnelAddress = new ColumnHeader();
             columnHeaderTunnelEndpoints = new ColumnHeader();
+            columnHeaderTunnelBytesSent = new ColumnHeader();
+            columnHeaderTunnelBytesReceived = new ColumnHeader();
+            columnHeaderTunnelTotalConnections = new ColumnHeader();
+            columnHeaderTunnelCurrentConenctions = new ColumnHeader();
             menuStripBody = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
             connectToolStripMenuItem = new ToolStripMenuItem();
@@ -47,6 +51,10 @@
             columnHeaderEndpointName = new ColumnHeader();
             columnHeaderEndpointDirection = new ColumnHeader();
             columnHeaderEndpointAddress = new ColumnHeader();
+            columnHeaderEndpointBytesSent = new ColumnHeader();
+            columnHeaderEndpointBytesReceived = new ColumnHeader();
+            columnHeaderEndpointTotalConnections = new ColumnHeader();
+            columnHeaderEndpointCurrentConenctions = new ColumnHeader();
             labelEndpoints = new Label();
             menuStripBody.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -57,14 +65,14 @@
             // 
             // listViewTunnels
             // 
-            listViewTunnels.Columns.AddRange(new ColumnHeader[] { columnHeaderTunnelName, columnHeaderTunnelDirection, columnHeaderTunnelAddress, columnHeaderTunnelEndpoints });
+            listViewTunnels.Columns.AddRange(new ColumnHeader[] { columnHeaderTunnelName, columnHeaderTunnelDirection, columnHeaderTunnelAddress, columnHeaderTunnelEndpoints, columnHeaderTunnelBytesSent, columnHeaderTunnelBytesReceived, columnHeaderTunnelTotalConnections, columnHeaderTunnelCurrentConenctions });
             listViewTunnels.Dock = DockStyle.Fill;
             listViewTunnels.FullRowSelect = true;
             listViewTunnels.GridLines = true;
             listViewTunnels.HeaderStyle = ColumnHeaderStyle.Nonclickable;
             listViewTunnels.Location = new Point(0, 15);
             listViewTunnels.Name = "listViewTunnels";
-            listViewTunnels.Size = new Size(784, 240);
+            listViewTunnels.Size = new Size(896, 243);
             listViewTunnels.TabIndex = 0;
             listViewTunnels.UseCompatibleStateImageBehavior = false;
             listViewTunnels.View = View.Details;
@@ -77,7 +85,7 @@
             // columnHeaderTunnelDirection
             // 
             columnHeaderTunnelDirection.Text = "Direction";
-            columnHeaderTunnelDirection.Width = 115;
+            columnHeaderTunnelDirection.Width = 65;
             // 
             // columnHeaderTunnelAddress
             // 
@@ -87,14 +95,34 @@
             // columnHeaderTunnelEndpoints
             // 
             columnHeaderTunnelEndpoints.Text = "Endpoints";
-            columnHeaderTunnelEndpoints.Width = 80;
+            columnHeaderTunnelEndpoints.Width = 70;
+            // 
+            // columnHeaderTunnelBytesSent
+            // 
+            columnHeaderTunnelBytesSent.Text = "Sent";
+            columnHeaderTunnelBytesSent.Width = 100;
+            // 
+            // columnHeaderTunnelBytesReceived
+            // 
+            columnHeaderTunnelBytesReceived.Text = "Recvd";
+            columnHeaderTunnelBytesReceived.Width = 100;
+            // 
+            // columnHeaderTunnelTotalConnections
+            // 
+            columnHeaderTunnelTotalConnections.Text = "Total Conn.";
+            columnHeaderTunnelTotalConnections.Width = 100;
+            // 
+            // columnHeaderTunnelCurrentConenctions
+            // 
+            columnHeaderTunnelCurrentConenctions.Text = "Curnt Conn.";
+            columnHeaderTunnelCurrentConenctions.Width = 100;
             // 
             // menuStripBody
             // 
             menuStripBody.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, securityToolStripMenuItem });
             menuStripBody.Location = new Point(0, 0);
             menuStripBody.Name = "menuStripBody";
-            menuStripBody.Size = new Size(784, 24);
+            menuStripBody.Size = new Size(896, 24);
             menuStripBody.TabIndex = 1;
             menuStripBody.Text = "menuStrip1";
             // 
@@ -135,9 +163,9 @@
             // 
             // statusStripBody
             // 
-            statusStripBody.Location = new Point(0, 539);
+            statusStripBody.Location = new Point(0, 547);
             statusStripBody.Name = "statusStripBody";
-            statusStripBody.Size = new Size(784, 22);
+            statusStripBody.Size = new Size(896, 22);
             statusStripBody.TabIndex = 2;
             statusStripBody.Text = "statusStrip1";
             // 
@@ -157,8 +185,8 @@
             // 
             splitContainer1.Panel2.Controls.Add(listViewEndpoints);
             splitContainer1.Panel2.Controls.Add(labelEndpoints);
-            splitContainer1.Size = new Size(784, 515);
-            splitContainer1.SplitterDistance = 255;
+            splitContainer1.Size = new Size(896, 523);
+            splitContainer1.SplitterDistance = 258;
             splitContainer1.TabIndex = 3;
             // 
             // labelTunnels
@@ -173,14 +201,14 @@
             // 
             // listViewEndpoints
             // 
-            listViewEndpoints.Columns.AddRange(new ColumnHeader[] { columnHeaderEndpointName, columnHeaderEndpointDirection, columnHeaderEndpointAddress });
+            listViewEndpoints.Columns.AddRange(new ColumnHeader[] { columnHeaderEndpointName, columnHeaderEndpointDirection, columnHeaderEndpointAddress, columnHeaderEndpointBytesSent, columnHeaderEndpointBytesReceived, columnHeaderEndpointTotalConnections, columnHeaderEndpointCurrentConenctions });
             listViewEndpoints.Dock = DockStyle.Fill;
             listViewEndpoints.FullRowSelect = true;
             listViewEndpoints.GridLines = true;
             listViewEndpoints.HeaderStyle = ColumnHeaderStyle.Nonclickable;
             listViewEndpoints.Location = new Point(0, 15);
             listViewEndpoints.Name = "listViewEndpoints";
-            listViewEndpoints.Size = new Size(784, 241);
+            listViewEndpoints.Size = new Size(896, 246);
             listViewEndpoints.TabIndex = 1;
             listViewEndpoints.UseCompatibleStateImageBehavior = false;
             listViewEndpoints.View = View.Details;
@@ -193,12 +221,32 @@
             // columnHeaderEndpointDirection
             // 
             columnHeaderEndpointDirection.Text = "Direction";
-            columnHeaderEndpointDirection.Width = 115;
+            columnHeaderEndpointDirection.Width = 65;
             // 
             // columnHeaderEndpointAddress
             // 
             columnHeaderEndpointAddress.Text = "Address";
             columnHeaderEndpointAddress.Width = 100;
+            // 
+            // columnHeaderEndpointBytesSent
+            // 
+            columnHeaderEndpointBytesSent.Text = "Sent";
+            columnHeaderEndpointBytesSent.Width = 100;
+            // 
+            // columnHeaderEndpointBytesReceived
+            // 
+            columnHeaderEndpointBytesReceived.Text = "Recvd";
+            columnHeaderEndpointBytesReceived.Width = 100;
+            // 
+            // columnHeaderEndpointTotalConnections
+            // 
+            columnHeaderEndpointTotalConnections.Text = "Total Conn.";
+            columnHeaderEndpointTotalConnections.Width = 100;
+            // 
+            // columnHeaderEndpointCurrentConenctions
+            // 
+            columnHeaderEndpointCurrentConenctions.Text = "Curnt Conn.";
+            columnHeaderEndpointCurrentConenctions.Width = 100;
             // 
             // labelEndpoints
             // 
@@ -214,7 +262,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(784, 561);
+            ClientSize = new Size(896, 569);
             Controls.Add(splitContainer1);
             Controls.Add(menuStripBody);
             Controls.Add(statusStripBody);
@@ -258,5 +306,13 @@
         private ColumnHeader columnHeaderEndpointDirection;
         private ColumnHeader columnHeaderEndpointAddress;
         private Label labelEndpoints;
+        private ColumnHeader columnHeaderTunnelBytesSent;
+        private ColumnHeader columnHeaderTunnelBytesReceived;
+        private ColumnHeader columnHeaderTunnelTotalConnections;
+        private ColumnHeader columnHeaderTunnelCurrentConenctions;
+        private ColumnHeader columnHeaderEndpointBytesSent;
+        private ColumnHeader columnHeaderEndpointBytesReceived;
+        private ColumnHeader columnHeaderEndpointTotalConnections;
+        private ColumnHeader columnHeaderEndpointCurrentConenctions;
     }
 }
