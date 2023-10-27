@@ -99,12 +99,12 @@
             // 
             // columnHeaderTunnelBytesSent
             // 
-            columnHeaderTunnelBytesSent.Text = "Sent";
+            columnHeaderTunnelBytesSent.Text = "Sent (KB)";
             columnHeaderTunnelBytesSent.Width = 100;
             // 
             // columnHeaderTunnelBytesReceived
             // 
-            columnHeaderTunnelBytesReceived.Text = "Recvd";
+            columnHeaderTunnelBytesReceived.Text = "Recvd (KB)";
             columnHeaderTunnelBytesReceived.Width = 100;
             // 
             // columnHeaderTunnelTotalConnections
@@ -230,12 +230,12 @@
             // 
             // columnHeaderEndpointBytesSent
             // 
-            columnHeaderEndpointBytesSent.Text = "Sent";
+            columnHeaderEndpointBytesSent.Text = "Sent (KB)";
             columnHeaderEndpointBytesSent.Width = 100;
             // 
             // columnHeaderEndpointBytesReceived
             // 
-            columnHeaderEndpointBytesReceived.Text = "Recvd";
+            columnHeaderEndpointBytesReceived.Text = "Recvd (KB)";
             columnHeaderEndpointBytesReceived.Width = 100;
             // 
             // columnHeaderEndpointTotalConnections

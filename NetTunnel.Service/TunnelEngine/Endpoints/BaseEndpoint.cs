@@ -130,7 +130,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 {
                     while (activeConnection.Read(ref buffer, out int length))
                     {
-                        BytesReceived += (ulong)buffer.Length;
+                        BytesReceived += (ulong)length;
 
                         var exchnagePayload = new NtFramePayloadEndpointExchange(_tunnel.PairId, PairId, activeConnection.StreamId, buffer, length);
                         _tunnel.SendStreamFrameNotification(exchnagePayload);
