@@ -2,7 +2,9 @@
 {
     public interface INtTunnelConfiguration
     {
-        public List<NtEndpointOutboundConfiguration> EndpointOutboundConfigurations { get; set; }
-        public List<NtEndpointInboundConfiguration> EndpointInboundConfigurations { get; set; }
+        public Guid PairId { get; }
+        public string Name { get; }
+        public List<NtEndpointOutboundConfiguration> EndpointOutboundConfigurations { get; }
+        public List<NtEndpointInboundConfiguration> EndpointInboundConfigurations { get; }
     }
 }

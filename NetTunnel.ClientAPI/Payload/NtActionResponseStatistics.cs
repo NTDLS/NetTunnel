@@ -4,7 +4,7 @@ namespace NetTunnel.ClientAPI.Payload
 {
     public class NtActionResponseStatistics : NtActionResponse
     {
-        public List<NtTunnelStatistics> TunnelStatistics { get; set; } = new();
+        public List<NtTunnelStatistics> Statistics { get; set; } = new();
 
         public NtActionResponseStatistics() { }
 

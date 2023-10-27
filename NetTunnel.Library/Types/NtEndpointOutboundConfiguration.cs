@@ -7,21 +7,28 @@ namespace NetTunnel.Library.Types
     /// <summary>
     /// The tunnel connector contains information that defines an outbound termination connection from an established endpoint.
     /// </summary>
-    public class NtEndpointOutboundConfiguration
+    public class NtEndpointOutboundConfiguration : INtEndpointConfiguration
     {
         [ProtoMember(1)]
         public Guid PairId { get; set; }
+
         [ProtoMember(2)]
-        public string Name { get; set; } = string.Empty;
+        public Guid TunnelPairId { get; set; }
+
         [ProtoMember(3)]
-        public string Address { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+
         [ProtoMember(4)]
+        public string Address { get; set; } = string.Empty;
+
+        [ProtoMember(5)]
         public int Port { get; set; }
 
         public NtEndpointOutboundConfiguration() { }
 
-        public NtEndpointOutboundConfiguration(Guid pairId, string name, string address, int port)
+        public NtEndpointOutboundConfiguration(Guid tunnelPairId, Guid pairId, string name, string address, int port)
         {
+            TunnelPairId = tunnelPairId;
             PairId = pairId;
             Name = name;
             Address = address;

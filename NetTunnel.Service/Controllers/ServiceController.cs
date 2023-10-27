@@ -29,8 +29,8 @@ namespace NetTunnel.Service.Controllers
                     Success = true
                 };
 
-                stats.TunnelStatistics.AddRange(Singletons.Core.InboundTunnels.GetStatistics());
-                stats.TunnelStatistics.AddRange(Singletons.Core.OutboundTunnels.GetStatistics());
+                stats.Statistics.AddRange(Singletons.Core.InboundTunnels.GetStatistics());
+                stats.Statistics.AddRange(Singletons.Core.OutboundTunnels.GetStatistics());
 
                 return stats;
             }
