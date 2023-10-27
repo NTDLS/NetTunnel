@@ -9,6 +9,8 @@ namespace NetTunnel.UI.Forms
     {
         private NtClient? _client;
 
+        volatile int _gridPopulationScope = 0;
+
         private System.Windows.Forms.Timer? _timer;
 
         #region Constructor / Deconstructor.
@@ -46,25 +48,27 @@ namespace NetTunnel.UI.Forms
             listViewTunnels.SelectedIndexChanged += ListViewTunnels_SelectedIndexChanged;
         }
 
+        bool _inTimerTick = false;
+
         private void _timer_Tick(object? sender, EventArgs e)
         {
+            if (_gridPopulationScope != 0 || _inTimerTick)
+            {
+                return;
+            }
+
             try
             {
+                _inTimerTick = true;
+
                 if (_client != null && _client.IsConnected)
                 {
                     _client.GetStatistics().ContinueWith(o =>
                     {
                         if (o.Result.Success)
                         {
-                            lock (listViewEndpoints)
-                            {
-                                PopulateEndpointStatistics(o.Result.Statistics);
-                            }
-
-                            lock (listViewTunnels)
-                            {
-                                PopulateTunnelStatistics(o.Result.Statistics);
-                            }
+                            PopulateEndpointStatistics(o.Result.Statistics);
+                            PopulateTunnelStatistics(o.Result.Statistics);
                         }
                     });
                 }
@@ -123,8 +127,13 @@ namespace NetTunnel.UI.Forms
                     }
                 }
             }
-
-            catch { }
+            catch
+            {
+            }
+            finally
+            {
+                _inTimerTick = false;
+            }
         }
 
         private void ListViewTunnels_SelectedIndexChanged(object? sender, EventArgs e)
@@ -241,9 +250,20 @@ namespace NetTunnel.UI.Forms
 
         private void RepopulateTunnelsGrid()
         {
-            lock (listViewTunnels)
+            try
             {
+                _timer?.Stop();
+                _gridPopulationScope++;
                 RepopulateTunnelsGrid_LockRequired();
+            }
+            finally
+            {
+                _gridPopulationScope--;
+
+                if (_gridPopulationScope == 0)
+                {
+                    _timer?.Start();
+                }
             }
         }
 
@@ -314,9 +334,20 @@ namespace NetTunnel.UI.Forms
 
         private void RepopulateEndpointsGrid(INtTunnelConfiguration tunnel)
         {
-            lock (listViewEndpoints)
+            try
             {
+                _timer?.Stop();
+                _gridPopulationScope++;
                 RepopulateEndpointsGrid_LockRequired(tunnel);
+            }
+            finally
+            {
+                _gridPopulationScope--;
+
+                if (_gridPopulationScope == 0)
+                {
+                    _timer?.Start();
+                }
             }
         }
 
