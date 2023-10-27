@@ -1,7 +1,10 @@
+#define AppVersion "0.1.0.0"
+
 [Setup]
 ;-- Main Setup Information
  AppName                          = NetTunnel
- AppVerName                       = NetTunnel 1.0.0.0
+ AppVersion                       = {#AppVersion}
+ AppVerName                       = NetTunnel {#AppVersion}
  AppCopyright                     = Copyright © 1995-2023 NetworkDLS.
  DefaultDirName                   = {commonpf}\NetworkDLS\NetTunnel
  DefaultGroupName                 = NetworkDLS\NetTunnel
@@ -14,12 +17,9 @@
  ChangesAssociations              = Yes
  OutputBaseFilename               = NetTunnel
  ArchitecturesInstallIn64BitMode  = x64
-
-;-- Windows 2000 & XP (Support Dialog)
- AppPublisher    = NetworkDLS
- AppPublisherURL = http://www.NetworkDLS.com/
- AppUpdatesURL   = http://www.NetworkDLS.com/
- AppVersion      = 1.0.0.0
+ AppPublisher                     = NetworkDLS
+ AppPublisherURL                  = http://www.NetworkDLS.com/
+ AppUpdatesURL                    = http://www.NetworkDLS.com/
 
 [Files]
  Source: "..\NetTunnel.Service\bin\Release\net7.0\runtimes\*.*"; DestDir: "{app}\Service\runtimes";  Flags: IgnoreVersion recursesubdirs;
