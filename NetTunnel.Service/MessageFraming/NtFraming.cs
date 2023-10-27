@@ -83,6 +83,9 @@ namespace NetTunnel.Service.MessageFraming
 
             Array.Clear(frameBuffer.ReceiveBuffer);
             frameBuffer.ReceiveBufferUsed = stream.Read(frameBuffer.ReceiveBuffer, 0, frameBuffer.ReceiveBuffer.Length);
+
+            tunnel.BytesReceived += (ulong)frameBuffer.ReceiveBufferUsed;
+
             ProcessFrameBuffer(stream, tunnel, frameBuffer, processNotificationCallback, processFrameQueryCallback);
         }
 

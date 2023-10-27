@@ -17,12 +17,16 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         protected NetworkStream? Stream { get; set; }
 
+        public ulong BytesReceived { get; set; }
+        public ulong BytesSent { get; set; }
+        public ulong TotalConnections { get; internal set; }
+        public ulong CurrentConnections { get; internal set; }
         public TunnelEngineCore Core { get; private set; }
         public bool KeepRunning { get; internal set; } = false;
         public Guid PairId { get; private set; }
         public string Name { get; private set; }
 
-        internal List<IEndpoint> Endpoints { get; private set; } = new();
+        public List<IEndpoint> Endpoints { get; set; } = new();
 
         private readonly Thread _heartbeatThread;
 
@@ -192,6 +196,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             {
                 var frameBytes = NtFraming.AssembleFrame(this, cmd);
                 Stream.Write(frameBytes, 0, frameBytes.Length);
+                BytesSent += (ulong)frameBytes.Length;
 
                 //Wait for a reply. When a reply is received, it will be routed to the correct query via ApplyQueryReply().
                 //ApplyQueryReply() will apply the payload data to queryAwaitingReply and trigger the wait event.
@@ -225,6 +230,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             var frameBytes = NtFraming.AssembleFrame(this, cmd);
             Stream.Write(frameBytes, 0, frameBytes.Length);
+            BytesSent += (ulong)frameBytes.Length;
         }
 
         /// <summary>
@@ -254,6 +260,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             var frameBytes = NtFraming.AssembleFrame(this, cmd);
             Stream.Write(frameBytes, 0, frameBytes.Length);
+            BytesSent += (ulong)frameBytes.Length;
         }
 
         #endregion

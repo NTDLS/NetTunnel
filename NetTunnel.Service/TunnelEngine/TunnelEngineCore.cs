@@ -2,7 +2,7 @@
 
 namespace NetTunnel.Service.TunnelEngine
 {
-    public class TunnelEngineCore
+    internal class TunnelEngineCore
     {
         public Logger Logging { get; set; }
         public UserSessionManager Sessions { get; set; }

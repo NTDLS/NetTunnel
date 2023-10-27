@@ -7,8 +7,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
     internal class BaseEndpoint : IEndpoint
     {
-        public ulong BytesReceived { get; private set; }
-        public ulong BytesSent { get; private set; }
+        public ulong BytesReceived { get; internal set; }
+        public ulong BytesSent { get; internal set; }
+        public ulong TotalConnections { get; internal set; }
+        public ulong CurrentConnections { get; internal set; }
 
         public Guid PairId { get; private set; }
         public string Name { get; private set; }
@@ -118,6 +120,9 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
             try
             {
+                TotalConnections++;
+                CurrentConnections++;
+
                 _tunnel.SendStreamFrameNotification(new NtFramePayloadEndpointConnect(_tunnel.PairId, PairId, activeConnection.StreamId));
 
                 byte[] buffer = new byte[Singletons.Configuration.FramebufferSize];
@@ -138,6 +143,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             }
             finally
             {
+                CurrentConnections--;
+
                 Utility.TryAndIgnore(activeConnection.Disconnect);
 
                 _activeConnections.Use((o) =>

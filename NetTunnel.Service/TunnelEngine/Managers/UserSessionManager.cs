@@ -3,7 +3,7 @@ using NTDLS.Semaphore;
 
 namespace NetTunnel.Service.TunnelEngine.Managers
 {
-    public class UserSessionManager
+    internal class UserSessionManager
     {
         private readonly TunnelEngineCore _core;
 

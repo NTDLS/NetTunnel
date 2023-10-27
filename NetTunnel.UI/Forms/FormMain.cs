@@ -88,8 +88,8 @@ namespace NetTunnel.UI.Forms
                                 var endpointStats = tunnelStats.EndpointStatistics.Where(o => o.EndpointPairId == endpoint.PairId && o.Direction == direction).SingleOrDefault();
                                 if (endpointStats != null)
                                 {
-                                    item.SubItems[columnHeaderEndpointBytesSent.Index].Text = $"{endpointStats.BytesSent:n0}";
-                                    item.SubItems[columnHeaderEndpointBytesReceived.Index].Text = $"{endpointStats.BytesReceived:n0}";
+                                    item.SubItems[columnHeaderEndpointBytesSent.Index].Text = $"{endpointStats.BytesSentKb:n0}";
+                                    item.SubItems[columnHeaderEndpointBytesReceived.Index].Text = $"{endpointStats.BytesReceivedKb:n0}";
                                     item.SubItems[columnHeaderEndpointTotalConnections.Index].Text = $"{endpointStats.TotalConnections:n0}";
                                     item.SubItems[columnHeaderEndpointCurrentConenctions.Index].Text = $"{endpointStats.CurrentConnections:n0}";
                                 }
@@ -114,8 +114,8 @@ namespace NetTunnel.UI.Forms
                             var tunnelStats = statistics.Where(o => o.TunnelPairId == tunnel.PairId && o.Direction == direction).SingleOrDefault();
                             if (tunnelStats != null)
                             {
-                                item.SubItems[columnHeaderTunnelBytesSent.Index].Text = $"{tunnelStats.BytesSent:n0}";
-                                item.SubItems[columnHeaderTunnelBytesReceived.Index].Text = $"{tunnelStats.BytesReceived:n0}";
+                                item.SubItems[columnHeaderTunnelBytesSent.Index].Text = $"{tunnelStats.BytesSentKb:n0}";
+                                item.SubItems[columnHeaderTunnelBytesReceived.Index].Text = $"{tunnelStats.BytesReceivedKb:n0}";
                                 item.SubItems[columnHeaderTunnelTotalConnections.Index].Text = $"{tunnelStats.TotalConnections:n0}";
                                 item.SubItems[columnHeaderTunnelCurrentConenctions.Index].Text = $"{tunnelStats.CurrentConnections:n0}";
                             }

@@ -85,6 +85,9 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             {
                 try
                 {
+                    CurrentConnections++;
+                    TotalConnections++;
+
                     Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' connecting to remote at {Address}:{DataPort}.");
 
                     _tcpClient = new TcpClient(Address, DataPort);
@@ -103,6 +106,10 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 catch (Exception ex)
                 {
                     Core.Logging.Write(Constants.NtLogSeverity.Exception, $"OutboundConnectionThreadProc: {ex.Message}");
+                }
+                finally
+                {
+                    CurrentConnections--;
                 }
             }
         }

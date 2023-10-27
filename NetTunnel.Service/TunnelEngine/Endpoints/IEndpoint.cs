@@ -14,5 +14,7 @@
         public void Stop();
         public ulong BytesReceived { get; }
         public ulong BytesSent { get; }
+        public ulong TotalConnections { get; }
+        public ulong CurrentConnections { get; }
     }
 }

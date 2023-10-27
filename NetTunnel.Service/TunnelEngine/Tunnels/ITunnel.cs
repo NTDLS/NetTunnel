@@ -2,6 +2,7 @@
 using NetTunnel.Service.MessageFraming.FramePayloads.Notifications;
 using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
 using NetTunnel.Service.MessageFraming.FramePayloads.Replies;
+using NetTunnel.Service.TunnelEngine.Endpoints;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
 {
@@ -16,6 +17,9 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         public Guid PairId { get; }
         public string Name { get; }
 
+        public void Start();
+        public void Stop();
+
         public Task<T?> SendStreamFramePayloadQuery<T>(INtFramePayloadQuery payload);
 
         /// <summary>
@@ -28,6 +32,13 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         /// </summary>
         public void SendStreamFrameNotification(INtFramePayloadNotification payload);
 
+        internal List<IEndpoint> Endpoints { get; set; }
+
         public void ApplyQueryReply(Guid frameId, INtFramePayloadReply replyPayload);
+
+        public ulong BytesReceived { get; set; }
+        public ulong BytesSent { get; set; }
+        public ulong TotalConnections { get; }
+        public ulong CurrentConnections { get; }
     }
 }

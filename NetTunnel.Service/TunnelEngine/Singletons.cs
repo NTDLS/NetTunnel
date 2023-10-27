@@ -2,7 +2,7 @@
 
 namespace NetTunnel.Service.TunnelEngine
 {
-    public static class Singletons
+    internal static class Singletons
     {
         private static TunnelEngineCore? _core = null;
         public static TunnelEngineCore Core

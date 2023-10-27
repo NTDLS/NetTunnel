@@ -84,21 +84,38 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
                 while (KeepRunning)
                 {
-                    Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Waiting on connection for inbound tunnel '{Name}' on port {DataPort}.");
-
-                    var tcpClient = _listener.AcceptTcpClient();
-                    Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Accepted connection for inbound tunnel '{Name}' on port {DataPort}.");
-
-                    using (Stream = tcpClient.GetStream())
+                    try
                     {
-                        ReceiveAndProcessStreamFrames(ProcessFrameNotificationCallback, ProcessFrameQueryCallback);
-                        Utility.TryAndIgnore(Stream.Close);
+                        Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Waiting on connection for inbound tunnel '{Name}' on port {DataPort}.");
+
+                        var tcpClient = _listener.AcceptTcpClient();
+                        Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Accepted connection for inbound tunnel '{Name}' on port {DataPort}.");
+
+                        if (KeepRunning)
+                        {
+                            TotalConnections++;
+                            CurrentConnections++;
+
+                            using (Stream = tcpClient.GetStream())
+                            {
+                                ReceiveAndProcessStreamFrames(ProcessFrameNotificationCallback, ProcessFrameQueryCallback);
+                                Utility.TryAndIgnore(Stream.Close);
+                            }
+
+                            Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Disconnected inbound tunnel '{Name}' on port {DataPort}");
+
+                            Utility.TryAndIgnore(tcpClient.Close);
+                            Utility.TryAndIgnore(tcpClient.Dispose);
+                        }
                     }
-
-                    Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Disconnected inbound tunnel '{Name}' on port {DataPort}");
-
-                    Utility.TryAndIgnore(tcpClient.Close);
-                    Utility.TryAndIgnore(tcpClient.Dispose);
+                    catch (Exception ex)
+                    {
+                        Core.Logging.Write(Constants.NtLogSeverity.Exception, $"InboundConnectionThreadProc: {ex.Message}");
+                    }
+                    finally
+                    {
+                        CurrentConnections--;
+                    }
                 }
             }
             catch (Exception ex)
