@@ -4,16 +4,16 @@ using NetTunnel.Library.Types;
 
 namespace NetTunnel.UI.Forms
 {
-    public partial class FormAddTunnel : Form
+    public partial class FormCreateOutboundTunnel : Form
     {
         private readonly NtClient? _client;
 
-        public FormAddTunnel()
+        public FormCreateOutboundTunnel()
         {
             InitializeComponent();
         }
 
-        public FormAddTunnel(NtClient client)
+        public FormCreateOutboundTunnel(NtClient client)
         {
             InitializeComponent();
 
@@ -35,7 +35,7 @@ namespace NetTunnel.UI.Forms
 #endif
         }
 
-        private void FormAddTunnel_Load(object sender, EventArgs e) { }
+        private void FormCreateOutboundTunnel_Load(object sender, EventArgs e) { }
 
         private void buttonAdd_Click(object sender, EventArgs e)
         {

@@ -16,5 +16,6 @@
         public ulong BytesSent { get; }
         public ulong TotalConnections { get; }
         public ulong CurrentConnections { get; }
+        public int TransmissionPort { get; }
     }
 }

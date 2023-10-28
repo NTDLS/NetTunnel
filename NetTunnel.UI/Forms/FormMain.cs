@@ -166,7 +166,7 @@ namespace NetTunnel.UI.Forms
 
                 var menu = new ContextMenuStrip();
 
-                menu.Items.Add("Add Tunnel");
+                menu.Items.Add("Create Outbound Tunnel");
 
                 if (itemUnderMouse != null)
                 {
@@ -179,13 +179,13 @@ namespace NetTunnel.UI.Forms
 
                 menu.ItemClicked += (object? sender, ToolStripItemClickedEventArgs e) =>
                 {
-                    if (e.ClickedItem?.Text == "Add Tunnel")
+                    if (e.ClickedItem?.Text == "Create Outbound Tunnel")
                     {
                         Utility.EnsureNotNull(_client);
 
-                        using (var formAddTunnel = new FormAddTunnel(_client))
+                        using (var formCreateOutboundTunnel = new FormCreateOutboundTunnel(_client))
                         {
-                            if (formAddTunnel.ShowDialog() == DialogResult.OK)
+                            if (formCreateOutboundTunnel.ShowDialog() == DialogResult.OK)
                             {
                                 RepopulateTunnelsGrid();
                             }
@@ -219,7 +219,25 @@ namespace NetTunnel.UI.Forms
                     }
                     else if (e.ClickedItem?.Text == "Delete Tunnel")
                     {
-                        MessageBox.Show("Not implemented");
+                        Utility.EnsureNotNull(_client);
+                        Utility.EnsureNotNull(itemUnderMouse);
+
+                        if (itemUnderMouse.Tag is NtTunnelInboundConfiguration tunnelInbound)
+                        {
+                            _client.TunnelInbound.Delete(tunnelInbound.PairId).ContinueWith((o) =>
+                            {
+                                DeleteItemFromGrid(listViewTunnels, itemUnderMouse);
+                                ClearGridItems(listViewEndpoints);
+                            });
+                        }
+                        else if (itemUnderMouse.Tag is NtTunnelOutboundConfiguration tunneloutbound)
+                        {
+                            _client.TunnelInbound.Delete(tunneloutbound.PairId).ContinueWith((o) =>
+                            {
+                                DeleteItemFromGrid(listViewTunnels, itemUnderMouse);
+                                ClearGridItems(listViewEndpoints);
+                            });
+                        }
                     }
                 };
             }
@@ -244,6 +262,30 @@ namespace NetTunnel.UI.Forms
                 MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK);
             }
             return false;
+        }
+
+        void DeleteItemFromGrid(ListView grid, ListViewItem item)
+        {
+            if (grid.InvokeRequired)
+            {
+                grid.Invoke(DeleteItemFromGrid, new object[] { grid, item });
+            }
+            else
+            {
+                grid.Items.Remove(item);
+            }
+        }
+
+        void ClearGridItems(ListView grid)
+        {
+            if (grid.InvokeRequired)
+            {
+                grid.Invoke(ClearGridItems, grid);
+            }
+            else
+            {
+                grid.Items.Clear();
+            }
         }
 
         #region Populate Grids.
@@ -370,7 +412,7 @@ namespace NetTunnel.UI.Forms
                     var item = new ListViewItem(endpoint.Name);
                     item.Tag = endpoint;
                     item.SubItems.Add("Inbound");
-                    item.SubItems.Add($"*:{endpoint.Port}");
+                    item.SubItems.Add($"*:{endpoint.TransmissionPort}");
                     item.SubItems.Add("~");
                     item.SubItems.Add("~");
                     item.SubItems.Add("~");
@@ -390,7 +432,7 @@ namespace NetTunnel.UI.Forms
                     var item = new ListViewItem(endpoint.Name);
                     item.Tag = endpoint;
                     item.SubItems.Add("Outbound");
-                    item.SubItems.Add($"{endpoint.Address}{endpoint.Port}");
+                    item.SubItems.Add($"{endpoint.Address}{endpoint.TransmissionPort}");
                     item.SubItems.Add("~");
                     item.SubItems.Add("~");
                     item.SubItems.Add("~");

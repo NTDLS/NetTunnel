@@ -22,17 +22,17 @@ namespace NetTunnel.Library.Types
         public string Address { get; set; } = string.Empty;
 
         [ProtoMember(5)]
-        public int Port { get; set; }
+        public int TransmissionPort { get; set; }
 
         public NtEndpointOutboundConfiguration() { }
 
-        public NtEndpointOutboundConfiguration(Guid tunnelPairId, Guid pairId, string name, string address, int port)
+        public NtEndpointOutboundConfiguration(Guid tunnelPairId, Guid pairId, string name, string address, int transmissionPort)
         {
             TunnelPairId = tunnelPairId;
             PairId = pairId;
             Name = name;
             Address = address;
-            Port = port;
+            TransmissionPort = transmissionPort;
         }
     }
 }

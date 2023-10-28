@@ -37,12 +37,12 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             {
                 if (endpoint is EndpointInbound inboundEndpoint)
                 {
-                    var endpointConfiguration = new NtEndpointInboundConfiguration(PairId, inboundEndpoint.PairId, inboundEndpoint.Name, inboundEndpoint.Port);
+                    var endpointConfiguration = new NtEndpointInboundConfiguration(PairId, inboundEndpoint.PairId, inboundEndpoint.Name, inboundEndpoint.TransmissionPort);
                     tunnelConfiguration.EndpointInboundConfigurations.Add(endpointConfiguration);
                 }
                 else if (endpoint is EndpointOutbound outboundEndpoint)
                 {
-                    var endpointConfiguration = new NtEndpointOutboundConfiguration(PairId, outboundEndpoint.PairId, outboundEndpoint.Name, outboundEndpoint.Address, outboundEndpoint.Port);
+                    var endpointConfiguration = new NtEndpointOutboundConfiguration(PairId, outboundEndpoint.PairId, outboundEndpoint.Name, outboundEndpoint.Address, outboundEndpoint.TransmissionPort);
                     tunnelConfiguration.EndpointOutboundConfigurations.Add(endpointConfiguration);
                 }
             }

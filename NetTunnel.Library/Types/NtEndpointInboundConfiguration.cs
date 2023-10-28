@@ -19,16 +19,16 @@ namespace NetTunnel.Library.Types
         public string Name { get; set; } = string.Empty;
 
         [ProtoMember(4)]
-        public int Port { get; set; }
+        public int TransmissionPort { get; set; }
 
         public NtEndpointInboundConfiguration() { }
 
-        public NtEndpointInboundConfiguration(Guid tunnelPairId, Guid pairId, string name, int port)
+        public NtEndpointInboundConfiguration(Guid tunnelPairId, Guid pairId, string name, int transmissionPort)
         {
             TunnelPairId = tunnelPairId;
             PairId = pairId;
             Name = name;
-            Port = port;
+            TransmissionPort = transmissionPort;
         }
     }
 }

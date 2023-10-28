@@ -11,27 +11,25 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
     internal class EndpointOutbound : BaseEndpoint, IEndpoint
     {
         public string Address { get; private set; }
-        public int Port { get; private set; }
 
         public EndpointOutbound(TunnelEngineCore core, ITunnel tunnel, NtEndpointOutboundConfiguration configuration)
-            : base(core, tunnel, configuration.PairId, configuration.Name)
+            : base(core, tunnel, configuration.PairId, configuration.Name, configuration.TransmissionPort)
         {
             Address = configuration.Address;
-            Port = configuration.Port;
         }
 
         public override void Start()
         {
             base.Start();
 
-            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Starting outbound endpoint '{Name}' on port {Port}.");
+            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Starting outbound endpoint '{Name}' on port {TransmissionPort}.");
         }
 
         public override void Stop()
         {
             base.Stop();
 
-            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopping outbound endpoint '{Name}' on port {Port}.");
+            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopping outbound endpoint '{Name}' on port {TransmissionPort}.");
 
             _activeConnections.Use((o) =>
             {
@@ -42,7 +40,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 o.Clear();
             });
 
-            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopped outbound endpoint '{Name}' on port {Port}.");
+            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopped outbound endpoint '{Name}' on port {TransmissionPort}.");
         }
 
         public void EstablishOutboundEndpointConnection(Guid streamId)
@@ -53,7 +51,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                 try
                 {
-                    tcpClient.Connect(Address, Port);
+                    tcpClient.Connect(Address, TransmissionPort);
                     if (KeepRunning) //Check again, we may have received a connection while shutting down.
                     {
                         var handlerThread = new Thread(HandleClientThreadProc);

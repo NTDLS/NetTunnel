@@ -8,3 +8,5 @@ packages/
 NetTunnel/NetTunnel.EndPoint/obj/
 
 \@Installers/Output/NetTunnel.exe
+
+NetTunnel.UI/NetTunnel.UI.csproj.user

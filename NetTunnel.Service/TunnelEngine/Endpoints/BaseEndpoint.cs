@@ -7,11 +7,11 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
     internal class BaseEndpoint : IEndpoint
     {
+        public int TransmissionPort { get; private set; }
         public ulong BytesReceived { get; internal set; }
         public ulong BytesSent { get; internal set; }
         public ulong TotalConnections { get; internal set; }
         public ulong CurrentConnections { get; internal set; }
-
         public Guid PairId { get; private set; }
         public string Name { get; private set; }
 
@@ -23,12 +23,13 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         internal readonly CriticalResource<Dictionary<Guid, ActiveEndpointConnection>> _activeConnections = new();
 
-        public BaseEndpoint(TunnelEngineCore core, ITunnel tunnel, Guid pairId, string name)
+        public BaseEndpoint(TunnelEngineCore core, ITunnel tunnel, Guid pairId, string name, int transmissionPort)
         {
             _core = core;
             _tunnel = tunnel;
             Name = name;
             PairId = pairId;
+            TransmissionPort = transmissionPort;
 
             _heartbeatThread = new Thread(HeartbeatThreadProc);
             _heartbeatThread.Start();

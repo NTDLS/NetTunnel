@@ -1,6 +1,6 @@
 ﻿namespace NetTunnel.UI.Forms
 {
-    partial class FormAddTunnel
+    partial class FormCreateOutboundTunnel
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormAddTunnel));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormCreateOutboundTunnel));
             labelRemoteAddress = new Label();
             labelRemoteUsername = new Label();
             labelRemotePassword = new Label();
@@ -50,7 +50,7 @@
             // labelRemoteAddress
             // 
             labelRemoteAddress.AutoSize = true;
-            labelRemoteAddress.Location = new Point(17, 30);
+            labelRemoteAddress.Location = new Point(17, 22);
             labelRemoteAddress.Name = "labelRemoteAddress";
             labelRemoteAddress.Size = new Size(86, 15);
             labelRemoteAddress.TabIndex = 0;
@@ -59,7 +59,7 @@
             // labelRemoteUsername
             // 
             labelRemoteUsername.AutoSize = true;
-            labelRemoteUsername.Location = new Point(18, 88);
+            labelRemoteUsername.Location = new Point(18, 76);
             labelRemoteUsername.Name = "labelRemoteUsername";
             labelRemoteUsername.Size = new Size(63, 15);
             labelRemoteUsername.TabIndex = 1;
@@ -68,7 +68,7 @@
             // labelRemotePassword
             // 
             labelRemotePassword.AutoSize = true;
-            labelRemotePassword.Location = new Point(17, 141);
+            labelRemotePassword.Location = new Point(17, 125);
             labelRemotePassword.Name = "labelRemotePassword";
             labelRemotePassword.Size = new Size(57, 15);
             labelRemotePassword.TabIndex = 2;
@@ -76,21 +76,21 @@
             // 
             // textBoxRemoteAddress
             // 
-            textBoxRemoteAddress.Location = new Point(18, 48);
+            textBoxRemoteAddress.Location = new Point(18, 40);
             textBoxRemoteAddress.Name = "textBoxRemoteAddress";
             textBoxRemoteAddress.Size = new Size(156, 23);
             textBoxRemoteAddress.TabIndex = 2;
             // 
             // textBoxRemoteUsername
             // 
-            textBoxRemoteUsername.Location = new Point(18, 106);
+            textBoxRemoteUsername.Location = new Point(18, 94);
             textBoxRemoteUsername.Name = "textBoxRemoteUsername";
             textBoxRemoteUsername.Size = new Size(239, 23);
             textBoxRemoteUsername.TabIndex = 4;
             // 
             // textBoxRemotePassword
             // 
-            textBoxRemotePassword.Location = new Point(18, 159);
+            textBoxRemotePassword.Location = new Point(18, 143);
             textBoxRemotePassword.Name = "textBoxRemotePassword";
             textBoxRemotePassword.PasswordChar = '*';
             textBoxRemotePassword.Size = new Size(239, 23);
@@ -98,7 +98,7 @@
             // 
             // textBoxRemotePort
             // 
-            textBoxRemotePort.Location = new Point(180, 48);
+            textBoxRemotePort.Location = new Point(180, 40);
             textBoxRemotePort.Name = "textBoxRemotePort";
             textBoxRemotePort.Size = new Size(77, 23);
             textBoxRemotePort.TabIndex = 3;
@@ -106,7 +106,7 @@
             // labelRemotePort
             // 
             labelRemotePort.AutoSize = true;
-            labelRemotePort.Location = new Point(180, 30);
+            labelRemotePort.Location = new Point(180, 22);
             labelRemotePort.Name = "labelRemotePort";
             labelRemotePort.Size = new Size(68, 15);
             labelRemotePort.TabIndex = 4;
@@ -114,7 +114,7 @@
             // 
             // buttonAdd
             // 
-            buttonAdd.Location = new Point(137, 330);
+            buttonAdd.Location = new Point(139, 302);
             buttonAdd.Name = "buttonAdd";
             buttonAdd.Size = new Size(75, 23);
             buttonAdd.TabIndex = 6;
@@ -124,7 +124,7 @@
             // 
             // buttonCancel
             // 
-            buttonCancel.Location = new Point(220, 330);
+            buttonCancel.Location = new Point(220, 302);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(75, 23);
             buttonCancel.TabIndex = 7;
@@ -152,7 +152,7 @@
             // 
             textBoxTunnelDataPort.Location = new Point(17, 79);
             textBoxTunnelDataPort.Name = "textBoxTunnelDataPort";
-            textBoxTunnelDataPort.Size = new Size(77, 23);
+            textBoxTunnelDataPort.Size = new Size(103, 23);
             textBoxTunnelDataPort.TabIndex = 1;
             // 
             // labelEndpointDataPort
@@ -160,9 +160,9 @@
             labelEndpointDataPort.AutoSize = true;
             labelEndpointDataPort.Location = new Point(17, 61);
             labelEndpointDataPort.Name = "labelEndpointDataPort";
-            labelEndpointDataPort.Size = new Size(106, 15);
+            labelEndpointDataPort.Size = new Size(100, 15);
             labelEndpointDataPort.TabIndex = 8;
-            labelEndpointDataPort.Text = "Endpoint data port";
+            labelEndpointDataPort.Text = "Transmission port";
             // 
             // groupBoxLoginInfo
             // 
@@ -176,16 +176,16 @@
             groupBoxLoginInfo.Controls.Add(labelRemotePort);
             groupBoxLoginInfo.Location = new Point(17, 117);
             groupBoxLoginInfo.Name = "groupBoxLoginInfo";
-            groupBoxLoginInfo.Size = new Size(278, 196);
+            groupBoxLoginInfo.Size = new Size(278, 179);
             groupBoxLoginInfo.TabIndex = 9;
             groupBoxLoginInfo.TabStop = false;
             groupBoxLoginInfo.Text = "Remote Service Login";
             // 
-            // FormAddTunnel
+            // FormCreateOutboundTunnel
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(312, 365);
+            ClientSize = new Size(312, 339);
             Controls.Add(groupBoxLoginInfo);
             Controls.Add(labelEndpointDataPort);
             Controls.Add(textBoxTunnelDataPort);
@@ -197,11 +197,11 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;
-            Name = "FormAddTunnel";
+            Name = "FormCreateOutboundTunnel";
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
-            Text = "NetTunnel : Tunnel";
-            Load += FormAddTunnel_Load;
+            Text = "NetTunnel : Create Outbound Tunnel";
+            Load += FormCreateOutboundTunnel_Load;
             groupBoxLoginInfo.ResumeLayout(false);
             groupBoxLoginInfo.PerformLayout();
             ResumeLayout(false);
