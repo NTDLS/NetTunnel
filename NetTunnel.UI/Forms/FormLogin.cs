@@ -16,7 +16,7 @@ namespace NetTunnel.UI.Forms
             AcceptButton = buttonLogin;
             CancelButton = buttonCancel;
 
-            var preferences = Persistence.LoadFromDisk<UIPreferences>();
+            var preferences = Persistence.LoadFromDisk<UILoginPreferences>();
             if (preferences != null)
             {
                 textBoxAddress.Text = preferences.Address;
@@ -43,7 +43,7 @@ namespace NetTunnel.UI.Forms
 
                 using var _ = new NtClient(Address, Username, Password);
 
-                var preferences = new UIPreferences()
+                var preferences = new UILoginPreferences()
                 {
                     Address = textBoxAddress.Text,
                     Port = textBoxPort.Text,
