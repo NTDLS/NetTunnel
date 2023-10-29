@@ -91,7 +91,7 @@ namespace NetTunnel.ClientAPI
         /// <param name="tunnel"></param>
         /// <returns></returns>
         /// <exception cref="NtAPIResponseException"></exception>
-        public async Task AddInboundEndpointPair(Guid tunnelPairId, NtEndpointInboundConfiguration inboundEndpoint, NtEndpointOutboundConfiguration outboundEndpoint)
+        public async Task AddEndpointInboundPair(Guid tunnelPairId, NtEndpointInboundConfiguration inboundEndpoint, NtEndpointOutboundConfiguration outboundEndpoint)
         {
             string url = $"api/TunnelOutbound/{_client.SessionId}/AddEndpointInboundPair/{tunnelPairId}";
 
@@ -114,7 +114,7 @@ namespace NetTunnel.ClientAPI
         /// <param name="tunnel"></param>
         /// <returns></returns>
         /// <exception cref="NtAPIResponseException"></exception>
-        public async Task AddOutboundEndpointPair(Guid tunnelPairId, NtEndpointInboundConfiguration inboundEndpoint, NtEndpointOutboundConfiguration outboundEndpoint)
+        public async Task AddEndpointOutboundPair(Guid tunnelPairId, NtEndpointInboundConfiguration inboundEndpoint, NtEndpointOutboundConfiguration outboundEndpoint)
         {
             string url = $"api/TunnelOutbound/{_client.SessionId}/AddEndpointOutboundPair/{tunnelPairId}";
 

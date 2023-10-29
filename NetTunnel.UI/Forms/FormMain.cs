@@ -170,7 +170,8 @@ namespace NetTunnel.UI.Forms
 
                 if (itemUnderMouse != null)
                 {
-                    menu.Items.Add("Add Endpoint to Tunnel");
+                    menu.Items.Add("Add Inbound Endpoint to Tunnel");
+                    menu.Items.Add("Add Outbound Endpoint to Tunnel");
                     menu.Items.Add(new ToolStripSeparator());
                     menu.Items.Add("Delete Tunnel");
                 }
@@ -191,29 +192,29 @@ namespace NetTunnel.UI.Forms
                             }
                         }
                     }
-                    else if (e.ClickedItem?.Text == "Add Endpoint to Tunnel")
+                    else if (e.ClickedItem?.Text == "Add Inbound Endpoint to Tunnel")
                     {
                         Utility.EnsureNotNull(_client);
                         Utility.EnsureNotNull(itemUnderMouse);
 
-                        if (itemUnderMouse.Tag is NtTunnelInboundConfiguration tunnelInbound)
+                        using (var formAddEndpoint = new FormAddEndpoint(_client, (INtTunnelConfiguration)itemUnderMouse.Tag, NtDirection.Inbound))
                         {
-                            using (var formAddEndpoint = new FormAddEndpoint(_client, tunnelInbound))
+                            if (formAddEndpoint.ShowDialog() == DialogResult.OK)
                             {
-                                if (formAddEndpoint.ShowDialog() == DialogResult.OK)
-                                {
-                                    RepopulateTunnelsGrid();
-                                }
+                                RepopulateTunnelsGrid();
                             }
                         }
-                        else if (itemUnderMouse.Tag is NtTunnelOutboundConfiguration tunnelOutbound)
+                    }
+                    else if (e.ClickedItem?.Text == "Add Outbound Endpoint to Tunnel")
+                    {
+                        Utility.EnsureNotNull(_client);
+                        Utility.EnsureNotNull(itemUnderMouse);
+
+                        using (var formAddEndpoint = new FormAddEndpoint(_client, (INtTunnelConfiguration)itemUnderMouse.Tag, NtDirection.Outbound))
                         {
-                            using (var formAddEndpoint = new FormAddEndpoint(_client, tunnelOutbound))
+                            if (formAddEndpoint.ShowDialog() == DialogResult.OK)
                             {
-                                if (formAddEndpoint.ShowDialog() == DialogResult.OK)
-                                {
-                                    RepopulateTunnelsGrid();
-                                }
+                                RepopulateTunnelsGrid();
                             }
                         }
                     }
