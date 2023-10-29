@@ -1,6 +1,7 @@
 using NetTunnel.ClientAPI;
 using NetTunnel.Library;
 using NetTunnel.Library.Types;
+using NetTunnel.UI.Helpers;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms
@@ -8,10 +9,11 @@ namespace NetTunnel.UI.Forms
     public partial class FormMain : Form
     {
         private NtClient? _client;
-
-        volatile int _gridPopulationScope = 0;
-
+        private bool _inTimerTick = false;
+        private volatile int _gridPopulationScope = 0;
         private System.Windows.Forms.Timer? _timer;
+        private ListViewItemComparer? _endpointsListViewItemComparer;
+        private ListViewItemComparer? _tunnelsListViewItemComparer;
 
         #region Constructor / Deconstructor.
 
@@ -38,7 +40,7 @@ namespace NetTunnel.UI.Forms
             _timer = new System.Windows.Forms.Timer()
             {
                 Enabled = true,
-                Interval = 1000
+                Interval = 250
             };
 
             _timer.Tick += _timer_Tick;
@@ -46,21 +48,52 @@ namespace NetTunnel.UI.Forms
 
             listViewTunnels.MouseUp += ListViewTunnels_MouseUp;
             listViewTunnels.SelectedIndexChanged += ListViewTunnels_SelectedIndexChanged;
+
+            _endpointsListViewItemComparer = new ListViewItemComparer();
+            listViewEndpoints.ListViewItemSorter = _endpointsListViewItemComparer;
+            listViewEndpoints.ColumnClick += ListViewEndpoints_ColumnClick;
+
+            _tunnelsListViewItemComparer = new ListViewItemComparer();
+            listViewTunnels.ListViewItemSorter = _tunnelsListViewItemComparer;
+            listViewTunnels.ColumnClick += ListViewTunnels_ColumnClick;
         }
 
-        bool _inTimerTick = false;
+        private bool ChangeConnection()
+        {
+            try
+            {
+                using (var formLogin = new FormLogin())
+                {
+                    if (formLogin.ShowDialog() == DialogResult.OK)
+                    {
+                        _client = new NtClient(formLogin.Address, formLogin.Username, formLogin.Password);
+                        RepopulateTunnelsGrid();
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK);
+            }
+            return false;
+        }
 
         private void _timer_Tick(object? sender, EventArgs e)
         {
-            if (_gridPopulationScope != 0 || _inTimerTick)
+            Utility.EnsureNotNull(_timer);
+
+            lock (_timer)
             {
-                return;
+                if (_gridPopulationScope != 0 || _inTimerTick)
+                {
+                    return;
+                }
+                _inTimerTick = true;
             }
 
             try
             {
-                _inTimerTick = true;
-
                 if (_client != null && _client.IsConnected)
                 {
                     _client.GetStatistics().ContinueWith(o =>
@@ -86,10 +119,11 @@ namespace NetTunnel.UI.Forms
                             var endpoint = (INtEndpointConfiguration)item.Tag;
                             var direction = (endpoint is NtEndpointInboundConfiguration) ? NtDirection.Inbound : NtDirection.Outbound;
 
-                            var tunnelStats = statistics.Where(o => o.TunnelPairId == endpoint.TunnelPairId && o.Direction == direction).SingleOrDefault();
+                            var tunnelStats = statistics.Where(o => o.TunnelPairId == endpoint.TunnelPairId).ToList();
                             if (tunnelStats != null)
                             {
-                                var endpointStats = tunnelStats.EndpointStatistics.Where(o => o.EndpointPairId == endpoint.PairId && o.Direction == direction).SingleOrDefault();
+                                var endpointStats = tunnelStats.SelectMany(o => o.EndpointStatistics)
+                                    .Where(o => o.EndpointPairId == endpoint.PairId && o.Direction == direction).SingleOrDefault();
                                 if (endpointStats != null)
                                 {
                                     item.SubItems[columnHeaderEndpointBytesSent.Index].Text = $"{endpointStats.BytesSentKb:n0}";
@@ -180,6 +214,8 @@ namespace NetTunnel.UI.Forms
 
                 menu.ItemClicked += (object? sender, ToolStripItemClickedEventArgs e) =>
                 {
+                    menu.Hide();
+
                     if (e.ClickedItem?.Text == "Create Outbound Tunnel")
                     {
                         Utility.EnsureNotNull(_client);
@@ -223,6 +259,14 @@ namespace NetTunnel.UI.Forms
                         Utility.EnsureNotNull(_client);
                         Utility.EnsureNotNull(itemUnderMouse);
 
+                        var tunnel = (INtTunnelConfiguration)itemUnderMouse.Tag;
+
+                        if (MessageBox.Show($"Delete the tunnel '{tunnel.Name}'?",
+                            Constants.FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                        {
+                            return;
+                        }
+
                         if (itemUnderMouse.Tag is NtTunnelInboundConfiguration tunnelInbound)
                         {
                             _client.TunnelInbound.Delete(tunnelInbound.PairId).ContinueWith((o) =>
@@ -242,27 +286,6 @@ namespace NetTunnel.UI.Forms
                     }
                 };
             }
-        }
-
-        private bool ChangeConnection()
-        {
-            try
-            {
-                using (var formLogin = new FormLogin())
-                {
-                    if (formLogin.ShowDialog() == DialogResult.OK)
-                    {
-                        _client = new NtClient(formLogin.Address, formLogin.Username, formLogin.Password);
-                        RepopulateTunnelsGrid();
-                        return true;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK);
-            }
-            return false;
         }
 
         void DeleteItemFromGrid(ListView grid, ListViewItem item)
@@ -441,6 +464,56 @@ namespace NetTunnel.UI.Forms
                     listViewEndpoints.Items.Add(item);
                 }
             }
+        }
+
+        #endregion
+
+        #region Grid Sorting.
+
+        private void ListViewTunnels_ColumnClick(object? sender, ColumnClickEventArgs e)
+        {
+            Utility.EnsureNotNull(sender);
+            Utility.EnsureNotNull(_tunnelsListViewItemComparer);
+
+            var listView = (ListView)sender;
+
+            if (e.Column == _tunnelsListViewItemComparer.SortColumn)
+            {
+                if (_tunnelsListViewItemComparer.SortOrder == SortOrder.Ascending)
+                    _tunnelsListViewItemComparer.SortOrder = SortOrder.Descending;
+                else
+                    _tunnelsListViewItemComparer.SortOrder = SortOrder.Ascending;
+            }
+            else
+            {
+                _tunnelsListViewItemComparer.SortColumn = e.Column;
+                _tunnelsListViewItemComparer.SortOrder = SortOrder.Ascending;
+            }
+
+            listView.Sort();
+        }
+
+        private void ListViewEndpoints_ColumnClick(object? sender, ColumnClickEventArgs e)
+        {
+            Utility.EnsureNotNull(sender);
+            Utility.EnsureNotNull(_endpointsListViewItemComparer);
+
+            var listView = (ListView)sender;
+
+            if (e.Column == _endpointsListViewItemComparer.SortColumn)
+            {
+                if (_endpointsListViewItemComparer.SortOrder == SortOrder.Ascending)
+                    _endpointsListViewItemComparer.SortOrder = SortOrder.Descending;
+                else
+                    _endpointsListViewItemComparer.SortOrder = SortOrder.Ascending;
+            }
+            else
+            {
+                _endpointsListViewItemComparer.SortColumn = e.Column;
+                _endpointsListViewItemComparer.SortOrder = SortOrder.Ascending;
+            }
+
+            listView.Sort();
         }
 
         #endregion

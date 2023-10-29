@@ -69,10 +69,10 @@
             listViewTunnels.Dock = DockStyle.Fill;
             listViewTunnels.FullRowSelect = true;
             listViewTunnels.GridLines = true;
-            listViewTunnels.HeaderStyle = ColumnHeaderStyle.Nonclickable;
             listViewTunnels.Location = new Point(0, 15);
+            listViewTunnels.MultiSelect = false;
             listViewTunnels.Name = "listViewTunnels";
-            listViewTunnels.Size = new Size(896, 243);
+            listViewTunnels.Size = new Size(912, 243);
             listViewTunnels.TabIndex = 0;
             listViewTunnels.UseCompatibleStateImageBehavior = false;
             listViewTunnels.View = View.Details;
@@ -85,7 +85,7 @@
             // columnHeaderTunnelDirection
             // 
             columnHeaderTunnelDirection.Text = "Direction";
-            columnHeaderTunnelDirection.Width = 65;
+            columnHeaderTunnelDirection.Width = 75;
             // 
             // columnHeaderTunnelAddress
             // 
@@ -122,7 +122,7 @@
             menuStripBody.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, securityToolStripMenuItem });
             menuStripBody.Location = new Point(0, 0);
             menuStripBody.Name = "menuStripBody";
-            menuStripBody.Size = new Size(896, 24);
+            menuStripBody.Size = new Size(912, 24);
             menuStripBody.TabIndex = 1;
             menuStripBody.Text = "menuStrip1";
             // 
@@ -165,7 +165,7 @@
             // 
             statusStripBody.Location = new Point(0, 547);
             statusStripBody.Name = "statusStripBody";
-            statusStripBody.Size = new Size(896, 22);
+            statusStripBody.Size = new Size(912, 22);
             statusStripBody.TabIndex = 2;
             statusStripBody.Text = "statusStrip1";
             // 
@@ -185,7 +185,7 @@
             // 
             splitContainer1.Panel2.Controls.Add(listViewEndpoints);
             splitContainer1.Panel2.Controls.Add(labelEndpoints);
-            splitContainer1.Size = new Size(896, 523);
+            splitContainer1.Size = new Size(912, 523);
             splitContainer1.SplitterDistance = 258;
             splitContainer1.TabIndex = 3;
             // 
@@ -205,10 +205,10 @@
             listViewEndpoints.Dock = DockStyle.Fill;
             listViewEndpoints.FullRowSelect = true;
             listViewEndpoints.GridLines = true;
-            listViewEndpoints.HeaderStyle = ColumnHeaderStyle.Nonclickable;
             listViewEndpoints.Location = new Point(0, 15);
+            listViewEndpoints.MultiSelect = false;
             listViewEndpoints.Name = "listViewEndpoints";
-            listViewEndpoints.Size = new Size(896, 246);
+            listViewEndpoints.Size = new Size(912, 246);
             listViewEndpoints.TabIndex = 1;
             listViewEndpoints.UseCompatibleStateImageBehavior = false;
             listViewEndpoints.View = View.Details;
@@ -221,7 +221,7 @@
             // columnHeaderEndpointDirection
             // 
             columnHeaderEndpointDirection.Text = "Direction";
-            columnHeaderEndpointDirection.Width = 65;
+            columnHeaderEndpointDirection.Width = 75;
             // 
             // columnHeaderEndpointAddress
             // 
@@ -262,7 +262,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(896, 569);
+            ClientSize = new Size(912, 569);
             Controls.Add(splitContainer1);
             Controls.Add(menuStripBody);
             Controls.Add(statusStripBody);

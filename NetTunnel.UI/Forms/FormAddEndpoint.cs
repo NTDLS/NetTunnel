@@ -1,7 +1,6 @@
 ﻿using NetTunnel.ClientAPI;
 using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using System.Net;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms
@@ -20,8 +19,7 @@ namespace NetTunnel.UI.Forms
             _tunnel = tunnel;
             _direction = direction;
 
-            this.Text = $"NetTunnel : Add {direction} Endpoint";
-
+            Text = $"NetTunnel : Add {direction} Endpoint";
         }
 
         public FormAddEndpoint()
