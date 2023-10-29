@@ -13,7 +13,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             LoadFromDisk();
         }
 
-        public async Task<T?> DispatchAddEndpointInbound<T>(Guid tunnelPairId, NtEndpointInboundConfiguration endpoint)
+        public async Task<T?> DispatchAddEndpointInboundToAssociatedTunnelService<T>(Guid tunnelPairId, NtEndpointInboundConfiguration endpoint)
         {
             return await Collection.Use((o) =>
             {
@@ -22,7 +22,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-        public async Task<T?> DispatchAddEndpointOutbound<T>(Guid tunnelPairId, NtEndpointOutboundConfiguration endpoint)
+        public async Task<T?> DispatchAddEndpointOutboundToAssociatedTunnelService<T>(Guid tunnelPairId, NtEndpointOutboundConfiguration endpoint)
         {
             return await Collection.Use((o) =>
             {
