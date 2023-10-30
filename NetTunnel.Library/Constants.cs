@@ -10,6 +10,15 @@
             Outbound
         }
 
+        public enum NtTunnelStatus
+        {
+            Undefiend,
+            Connecting,
+            Established,
+            Disconnected
+        }
+
+
         public enum NtLogSeverity
         {
             Debug = 0, //Super-verbose, debug information.

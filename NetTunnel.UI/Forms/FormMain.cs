@@ -154,8 +154,7 @@ namespace NetTunnel.UI.Forms
                             {
                                 item.SubItems[columnHeaderTunnelBytesSent.Index].Text = $"{tunnelStats.BytesSentKb:n0}";
                                 item.SubItems[columnHeaderTunnelBytesReceived.Index].Text = $"{tunnelStats.BytesReceivedKb:n0}";
-                                item.SubItems[columnHeaderTunnelTotalConnections.Index].Text = $"{tunnelStats.TotalConnections:n0}";
-                                item.SubItems[columnHeaderTunnelCurrentConenctions.Index].Text = $"{tunnelStats.CurrentConnections:n0}";
+                                item.SubItems[columnHeaderTunnelStatus.Index].Text = tunnelStats.Status.ToString();
                             }
                         }
                     }
@@ -368,7 +367,6 @@ namespace NetTunnel.UI.Forms
                     item.SubItems.Add("~");
                     item.SubItems.Add("~");
                     item.SubItems.Add("~");
-                    item.SubItems.Add("~");
                     listViewTunnels.Items.Add(item);
                 }
             }
@@ -389,7 +387,6 @@ namespace NetTunnel.UI.Forms
                     item.SubItems.Add("Outbound");
                     item.SubItems.Add($"{tunnel.Address}{tunnel.DataPort}");
                     item.SubItems.Add($"{endpointCount:n0}");
-                    item.SubItems.Add("~");
                     item.SubItems.Add("~");
                     item.SubItems.Add("~");
                     item.SubItems.Add("~");

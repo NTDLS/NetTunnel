@@ -2,6 +2,7 @@
 using NetTunnel.Library.Types;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using System.Net.Sockets;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
 {
@@ -88,16 +89,22 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                     CurrentConnections++;
                     TotalConnections++;
 
+                    Status = NtTunnelStatus.Connecting;
+
                     Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' connecting to remote at {Address}:{DataPort}.");
 
                     _tcpClient = new TcpClient(Address, DataPort);
 
                     Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' connection successful.");
 
+                    Status = NtTunnelStatus.Established;
+
                     using (Stream = _tcpClient.GetStream())
                     {
                         ReceiveAndProcessStreamFrames(ProcessFrameNotificationCallback, ProcessFrameQueryCallback);
                     }
+
+                    Status = NtTunnelStatus.Disconnected;
 
                     Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' disconnected.");
 

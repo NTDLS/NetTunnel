@@ -3,6 +3,7 @@ using NetTunnel.Library.Types;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using System.Net;
 using System.Net.Sockets;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
 {
@@ -86,6 +87,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 {
                     try
                     {
+                        Status = NtTunnelStatus.Connecting;
+
                         Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Waiting on connection for inbound tunnel '{Name}' on port {DataPort}.");
 
                         var tcpClient = _listener.AcceptTcpClient();
@@ -96,11 +99,15 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                             TotalConnections++;
                             CurrentConnections++;
 
+                            Status = NtTunnelStatus.Established;
+
                             using (Stream = tcpClient.GetStream())
                             {
                                 ReceiveAndProcessStreamFrames(ProcessFrameNotificationCallback, ProcessFrameQueryCallback);
                                 Utility.TryAndIgnore(Stream.Close);
                             }
+
+                            Status = NtTunnelStatus.Disconnected;
 
                             Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Disconnected inbound tunnel '{Name}' on port {DataPort}");
 

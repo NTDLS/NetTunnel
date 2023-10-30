@@ -36,8 +36,7 @@
             columnHeaderTunnelEndpoints = new ColumnHeader();
             columnHeaderTunnelBytesSent = new ColumnHeader();
             columnHeaderTunnelBytesReceived = new ColumnHeader();
-            columnHeaderTunnelTotalConnections = new ColumnHeader();
-            columnHeaderTunnelCurrentConenctions = new ColumnHeader();
+            columnHeaderTunnelStatus = new ColumnHeader();
             menuStripBody = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
             connectToolStripMenuItem = new ToolStripMenuItem();
@@ -65,7 +64,7 @@
             // 
             // listViewTunnels
             // 
-            listViewTunnels.Columns.AddRange(new ColumnHeader[] { columnHeaderTunnelName, columnHeaderTunnelDirection, columnHeaderTunnelAddress, columnHeaderTunnelEndpoints, columnHeaderTunnelBytesSent, columnHeaderTunnelBytesReceived, columnHeaderTunnelTotalConnections, columnHeaderTunnelCurrentConenctions });
+            listViewTunnels.Columns.AddRange(new ColumnHeader[] { columnHeaderTunnelName, columnHeaderTunnelDirection, columnHeaderTunnelAddress, columnHeaderTunnelEndpoints, columnHeaderTunnelBytesSent, columnHeaderTunnelBytesReceived, columnHeaderTunnelStatus });
             listViewTunnels.Dock = DockStyle.Fill;
             listViewTunnels.FullRowSelect = true;
             listViewTunnels.GridLines = true;
@@ -107,15 +106,10 @@
             columnHeaderTunnelBytesReceived.Text = "Recvd (KB)";
             columnHeaderTunnelBytesReceived.Width = 100;
             // 
-            // columnHeaderTunnelTotalConnections
+            // columnHeaderTunnelStatus
             // 
-            columnHeaderTunnelTotalConnections.Text = "Total Conn.";
-            columnHeaderTunnelTotalConnections.Width = 100;
-            // 
-            // columnHeaderTunnelCurrentConenctions
-            // 
-            columnHeaderTunnelCurrentConenctions.Text = "Curnt Conn.";
-            columnHeaderTunnelCurrentConenctions.Width = 100;
+            columnHeaderTunnelStatus.Text = "Status";
+            columnHeaderTunnelStatus.Width = 200;
             // 
             // menuStripBody
             // 
@@ -308,11 +302,10 @@
         private Label labelEndpoints;
         private ColumnHeader columnHeaderTunnelBytesSent;
         private ColumnHeader columnHeaderTunnelBytesReceived;
-        private ColumnHeader columnHeaderTunnelTotalConnections;
-        private ColumnHeader columnHeaderTunnelCurrentConenctions;
         private ColumnHeader columnHeaderEndpointBytesSent;
         private ColumnHeader columnHeaderEndpointBytesReceived;
         private ColumnHeader columnHeaderEndpointTotalConnections;
         private ColumnHeader columnHeaderEndpointCurrentConenctions;
+        private ColumnHeader columnHeaderTunnelStatus;
     }
 }

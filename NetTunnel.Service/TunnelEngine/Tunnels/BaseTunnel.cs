@@ -7,6 +7,7 @@ using NetTunnel.Service.MessageFraming.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using System.Diagnostics;
 using System.Net.Sockets;
+using static NetTunnel.Library.Constants;
 using static NetTunnel.Service.MessageFraming.Types;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
@@ -17,6 +18,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         protected NetworkStream? Stream { get; set; }
 
+        public NtTunnelStatus Status { get; set; }
         public ulong BytesReceived { get; set; }
         public ulong BytesSent { get; set; }
         public ulong TotalConnections { get; internal set; }

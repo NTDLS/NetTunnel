@@ -3,6 +3,7 @@ using NetTunnel.Service.MessageFraming.FramePayloads.Notifications;
 using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
 using NetTunnel.Service.MessageFraming.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine.Endpoints;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
 {
@@ -40,5 +41,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         public ulong BytesSent { get; set; }
         public ulong TotalConnections { get; }
         public ulong CurrentConnections { get; }
+        public NtTunnelStatus Status { get; set; }
     }
 }
