@@ -72,7 +72,7 @@ namespace NetTunnel.Service.MessageFraming
             }
         }
 
-        public static void ReceiveAndProcessStreamFrames(NetworkStream? stream,
+        public static bool ReceiveAndProcessStreamFrames(NetworkStream? stream,
             ITunnel tunnel, NtFrameBuffer frameBuffer, ProcessFrameNotification
             processNotificationCallback, ProcessFrameQuery processFrameQueryCallback)
         {
@@ -83,10 +83,16 @@ namespace NetTunnel.Service.MessageFraming
 
             Array.Clear(frameBuffer.ReceiveBuffer);
             frameBuffer.ReceiveBufferUsed = stream.Read(frameBuffer.ReceiveBuffer, 0, frameBuffer.ReceiveBuffer.Length);
+            if (frameBuffer.ReceiveBufferUsed == 0)
+            {
+                return false;
+            }
 
             tunnel.BytesReceived += (ulong)frameBuffer.ReceiveBufferUsed;
 
             ProcessFrameBuffer(stream, tunnel, frameBuffer, processNotificationCallback, processFrameQueryCallback);
+
+            return true;
         }
 
         public static void ProcessFrameBuffer(NetworkStream? stream, ITunnel tunnel, NtFrameBuffer frameBuffer, ProcessFrameNotification processNotificationCallback,

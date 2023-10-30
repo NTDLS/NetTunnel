@@ -101,9 +101,9 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             try
             {
                 var frameBuffer = new NtFrameBuffer(Singletons.Configuration.FramebufferSize);
-                while (KeepRunning)
+                while (KeepRunning
+                    && NtFraming.ReceiveAndProcessStreamFrames(Stream, this, frameBuffer, processFrameNotificationCallback, processFrameQueryCallback))
                 {
-                    NtFraming.ReceiveAndProcessStreamFrames(Stream, this, frameBuffer, processFrameNotificationCallback, processFrameQueryCallback);
                 }
             }
             catch (Exception ex)
@@ -173,7 +173,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 {
                     return new NtFramePayloadBoolean(ex);
                 }
-                }
+            }
             else if (frame is NtFramePayloadAddEndpointInbound inboundEndpoint)
             {
                 var endpoint = AddInboundEndpoint(inboundEndpoint.Configuration);
