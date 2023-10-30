@@ -9,6 +9,7 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormMain : Form
     {
+        private int _allPairIdHashs = -1;
         private bool _needToRepopulateTunnels = false;
         private NtClient? _client;
         private bool _inTimerTick = false;
@@ -89,6 +90,7 @@ namespace NetTunnel.UI.Forms
             {
                 _needToRepopulateTunnels = false;
                 RepopulateTunnelsGrid();
+                return;
             }
 
             lock (_timer)
@@ -108,6 +110,14 @@ namespace NetTunnel.UI.Forms
                     {
                         if (o.Result.Success)
                         {
+                            int allPairIdHashs = o.Result.AllPairIdHashs();
+
+                            if (allPairIdHashs != _allPairIdHashs && _allPairIdHashs != -1)
+                            {
+                                _needToRepopulateTunnels = true;
+                            }
+                            _allPairIdHashs = allPairIdHashs;
+
                             PopulateEndpointStatistics(o.Result.Statistics);
                             PopulateTunnelStatistics(o.Result.Statistics);
                         }
@@ -152,8 +162,6 @@ namespace NetTunnel.UI.Forms
                     }
                     else
                     {
-                        int unhandledTunnels = statistics.Count;
-
                         foreach (ListViewItem item in listViewTunnels.Items)
                         {
                             var tunnel = (INtTunnelConfiguration)item.Tag;
@@ -162,21 +170,22 @@ namespace NetTunnel.UI.Forms
                             var tunnelStats = statistics.Where(o => o.TunnelPairId == tunnel.PairId && o.Direction == direction).SingleOrDefault();
                             if (tunnelStats != null)
                             {
-                                unhandledTunnels--;
 
                                 item.SubItems[columnHeaderTunnelBytesSent.Index].Text = $"{tunnelStats.BytesSentKb:n0}";
                                 item.SubItems[columnHeaderTunnelBytesReceived.Index].Text = $"{tunnelStats.BytesReceivedKb:n0}";
                                 item.SubItems[columnHeaderTunnelStatus.Index].Text = tunnelStats.Status.ToString();
-                            }
-                            else
-                            {
-                                unhandledTunnels++;
-                            }
-                        }
 
-                        if (unhandledTunnels != 0)
-                        {
-                            _needToRepopulateTunnels = true;
+                                switch (tunnelStats.Status)
+                                {
+                                    case NtTunnelStatus.Connecting:
+                                    case NtTunnelStatus.Disconnected:
+                                        item.BackColor = Color.FromArgb(255, 200, 200);
+                                        break;
+                                    case NtTunnelStatus.Established:
+                                        item.BackColor = Color.FromArgb(200, 255, 200);
+                                        break;
+                                }
+                            }
                         }
                     }
                 }
