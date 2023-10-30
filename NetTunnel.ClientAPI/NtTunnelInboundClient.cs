@@ -84,6 +84,19 @@ namespace NetTunnel.ClientAPI
             }
         }
 
+        public async Task DeletePair(Guid tunnelPairId)
+        {
+            string url = $"api/TunnelInbound/{_client.SessionId}/DeletePair/{tunnelPairId}";
+
+            using var response = await _client.Connection.GetAsync(url);
+            string resultText = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<NtActionResponse>(resultText);
+            if (result == null || result.Success == false)
+            {
+                throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
+            }
+        }
+
         /// <summary>
         /// Add a inbound endpoint to the tunnel and an outbound endpoint to the other end of the associated tunnel.
         /// </summary>

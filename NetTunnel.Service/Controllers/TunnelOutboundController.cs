@@ -57,6 +57,30 @@ namespace NetTunnel.Service.Controllers
         }
 
         [HttpGet]
+        [Route("{sessionId}/DeletePair/{tunnelPairId}")]
+        public async Task<NtActionResponse> DeletePair(Guid sessionId, Guid tunnelPairId)
+        {
+            try
+            {
+                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+
+                return await Singletons.Core.OutboundTunnels.DeletePair(tunnelPairId).ContinueWith(x =>
+                {
+                    if (x.IsCompletedSuccessfully)
+                    {
+                        Singletons.Core.OutboundTunnels.SaveToDisk();
+                        return new NtActionResponse { Success = true };
+                    }
+                    return new NtActionResponse { Success = false };
+                });
+            }
+            catch (Exception ex)
+            {
+                return new NtActionResponseTunnelsInbound(ex);
+            }
+        }
+
+        [HttpGet]
         [Route("{sessionId}/Start/{tunnelPairId}")]
         public NtActionResponse Start(Guid sessionId, Guid tunnelPairId)
         {

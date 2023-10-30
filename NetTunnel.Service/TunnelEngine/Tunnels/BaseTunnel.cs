@@ -153,7 +153,28 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         /// </summary>
         internal INtFramePayloadReply ProcessFrameQueryCallback(ITunnel tunnel, INtFramePayloadQuery frame)
         {
-            if (frame is NtFramePayloadAddEndpointInbound inboundEndpoint)
+            if (frame is NtFramePayloadDeleteTunnel deleteTunnel)
+            {
+                try
+                {
+                    if (this is TunnelInbound)
+                    {
+                        Core.InboundTunnels.Delete(deleteTunnel.TunnelPairId);
+                        Core.InboundTunnels.SaveToDisk();
+                    }
+                    else
+                    {
+                        Core.OutboundTunnels.Delete(deleteTunnel.TunnelPairId);
+                        Core.OutboundTunnels.SaveToDisk();
+                    }
+                    return new NtFramePayloadBoolean(true);
+                }
+                catch (Exception ex)
+                {
+                    return new NtFramePayloadBoolean(ex);
+                }
+                }
+            else if (frame is NtFramePayloadAddEndpointInbound inboundEndpoint)
             {
                 var endpoint = AddInboundEndpoint(inboundEndpoint.Configuration);
                 endpoint.Start();

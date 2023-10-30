@@ -9,6 +9,9 @@ namespace NetTunnel.Service.MessageFraming.FramePayloads.Replies
         [ProtoMember(1)]
         public bool Value { get; set; }
 
+        [ProtoMember(2)]
+        public string Message { get; set; } = string.Empty;
+
         public NtFramePayloadBoolean()
         {
         }
@@ -16,6 +19,12 @@ namespace NetTunnel.Service.MessageFraming.FramePayloads.Replies
         public NtFramePayloadBoolean(bool value)
         {
             Value = value;
+        }
+
+        public NtFramePayloadBoolean(Exception exception)
+        {
+            Value = false;
+            Message = exception.Message;
         }
     }
 }

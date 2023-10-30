@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
+using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NetTunnel.Service.TunnelEngine.Tunnels;
 using NTDLS.Semaphore;
@@ -39,6 +40,34 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
                 tunnel.Stop();
                 o.Remove(tunnel);
+            });
+        }
+
+        public async Task<R?> DispatchDeleteTunnel<R>(Guid tunnelPairId)
+        {
+            return await Collection.Use((o) =>
+            {
+                var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
+                return tunnel.SendStreamFramePayloadQuery<R>(new NtFramePayloadDeleteTunnel(tunnelPairId));
+            });
+        }
+
+        public async Task<bool> DeletePair(Guid tunnelPairId)
+        {
+            return await Collection.Use((o) =>
+            {
+                var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
+
+                return DispatchDeleteTunnel<bool>(tunnelPairId).ContinueWith(t =>
+                {
+                    if (t.IsCompletedSuccessfully && t.Result == true)
+                    {
+                        tunnel.Stop();
+                        o.Remove(tunnel);
+                        return true;
+                    }
+                    return false;
+                });
             });
         }
 

@@ -2,12 +2,14 @@ using NetTunnel.ClientAPI;
 using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.UI.Helpers;
+using System.DirectoryServices;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms
 {
     public partial class FormMain : Form
     {
+        private bool _needToRepopulateTunnels = false;
         private NtClient? _client;
         private bool _inTimerTick = false;
         private volatile int _gridPopulationScope = 0;
@@ -83,6 +85,12 @@ namespace NetTunnel.UI.Forms
         {
             Utility.EnsureNotNull(_timer);
 
+            if (_needToRepopulateTunnels)
+            {
+                _needToRepopulateTunnels = false;
+                RepopulateTunnelsGrid();
+            }
+
             lock (_timer)
             {
                 if (_gridPopulationScope != 0 || _inTimerTick)
@@ -144,6 +152,8 @@ namespace NetTunnel.UI.Forms
                     }
                     else
                     {
+                        int unhandledTunnels = statistics.Count;
+
                         foreach (ListViewItem item in listViewTunnels.Items)
                         {
                             var tunnel = (INtTunnelConfiguration)item.Tag;
@@ -152,10 +162,21 @@ namespace NetTunnel.UI.Forms
                             var tunnelStats = statistics.Where(o => o.TunnelPairId == tunnel.PairId && o.Direction == direction).SingleOrDefault();
                             if (tunnelStats != null)
                             {
+                                unhandledTunnels--;
+
                                 item.SubItems[columnHeaderTunnelBytesSent.Index].Text = $"{tunnelStats.BytesSentKb:n0}";
                                 item.SubItems[columnHeaderTunnelBytesReceived.Index].Text = $"{tunnelStats.BytesReceivedKb:n0}";
                                 item.SubItems[columnHeaderTunnelStatus.Index].Text = tunnelStats.Status.ToString();
                             }
+                            else
+                            {
+                                unhandledTunnels++;
+                            }
+                        }
+
+                        if (unhandledTunnels != 0)
+                        {
+                            _needToRepopulateTunnels = true;
                         }
                     }
                 }
@@ -268,18 +289,39 @@ namespace NetTunnel.UI.Forms
 
                         if (itemUnderMouse.Tag is NtTunnelInboundConfiguration tunnelInbound)
                         {
-                            _client.TunnelInbound.Delete(tunnelInbound.PairId).ContinueWith((o) =>
+                            _client.TunnelInbound.DeletePair(tunnelInbound.PairId).ContinueWith((o) =>
                             {
-                                DeleteItemFromGrid(listViewTunnels, itemUnderMouse);
-                                ClearGridItems(listViewEndpoints);
+                                if (o.IsCompletedSuccessfully == false)
+                                {
+                                    if (MessageBox.Show($"Failed to delete the remote tunnel, would you like to delete the local one anyway?",
+                                        Constants.FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                                    {
+                                        //If the pair deletion failed, just delete the local tunnel.
+                                        _client.TunnelInbound.Delete(tunnelInbound.PairId).ContinueWith((o) =>
+                                        {
+                                            _needToRepopulateTunnels = true;
+                                        });
+                                    }
+                                }
                             });
+
                         }
                         else if (itemUnderMouse.Tag is NtTunnelOutboundConfiguration tunneloutbound)
                         {
-                            _client.TunnelInbound.Delete(tunneloutbound.PairId).ContinueWith((o) =>
+                            _client.TunnelOutbound.DeletePair(tunneloutbound.PairId).ContinueWith((o) =>
                             {
-                                DeleteItemFromGrid(listViewTunnels, itemUnderMouse);
-                                ClearGridItems(listViewEndpoints);
+                                if (o.IsCompletedSuccessfully == false)
+                                {
+                                    if (MessageBox.Show($"Failed to delete the remote tunnel, would you like to delete the local one anyway?",
+                                        Constants.FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                                    {
+                                        //If the pair deletion failed, just delete the local tunnel.
+                                        _client.TunnelOutbound.Delete(tunneloutbound.PairId).ContinueWith((o) =>
+                                        {
+                                            _needToRepopulateTunnels = true;
+                                        });
+                                    }
+                                }
                             });
                         }
                     }
