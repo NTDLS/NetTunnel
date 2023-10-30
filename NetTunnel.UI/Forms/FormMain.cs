@@ -293,15 +293,18 @@ namespace NetTunnel.UI.Forms
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
-                                    if (MessageBox.Show($"Failed to delete the remote tunnel, would you like to delete the local one anyway?",
-                                        Constants.FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                                    this.Invoke(new Action(() =>
                                     {
-                                        //If the pair deletion failed, just delete the local tunnel.
-                                        _client.TunnelInbound.Delete(tunnelInbound.PairId).ContinueWith((o) =>
+                                        if (MessageBox.Show(this, $"Failed to delete the remote tunnel, would you like to delete the local one anyway?",
+                                        Constants.FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                         {
-                                            _needToRepopulateTunnels = true;
-                                        });
-                                    }
+                                            //If the pair deletion failed, just delete the local tunnel.
+                                            _client.TunnelInbound.Delete(tunnelInbound.PairId).ContinueWith((o) =>
+                                            {
+                                                _needToRepopulateTunnels = true;
+                                            });
+                                        }
+                                    }));
                                 }
                             });
 
@@ -312,15 +315,18 @@ namespace NetTunnel.UI.Forms
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
-                                    if (MessageBox.Show($"Failed to delete the remote tunnel, would you like to delete the local one anyway?",
-                                        Constants.FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                                    this.Invoke(new Action(() =>
                                     {
-                                        //If the pair deletion failed, just delete the local tunnel.
-                                        _client.TunnelOutbound.Delete(tunneloutbound.PairId).ContinueWith((o) =>
+                                        if (MessageBox.Show(this, $"Failed to delete the remote tunnel, would you like to delete the local one anyway?",
+                                            Constants.FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                         {
-                                            _needToRepopulateTunnels = true;
-                                        });
-                                    }
+                                            //If the pair deletion failed, just delete the local tunnel.
+                                            _client.TunnelOutbound.Delete(tunneloutbound.PairId).ContinueWith((o) =>
+                                            {
+                                                _needToRepopulateTunnels = true;
+                                            });
+                                        }
+                                    }));
                                 }
                             });
                         }

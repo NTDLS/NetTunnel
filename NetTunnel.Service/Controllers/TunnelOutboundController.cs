@@ -66,12 +66,11 @@ namespace NetTunnel.Service.Controllers
 
                 return await Singletons.Core.OutboundTunnels.DeletePair(tunnelPairId).ContinueWith(x =>
                 {
-                    if (x.IsCompletedSuccessfully)
+                    if (x.IsCompletedSuccessfully && x.Result == true)
                     {
                         Singletons.Core.OutboundTunnels.SaveToDisk();
-                        return new NtActionResponse { Success = true };
                     }
-                    return new NtActionResponse { Success = false };
+                    return new NtActionResponse { Success = x.Result };
                 });
             }
             catch (Exception ex)
