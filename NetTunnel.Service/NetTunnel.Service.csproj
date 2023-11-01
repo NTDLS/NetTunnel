@@ -9,10 +9,10 @@
     <Company>NetworkDLS</Company>
     <Authors>NetworkDLS</Authors>
     <Copyright>Copyright © 2023 NetworkDLS</Copyright>
-    <AssemblyVersion>0.1.0.0</AssemblyVersion>
-    <FileVersion>0.1.0.0</FileVersion>
-    <VersionPrefix>0.1.0.0</VersionPrefix>
-    <Version>0.1.0.0</Version>
+    <AssemblyVersion>0.3.0.0</AssemblyVersion>
+    <FileVersion>0.3.0.0</FileVersion>
+    <VersionPrefix>0.3.0.0</VersionPrefix>
+    <Version>0.3.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
