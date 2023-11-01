@@ -9,6 +9,7 @@
         public bool DebugLogging { get; set; } = false;
         public int FrameQueryTimeoutMs { get; set; } = 60000;
         public int HeartbeatDelayMs { get; set; } = 10000;
+        public int TunnelEncryptionKeySize { get; set; } = 8;
         public int MaxStaleConnectionAgeMs { get; set; } = 600000;
     }
 }

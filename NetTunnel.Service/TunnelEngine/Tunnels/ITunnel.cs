@@ -18,6 +18,9 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         public Guid PairId { get; }
         public string Name { get; }
 
+        public byte[]? EncryptionKey { get; }
+        public bool SecureKeyExchangeIsComplete { get; }
+
         public void Start();
         public void Stop();
 

@@ -20,12 +20,25 @@ namespace NetTunnel.Service.MessageFraming
     {
         private static CriticalResource<Dictionary<string, MethodInfo>> _reflectioncache = new();
 
+        public static void SimpleCipher(ref byte[] data, byte[] key)
+        {
+            for (int i = 0; i < data.Length; i++)
+            {
+                data[i] = (byte)(data[i] ^ key[i % key.Length]);
+            }
+        }
+
         public static byte[] AssembleFrame(ITunnel tunnel, NtFrame frame)
         {
             try
             {
                 var frameBody = Utility.SerializeToByteArray(frame);
                 var frameBytes = Utility.Compress(frameBody);
+
+                if (tunnel.EncryptionKey != null && tunnel.SecureKeyExchangeIsComplete)
+                {
+                    SimpleCipher(ref frameBytes, tunnel.EncryptionKey);
+                }
                 var grossFrameSize = frameBytes.Length + NtFrameDefaults.FRAME_HEADER_SIZE;
                 var grossFrameBytes = new byte[grossFrameSize];
                 var frameCrc = CRC16.ComputeChecksum(frameBytes);
@@ -160,11 +173,13 @@ namespace NetTunnel.Service.MessageFraming
 
                     var netFrameSize = grossFrameSize - NtFrameDefaults.FRAME_HEADER_SIZE;
                     var frameBytes = new byte[netFrameSize];
-
                     Buffer.BlockCopy(frameBuffer.FrameBuilder, NtFrameDefaults.FRAME_HEADER_SIZE, frameBytes, 0, netFrameSize);
+                    if (tunnel.EncryptionKey != null && tunnel.SecureKeyExchangeIsComplete)
+                    {
+                        SimpleCipher(ref frameBytes, tunnel.EncryptionKey);
+                    }
 
                     var frameBody = Utility.Decompress(frameBytes);
-
                     var frame = Utility.DeserializeToObject<NtFrame>(frameBody);
 
                     //Zero out the consumed portion of the frame buffer - more for fun than anything else.

@@ -5,6 +5,7 @@ using NetTunnel.Service.MessageFraming.FramePayloads.Notifications;
 using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
 using NetTunnel.Service.MessageFraming.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine.Endpoints;
+using NTDLS.SecureKeyExchange;
 using System.Diagnostics;
 using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
@@ -15,6 +16,9 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
     internal class BaseTunnel : ITunnel
     {
         private readonly List<QueriesAwaitingReply> _queriesAwaitingReplies = new();
+
+        public byte[]? EncryptionKey { get; protected set; }
+        public bool SecureKeyExchangeIsComplete { get; protected set; }
 
         protected NetworkStream? Stream { get; set; }
 
@@ -104,6 +108,28 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 while (KeepRunning
                     && NtFraming.ReceiveAndProcessStreamFrames(Stream, this, frameBuffer, processFrameNotificationCallback, processFrameQueryCallback))
                 {
+                    //We have to set "SecureKeyExchangeIsComplete = true" after the message pump "ReceiveAndProcessStreamFrames" because otherwise the
+                    //  last part of the key exchange is encrypted.
+                    if (EncryptionKey != null && SecureKeyExchangeIsComplete == false)
+                    {
+                        SecureKeyExchangeIsComplete = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Core.Logging.Write(Constants.NtLogSeverity.Exception, $"ReceiveAndProcessStreamFrames: {ex.Message}");
+            }
+        }
+
+        internal void ReceiveAndProcessPreAuthStreamFrames(ProcessFrameNotification processFrameNotificationCallback, ProcessFrameQuery processFrameQueryCallback)
+        {
+            try
+            {
+                var frameBuffer = new NtFrameBuffer(Singletons.Configuration.FramebufferSize);
+                while (KeepRunning
+                    && NtFraming.ReceiveAndProcessStreamFrames(Stream, this, frameBuffer, processFrameNotificationCallback, processFrameQueryCallback))
+                {
                 }
             }
             catch (Exception ex)
@@ -117,6 +143,11 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         /// </summary>
         internal void ProcessFrameNotificationCallback(ITunnel tunnel, INtFramePayloadNotification frame)
         {
+            if (EncryptionKey == null || SecureKeyExchangeIsComplete == false)
+            {
+                throw new Exception("Encrpyion has not been initialized.");
+            }
+
             if (frame is NtFramePayloadMessage message)
             {
                 Debug.Print($"{message.Message}");
@@ -153,6 +184,21 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         /// </summary>
         internal INtFramePayloadReply ProcessFrameQueryCallback(ITunnel tunnel, INtFramePayloadQuery frame)
         {
+            //We received a diffe-hellman key exhange request, respond to it so we can prop up encryption.
+            if (frame is NtFramePayloadRequestKeyExchange keyExchangeRequest)
+            {
+                var compoundNegotiator = new CompoundNegotiator();
+                byte[] negotiationReplyToken = compoundNegotiator.ApplyNegotiationToken(keyExchangeRequest.NegotiationToken);
+                var negotiationReply = new NtFramePayloadKeyExchangeReply(negotiationReplyToken);
+                EncryptionKey = compoundNegotiator.SharedSecret;
+                return negotiationReply;
+            }
+
+            if (EncryptionKey == null || SecureKeyExchangeIsComplete == false)
+            {
+                throw new Exception("Encrpyion has not been initialized.");
+            }
+
             if (frame is NtFramePayloadDeleteTunnel deleteTunnel)
             {
                 try

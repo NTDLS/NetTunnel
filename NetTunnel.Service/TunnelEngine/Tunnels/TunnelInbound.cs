@@ -1,6 +1,9 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
+using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
+using NetTunnel.Service.MessageFraming.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine.Endpoints;
+using NTDLS.SecureKeyExchange;
 using System.Net;
 using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
@@ -103,6 +106,23 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
                             using (Stream = tcpClient.GetStream())
                             {
+                                {
+                                    //The first thing we do when a client connects is we start a new key exhange process.
+                                    var compoundNegotiator = new CompoundNegotiator();
+                                    byte[] negotiationToken = compoundNegotiator.GenerateNegotiationToken(Singletons.Configuration.TunnelEncryptionKeySize / 12);
+
+                                    var query = new NtFramePayloadRequestKeyExchange(negotiationToken);
+                                    SendStreamFramePayloadQuery<NtFramePayloadKeyExchangeReply>(query).ContinueWith((o) =>
+                                    {
+                                        if (o.IsCompletedSuccessfully && o.Result != null)
+                                        {
+                                            compoundNegotiator.ApplyNegotiationResponseToken(o.Result.NegotiationToken);
+                                            EncryptionKey = compoundNegotiator.SharedSecret;
+                                            SecureKeyExchangeIsComplete = true;
+                                        }
+                                    });
+                                }
+
                                 ReceiveAndProcessStreamFrames(ProcessFrameNotificationCallback, ProcessFrameQueryCallback);
                                 Utility.TryAndIgnore(Stream.Close);
                             }
