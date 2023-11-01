@@ -127,15 +127,12 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 _tunnel.SendStreamFrameNotification(new NtFramePayloadEndpointConnect(_tunnel.PairId, PairId, activeConnection.StreamId));
 
                 byte[] buffer = new byte[Singletons.Configuration.FramebufferSize];
-                while (KeepRunning && activeConnection.IsConnected)
+                while (KeepRunning && activeConnection.IsConnected && activeConnection.Read(ref buffer, out int length))
                 {
-                    while (activeConnection.Read(ref buffer, out int length))
-                    {
-                        BytesReceived += (ulong)length;
+                    BytesReceived += (ulong)length;
 
-                        var exchnagePayload = new NtFramePayloadEndpointExchange(_tunnel.PairId, PairId, activeConnection.StreamId, buffer, length);
-                        _tunnel.SendStreamFrameNotification(exchnagePayload);
-                    }
+                    var exchnagePayload = new NtFramePayloadEndpointExchange(_tunnel.PairId, PairId, activeConnection.StreamId, buffer, length);
+                    _tunnel.SendStreamFrameNotification(exchnagePayload);
                 }
             }
             catch (Exception ex)

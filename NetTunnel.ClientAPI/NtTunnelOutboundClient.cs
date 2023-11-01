@@ -84,6 +84,12 @@ namespace NetTunnel.ClientAPI
             }
         }
 
+        /// <summary>
+        /// Deletes a tunnel and notified the associated-service tunnel to delete itself as well.
+        /// </summary>
+        /// <param name="tunnelPairId"></param>
+        /// <returns></returns>
+        /// <exception cref="NtAPIResponseException"></exception>
         public async Task DeletePair(Guid tunnelPairId)
         {
             string url = $"api/TunnelOutbound/{_client.SessionId}/DeletePair/{tunnelPairId}";

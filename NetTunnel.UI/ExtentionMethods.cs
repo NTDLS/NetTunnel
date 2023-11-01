@@ -26,5 +26,29 @@
                 ctrl.Enabled = enable;
             }
         }
+
+        public static void InvokeDeleteItem(this ListView grid, ListViewItem item)
+        {
+            if (grid.InvokeRequired)
+            {
+                grid.Invoke(InvokeDeleteItem, new object[] { grid, item });
+            }
+            else
+            {
+                grid.Items.Remove(item);
+            }
+        }
+
+        public static void InvokeClearRows(this ListView grid)
+        {
+            if (grid.InvokeRequired)
+            {
+                grid.Invoke(InvokeClearRows, grid);
+            }
+            else
+            {
+                grid.Items.Clear();
+            }
+        }
     }
 }

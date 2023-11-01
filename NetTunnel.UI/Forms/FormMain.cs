@@ -339,32 +339,10 @@ namespace NetTunnel.UI.Forms
                                 }
                             });
                         }
+
+                        listViewEndpoints.InvokeClearRows();
                     }
                 };
-            }
-        }
-
-        void DeleteItemFromGrid(ListView grid, ListViewItem item)
-        {
-            if (grid.InvokeRequired)
-            {
-                grid.Invoke(DeleteItemFromGrid, new object[] { grid, item });
-            }
-            else
-            {
-                grid.Items.Remove(item);
-            }
-        }
-
-        void ClearGridItems(ListView grid)
-        {
-            if (grid.InvokeRequired)
-            {
-                grid.Invoke(ClearGridItems, grid);
-            }
-            else
-            {
-                grid.Items.Clear();
             }
         }
 
