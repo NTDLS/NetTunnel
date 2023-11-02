@@ -3,6 +3,7 @@ using NetTunnel.Library.Types;
 using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
 using NetTunnel.Service.MessageFraming.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine.Endpoints;
+using NTDLS.NASCCL;
 using NTDLS.SecureKeyExchange;
 using System.Net;
 using System.Net.Sockets;
@@ -75,6 +76,11 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             Utility.TryAndIgnore(_listener.Stop);
 
             _inboundConnectionThread?.Join(); //Wait on thread to finish.
+
+            //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+            //TODO: Deleting outbound tunnel gets stuck here ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+            //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
             Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopped inbound tunnel '{Name}'.");
         }
 
@@ -118,6 +124,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                                         {
                                             compoundNegotiator.ApplyNegotiationResponseToken(o.Result.NegotiationToken);
                                             EncryptionKey = compoundNegotiator.SharedSecret;
+                                            NascclStream = new NASCCLStream(EncryptionKey);
                                             SecureKeyExchangeIsComplete = true;
                                         }
                                     });

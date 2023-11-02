@@ -20,14 +20,6 @@ namespace NetTunnel.Service.MessageFraming
     {
         private static CriticalResource<Dictionary<string, MethodInfo>> _reflectioncache = new();
 
-        public static void SimpleCipher(ref byte[] data, byte[] key)
-        {
-            for (int i = 0; i < data.Length; i++)
-            {
-                data[i] = (byte)(data[i] ^ key[i % key.Length]);
-            }
-        }
-
         public static byte[] AssembleFrame(ITunnel tunnel, NtFrame frame)
         {
             try
@@ -35,9 +27,9 @@ namespace NetTunnel.Service.MessageFraming
                 var frameBody = Utility.SerializeToByteArray(frame);
                 var frameBytes = Utility.Compress(frameBody);
 
-                if (tunnel.EncryptionKey != null && tunnel.SecureKeyExchangeIsComplete)
+                if (tunnel.SecureKeyExchangeIsComplete)
                 {
-                    SimpleCipher(ref frameBytes, tunnel.EncryptionKey);
+                    tunnel.NascclStream?.Cipher(ref frameBytes);
                 }
                 var grossFrameSize = frameBytes.Length + NtFrameDefaults.FRAME_HEADER_SIZE;
                 var grossFrameBytes = new byte[grossFrameSize];
@@ -174,9 +166,9 @@ namespace NetTunnel.Service.MessageFraming
                     var netFrameSize = grossFrameSize - NtFrameDefaults.FRAME_HEADER_SIZE;
                     var frameBytes = new byte[netFrameSize];
                     Buffer.BlockCopy(frameBuffer.FrameBuilder, NtFrameDefaults.FRAME_HEADER_SIZE, frameBytes, 0, netFrameSize);
-                    if (tunnel.EncryptionKey != null && tunnel.SecureKeyExchangeIsComplete)
+                    if (tunnel.SecureKeyExchangeIsComplete)
                     {
-                        SimpleCipher(ref frameBytes, tunnel.EncryptionKey);
+                        tunnel.NascclStream?.Cipher(ref frameBytes);
                     }
 
                     var frameBody = Utility.Decompress(frameBytes);

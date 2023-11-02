@@ -1,4 +1,3 @@
-using NTDLS.SecureKeyExchange;
 using Topshelf;
 
 namespace NetTunnel.Service

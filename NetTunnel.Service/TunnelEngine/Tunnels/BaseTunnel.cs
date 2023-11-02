@@ -5,6 +5,7 @@ using NetTunnel.Service.MessageFraming.FramePayloads.Notifications;
 using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
 using NetTunnel.Service.MessageFraming.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine.Endpoints;
+using NTDLS.NASCCL;
 using NTDLS.SecureKeyExchange;
 using System.Diagnostics;
 using System.Net.Sockets;
@@ -19,6 +20,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         public byte[]? EncryptionKey { get; protected set; }
         public bool SecureKeyExchangeIsComplete { get; protected set; }
+        public NASCCLStream? NascclStream { get; protected set; }
 
         protected NetworkStream? Stream { get; set; }
 
@@ -112,24 +114,9 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                     //  last part of the key exchange is encrypted.
                     if (EncryptionKey != null && SecureKeyExchangeIsComplete == false)
                     {
+                        NascclStream = new NASCCLStream(EncryptionKey);
                         SecureKeyExchangeIsComplete = true;
                     }
-                }
-            }
-            catch (Exception ex)
-            {
-                Core.Logging.Write(Constants.NtLogSeverity.Exception, $"ReceiveAndProcessStreamFrames: {ex.Message}");
-            }
-        }
-
-        internal void ReceiveAndProcessPreAuthStreamFrames(ProcessFrameNotification processFrameNotificationCallback, ProcessFrameQuery processFrameQueryCallback)
-        {
-            try
-            {
-                var frameBuffer = new NtFrameBuffer(Singletons.Configuration.FramebufferSize);
-                while (KeepRunning
-                    && NtFraming.ReceiveAndProcessStreamFrames(Stream, this, frameBuffer, processFrameNotificationCallback, processFrameQueryCallback))
-                {
                 }
             }
             catch (Exception ex)

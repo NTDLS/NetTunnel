@@ -2,7 +2,6 @@ using NetTunnel.ClientAPI;
 using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.UI.Helpers;
-using System.DirectoryServices;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms

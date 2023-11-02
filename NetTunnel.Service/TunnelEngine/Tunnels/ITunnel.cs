@@ -3,6 +3,7 @@ using NetTunnel.Service.MessageFraming.FramePayloads.Notifications;
 using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
 using NetTunnel.Service.MessageFraming.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine.Endpoints;
+using NTDLS.NASCCL;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
@@ -17,7 +18,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         /// </summary>
         public Guid PairId { get; }
         public string Name { get; }
-
+        public NASCCLStream? NascclStream { get; }
         public byte[]? EncryptionKey { get; }
         public bool SecureKeyExchangeIsComplete { get; }
 
