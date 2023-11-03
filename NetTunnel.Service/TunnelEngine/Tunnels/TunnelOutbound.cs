@@ -77,11 +77,14 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             Utility.TryAndIgnore(() => _tcpClient?.Close());
 
             _outboundConnectionThread?.Join(); //Wait on thread to finish.
+
             Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopped outbound tunnel '{Name}'.");
         }
 
         private void OutboundConnectionThreadProc()
         {
+            Thread.CurrentThread.Name = $"OutboundConnectionThreadProc:{Thread.CurrentThread.ManagedThreadId}";
+
             while (KeepRunning)
             {
                 try

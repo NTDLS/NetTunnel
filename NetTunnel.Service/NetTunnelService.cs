@@ -41,6 +41,8 @@ namespace NetTunnel.Service
 
         private void DoWork()
         {
+            Thread.CurrentThread.Name = $"DoWork:{Thread.CurrentThread.ManagedThreadId}";
+
             Singletons.Core.Start();
 
             // Add services to the container.

@@ -75,10 +75,13 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             Utility.TryAndIgnore(_listener.Stop);
             Utility.TryAndIgnore(_listener.Stop);
 
-            _inboundConnectionThread?.Join(); //Wait on thread to finish.
+            if (Thread.CurrentThread.ManagedThreadId != _inboundConnectionThread?.ManagedThreadId)
+            {
+                _inboundConnectionThread?.Join(); //Wait on thread to finish.
+            }
 
             //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-            //TODO: Deleting outbound tunnel gets stuck here ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+            //TODO: This is working now, but the associated tunnel is not being deleted.
             //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
             Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopped inbound tunnel '{Name}'.");
@@ -86,6 +89,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         private void InboundConnectionThreadProc()
         {
+            Thread.CurrentThread.Name = $"InboundConnectionThreadProc:{Thread.CurrentThread.ManagedThreadId}";
+
             try
             {
                 _listener.Start();
