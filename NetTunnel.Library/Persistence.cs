@@ -44,5 +44,15 @@ namespace NetTunnel.Library
             }
             return default;
         }
+
+        public static T LoadFromDisk<T>(T defaultResult)
+        {
+            var result = LoadFromDisk<T>();
+            if (result == null)
+            {
+                return defaultResult;
+            }
+            return result;
+        }
     }
 }

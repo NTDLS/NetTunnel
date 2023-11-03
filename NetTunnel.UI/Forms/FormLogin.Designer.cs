@@ -76,7 +76,7 @@
             textBoxUsername.Location = new Point(90, 90);
             textBoxUsername.Name = "textBoxUsername";
             textBoxUsername.Size = new Size(262, 23);
-            textBoxUsername.TabIndex = 2;
+            textBoxUsername.TabIndex = 5;
             // 
             // textBoxPassword
             // 
@@ -84,14 +84,14 @@
             textBoxPassword.Name = "textBoxPassword";
             textBoxPassword.PasswordChar = '*';
             textBoxPassword.Size = new Size(262, 23);
-            textBoxPassword.TabIndex = 3;
+            textBoxPassword.TabIndex = 0;
             // 
             // buttonCancel
             // 
             buttonCancel.Location = new Point(277, 189);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(75, 23);
-            buttonCancel.TabIndex = 5;
+            buttonCancel.TabIndex = 2;
             buttonCancel.Text = "Cancel";
             buttonCancel.UseVisualStyleBackColor = true;
             buttonCancel.Click += buttonCancel_Click;
@@ -101,7 +101,7 @@
             buttonLogin.Location = new Point(196, 189);
             buttonLogin.Name = "buttonLogin";
             buttonLogin.Size = new Size(75, 23);
-            buttonLogin.TabIndex = 4;
+            buttonLogin.TabIndex = 1;
             buttonLogin.Text = "Login";
             buttonLogin.UseVisualStyleBackColor = true;
             buttonLogin.Click += buttonLogin_Click;
@@ -120,14 +120,14 @@
             textBoxPort.Location = new Point(294, 34);
             textBoxPort.Name = "textBoxPort";
             textBoxPort.Size = new Size(58, 23);
-            textBoxPort.TabIndex = 1;
+            textBoxPort.TabIndex = 4;
             // 
             // textBoxAddress
             // 
             textBoxAddress.Location = new Point(90, 34);
             textBoxAddress.Name = "textBoxAddress";
             textBoxAddress.Size = new Size(198, 23);
-            textBoxAddress.TabIndex = 0;
+            textBoxAddress.TabIndex = 3;
             // 
             // labelRemoteAddress
             // 

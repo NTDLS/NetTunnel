@@ -16,17 +16,23 @@ namespace NetTunnel.UI.Forms
             AcceptButton = buttonLogin;
             CancelButton = buttonCancel;
 
-            var preferences = Persistence.LoadFromDisk<UILoginPreferences>();
-            if (preferences != null)
+            var preferences = Persistence.LoadFromDisk<UILoginPreferences>(new UILoginPreferences
             {
-                textBoxAddress.Text = preferences.Address;
-                textBoxPort.Text = preferences.Port;
-                textBoxUsername.Text = preferences.Username;
-            }
+                Address = "127.0.0.1",
+                Port = "52845",
+                Username = "root"
+            });
+
+            textBoxAddress.Text = preferences.Address;
+            textBoxPort.Text = preferences.Port;
+            textBoxUsername.Text = preferences.Username;
 
 #if DEBUG
             textBoxPassword.Text = Environment.MachineName.ToLower();
 #endif
+
+            textBoxPassword.Focus();
+
         }
 
         private void buttonLogin_Click(object sender, EventArgs e)
