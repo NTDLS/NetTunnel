@@ -14,14 +14,16 @@ namespace NetTunnel.ClientAPI.Payload
         {
             int rollingTotal = 0;
 
-            foreach (var item in Statistics.SelectMany(o => o.EndpointStatistics))
+            foreach (var item in Statistics)
             {
                 rollingTotal += item.TunnelPairId.GetHashCode();
-                rollingTotal += item.EndpointPairId.GetHashCode();
+                foreach (var endpoint in item.EndpointStatistics)
+                {
+                    rollingTotal += endpoint.TunnelPairId.GetHashCode();
+                    rollingTotal += endpoint.EndpointPairId.GetHashCode();
+                }
             }
-
             return rollingTotal;
-
         }
 
         public NtActionResponseStatistics() { }

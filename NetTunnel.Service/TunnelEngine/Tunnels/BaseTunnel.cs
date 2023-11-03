@@ -141,6 +141,19 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             {
                 Debug.Print($"{message.Message}");
             }
+            else if (frame is NtFramePayloadDeleteTunnel deleteTunnel)
+            {
+                if (this is TunnelInbound)
+                {
+                    Core.InboundTunnels.Delete(deleteTunnel.TunnelPairId);
+                    Core.InboundTunnels.SaveToDisk();
+                }
+                else
+                {
+                    Core.OutboundTunnels.Delete(deleteTunnel.TunnelPairId);
+                    Core.OutboundTunnels.SaveToDisk();
+                }
+            }
             else if (frame is NtFramePayloadEndpointConnect connectEndpoint)
             {
                 //Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Recevied endpoint connection notification.");
@@ -188,28 +201,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 throw new Exception("Encrpyion has not been initialized.");
             }
 
-            if (frame is NtFramePayloadDeleteTunnel deleteTunnel)
-            {
-                try
-                {
-                    if (this is TunnelInbound)
-                    {
-                        Core.InboundTunnels.Delete(deleteTunnel.TunnelPairId);
-                        Core.InboundTunnels.SaveToDisk();
-                    }
-                    else
-                    {
-                        Core.OutboundTunnels.Delete(deleteTunnel.TunnelPairId);
-                        Core.OutboundTunnels.SaveToDisk();
-                    }
-                    return new NtFramePayloadBoolean(true);
-                }
-                catch (Exception ex)
-                {
-                    return new NtFramePayloadBoolean(ex);
-                }
-            }
-            else if (frame is NtFramePayloadAddEndpointInbound inboundEndpoint)
+
+            if (frame is NtFramePayloadAddEndpointInbound inboundEndpoint)
             {
                 var endpoint = AddInboundEndpoint(inboundEndpoint.Configuration);
                 endpoint.Start();

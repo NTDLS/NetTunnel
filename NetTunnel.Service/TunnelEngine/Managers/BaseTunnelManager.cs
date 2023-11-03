@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
+using NetTunnel.Service.MessageFraming.FramePayloads.Notifications;
 using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NetTunnel.Service.TunnelEngine.Tunnels;
@@ -43,31 +44,23 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-        public async Task<R?> DispatchDeleteTunnel<R>(Guid tunnelPairId)
+        public void DispatchDeleteTunnel(Guid tunnelPairId)
         {
-            return await Collection.Use((o) =>
+            Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
-                return tunnel.SendStreamFramePayloadQuery<R>(new NtFramePayloadDeleteTunnel(tunnelPairId));
+                tunnel.SendStreamFrameNotification(new NtFramePayloadDeleteTunnel(tunnelPairId));
             });
         }
 
-        public async Task<bool> DeletePair(Guid tunnelPairId)
+        public void DeletePair(Guid tunnelPairId)
         {
-            return await Collection.Use((o) =>
+            Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
-
-                return DispatchDeleteTunnel<bool>(tunnelPairId).ContinueWith(t =>
-                {
-                    if (t.IsCompletedSuccessfully && t.Result == true)
-                    {
-                        tunnel.Stop();
-                        o.Remove(tunnel);
-                        return true;
-                    }
-                    return false;
-                });
+                DispatchDeleteTunnel(tunnelPairId);
+                tunnel.Stop();
+                o.Remove(tunnel);
             });
         }
 
