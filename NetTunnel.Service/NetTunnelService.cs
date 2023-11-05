@@ -8,8 +8,8 @@ namespace NetTunnel.Service
 {
     internal class NetTunnelService
     {
-        private SemaphoreSlim _semaphoreToRequestStop;
-        private Thread _thread;
+        private readonly SemaphoreSlim _semaphoreToRequestStop;
+        private readonly Thread _thread;
 
         public NetTunnelService()
         {
