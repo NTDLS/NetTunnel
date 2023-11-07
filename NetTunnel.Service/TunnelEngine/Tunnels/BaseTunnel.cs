@@ -201,7 +201,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 throw new Exception("Encrpyion has not been initialized.");
             }
 
-
             if (frame is NtFramePayloadAddEndpointInbound inboundEndpoint)
             {
                 var endpoint = AddInboundEndpoint(inboundEndpoint.Configuration);
