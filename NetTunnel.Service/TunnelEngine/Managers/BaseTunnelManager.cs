@@ -1,7 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.MessageFraming.FramePayloads.Notifications;
-using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NetTunnel.Service.TunnelEngine.Tunnels;
 using NTDLS.Semaphore;
@@ -12,7 +11,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
     {
         public TunnelEngineCore Core { get; private set; }
 
-        protected readonly CriticalResource<List<T>> Collection = new();
+        protected readonly PessimisticCriticalResource<List<T>> Collection = new();
 
         public void Start(Guid tunnelPairId) => Collection.Use((o) => o.Where(o => o.PairId == tunnelPairId).Single().Start());
         public void Stop(Guid tunnelPairId) => Collection.Use((o) => o.Where(o => o.PairId == tunnelPairId).Single().Stop());

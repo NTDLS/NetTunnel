@@ -7,7 +7,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
     {
         private readonly TunnelEngineCore _core;
 
-        private CriticalResource<List<NtUserSession>> _collection = new();
+        private PessimisticCriticalResource<List<NtUserSession>> _collection = new();
 
         public UserSessionManager(TunnelEngineCore core)
         {

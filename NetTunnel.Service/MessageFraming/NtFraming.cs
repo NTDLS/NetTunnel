@@ -18,7 +18,7 @@ namespace NetTunnel.Service.MessageFraming
     /// </summary>
     internal static class NtFraming
     {
-        private static readonly CriticalResource<Dictionary<string, MethodInfo>> _reflectioncache = new();
+        private static readonly PessimisticCriticalResource<Dictionary<string, MethodInfo>> _reflectioncache = new();
 
         public static byte[] AssembleFrame(ITunnel tunnel, NtFrame frame)
         {

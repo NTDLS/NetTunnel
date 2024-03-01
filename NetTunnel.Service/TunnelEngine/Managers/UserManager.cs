@@ -7,7 +7,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
     {
         private readonly TunnelEngineCore _core;
 
-        private readonly CriticalResource<List<NtUser>> _collection = new();
+        private readonly PessimisticCriticalResource<List<NtUser>> _collection = new();
 
         public UserManager(TunnelEngineCore core)
         {

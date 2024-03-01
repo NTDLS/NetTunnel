@@ -20,10 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.2" />
     <PackageReference Include="NTDLS.NASCCL" Version="1.1.1" />
-    <PackageReference Include="NTDLS.SecureKeyExchange" Version="2.2.0" />
-    <PackageReference Include="NTDLS.Semaphore" Version="1.5.1" />
+    <PackageReference Include="NTDLS.SecureKeyExchange" Version="2.2.1" />
+    <PackageReference Include="NTDLS.Semaphore" Version="3.3.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Topshelf" Version="4.3.0" />
   </ItemGroup>

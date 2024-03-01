@@ -21,7 +21,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         private readonly Thread _heartbeatThread;
 
-        internal readonly CriticalResource<Dictionary<Guid, ActiveEndpointConnection>> _activeConnections = new();
+        internal readonly PessimisticCriticalResource<Dictionary<Guid, ActiveEndpointConnection>> _activeConnections = new();
 
         public BaseEndpoint(TunnelEngineCore core, ITunnel tunnel, Guid pairId, string name, int transmissionPort)
         {
