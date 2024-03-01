@@ -1,7 +1,9 @@
+using Microsoft.VisualBasic.ApplicationServices;
 using NetTunnel.ClientAPI;
 using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.UI.Helpers;
+using System.Net;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms
@@ -133,7 +135,9 @@ namespace NetTunnel.UI.Forms
                     {
                         foreach (ListViewItem item in listViewEndpoints.Items)
                         {
-                            var endpoint = (INtEndpointConfiguration)item.Tag;
+                            var endpoint = (INtEndpointConfiguration?)item.Tag;
+                            Utility.EnsureNotNull(endpoint);
+
                             var direction = (endpoint is NtEndpointInboundConfiguration) ? NtDirection.Inbound : NtDirection.Outbound;
 
                             var tunnelStats = statistics.Where(o => o.TunnelPairId == endpoint.TunnelPairId).ToList();
@@ -163,7 +167,9 @@ namespace NetTunnel.UI.Forms
                     {
                         foreach (ListViewItem item in listViewTunnels.Items)
                         {
-                            var tunnel = (INtTunnelConfiguration)item.Tag;
+                            var tunnel = (INtTunnelConfiguration?)item.Tag;
+                            Utility.EnsureNotNull(tunnel);
+
                             var direction = (tunnel is NtTunnelInboundConfiguration) ? NtDirection.Inbound : NtDirection.Outbound;
 
                             var tunnelStats = statistics.Where(o => o.TunnelPairId == tunnel.PairId && o.Direction == direction).SingleOrDefault();
@@ -261,7 +267,10 @@ namespace NetTunnel.UI.Forms
                         Utility.EnsureNotNull(_client);
                         Utility.EnsureNotNull(itemUnderMouse);
 
-                        using (var formAddEndpoint = new FormAddEndpoint(_client, (INtTunnelConfiguration)itemUnderMouse.Tag, NtDirection.Inbound))
+                        var tunnel = (INtTunnelConfiguration?)itemUnderMouse.Tag;
+                        Utility.EnsureNotNull(tunnel);
+
+                        using (var formAddEndpoint = new FormAddEndpoint(_client, tunnel, NtDirection.Inbound))
                         {
                             if (formAddEndpoint.ShowDialog() == DialogResult.OK)
                             {
@@ -274,7 +283,10 @@ namespace NetTunnel.UI.Forms
                         Utility.EnsureNotNull(_client);
                         Utility.EnsureNotNull(itemUnderMouse);
 
-                        using (var formAddEndpoint = new FormAddEndpoint(_client, (INtTunnelConfiguration)itemUnderMouse.Tag, NtDirection.Outbound))
+                        var tunnel = (INtTunnelConfiguration?)itemUnderMouse.Tag;
+                        Utility.EnsureNotNull(tunnel);
+
+                        using (var formAddEndpoint = new FormAddEndpoint(_client, tunnel, NtDirection.Outbound))
                         {
                             if (formAddEndpoint.ShowDialog() == DialogResult.OK)
                             {
@@ -287,7 +299,8 @@ namespace NetTunnel.UI.Forms
                         Utility.EnsureNotNull(_client);
                         Utility.EnsureNotNull(itemUnderMouse);
 
-                        var tunnel = (INtTunnelConfiguration)itemUnderMouse.Tag;
+                        var tunnel = (INtTunnelConfiguration?)itemUnderMouse.Tag;
+                        Utility.EnsureNotNull(tunnel);
 
                         if (MessageBox.Show($"Delete the tunnel '{tunnel.Name}'?",
                             Constants.FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)

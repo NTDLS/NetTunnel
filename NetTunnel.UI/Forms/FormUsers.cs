@@ -75,14 +75,18 @@ namespace NetTunnel.UI.Forms
                     {
                         if (e.ClickedItem?.Text == "Change password")
                         {
-                            using (var formChangeUserPassword = new FormChangeUserPassword(_client, (NtUser)itemUnderMouse.Tag))
+                            var user = (NtUser?)itemUnderMouse.Tag;
+                            Utility.EnsureNotNull(user);
+
+                            using (var formChangeUserPassword = new FormChangeUserPassword(_client, user))
                             {
                                 formChangeUserPassword.ShowDialog();
                             }
                         }
                         else if (e.ClickedItem?.Text == "Delete")
                         {
-                            var user = (NtUser)itemUnderMouse.Tag;
+                            var user = (NtUser?)itemUnderMouse.Tag;
+                            Utility.EnsureNotNull(user);
 
                             if (MessageBox.Show($"Delete the user '{user.Username}'?",
                                 Constants.FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
