@@ -30,18 +30,16 @@ namespace NetTunnel.Service
 
         public static X509Certificate2 CreateSelfSignedCertificate()
         {
-            using (RSA rsa = RSA.Create(Singletons.Configuration.RSAKeyLength))
-            {
-                var request = new CertificateRequest($"CN=NetTunnel.EndPoint.private", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-                var certificate = request.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(1));
+            using RSA rsa = RSA.Create(Singletons.Configuration.RSAKeyLength);
+            var request = new CertificateRequest($"CN=NetTunnel.EndPoint.private", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+            var certificate = request.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(1));
 
-                return new X509Certificate2(certificate.Export(X509ContentType.Pkcs12), "");
-            }
+            return new X509Certificate2(certificate.Export(X509ContentType.Pkcs12), "");
         }
 
         private void DoWork()
         {
-            Thread.CurrentThread.Name = $"DoWork:{Thread.CurrentThread.ManagedThreadId}";
+            Thread.CurrentThread.Name = $"DoWork:{Environment.CurrentManagedThreadId}";
 
             Singletons.Core.Start();
 

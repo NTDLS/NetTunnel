@@ -83,7 +83,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         private void HeartbeatThreadProc()
         {
-            Thread.CurrentThread.Name = $"HeartbeatThreadProc:{Thread.CurrentThread.ManagedThreadId}";
+            Thread.CurrentThread.Name = $"HeartbeatThreadProc:{Environment.CurrentManagedThreadId}";
 
             DateTime lastheartBeat = DateTime.UtcNow;
 

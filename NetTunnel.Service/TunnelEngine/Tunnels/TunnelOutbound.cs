@@ -76,7 +76,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             Utility.TryAndIgnore(() => _tcpClient?.Client?.Close());
             Utility.TryAndIgnore(() => _tcpClient?.Close());
 
-            if (Thread.CurrentThread.ManagedThreadId != _outboundConnectionThread?.ManagedThreadId)
+            if (Environment.CurrentManagedThreadId != _outboundConnectionThread?.ManagedThreadId)
             {
                 _outboundConnectionThread?.Join(); //Wait on thread to finish.
             }
@@ -86,7 +86,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         private void OutboundConnectionThreadProc()
         {
-            Thread.CurrentThread.Name = $"OutboundConnectionThreadProc:{Thread.CurrentThread.ManagedThreadId}";
+            Thread.CurrentThread.Name = $"OutboundConnectionThreadProc:{Environment.CurrentManagedThreadId}";
 
             while (KeepRunning)
             {

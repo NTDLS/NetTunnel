@@ -37,7 +37,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         private void HeartbeatThreadProc()
         {
-            Thread.CurrentThread.Name = $"HeartbeatThreadProc:{Thread.CurrentThread.ManagedThreadId}";
+            Thread.CurrentThread.Name = $"HeartbeatThreadProc:{Environment.CurrentManagedThreadId}";
 
             DateTime lastheartBeat = DateTime.UtcNow;
 
@@ -118,7 +118,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         internal void HandleClientThreadProc(object? obj)
         {
-            Thread.CurrentThread.Name = $"HandleClientThreadProc:{Thread.CurrentThread.ManagedThreadId}";
+            Thread.CurrentThread.Name = $"HandleClientThreadProc:{Environment.CurrentManagedThreadId}";
 
             Utility.EnsureNotNull(obj);
             var activeConnection = (ActiveEndpointConnection)obj;

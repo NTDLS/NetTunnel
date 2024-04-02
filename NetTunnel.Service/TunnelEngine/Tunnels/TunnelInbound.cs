@@ -75,7 +75,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             Utility.TryAndIgnore(_listener.Stop);
             Utility.TryAndIgnore(_listener.Stop);
 
-            if (Thread.CurrentThread.ManagedThreadId != _inboundConnectionThread?.ManagedThreadId)
+            if (Environment.CurrentManagedThreadId != _inboundConnectionThread?.ManagedThreadId)
             {
                 _inboundConnectionThread?.Join(); //Wait on thread to finish.
             }
@@ -85,7 +85,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         private void InboundConnectionThreadProc()
         {
-            Thread.CurrentThread.Name = $"InboundConnectionThreadProc:{Thread.CurrentThread.ManagedThreadId}";
+            Thread.CurrentThread.Name = $"InboundConnectionThreadProc:{Environment.CurrentManagedThreadId}";
 
             try
             {

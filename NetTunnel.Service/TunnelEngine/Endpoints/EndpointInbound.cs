@@ -53,7 +53,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         void InboundConnectionThreadProc()
         {
-            Thread.CurrentThread.Name = $"InboundConnectionThreadProc:{Thread.CurrentThread.ManagedThreadId}";
+            Thread.CurrentThread.Name = $"InboundConnectionThreadProc:{Environment.CurrentManagedThreadId}";
 
             try
             {
