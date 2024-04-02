@@ -301,7 +301,7 @@ namespace NetTunnel.UI.Forms
                         Utility.EnsureNotNull(tunnel);
 
                         if (MessageBox.Show($"Delete the tunnel '{tunnel.Name}'?",
-                            Constants.FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                            FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                         {
                             return;
                         }
@@ -315,7 +315,7 @@ namespace NetTunnel.UI.Forms
                                     this.Invoke(new Action(() =>
                                     {
                                         if (MessageBox.Show(this, $"Failed to delete the remote tunnel, would you like to delete the local one anyway?",
-                                        Constants.FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                                        FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                         {
                                             //If the pair deletion failed, just delete the local tunnel.
                                             _client.TunnelInbound.Delete(tunnelInbound.PairId).ContinueWith((o) =>
@@ -337,7 +337,7 @@ namespace NetTunnel.UI.Forms
                                     this.Invoke(new Action(() =>
                                     {
                                         if (MessageBox.Show(this, $"Failed to delete the remote tunnel, would you like to delete the local one anyway?",
-                                            Constants.FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                                            FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                         {
                                             //If the pair deletion failed, just delete the local tunnel.
                                             _client.TunnelOutbound.Delete(tunneloutbound.PairId).ContinueWith((o) =>
