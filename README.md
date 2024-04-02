@@ -17,7 +17,7 @@ If you are in a situation where both endpoints are behind firewalls, you can get
 
 ## Notes
 * All configuration and handshakes are done though plain ol' HTTPS, we here at NetworkDLS like our proprietary (and better) frameworks, but we use HTTPS here as to not freakout any outbound firewall rules.
-* We use [diffie hellman](https://github.com/NTDLS/NTDLS.SecureKeyExchange) to create a 960bit key for each tunnel.
+* We use [diffie hellman](https://github.com/NTDLS/NTDLS.SecureKeyExchange) to create and exchange a 960bit key for each tunnel at each startup.
 * All data exchanged though the tunnel encrypted using the [NASCCL](https://github.com/NTDLS/NTDLS.NASCCL) symmetric cipher.
 * All data exchanged though the tunnel is compressed using the deflate algorithm.
 * The UI connectes to standard HTTPS endpoints using 2048bit asymmetric encryption.
