@@ -1,4 +1,4 @@
-#define AppVersion "0.4.0.0"
+#define AppVersion "1.0.0"
 
 [Setup]
 ;-- Main Setup Information
@@ -22,14 +22,14 @@
  AppUpdatesURL                    = http://www.NetworkDLS.com/
 
 [Files]
- Source: "..\NetTunnel.Service\bin\Release\net7.0\runtimes\*.*"; DestDir: "{app}\Service\runtimes";  Flags: IgnoreVersion recursesubdirs;
- Source: "..\NetTunnel.Service\bin\Release\net7.0\*.exe";        DestDir: "{app}\Service";           Flags: IgnoreVersion;
- Source: "..\NetTunnel.Service\bin\Release\net7.0\*.dll";        DestDir: "{app}\Service";           Flags: IgnoreVersion;
- Source: "..\NetTunnel.Service\bin\Release\net7.0\*.json";       DestDir: "{app}\Service";           Flags: IgnoreVersion;
+ Source: "..\NetTunnel.Service\bin\Release\net8.0\runtimes\*.*"; DestDir: "{app}\Service\runtimes";  Flags: IgnoreVersion recursesubdirs;
+ Source: "..\NetTunnel.Service\bin\Release\net8.0\*.exe";        DestDir: "{app}\Service";           Flags: IgnoreVersion;
+ Source: "..\NetTunnel.Service\bin\Release\net8.0\*.dll";        DestDir: "{app}\Service";           Flags: IgnoreVersion;
+ Source: "..\NetTunnel.Service\bin\Release\net8.0\*.json";       DestDir: "{app}\Service";           Flags: IgnoreVersion;
 
- Source: "..\NetTunnel.UI\bin\Release\net7.0-windows\*.exe";     DestDir: "{app}\UI";                Flags: IgnoreVersion;
- Source: "..\NetTunnel.UI\bin\Release\net7.0-windows\*.dll";     DestDir: "{app}\UI";                Flags: IgnoreVersion;
- Source: "..\NetTunnel.UI\bin\Release\net7.0-windows\*.json";    DestDir: "{app}\UI";                Flags: IgnoreVersion;
+ Source: "..\NetTunnel.UI\bin\Release\net8.0-windows\*.exe";     DestDir: "{app}\UI";                Flags: IgnoreVersion;
+ Source: "..\NetTunnel.UI\bin\Release\net8.0-windows\*.dll";     DestDir: "{app}\UI";                Flags: IgnoreVersion;
+ Source: "..\NetTunnel.UI\bin\Release\net8.0-windows\*.json";    DestDir: "{app}\UI";                Flags: IgnoreVersion;
   
 [Icons]
  Name: "{commondesktop}\NetTunnel Manager";  Filename: "{app}\UI\NetTunnel.UI.exe";
