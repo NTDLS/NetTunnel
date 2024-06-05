@@ -145,5 +145,45 @@ namespace NetTunnel.ClientAPI
                 throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
             }
         }
+
+        /// <summary>
+        /// Delete an endpoint from the tunnel and an endpoint from the other end of the associated tunnel.
+        /// </summary>
+        /// <param name="tunnelPairId"></param>
+        /// <param name="endpointId"></param>
+        /// <returns></returns>
+        /// <exception cref="NtAPIResponseException"></exception>
+        public async Task DeleteEndpointPair(Guid tunnelPairId, Guid endpointId)
+        {
+            string url = $"api/TunnelInbound/{_client.SessionId}/DeleteEndpointPair/{tunnelPairId}/{endpointId}";
+
+            using var response = _client.Connection.GetAsync(url);
+            string resultText = await response.Result.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<NtActionResponse>(resultText);
+            if (result == null || result.Success == false)
+            {
+                throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
+            }
+        }
+
+        /// <summary>
+        /// Delete an endpoint from the tunnel.
+        /// </summary>
+        /// <param name="tunnelPairId"></param>
+        /// <param name="endpointId"></param>
+        /// <returns></returns>
+        /// <exception cref="NtAPIResponseException"></exception>
+        public async Task DeleteEndpoint(Guid tunnelPairId, Guid endpointId)
+        {
+            string url = $"api/TunnelInbound/{_client.SessionId}/DeleteEndpoint/{tunnelPairId}/{endpointId}";
+
+            using var response = _client.Connection.GetAsync(url);
+            string resultText = await response.Result.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<NtActionResponse>(resultText);
+            if (result == null || result.Success == false)
+            {
+                throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
+            }
+        }
     }
 }

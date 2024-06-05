@@ -176,9 +176,53 @@ namespace NetTunnel.Service.Controllers
                 Singletons.Core.InboundTunnels.AddEndpointOutbound(tunnelId, endpoints.Outbound);
                 Singletons.Core.InboundTunnels.SaveToDisk();
 
+                //Tell the remote tunnel service to add the endpoint.
                 var result = await Singletons.Core.InboundTunnels.DispatchAddEndpointInboundToAssociatedTunnelService<NtFramePayloadBoolean>(tunnelId, endpoints.Inbound);
 
                 return new NtActionResponse { Success = result?.Value ?? false };
+            }
+            catch (Exception ex)
+            {
+                return new NtActionResponse(ex);
+            }
+        }
+
+        [HttpGet]
+        [Route("{sessionId}/DeleteEndpointPair/{tunnelId}/{endpointId}")]
+        public async Task<NtActionResponse> DeleteEndpointPair(Guid sessionId, Guid tunnelId, Guid endpointId)
+        {
+            try
+            {
+                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+
+                //Remove the the endpoint to the local tunnel.
+                Singletons.Core.InboundTunnels.DeleteEndpoint(tunnelId, endpointId);
+                Singletons.Core.InboundTunnels.SaveToDisk();
+
+                //Tell the remote tunnel service to delete the endpoint.
+                var result = await Singletons.Core.InboundTunnels.DispatchDeleteEndpointToAssociatedTunnelService<NtFramePayloadBoolean>(tunnelId, endpointId);
+
+                return new NtActionResponse { Success = result?.Value ?? false };
+            }
+            catch (Exception ex)
+            {
+                return new NtActionResponse(ex);
+            }
+        }
+
+        [HttpGet]
+        [Route("{sessionId}/DeleteEndpoint/{tunnelId}/{endpointId}")]
+        public NtActionResponse DeleteEndpoint(Guid sessionId, Guid tunnelId, Guid endpointId)
+        {
+            try
+            {
+                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+
+                //Remove the the endpoint to the local tunnel.
+                Singletons.Core.InboundTunnels.DeleteEndpoint(tunnelId, endpointId);
+                Singletons.Core.InboundTunnels.SaveToDisk();
+
+                return new NtActionResponse { Success = true };
             }
             catch (Exception ex)
             {

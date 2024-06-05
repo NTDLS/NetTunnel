@@ -14,6 +14,29 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             LoadFromDisk();
         }
 
+        /// <summary>
+        /// Tell the remote tunnel service to delete the specified endpoint.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tunnelPairId"></param>
+        /// <param name="endpointId"></param>
+        /// <returns></returns>
+        public async Task<T?> DispatchDeleteEndpointToAssociatedTunnelService<T>(Guid tunnelPairId, Guid endpointId)
+        {
+            return await Collection.Use((o) =>
+            {
+                var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
+                return tunnel.SendStreamFramePayloadQuery<T>(new NtFramePayloadDeleteEndpoint(endpointId));
+            });
+        }
+
+        /// <summary>
+        /// Tell the remote tunnel service to add the inbound endpoint.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tunnelPairId"></param>
+        /// <param name="endpoint"></param>
+        /// <returns></returns>
         public async Task<T?> DispatchAddEndpointInboundToAssociatedTunnelService<T>(Guid tunnelPairId, NtEndpointInboundConfiguration endpoint)
         {
             return await Collection.Use((o) =>
@@ -23,6 +46,13 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
+        /// <summary>
+        /// Tell the remote tunnel service to add the outbound endpoint.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tunnelPairId"></param>
+        /// <param name="endpoint"></param>
+        /// <returns></returns>
         public async Task<T?> DispatchAddEndpointOutboundToAssociatedTunnelService<T>(Guid tunnelPairId, NtEndpointOutboundConfiguration endpoint)
         {
             return await Collection.Use((o) =>
@@ -48,6 +78,21 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
                 tunnel.AddOutboundEndpoint(endpoint);
                 //tunnel.Start();
+            });
+        }
+
+        public void DeleteEndpoint(Guid tunnelPairId, Guid endpointPairId)
+        {
+            Collection.Use((o) =>
+            {
+                var tunnel = o.Where(o => o.PairId == tunnelPairId).Single();
+                var endpoint = tunnel.Endpoints.Where(o => o.PairId == endpointPairId).Single();
+
+                endpoint.Stop();
+
+                tunnel.DeleteEndpoint(endpointPairId);
+
+                endpoint.Start();
             });
         }
 

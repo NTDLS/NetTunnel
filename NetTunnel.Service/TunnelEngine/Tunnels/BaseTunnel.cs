@@ -85,13 +85,13 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         {
             Thread.CurrentThread.Name = $"HeartbeatThreadProc:{Environment.CurrentManagedThreadId}";
 
-            DateTime lastheartBeat = DateTime.UtcNow;
+            DateTime lastHeartBeat = DateTime.UtcNow;
 
             while (KeepRunning)
             {
-                if ((DateTime.UtcNow - lastheartBeat).TotalMilliseconds > Singletons.Configuration.HeartbeatDelayMs)
+                if ((DateTime.UtcNow - lastHeartBeat).TotalMilliseconds > Singletons.Configuration.HeartbeatDelayMs)
                 {
-                    lastheartBeat = DateTime.UtcNow;
+                    lastHeartBeat = DateTime.UtcNow;
                 }
 
                 Thread.Sleep(100);
@@ -134,7 +134,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         {
             if (EncryptionKey == null || SecureKeyExchangeIsComplete == false)
             {
-                throw new Exception("Encrpyion has not been initialized.");
+                throw new Exception("Encryption has not been initialized.");
             }
 
             if (frame is NtFramePayloadMessage message)
@@ -156,14 +156,14 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             }
             else if (frame is NtFramePayloadEndpointConnect connectEndpoint)
             {
-                //Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Recevied endpoint connection notification.");
+                //Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Received endpoint connection notification.");
 
                 Endpoints.OfType<EndpointOutbound>().Where(o => o.PairId == connectEndpoint.EndpointPairId).FirstOrDefault()?
                     .EstablishOutboundEndpointConnection(connectEndpoint.StreamId);
             }
             else if (frame is NtFramePayloadEndpointDisconnect disconnectEndpoint)
             {
-                //Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Recevied endpoint disconnection notification.");
+                //Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Received endpoint disconnection notification.");
 
                 GetEndpointById(disconnectEndpoint.EndpointPairId)?
                     .Disconnect(disconnectEndpoint.StreamId);
@@ -198,7 +198,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             if (EncryptionKey == null || SecureKeyExchangeIsComplete == false)
             {
-                throw new Exception("Encrpyion has not been initialized.");
+                throw new Exception("Encryption has not been initialized.");
             }
 
             if (frame is NtFramePayloadAddEndpointInbound inboundEndpoint)
@@ -335,6 +335,16 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             return endpoint;
         }
 
+        public void DeleteEndpoint(Guid endpointPairId)
+        {
+            var endpoint = Endpoints.Where(o => o.PairId == endpointPairId).Single();
+            endpoint.Stop();
+            Endpoints.Remove(endpoint);
+            if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
+            if (this is TunnelOutbound) Core.OutboundTunnels.SaveToDisk();
+        }
+
+        /*
         public void DeleteInboundEndpoint(Guid endpointPairId)
         {
             var endpoint = Endpoints.OfType<EndpointInbound>().Where(o => o.PairId == endpointPairId).Single();
@@ -352,6 +362,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
             if (this is TunnelOutbound) Core.OutboundTunnels.SaveToDisk();
         }
+        */
 
         #endregion
     }

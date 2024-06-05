@@ -2,6 +2,7 @@ using NetTunnel.ClientAPI;
 using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.UI.Helpers;
+using System.Net;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms
@@ -232,16 +233,12 @@ namespace NetTunnel.UI.Forms
                     return;
                 }
 
-                var selectedTunnel = selectedTunnelRow.Tag as INtTunnelConfiguration;
-                if (selectedTunnelRow == null)
-                {
-                    throw new Exception("Selected tunnel tag is not INtTunnelConfiguration.");
-                }
+                var selectedTunnel = (selectedTunnelRow.Tag as INtTunnelConfiguration).EnsureNotNull();
 
-                var endpointUnderMouse = listViewEndpoints.GetItemAt(e.X, e.Y);
-                if (endpointUnderMouse != null)
+                var selectedEndpointRow = listViewEndpoints.GetItemAt(e.X, e.Y);
+                if (selectedEndpointRow != null)
                 {
-                    endpointUnderMouse.Selected = true;
+                    selectedEndpointRow.Selected = true;
                 }
 
                 var menu = new ContextMenuStrip();
@@ -249,7 +246,7 @@ namespace NetTunnel.UI.Forms
                 menu.Items.Add("Add Inbound Endpoint to Tunnel");
                 menu.Items.Add("Add Outbound Endpoint to Tunnel");
 
-                if (endpointUnderMouse != null)
+                if (selectedEndpointRow != null)
                 {
                     menu.Items.Add(new ToolStripSeparator());
                     menu.Items.Add("Delete Endpoint");
@@ -264,11 +261,9 @@ namespace NetTunnel.UI.Forms
                     if (e.ClickedItem?.Text == "Add Inbound Endpoint to Tunnel")
                     {
                         _client.EnsureNotNull();
-                        endpointUnderMouse.EnsureNotNull();
+                        selectedEndpointRow.EnsureNotNull();
 
-                        var tunnel = ((INtTunnelConfiguration?)endpointUnderMouse.Tag).EnsureNotNull();
-
-                        using (var formAddEndpoint = new FormAddEndpoint(_client, tunnel, NtDirection.Inbound))
+                        using (var formAddEndpoint = new FormAddEndpoint(_client, selectedTunnel, NtDirection.Inbound))
                         {
                             if (formAddEndpoint.ShowDialog() == DialogResult.OK)
                             {
@@ -279,11 +274,9 @@ namespace NetTunnel.UI.Forms
                     else if (e.ClickedItem?.Text == "Add Outbound Endpoint to Tunnel")
                     {
                         _client.EnsureNotNull();
-                        endpointUnderMouse.EnsureNotNull();
+                        selectedEndpointRow.EnsureNotNull();
 
-                        var tunnel = ((INtTunnelConfiguration?)endpointUnderMouse.Tag).EnsureNotNull();
-
-                        using (var formAddEndpoint = new FormAddEndpoint(_client, tunnel, NtDirection.Outbound))
+                        using (var formAddEndpoint = new FormAddEndpoint(_client, selectedTunnel, NtDirection.Outbound))
                         {
                             if (formAddEndpoint.ShowDialog() == DialogResult.OK)
                             {
@@ -294,29 +287,27 @@ namespace NetTunnel.UI.Forms
                     else if (e.ClickedItem?.Text == "Delete Endpoint")
                     {
                         _client.EnsureNotNull();
-                        endpointUnderMouse.EnsureNotNull();
+                        var selectedEndpoint = (selectedEndpointRow?.Tag as INtEndpointConfiguration).EnsureNotNull();
 
-                        var tunnel = ((INtTunnelConfiguration?)endpointUnderMouse.Tag).EnsureNotNull();
-
-                        if (MessageBox.Show($"Delete the endpoint '{tunnel.Name}'?",
+                        if (MessageBox.Show($"Delete the endpoint '{selectedEndpoint.Name}'?",
                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                         {
                             return;
                         }
 
-                        if (endpointUnderMouse.Tag is NtTunnelInboundConfiguration tunnelInbound)
+                        if (selectedTunnel is NtTunnelInboundConfiguration tunnelInbound)
                         {
-                            _client.TunnelInbound.DeletePair(tunnelInbound.PairId).ContinueWith((o) =>
+                            _client.TunnelInbound.DeleteEndpointPair(tunnelInbound.PairId, selectedEndpoint.PairId).ContinueWith((o) =>
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
                                     Invoke(new Action(() =>
                                     {
-                                        if (MessageBox.Show(this, $"Failed to delete the remote tunnel, would you like to delete the local one anyway?",
+                                        if (MessageBox.Show(this, $"Failed to delete the remote endpoint, would you like to delete the local one anyway?",
                                         FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                         {
-                                            //If the pair deletion failed, just delete the local tunnel.
-                                            _client.TunnelInbound.Delete(tunnelInbound.PairId).ContinueWith((o) =>
+                                            //If the pair deletion failed, just delete the local endpoint.
+                                            _client.TunnelInbound.DeleteEndpoint(tunnelInbound.PairId, selectedEndpoint.PairId).ContinueWith((o) =>
                                             {
                                                 _needToRepopulateTunnels = true;
                                             });
@@ -326,19 +317,19 @@ namespace NetTunnel.UI.Forms
                             });
 
                         }
-                        else if (endpointUnderMouse.Tag is NtTunnelOutboundConfiguration tunnelOutbound)
+                        else if (selectedTunnel is NtTunnelOutboundConfiguration tunnelOutbound)
                         {
-                            _client.TunnelOutbound.DeletePair(tunnelOutbound.PairId).ContinueWith((o) =>
+                            _client.TunnelOutbound.DeleteEndpointPair(tunnelOutbound.PairId, selectedEndpoint.PairId).ContinueWith((o) =>
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
                                     Invoke(new Action(() =>
                                     {
-                                        if (MessageBox.Show(this, $"Failed to delete the remote tunnel, would you like to delete the local one anyway?",
+                                        if (MessageBox.Show(this, $"Failed to delete the remote endpoint, would you like to delete the local one anyway?",
                                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                         {
-                                            //If the pair deletion failed, just delete the local tunnel.
-                                            _client.TunnelOutbound.Delete(tunnelOutbound.PairId).ContinueWith((o) =>
+                                            //If the pair deletion failed, just delete the local endpoint.
+                                            _client.TunnelOutbound.DeleteEndpoint(tunnelOutbound.PairId, selectedEndpoint.PairId).ContinueWith((o) =>
                                             {
                                                 _needToRepopulateTunnels = true;
                                             });
