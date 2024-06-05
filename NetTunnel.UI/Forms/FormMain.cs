@@ -315,7 +315,7 @@ namespace NetTunnel.UI.Forms
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
-                                    this.Invoke(new Action(() =>
+                                    Invoke(new Action(() =>
                                     {
                                         if (MessageBox.Show(this, $"Failed to delete the remote tunnel, would you like to delete the local one anyway?",
                                         FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
@@ -337,7 +337,7 @@ namespace NetTunnel.UI.Forms
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
-                                    this.Invoke(new Action(() =>
+                                    Invoke(new Action(() =>
                                     {
                                         if (MessageBox.Show(this, $"Failed to delete the remote tunnel, would you like to delete the local one anyway?",
                                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
