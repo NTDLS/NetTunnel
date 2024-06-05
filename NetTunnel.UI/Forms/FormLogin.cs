@@ -27,7 +27,8 @@ namespace NetTunnel.UI.Forms
             checkBoxUseSSL.Checked = preferences.UseSSL;
 
 #if DEBUG
-            textBoxPassword.Text = Environment.MachineName.ToLower();
+            textBoxPassword.Text = "123456789";
+            //textBoxPassword.Text = Environment.MachineName.ToLower();
 #endif
 
             textBoxPassword.Focus();

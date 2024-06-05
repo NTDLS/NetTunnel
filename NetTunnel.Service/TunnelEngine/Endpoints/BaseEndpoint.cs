@@ -120,8 +120,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
             Thread.CurrentThread.Name = $"HandleClientThreadProc:{Environment.CurrentManagedThreadId}";
 
-            Utility.EnsureNotNull(obj);
-            var activeConnection = (ActiveEndpointConnection)obj;
+            var activeConnection = ((ActiveEndpointConnection?)obj).EnsureNotNull();
 
             try
             {

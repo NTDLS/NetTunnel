@@ -17,8 +17,7 @@ namespace NetTunnel.ClientAPI
         {
             get
             {
-                Utility.EnsureNotNull(_connection);
-                return _connection;
+                return _connection.EnsureNotNull();
             }
         }
 

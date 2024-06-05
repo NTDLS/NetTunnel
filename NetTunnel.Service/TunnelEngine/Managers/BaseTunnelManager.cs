@@ -28,8 +28,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             Collection.Use((o) =>
             {
                 var tunnel = (T?)Activator.CreateInstance(typeof(T), Core, config);
-                Utility.EnsureNotNull(tunnel);
-                o.Add(tunnel);
+                o.Add(tunnel.EnsureNotNull());
             });
         }
 

@@ -125,8 +125,7 @@ namespace NetTunnel.Service.Controllers
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                var tunnel = JsonConvert.DeserializeObject<NtTunnelOutboundConfiguration>(value);
-                Utility.EnsureNotNull(tunnel);
+                var tunnel = JsonConvert.DeserializeObject<NtTunnelOutboundConfiguration>(value).EnsureNotNull();
 
                 Singletons.Core.OutboundTunnels.Add(tunnel);
                 Singletons.Core.OutboundTunnels.SaveToDisk();
@@ -147,8 +146,7 @@ namespace NetTunnel.Service.Controllers
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                var endpoints = JsonConvert.DeserializeObject<NtEndpointPairConfiguration>(value);
-                Utility.EnsureNotNull(endpoints);
+                var endpoints = JsonConvert.DeserializeObject<NtEndpointPairConfiguration>(value).EnsureNotNull();
 
                 //Add the inbound endpoint to the local tunnel.
                 Singletons.Core.OutboundTunnels.AddEndpointInbound(tunnelId, endpoints.Inbound);
@@ -172,8 +170,7 @@ namespace NetTunnel.Service.Controllers
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                var endpoints = JsonConvert.DeserializeObject<NtEndpointPairConfiguration>(value);
-                Utility.EnsureNotNull(endpoints);
+                var endpoints = JsonConvert.DeserializeObject<NtEndpointPairConfiguration>(value).EnsureNotNull();
 
                 //Add the Outbound endpoint to the local tunnel.
                 Singletons.Core.OutboundTunnels.AddEndpointOutbound(tunnelId, endpoints.Outbound);

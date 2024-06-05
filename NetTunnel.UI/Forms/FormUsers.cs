@@ -23,8 +23,7 @@ namespace NetTunnel.UI.Forms
 
         private void FormUsers_Load(object sender, EventArgs e)
         {
-            Utility.EnsureNotNull(_client);
-            _client.Security.ListUsers().ContinueWith(t =>
+            _client.EnsureNotNull().Security.ListUsers().ContinueWith(t =>
             {
                 foreach (var user in t.Result.Collection)
                 {
@@ -51,7 +50,7 @@ namespace NetTunnel.UI.Forms
 
         private void ListViewUsers_MouseUp(object? sender, MouseEventArgs e)
         {
-            Utility.EnsureNotNull(_client);
+            _client.EnsureNotNull();
 
             if (e.Button == MouseButtons.Right)
             {
@@ -75,8 +74,7 @@ namespace NetTunnel.UI.Forms
                     {
                         if (e.ClickedItem?.Text == "Change password")
                         {
-                            var user = (NtUser?)itemUnderMouse.Tag;
-                            Utility.EnsureNotNull(user);
+                            var user = ((NtUser?)itemUnderMouse.Tag).EnsureNotNull();
 
                             using (var formChangeUserPassword = new FormChangeUserPassword(_client, user))
                             {
@@ -85,8 +83,7 @@ namespace NetTunnel.UI.Forms
                         }
                         else if (e.ClickedItem?.Text == "Delete")
                         {
-                            var user = (NtUser?)itemUnderMouse.Tag;
-                            Utility.EnsureNotNull(user);
+                            var user = ((NtUser?)itemUnderMouse.Tag).EnsureNotNull();
 
                             if (MessageBox.Show($"Delete the user '{user.Username}'?",
                                 Constants.FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
@@ -113,7 +110,7 @@ namespace NetTunnel.UI.Forms
 
         private void buttonAddUser_Click(object sender, EventArgs e)
         {
-            Utility.EnsureNotNull(_client);
+            _client.EnsureNotNull();
 
             using (var formAddUser = new FormAddUser(_client))
             {

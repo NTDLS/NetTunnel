@@ -43,8 +43,8 @@ namespace NetTunnel.UI.Forms
 
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            Utility.EnsureNotNull(_client);
-            Utility.EnsureNotNull(_tunnel);
+            _client.EnsureNotNull();
+            _tunnel.EnsureNotNull();
 
             try
             {

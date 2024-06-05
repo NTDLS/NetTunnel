@@ -43,8 +43,7 @@ namespace NetTunnel.Service.Controllers
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                var content = JsonConvert.DeserializeObject<NtUser>(value);
-                Utility.EnsureNotNull(content);
+                var content = JsonConvert.DeserializeObject<NtUser>(value).EnsureNotNull();
 
                 Singletons.Core.Users.Add(content);
                 Singletons.Core.Users.SaveToDisk();
@@ -68,8 +67,7 @@ namespace NetTunnel.Service.Controllers
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                var content = JsonConvert.DeserializeObject<NtUser>(value);
-                Utility.EnsureNotNull(content);
+                var content = JsonConvert.DeserializeObject<NtUser>(value).EnsureNotNull();
 
                 Singletons.Core.Users.ChangePassword(content);
                 Singletons.Core.Users.SaveToDisk();
@@ -93,8 +91,7 @@ namespace NetTunnel.Service.Controllers
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                var content = JsonConvert.DeserializeObject<NtUser>(value);
-                Utility.EnsureNotNull(content);
+                var content = JsonConvert.DeserializeObject<NtUser>(value).EnsureNotNull();
 
                 Singletons.Core.Users.Delete(content);
                 Singletons.Core.Users.SaveToDisk();
