@@ -8,7 +8,7 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormMain : Form
     {
-        private int _allPairIdHashes = -1;
+        private int _allTunnelAndEndpointHashes = -1;
         private bool _needToRepopulateTunnels = false;
         private NtClient? _client;
         private bool _inTimerTick = false;
@@ -112,13 +112,13 @@ namespace NetTunnel.UI.Forms
                     {
                         if (o.Result.Success)
                         {
-                            int allPairIdHashes = o.Result.AllPairIdHashs();
+                            int allTunnelAndEndpointHashes = o.Result.AllTunnelIdAndEndpointIdHashes();
 
-                            if (allPairIdHashes != _allPairIdHashes && _allPairIdHashes != -1)
+                            if (allTunnelAndEndpointHashes != _allTunnelAndEndpointHashes && _allTunnelAndEndpointHashes != -1)
                             {
                                 _needToRepopulateTunnels = true;
                             }
-                            _allPairIdHashes = allPairIdHashes;
+                            _allTunnelAndEndpointHashes = allTunnelAndEndpointHashes;
 
                             PopulateEndpointStatistics(o.Result.Statistics);
                             PopulateTunnelStatistics(o.Result.Statistics);
@@ -141,11 +141,11 @@ namespace NetTunnel.UI.Forms
 
                             var direction = (endpoint is NtEndpointInboundConfiguration) ? NtDirection.Inbound : NtDirection.Outbound;
 
-                            var tunnelStats = statistics.Where(o => o.TunnelPairId == endpoint.TunnelPairId).ToList();
+                            var tunnelStats = statistics.Where(o => o.TunnelId == endpoint.TunnelId).ToList();
                             if (tunnelStats != null)
                             {
                                 var endpointStats = tunnelStats.SelectMany(o => o.EndpointStatistics)
-                                    .Where(o => o.EndpointPairId == endpoint.PairId && o.Direction == direction).SingleOrDefault();
+                                    .Where(o => o.EndpointId == endpoint.EndpointId && o.Direction == direction).SingleOrDefault();
                                 if (endpointStats != null)
                                 {
                                     item.SubItems[columnHeaderEndpointBytesSent.Index].Text = $"{endpointStats.BytesSentKb:n0}";
@@ -172,7 +172,7 @@ namespace NetTunnel.UI.Forms
 
                             var direction = (tunnel is NtTunnelInboundConfiguration) ? NtDirection.Inbound : NtDirection.Outbound;
 
-                            var tunnelStats = statistics.Where(o => o.TunnelPairId == tunnel.PairId && o.Direction == direction).SingleOrDefault();
+                            var tunnelStats = statistics.Where(o => o.TunnelId == tunnel.TunnelId && o.Direction == direction).SingleOrDefault();
                             if (tunnelStats != null)
                             {
 
@@ -311,7 +311,7 @@ namespace NetTunnel.UI.Forms
 
                         if (selectedTunnel is NtTunnelInboundConfiguration tunnelInbound)
                         {
-                            _client.TunnelInbound.DeleteEndpointPair(tunnelInbound.PairId, selectedEndpoint.PairId).ContinueWith((o) =>
+                            _client.TunnelInbound.DeleteEndpointPair(tunnelInbound.TunnelId, selectedEndpoint.EndpointId).ContinueWith((o) =>
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
@@ -321,7 +321,7 @@ namespace NetTunnel.UI.Forms
                                         FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                         {
                                             //If the pair deletion failed, just delete the local endpoint.
-                                            _client.TunnelInbound.DeleteEndpoint(tunnelInbound.PairId, selectedEndpoint.PairId).ContinueWith((o) =>
+                                            _client.TunnelInbound.DeleteEndpoint(tunnelInbound.TunnelId, selectedEndpoint.EndpointId).ContinueWith((o) =>
                                             {
                                                 _needToRepopulateTunnels = true;
                                             });
@@ -333,7 +333,7 @@ namespace NetTunnel.UI.Forms
                         }
                         else if (selectedTunnel is NtTunnelOutboundConfiguration tunnelOutbound)
                         {
-                            _client.TunnelOutbound.DeleteEndpointPair(tunnelOutbound.PairId, selectedEndpoint.PairId).ContinueWith((o) =>
+                            _client.TunnelOutbound.DeleteEndpointPair(tunnelOutbound.TunnelId, selectedEndpoint.EndpointId).ContinueWith((o) =>
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
@@ -343,7 +343,7 @@ namespace NetTunnel.UI.Forms
                                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                         {
                                             //If the pair deletion failed, just delete the local endpoint.
-                                            _client.TunnelOutbound.DeleteEndpoint(tunnelOutbound.PairId, selectedEndpoint.PairId).ContinueWith((o) =>
+                                            _client.TunnelOutbound.DeleteEndpoint(tunnelOutbound.TunnelId, selectedEndpoint.EndpointId).ContinueWith((o) =>
                                             {
                                                 _needToRepopulateTunnels = true;
                                             });
@@ -446,7 +446,7 @@ namespace NetTunnel.UI.Forms
 
                         if (itemUnderMouse.Tag is NtTunnelInboundConfiguration tunnelInbound)
                         {
-                            _client.TunnelInbound.DeletePair(tunnelInbound.PairId).ContinueWith((o) =>
+                            _client.TunnelInbound.DeletePair(tunnelInbound.TunnelId).ContinueWith((o) =>
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
@@ -456,7 +456,7 @@ namespace NetTunnel.UI.Forms
                                         FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                         {
                                             //If the pair deletion failed, just delete the local tunnel.
-                                            _client.TunnelInbound.Delete(tunnelInbound.PairId).ContinueWith((o) =>
+                                            _client.TunnelInbound.Delete(tunnelInbound.TunnelId).ContinueWith((o) =>
                                             {
                                                 _needToRepopulateTunnels = true;
                                             });
@@ -468,7 +468,7 @@ namespace NetTunnel.UI.Forms
                         }
                         else if (itemUnderMouse.Tag is NtTunnelOutboundConfiguration tunnelOutbound)
                         {
-                            _client.TunnelOutbound.DeletePair(tunnelOutbound.PairId).ContinueWith((o) =>
+                            _client.TunnelOutbound.DeletePair(tunnelOutbound.TunnelId).ContinueWith((o) =>
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
@@ -478,7 +478,7 @@ namespace NetTunnel.UI.Forms
                                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                         {
                                             //If the pair deletion failed, just delete the local tunnel.
-                                            _client.TunnelOutbound.Delete(tunnelOutbound.PairId).ContinueWith((o) =>
+                                            _client.TunnelOutbound.Delete(tunnelOutbound.TunnelId).ContinueWith((o) =>
                                             {
                                                 _needToRepopulateTunnels = true;
                                             });

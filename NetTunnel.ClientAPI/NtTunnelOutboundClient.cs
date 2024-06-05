@@ -45,9 +45,9 @@ namespace NetTunnel.ClientAPI
             }
         }
 
-        public async Task Start(Guid tunnelPairId)
+        public async Task Start(Guid tunnelId)
         {
-            string url = $"api/TunnelOutbound/{_client.SessionId}/Start/{tunnelPairId}";
+            string url = $"api/TunnelOutbound/{_client.SessionId}/Start/{tunnelId}";
 
             using var response = await _client.Connection.GetAsync(url);
             string resultText = await response.Content.ReadAsStringAsync();
@@ -58,9 +58,9 @@ namespace NetTunnel.ClientAPI
             }
         }
 
-        public async Task Stop(Guid tunnelPairId)
+        public async Task Stop(Guid tunnelId)
         {
-            string url = $"api/TunnelOutbound/{_client.SessionId}/Stop/{tunnelPairId}";
+            string url = $"api/TunnelOutbound/{_client.SessionId}/Stop/{tunnelId}";
 
             using var response = await _client.Connection.GetAsync(url);
             string resultText = await response.Content.ReadAsStringAsync();
@@ -71,9 +71,9 @@ namespace NetTunnel.ClientAPI
             }
         }
 
-        public async Task Delete(Guid tunnelPairId)
+        public async Task Delete(Guid tunnelId)
         {
-            string url = $"api/TunnelOutbound/{_client.SessionId}/Delete/{tunnelPairId}";
+            string url = $"api/TunnelOutbound/{_client.SessionId}/Delete/{tunnelId}";
 
             using var response = await _client.Connection.GetAsync(url);
             string resultText = await response.Content.ReadAsStringAsync();
@@ -87,12 +87,12 @@ namespace NetTunnel.ClientAPI
         /// <summary>
         /// Deletes a tunnel and notified the associated-service tunnel to delete itself as well.
         /// </summary>
-        /// <param name="tunnelPairId"></param>
+        /// <param name="tunnelId"></param>
         /// <returns></returns>
         /// <exception cref="NtAPIResponseException"></exception>
-        public async Task DeletePair(Guid tunnelPairId)
+        public async Task DeletePair(Guid tunnelId)
         {
-            string url = $"api/TunnelOutbound/{_client.SessionId}/DeletePair/{tunnelPairId}";
+            string url = $"api/TunnelOutbound/{_client.SessionId}/DeletePair/{tunnelId}";
 
             using var response = await _client.Connection.GetAsync(url);
             string resultText = await response.Content.ReadAsStringAsync();
@@ -106,13 +106,13 @@ namespace NetTunnel.ClientAPI
         /// <summary>
         /// Add a inbound endpoint to the tunnel and an outbound endpoint to the other end of the associated tunnel.
         /// </summary>
-        /// <param name="tunnelPairId"></param>
+        /// <param name="tunnelId"></param>
         /// <param name="tunnel"></param>
         /// <returns></returns>
         /// <exception cref="NtAPIResponseException"></exception>
-        public async Task AddEndpointInboundPair(Guid tunnelPairId, NtEndpointInboundConfiguration inboundEndpoint, NtEndpointOutboundConfiguration outboundEndpoint)
+        public async Task AddEndpointInboundPair(Guid tunnelId, NtEndpointInboundConfiguration inboundEndpoint, NtEndpointOutboundConfiguration outboundEndpoint)
         {
-            string url = $"api/TunnelOutbound/{_client.SessionId}/AddEndpointInboundPair/{tunnelPairId}";
+            string url = $"api/TunnelOutbound/{_client.SessionId}/AddEndpointInboundPair/{tunnelId}";
 
             var postContent = new StringContent(JsonConvert.SerializeObject(
                 new NtEndpointPairConfiguration(inboundEndpoint, outboundEndpoint)), Encoding.UTF8, "text/plain");
@@ -129,13 +129,13 @@ namespace NetTunnel.ClientAPI
         /// <summary>
         /// Add a outbound endpoint to the tunnel and an inbound endpoint to the other end of the associated tunnel.
         /// </summary>
-        /// <param name="tunnelPairId"></param>
+        /// <param name="tunnelId"></param>
         /// <param name="tunnel"></param>
         /// <returns></returns>
         /// <exception cref="NtAPIResponseException"></exception>
-        public async Task AddEndpointOutboundPair(Guid tunnelPairId, NtEndpointInboundConfiguration inboundEndpoint, NtEndpointOutboundConfiguration outboundEndpoint)
+        public async Task AddEndpointOutboundPair(Guid tunnelId, NtEndpointInboundConfiguration inboundEndpoint, NtEndpointOutboundConfiguration outboundEndpoint)
         {
-            string url = $"api/TunnelOutbound/{_client.SessionId}/AddEndpointOutboundPair/{tunnelPairId}";
+            string url = $"api/TunnelOutbound/{_client.SessionId}/AddEndpointOutboundPair/{tunnelId}";
 
             var postContent = new StringContent(JsonConvert.SerializeObject(
                 new NtEndpointPairConfiguration(inboundEndpoint, outboundEndpoint)), Encoding.UTF8, "text/plain");
@@ -152,13 +152,13 @@ namespace NetTunnel.ClientAPI
         /// <summary>
         /// Delete an endpoint from the tunnel and an endpoint from the other end of the associated tunnel.
         /// </summary>
-        /// <param name="tunnelPairId"></param>
+        /// <param name="tunnelId"></param>
         /// <param name="endpointId"></param>
         /// <returns></returns>
         /// <exception cref="NtAPIResponseException"></exception>
-        public async Task DeleteEndpointPair(Guid tunnelPairId, Guid endpointId)
+        public async Task DeleteEndpointPair(Guid tunnelId, Guid endpointId)
         {
-            string url = $"api/TunnelOutbound/{_client.SessionId}/DeleteEndpointPair/{tunnelPairId}/{endpointId}";
+            string url = $"api/TunnelOutbound/{_client.SessionId}/DeleteEndpointPair/{tunnelId}/{endpointId}";
 
             using var response = _client.Connection.GetAsync(url);
             string resultText = await response.Result.Content.ReadAsStringAsync();
@@ -172,13 +172,13 @@ namespace NetTunnel.ClientAPI
         /// <summary>
         /// Delete an endpoint from the tunnel.
         /// </summary>
-        /// <param name="tunnelPairId"></param>
+        /// <param name="tunnelId"></param>
         /// <param name="endpointId"></param>
         /// <returns></returns>
         /// <exception cref="NtAPIResponseException"></exception>
-        public async Task DeleteEndpoint(Guid tunnelPairId, Guid endpointId)
+        public async Task DeleteEndpoint(Guid tunnelId, Guid endpointId)
         {
-            string url = $"api/TunnelOutbound/{_client.SessionId}/DeleteEndpoint/{tunnelPairId}/{endpointId}";
+            string url = $"api/TunnelOutbound/{_client.SessionId}/DeleteEndpoint/{tunnelId}/{endpointId}";
 
             using var response = _client.Connection.GetAsync(url);
             string resultText = await response.Result.Content.ReadAsStringAsync();

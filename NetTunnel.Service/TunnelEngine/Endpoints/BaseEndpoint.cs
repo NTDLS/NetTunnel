@@ -12,7 +12,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         public ulong BytesSent { get; internal set; }
         public ulong TotalConnections { get; internal set; }
         public ulong CurrentConnections { get; internal set; }
-        public Guid PairId { get; private set; }
+        public Guid EndpointId { get; private set; }
         public string Name { get; private set; }
 
         internal readonly TunnelEngineCore _core;
@@ -23,12 +23,12 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         internal readonly PessimisticCriticalResource<Dictionary<Guid, ActiveEndpointConnection>> _activeConnections = new();
 
-        public BaseEndpoint(TunnelEngineCore core, ITunnel tunnel, Guid pairId, string name, int transmissionPort)
+        public BaseEndpoint(TunnelEngineCore core, ITunnel tunnel, Guid endpointId, string name, int transmissionPort)
         {
             _core = core;
             _tunnel = tunnel;
             Name = name;
-            PairId = pairId;
+            EndpointId = endpointId;
             TransmissionPort = transmissionPort;
 
             _heartbeatThread = new Thread(HeartbeatThreadProc);
@@ -127,14 +127,14 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 TotalConnections++;
                 CurrentConnections++;
 
-                _tunnel.SendStreamFrameNotification(new NtFramePayloadEndpointConnect(_tunnel.PairId, PairId, activeConnection.StreamId));
+                _tunnel.SendStreamFrameNotification(new NtFramePayloadEndpointConnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId));
 
                 byte[] buffer = new byte[Singletons.Configuration.FramebufferSize];
                 while (KeepRunning && activeConnection.IsConnected && activeConnection.Read(ref buffer, out int length))
                 {
                     BytesReceived += (ulong)length;
 
-                    var exchnagePayload = new NtFramePayloadEndpointExchange(_tunnel.PairId, PairId, activeConnection.StreamId, buffer, length);
+                    var exchnagePayload = new NtFramePayloadEndpointExchange(_tunnel.TunnelId, EndpointId, activeConnection.StreamId, buffer, length);
                     _tunnel.SendStreamFrameNotification(exchnagePayload);
                 }
             }
@@ -155,7 +155,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             }
 
             Utility.TryAndIgnore(() =>
-                _tunnel.SendStreamFrameNotification(new NtFramePayloadEndpointDisconnect(_tunnel.PairId, PairId, activeConnection.StreamId)));
+                _tunnel.SendStreamFrameNotification(new NtFramePayloadEndpointDisconnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId)));
         }
     }
 }

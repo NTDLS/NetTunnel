@@ -31,18 +31,18 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         public NtTunnelInboundConfiguration CloneConfiguration()
         {
-            var tunnelConfiguration = new NtTunnelInboundConfiguration(PairId, Name, DataPort);
+            var tunnelConfiguration = new NtTunnelInboundConfiguration(TunnelId, Name, DataPort);
 
             foreach (var endpoint in Endpoints)
             {
                 if (endpoint is EndpointInbound inboundEndpoint)
                 {
-                    var endpointConfiguration = new NtEndpointInboundConfiguration(PairId, inboundEndpoint.PairId, inboundEndpoint.Name, inboundEndpoint.TransmissionPort);
+                    var endpointConfiguration = new NtEndpointInboundConfiguration(TunnelId, inboundEndpoint.EndpointId, inboundEndpoint.Name, inboundEndpoint.TransmissionPort);
                     tunnelConfiguration.EndpointInboundConfigurations.Add(endpointConfiguration);
                 }
                 else if (endpoint is EndpointOutbound outboundEndpoint)
                 {
-                    var endpointConfiguration = new NtEndpointOutboundConfiguration(PairId, outboundEndpoint.PairId, outboundEndpoint.Name, outboundEndpoint.Address, outboundEndpoint.TransmissionPort);
+                    var endpointConfiguration = new NtEndpointOutboundConfiguration(TunnelId, outboundEndpoint.EndpointId, outboundEndpoint.Name, outboundEndpoint.Address, outboundEndpoint.TransmissionPort);
                     tunnelConfiguration.EndpointOutboundConfigurations.Add(endpointConfiguration);
                 }
             }

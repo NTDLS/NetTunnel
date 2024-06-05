@@ -31,7 +31,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         public ulong CurrentConnections { get; internal set; }
         public TunnelEngineCore Core { get; private set; }
         public bool KeepRunning { get; internal set; } = false;
-        public Guid PairId { get; private set; }
+        public Guid TunnelId { get; private set; }
         public string Name { get; private set; }
 
         public List<IEndpoint> Endpoints { get; set; } = new();
@@ -42,7 +42,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         {
             Core = core;
 
-            PairId = configuration.PairId;
+            TunnelId = configuration.TunnelId;
             Name = configuration.Name;
 
             configuration.EndpointInboundConfigurations.ForEach(o => Endpoints.Add(new EndpointInbound(Core, this, o)));
@@ -56,7 +56,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         {
             Core = core;
 
-            PairId = configuration.PairId;
+            TunnelId = configuration.TunnelId;
             Name = configuration.Name;
 
             configuration.EndpointInboundConfigurations.ForEach(o => Endpoints.Add(new EndpointInbound(Core, this, o)));
@@ -97,7 +97,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 Thread.Sleep(100);
             }
         }
-        public IEndpoint? GetEndpointById(Guid pairId) => Endpoints.Where(o => o.PairId == pairId).FirstOrDefault();
+        public IEndpoint? GetEndpointById(Guid endpointId) => Endpoints.Where(o => o.EndpointId == endpointId).FirstOrDefault();
 
         #region TCP/IP frame and Stream interactions.
 
@@ -145,12 +145,12 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             {
                 if (this is TunnelInbound)
                 {
-                    Core.InboundTunnels.Delete(deleteTunnel.TunnelPairId);
+                    Core.InboundTunnels.Delete(deleteTunnel.TunnelId);
                     Core.InboundTunnels.SaveToDisk();
                 }
                 else
                 {
-                    Core.OutboundTunnels.Delete(deleteTunnel.TunnelPairId);
+                    Core.OutboundTunnels.Delete(deleteTunnel.TunnelId);
                     Core.OutboundTunnels.SaveToDisk();
                 }
             }
@@ -158,21 +158,21 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             {
                 //Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Received endpoint connection notification.");
 
-                Endpoints.OfType<EndpointOutbound>().Where(o => o.PairId == connectEndpoint.EndpointPairId).FirstOrDefault()?
+                Endpoints.OfType<EndpointOutbound>().Where(o => o.EndpointId == connectEndpoint.EndpointId).FirstOrDefault()?
                     .EstablishOutboundEndpointConnection(connectEndpoint.StreamId);
             }
             else if (frame is NtFramePayloadEndpointDisconnect disconnectEndpoint)
             {
                 //Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Received endpoint disconnection notification.");
 
-                GetEndpointById(disconnectEndpoint.EndpointPairId)?
+                GetEndpointById(disconnectEndpoint.EndpointId)?
                     .Disconnect(disconnectEndpoint.StreamId);
             }
             else if (frame is NtFramePayloadEndpointExchange exchange)
             {
                 //Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Exchanging {exchange.Bytes.Length} bytes.");
 
-                GetEndpointById(exchange.EndpointPairId)?
+                GetEndpointById(exchange.EndpointId)?
                     .SendEndpointData(exchange.StreamId, exchange.Bytes);
             }
             else
@@ -340,9 +340,9 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             return endpoint;
         }
 
-        public void DeleteEndpoint(Guid endpointPairId)
+        public void DeleteEndpoint(Guid endpointId)
         {
-            var endpoint = Endpoints.Where(o => o.PairId == endpointPairId).SingleOrDefault();
+            var endpoint = Endpoints.Where(o => o.EndpointId == endpointId).SingleOrDefault();
             if (endpoint != null)
             {
                 endpoint.Stop();
@@ -351,26 +351,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 if (this is TunnelOutbound) Core.OutboundTunnels.SaveToDisk();
             }
         }
-
-        /*
-        public void DeleteInboundEndpoint(Guid endpointPairId)
-        {
-            var endpoint = Endpoints.OfType<EndpointInbound>().Where(o => o.PairId == endpointPairId).Single();
-            endpoint.Stop();
-            Endpoints.Remove(endpoint);
-            if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
-            if (this is TunnelOutbound) Core.OutboundTunnels.SaveToDisk();
-        }
-
-        public void DeleteOutboundEndpoint(Guid endpointPairId)
-        {
-            var endpoint = Endpoints.OfType<EndpointOutbound>().Where(o => o.PairId == endpointPairId).Single();
-            endpoint.Stop();
-            Endpoints.Remove(endpoint);
-            if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
-            if (this is TunnelOutbound) Core.OutboundTunnels.SaveToDisk();
-        }
-        */
 
         #endregion
     }

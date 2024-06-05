@@ -59,18 +59,18 @@ namespace NetTunnel.UI.Forms
 
                 this.EnableControl(buttonAdd, false);
 
-                var endpointPairId = Guid.NewGuid(); //The endpointId is the same on both services.
+                var endpointId = Guid.NewGuid(); //The endpointId is the same on both services.
 
-                var endpointInbound = new NtEndpointInboundConfiguration(_tunnel.PairId, endpointPairId, textBoxName.Text, int.Parse(textBoxListenPort.Text));
+                var endpointInbound = new NtEndpointInboundConfiguration(_tunnel.TunnelId, endpointId, textBoxName.Text, int.Parse(textBoxListenPort.Text));
 
-                var endpointOutbound = new NtEndpointOutboundConfiguration(_tunnel.PairId, endpointPairId, textBoxName.Text,
+                var endpointOutbound = new NtEndpointOutboundConfiguration(_tunnel.TunnelId, endpointId, textBoxName.Text,
                     textBoxTerminationAddress.Text, int.Parse(textBoxTerminationPort.Text));
 
                 if (_tunnel is NtTunnelInboundConfiguration)
                 {
                     if (_direction == NtDirection.Inbound)
                     {
-                        _client.TunnelInbound.AddEndpointInboundPair(_tunnel.PairId, endpointInbound, endpointOutbound).ContinueWith((o) =>
+                        _client.TunnelInbound.AddEndpointInboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
@@ -83,7 +83,7 @@ namespace NetTunnel.UI.Forms
                     }
                     else
                     {
-                        _client.TunnelInbound.AddEndpointOutboundPair(_tunnel.PairId, endpointInbound, endpointOutbound).ContinueWith((o) =>
+                        _client.TunnelInbound.AddEndpointOutboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
@@ -98,7 +98,7 @@ namespace NetTunnel.UI.Forms
                 {
                     if (_direction == NtDirection.Inbound)
                     {
-                        _client.TunnelOutbound.AddEndpointInboundPair(_tunnel.PairId, endpointInbound, endpointOutbound).ContinueWith((o) =>
+                        _client.TunnelOutbound.AddEndpointInboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
@@ -110,7 +110,7 @@ namespace NetTunnel.UI.Forms
                     }
                     else
                     {
-                        _client.TunnelOutbound.AddEndpointOutboundPair(_tunnel.PairId, endpointInbound, endpointOutbound).ContinueWith((o) =>
+                        _client.TunnelOutbound.AddEndpointOutboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
                         {
                             if (!o.IsCompletedSuccessfully)
                             {

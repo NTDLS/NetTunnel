@@ -16,7 +16,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         /// <summary>
         /// This ID is distinct among an instance of the service but the associated remote service tunnel has the same id.
         /// </summary>
-        public Guid PairId { get; }
+        public Guid TunnelId { get; }
         public string Name { get; }
         public NASCCLStream? NascclStream { get; }
         public byte[]? EncryptionKey { get; }

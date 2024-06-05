@@ -7,20 +7,20 @@ namespace NetTunnel.ClientAPI.Payload
         public List<NtTunnelStatistics> Statistics { get; set; } = new();
 
         /// <summary>
-        /// This overall hash is used to determine if there has been an addition/removal of any tunnel or endpoint.
+        /// This overall hash is used to determine if there has been an additions/removals of any tunnel or endpoint.
         /// </summary>
         /// <returns></returns>
-        public int AllPairIdHashs()
+        public int AllTunnelIdAndEndpointIdHashes()
         {
             int rollingTotal = 0;
 
             foreach (var item in Statistics)
             {
-                rollingTotal += item.TunnelPairId.GetHashCode();
+                rollingTotal += item.TunnelId.GetHashCode();
                 foreach (var endpoint in item.EndpointStatistics)
                 {
-                    rollingTotal += endpoint.TunnelPairId.GetHashCode();
-                    rollingTotal += endpoint.EndpointPairId.GetHashCode();
+                    rollingTotal += endpoint.TunnelId.GetHashCode();
+                    rollingTotal += endpoint.EndpointId.GetHashCode();
                 }
             }
             return rollingTotal;

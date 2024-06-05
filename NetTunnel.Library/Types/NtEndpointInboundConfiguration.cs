@@ -10,10 +10,10 @@ namespace NetTunnel.Library.Types
     public class NtEndpointInboundConfiguration : INtEndpointConfiguration
     {
         [ProtoMember(1)]
-        public Guid PairId { get; set; }
+        public Guid EndpointId { get; set; }
 
         [ProtoMember(2)]
-        public Guid TunnelPairId { get; set; }
+        public Guid TunnelId { get; set; }
 
         [ProtoMember(3)]
         public string Name { get; set; } = string.Empty;
@@ -23,10 +23,10 @@ namespace NetTunnel.Library.Types
 
         public NtEndpointInboundConfiguration() { }
 
-        public NtEndpointInboundConfiguration(Guid tunnelPairId, Guid pairId, string name, int transmissionPort)
+        public NtEndpointInboundConfiguration(Guid tunnelId, Guid endpointId, string name, int transmissionPort)
         {
-            TunnelPairId = tunnelPairId;
-            PairId = pairId;
+            TunnelId = tunnelId;
+            EndpointId = endpointId;
             Name = name;
             TransmissionPort = transmissionPort;
         }

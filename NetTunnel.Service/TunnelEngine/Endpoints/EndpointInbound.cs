@@ -16,7 +16,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         private readonly TcpListener _listener;
 
         public EndpointInbound(TunnelEngineCore core, ITunnel tunnel, NtEndpointInboundConfiguration configuration)
-            : base(core, tunnel, configuration.PairId, configuration.Name, configuration.TransmissionPort)
+            : base(core, tunnel, configuration.EndpointId, configuration.Name, configuration.TransmissionPort)
         {
             _listener = new TcpListener(IPAddress.Any, configuration.TransmissionPort);
         }

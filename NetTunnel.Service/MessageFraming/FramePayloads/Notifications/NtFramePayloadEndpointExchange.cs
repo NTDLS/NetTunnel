@@ -10,19 +10,19 @@ namespace NetTunnel.Service.MessageFraming.FramePayloads.Notifications
         public Guid StreamId { get; set; }
 
         [ProtoMember(2)]
-        public Guid TunnelPairId { get; set; }
+        public Guid TunnelId { get; set; }
 
         [ProtoMember(3)]
-        public Guid EndpointPairId { get; set; }
+        public Guid EndpointId { get; set; }
 
         [ProtoMember(4)]
         public byte[] Bytes { get; set; }
 
-        public NtFramePayloadEndpointExchange(Guid tunnelPairId, Guid endpointPairId, Guid streamId, byte[] bytes, int length)
+        public NtFramePayloadEndpointExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
         {
             StreamId = streamId;
-            TunnelPairId = tunnelPairId;
-            EndpointPairId = endpointPairId;
+            TunnelId = tunnelId;
+            EndpointId = endpointId;
             Bytes = new byte[length];
 
             Array.Copy(bytes, Bytes, length);

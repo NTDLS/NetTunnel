@@ -58,13 +58,13 @@ namespace NetTunnel.UI.Forms
 
                 this.EnableControl(buttonAdd, false);
 
-                var tunnelPairId = Guid.NewGuid(); //The TunnelId is the same on both services.
+                var tunnelId = Guid.NewGuid(); //The TunnelId is the same on both services.
 
-                var outboundTunnel = new NtTunnelOutboundConfiguration(tunnelPairId, textBoxName.Text,
+                var outboundTunnel = new NtTunnelOutboundConfiguration(tunnelId, textBoxName.Text,
                     textBoxRemoteAddress.Text, int.Parse(textBoxRemotePort.Text), int.Parse(textBoxTunnelDataPort.Text),
                     textBoxRemoteUsername.Text, Utility.CalculateSHA256(textBoxRemotePassword.Text));
 
-                var inboundTunnel = new NtTunnelInboundConfiguration(tunnelPairId, textBoxName.Text, int.Parse(textBoxTunnelDataPort.Text));
+                var inboundTunnel = new NtTunnelInboundConfiguration(tunnelId, textBoxName.Text, int.Parse(textBoxTunnelDataPort.Text));
 
                 NtClient remoteClient;
 
@@ -105,7 +105,7 @@ namespace NetTunnel.UI.Forms
                         if (!t.IsCompletedSuccessfully)
                         {
                             //If we failed to create the remote tunnel config, remove the local config.
-                            _client.TunnelOutbound.Delete(outboundTunnel.PairId).ContinueWith(t =>
+                            _client.TunnelOutbound.Delete(outboundTunnel.TunnelId).ContinueWith(t =>
                             {
                                 this.EnableControl(buttonAdd, true);
                                 throw new Exception("Failed to create remote inbound tunnel.");
@@ -113,10 +113,10 @@ namespace NetTunnel.UI.Forms
                         }
 
                         //Start the listening tunnel:
-                        remoteClient.TunnelInbound.Start(inboundTunnel.PairId).Wait();
+                        remoteClient.TunnelInbound.Start(inboundTunnel.TunnelId).Wait();
 
                         //Start the outbound-connecting tunnel:
-                        _client.TunnelOutbound.Start(outboundTunnel.PairId).Wait();
+                        _client.TunnelOutbound.Start(outboundTunnel.TunnelId).Wait();
 
                         this.CloseFormWithResult(DialogResult.OK);
                     });

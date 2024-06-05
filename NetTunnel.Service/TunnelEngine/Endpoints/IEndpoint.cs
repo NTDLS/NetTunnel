@@ -5,7 +5,7 @@
         /// <summary>
         /// This ID is distinct among an instance of the service but the associated remote service endpoint has the same id.
         /// </summary>
-        public Guid PairId { get; }
+        public Guid EndpointId { get; }
         public string Name { get; }
         public bool KeepRunning { get; }
         public void Disconnect(Guid streamId);

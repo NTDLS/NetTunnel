@@ -38,14 +38,14 @@ namespace NetTunnel.Service.Controllers
         }
 
         [HttpGet]
-        [Route("{sessionId}/Delete/{tunnelPairId}")]
-        public NtActionResponse Delete(Guid sessionId, Guid tunnelPairId)
+        [Route("{sessionId}/Delete/{tunnelId}")]
+        public NtActionResponse Delete(Guid sessionId, Guid tunnelId)
         {
             try
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                Singletons.Core.OutboundTunnels.Delete(tunnelPairId);
+                Singletons.Core.OutboundTunnels.Delete(tunnelId);
                 Singletons.Core.OutboundTunnels.SaveToDisk();
 
                 return new NtActionResponse { Success = true };
@@ -57,14 +57,14 @@ namespace NetTunnel.Service.Controllers
         }
 
         [HttpGet]
-        [Route("{sessionId}/DeletePair/{tunnelPairId}")]
-        public NtActionResponse DeletePair(Guid sessionId, Guid tunnelPairId)
+        [Route("{sessionId}/DeletePair/{tunnelId}")]
+        public NtActionResponse DeletePair(Guid sessionId, Guid tunnelId)
         {
             try
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                Singletons.Core.OutboundTunnels.DeletePair(tunnelPairId);
+                Singletons.Core.OutboundTunnels.DeletePair(tunnelId);
                 Singletons.Core.OutboundTunnels.SaveToDisk();
 
                 return new NtActionResponse { Success = true };
@@ -76,14 +76,14 @@ namespace NetTunnel.Service.Controllers
         }
 
         [HttpGet]
-        [Route("{sessionId}/Start/{tunnelPairId}")]
-        public NtActionResponse Start(Guid sessionId, Guid tunnelPairId)
+        [Route("{sessionId}/Start/{tunnelId}")]
+        public NtActionResponse Start(Guid sessionId, Guid tunnelId)
         {
             try
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                Singletons.Core.OutboundTunnels.Start(tunnelPairId);
+                Singletons.Core.OutboundTunnels.Start(tunnelId);
 
                 return new NtActionResponse { Success = true };
             }
@@ -94,14 +94,14 @@ namespace NetTunnel.Service.Controllers
         }
 
         [HttpGet]
-        [Route("{sessionId}/Stop/{tunnelPairId}")]
-        public NtActionResponse Stop(Guid sessionId, Guid tunnelPairId)
+        [Route("{sessionId}/Stop/{tunnelId}")]
+        public NtActionResponse Stop(Guid sessionId, Guid tunnelId)
         {
             try
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                Singletons.Core.OutboundTunnels.Stop(tunnelPairId);
+                Singletons.Core.OutboundTunnels.Stop(tunnelId);
 
                 return new NtActionResponse { Success = true };
             }

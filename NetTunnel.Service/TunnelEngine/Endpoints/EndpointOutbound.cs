@@ -13,7 +13,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         public string Address { get; private set; }
 
         public EndpointOutbound(TunnelEngineCore core, ITunnel tunnel, NtEndpointOutboundConfiguration configuration)
-            : base(core, tunnel, configuration.PairId, configuration.Name, configuration.TransmissionPort)
+            : base(core, tunnel, configuration.EndpointId, configuration.Name, configuration.TransmissionPort)
         {
             Address = configuration.Address;
         }

@@ -10,17 +10,17 @@ namespace NetTunnel.Service.MessageFraming.FramePayloads.Notifications
         public Guid StreamId { get; set; }
 
         [ProtoMember(2)]
-        public Guid TunnelPairId { get; set; }
+        public Guid TunnelId { get; set; }
 
         [ProtoMember(3)]
-        public Guid EndpointPairId { get; set; }
+        public Guid EndpointId { get; set; }
 
 
-        public NtFramePayloadEndpointConnect(Guid tunnelPairId, Guid endpointPairId, Guid streamId)
+        public NtFramePayloadEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId)
         {
             StreamId = streamId;
-            TunnelPairId = tunnelPairId;
-            EndpointPairId = endpointPairId;
+            TunnelId = tunnelId;
+            EndpointId = endpointId;
         }
 
         public NtFramePayloadEndpointConnect()
