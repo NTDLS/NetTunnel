@@ -213,9 +213,14 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 endpoint.Start();
                 return new NtFramePayloadBoolean(true);
             }
+            else if (frame is NtFramePayloadDeleteEndpoint deleteEndpoint)
+            {
+                DeleteEndpoint(deleteEndpoint.EndpointId);
+                return new NtFramePayloadBoolean(true);
+            }
             else
             {
-                throw new Exception("ProcessFrameQueryCallback: Unhandled query frame type.");
+                throw new Exception($"ProcessFrameQueryCallback: Unhandled query frame type '{frame?.GetType()?.Name}'.");
             }
         }
 
@@ -337,11 +342,14 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         public void DeleteEndpoint(Guid endpointPairId)
         {
-            var endpoint = Endpoints.Where(o => o.PairId == endpointPairId).Single();
-            endpoint.Stop();
-            Endpoints.Remove(endpoint);
-            if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
-            if (this is TunnelOutbound) Core.OutboundTunnels.SaveToDisk();
+            var endpoint = Endpoints.Where(o => o.PairId == endpointPairId).SingleOrDefault();
+            if (endpoint != null)
+            {
+                endpoint.Stop();
+                Endpoints.Remove(endpoint);
+                if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
+                if (this is TunnelOutbound) Core.OutboundTunnels.SaveToDisk();
+            }
         }
 
         /*

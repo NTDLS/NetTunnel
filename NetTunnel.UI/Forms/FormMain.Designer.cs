@@ -248,9 +248,9 @@
             labelEndpoints.Dock = DockStyle.Top;
             labelEndpoints.Location = new Point(0, 0);
             labelEndpoints.Name = "labelEndpoints";
-            labelEndpoints.Size = new Size(202, 15);
+            labelEndpoints.Size = new Size(196, 15);
             labelEndpoints.TabIndex = 2;
-            labelEndpoints.Text = "Endpoints (of selected Tunnel above)";
+            labelEndpoints.Text = "Endpoints of (select a tunnel above)";
             // 
             // FormMain
             // 
