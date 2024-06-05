@@ -1,7 +1,7 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.TunnelEngine.Endpoints;
-using System.Net.Sockets;
+using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
@@ -18,7 +18,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         public string Username { get; set; }
         public string PasswordHash { get; set; }
 
-        private TcpClient? _tcpClient;
+        private readonly RmClient _client;
 
         public TunnelOutbound(TunnelEngineCore core, NtTunnelOutboundConfiguration configuration)
             : base(core, configuration)
@@ -28,6 +28,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             DataPort = configuration.DataPort;
             Username = configuration.Username;
             PasswordHash = configuration.PasswordHash;
+
+            _client = new RmClient();
         }
 
         public NtTunnelOutboundConfiguration CloneConfiguration()
@@ -73,8 +75,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopping outbound tunnel '{Name}'.");
             base.Stop();
 
-            Utility.TryAndIgnore(() => _tcpClient?.Client?.Close());
-            Utility.TryAndIgnore(() => _tcpClient?.Close());
+            Utility.TryAndIgnore(_client.Disconnect);
 
             if (Environment.CurrentManagedThreadId != _outboundConnectionThread?.ManagedThreadId)
             {
@@ -83,6 +84,12 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopped outbound tunnel '{Name}'.");
         }
+
+        public new Task<T> Query<T>(IRmQuery<T> query) where T : IRmQueryReply
+            => _client.Query<T>(query);
+
+        public new void Notify(IRmNotification notification)
+            => _client.Notify(notification);
 
         private void OutboundConnectionThreadProc()
         {
@@ -99,8 +106,9 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
                     Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' connecting to remote at {Address}:{DataPort}.");
 
-                    _tcpClient = new TcpClient(Address, DataPort);
+                    _client.Connect(Address, DataPort);
 
+                    /*
                     Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' connection successful.");
 
                     Status = NtTunnelStatus.Established;
@@ -115,6 +123,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                     Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' disconnected.");
 
                     _tcpClient.Close();
+                    */
                 }
                 catch (Exception ex)
                 {

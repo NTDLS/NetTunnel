@@ -1,12 +1,8 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
-using NetTunnel.Service.MessageFraming.FramePayloads.Replies;
+using NetTunnel.Service.FramePayloads.Queries;
 using NetTunnel.Service.TunnelEngine.Endpoints;
-using NTDLS.NASCCL;
-using NTDLS.SecureKeyExchange;
-using System.Net;
-using System.Net.Sockets;
+using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
@@ -16,17 +12,17 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
     /// </summary>
     internal class TunnelInbound : BaseTunnel, ITunnel
     {
-        private Thread? _inboundConnectionThread;
+        //private Thread? _inboundConnectionThread;
         public int DataPort { get; private set; }
 
-        private readonly TcpListener _listener;
+        private readonly RmServer _server;
+        private Guid? _peerRmClientConnectionId;
 
         public TunnelInbound(TunnelEngineCore core, NtTunnelInboundConfiguration configuration)
             : base(core, configuration)
         {
             DataPort = configuration.DataPort;
-
-            _listener = new TcpListener(IPAddress.Any, DataPort);
+            _server = new RmServer();
         }
 
         public NtTunnelInboundConfiguration CloneConfiguration()
@@ -60,28 +56,55 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             Core.Logging.Write(NtLogSeverity.Verbose, $"Starting inbound tunnel '{Name}' on port {DataPort}.");
             base.Start();
 
-            _inboundConnectionThread = new Thread(InboundConnectionThreadProc);
-            _inboundConnectionThread.Start();
+            _server.Start(DataPort);
+            Core.Logging.Write(NtLogSeverity.Verbose, $"Started listening for inbound tunnel '{Name}' on port {DataPort}.");
+
+            _server.OnConnected += (RmContext context) =>
+            {
+                if (_peerRmClientConnectionId != null)
+                {
+                    throw new Exception("The inbound tunnel cannot accept more than one connection.");
+                }
+                _peerRmClientConnectionId = context.ConnectionId;
+            };
+
+            _server.OnDisconnected += (RmContext context) =>
+            {
+                _peerRmClientConnectionId = null;
+            };
+
 
             Core.Logging.Write(NtLogSeverity.Verbose, $"Starting endpoints for inbound tunnel '{Name}'.");
             Endpoints.ForEach(x => x.Start());
         }
+
 
         public override void Stop()
         {
             Core.Logging.Write(NtLogSeverity.Verbose, $"Stopping inbound tunnel '{Name}' on port {DataPort}.");
             base.Stop();
 
-            Utility.TryAndIgnore(_listener.Stop);
-            Utility.TryAndIgnore(_listener.Stop);
+            Utility.TryAndIgnore(_server.Stop);
 
+            /*
             if (Environment.CurrentManagedThreadId != _inboundConnectionThread?.ManagedThreadId)
             {
                 _inboundConnectionThread?.Join(); //Wait on thread to finish.
             }
+            */
 
             Core.Logging.Write(NtLogSeverity.Verbose, $"Stopped inbound tunnel '{Name}'.");
         }
+
+        public new Task<T> Query<T>(IRmQuery<T> query) where T : IRmQueryReply
+        {
+            _server.Query(Guid.NewGuid(), new NtFramePayloadDeleteEndpoint());
+
+            return _server.Query<T>(_peerRmClientConnectionId.EnsureNotNullOrEmpty(), query);
+        }
+
+        public new void Notify(IRmNotification notification)
+            => _server.Notify(_peerRmClientConnectionId.EnsureNotNullOrEmpty(), notification);
 
         private void InboundConnectionThreadProc()
         {
@@ -89,9 +112,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             try
             {
-                _listener.Start();
-
-                Core.Logging.Write(NtLogSeverity.Verbose, $"Started listiening for inbound tunnel '{Name}' on port {DataPort}.");
 
                 while (KeepRunning)
                 {
@@ -101,6 +121,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
                         Core.Logging.Write(NtLogSeverity.Verbose, $"Waiting on connection for inbound tunnel '{Name}' on port {DataPort}.");
 
+                        /*
                         var tcpClient = _listener.AcceptTcpClient();
                         Core.Logging.Write(NtLogSeverity.Verbose, $"Accepted connection for inbound tunnel '{Name}' on port {DataPort}.");
 
@@ -113,7 +134,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
                             using (Stream = tcpClient.GetStream())
                             {
-                                //The first thing we do when a client connects is we start a new key exhange process.
+                                //The first thing we do when a client connects is we start a new key exchange process.
                                 var compoundNegotiator = new CompoundNegotiator();
                                 byte[] negotiationToken = compoundNegotiator.GenerateNegotiationToken(Singletons.Configuration.TunnelEncryptionKeySize / 12);
 
@@ -140,6 +161,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                             Utility.TryAndIgnore(tcpClient.Close);
                             Utility.TryAndIgnore(tcpClient.Dispose);
                         }
+                        */
                     }
                     catch (Exception ex)
                     {
@@ -157,7 +179,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             }
             finally
             {
-                Utility.TryAndIgnore(_listener.Stop);
+                Utility.TryAndIgnore(_server.Stop);
             }
         }
     }

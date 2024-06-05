@@ -1,8 +1,9 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
+using NetTunnel.Service.FramePayloads.Queries;
 using NetTunnel.Service.TunnelEngine.Tunnels;
 using NTDLS.Persistence;
+using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Service.TunnelEngine.Managers
 {
@@ -21,12 +22,12 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// <param name="tunnelId"></param>
         /// <param name="endpointId"></param>
         /// <returns></returns>
-        public async Task<T?> DispatchDeleteEndpointToAssociatedTunnelService<T>(Guid tunnelId, Guid endpointId)
+        public async Task<T> DispatchDeleteEndpointToAssociatedTunnelService<T>(Guid tunnelId, Guid endpointId) where T : IRmQueryReply
         {
             return await Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                return tunnel.SendStreamFramePayloadQuery<T>(new NtFramePayloadDeleteEndpoint(endpointId));
+                return tunnel.Query<T>(new NtFramePayloadDeleteEndpoint(endpointId));
             });
         }
 
@@ -37,12 +38,12 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// <param name="tunnelId"></param>
         /// <param name="endpoint"></param>
         /// <returns></returns>
-        public async Task<T?> DispatchAddEndpointInboundToAssociatedTunnelService<T>(Guid tunnelId, NtEndpointInboundConfiguration endpoint)
+        public async Task<T> DispatchAddEndpointInboundToAssociatedTunnelService<T>(Guid tunnelId, NtEndpointInboundConfiguration endpoint) where T : IRmQueryReply
         {
             return await Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                return tunnel.SendStreamFramePayloadQuery<T>(new NtFramePayloadAddEndpointInbound(endpoint));
+                return tunnel.Query<T>(new NtFramePayloadAddEndpointInbound(endpoint));
             });
         }
 
@@ -53,12 +54,12 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// <param name="tunnelId"></param>
         /// <param name="endpoint"></param>
         /// <returns></returns>
-        public async Task<T?> DispatchAddEndpointOutboundToAssociatedTunnelService<T>(Guid tunnelId, NtEndpointOutboundConfiguration endpoint)
+        public async Task<T> DispatchAddEndpointOutboundToAssociatedTunnelService<T>(Guid tunnelId, NtEndpointOutboundConfiguration endpoint) where T : IRmQueryReply
         {
             return await Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                return tunnel.SendStreamFramePayloadQuery<T>(new NtFramePayloadAddEndpointOutbound(endpoint));
+                return tunnel.Query<T>(new NtFramePayloadAddEndpointOutbound(endpoint));
             });
         }
 
