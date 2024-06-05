@@ -1,13 +1,16 @@
 ﻿using NetTunnel.ClientAPI;
 using NetTunnel.Library;
+using NTDLS.Persistence;
 
 namespace NetTunnel.UI.Forms
 {
     public partial class FormLogin : Form
     {
         public string Address { get; set; } = string.Empty;
+        public string ServerURL { get; set; } = string.Empty;
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public bool UseSSL { get; set; }
 
         public FormLogin()
         {
@@ -16,16 +19,12 @@ namespace NetTunnel.UI.Forms
             AcceptButton = buttonLogin;
             CancelButton = buttonCancel;
 
-            var preferences = Persistence.LoadFromDisk<UILoginPreferences>(new UILoginPreferences
-            {
-                Address = "127.0.0.1",
-                Port = "52845",
-                Username = "root"
-            });
+            var preferences = LocalUserApplicationData.LoadFromDisk(Constants.FriendlyName, new UILoginPreferences());
 
             textBoxAddress.Text = preferences.Address;
             textBoxPort.Text = preferences.Port;
             textBoxUsername.Text = preferences.Username;
+            checkBoxUseSSL.Checked = preferences.UseSSL;
 
 #if DEBUG
             textBoxPassword.Text = Environment.MachineName.ToLower();
@@ -44,19 +43,29 @@ namespace NetTunnel.UI.Forms
 
                 Username = textBoxUsername.Text;
                 Password = Utility.CalculateSHA256(textBoxPassword.Text);
+                UseSSL = checkBoxUseSSL.Checked;
+                Address = textBoxAddress.Text;
 
-                Address = $"https://{textBoxAddress.Text}:{port}/";
+                if (UseSSL)
+                {
+                    ServerURL = $"https://{textBoxAddress.Text}:{port}/";
+                }
+                else
+                {
+                    ServerURL = $"http://{textBoxAddress.Text}:{port}/";
+                }
 
-                using var _ = new NtClient(Address, Username, Password);
+                using var _ = new NtClient(ServerURL, Username, Password);
 
                 var preferences = new UILoginPreferences()
                 {
                     Address = textBoxAddress.Text,
                     Port = textBoxPort.Text,
                     Username = textBoxUsername.Text,
+                    UseSSL = checkBoxUseSSL.Checked
                 };
 
-                Persistence.SaveToDisk(preferences);
+                LocalUserApplicationData.SaveToDisk(Constants.FriendlyName, preferences);
 
                 DialogResult = DialogResult.OK;
                 Close();

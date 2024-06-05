@@ -2,6 +2,7 @@
 using NetTunnel.Library.Types;
 using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
 using NetTunnel.Service.TunnelEngine.Tunnels;
+using NTDLS.Persistence;
 
 namespace NetTunnel.Service.TunnelEngine.Managers
 {
@@ -78,14 +79,14 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-        public void SaveToDisk() => Persistence.SaveToDisk(CloneConfigurations());
+        public void SaveToDisk() => CommonApplicationData.SaveToDisk(Constants.FriendlyName, CloneConfigurations());
 
         private void LoadFromDisk()
         {
             Collection.Use((o) =>
             {
                 if (o.Count != 0) throw new Exception("Can not load configuration on top of existing collection.");
-                Persistence.LoadFromDisk<List<NtTunnelInboundConfiguration>>()?.ForEach(o => Add(o));
+                CommonApplicationData.LoadFromDisk<List<NtTunnelInboundConfiguration>>(Constants.FriendlyName)?.ForEach(o => Add(o));
             });
         }
     }

@@ -2,8 +2,9 @@
 {
     internal class UILoginPreferences
     {
-        public string Username { get; set; } = string.Empty;
-        public string Address { get; set; } = string.Empty;
-        public string Port { get; set; } = string.Empty;
+        public string Username { get; set; } = "root";
+        public string Address { get; set; } = "127.0.0.1";
+        public string Port { get; set; } = "52845";
+        public bool UseSSL { get; set; } = true;
     }
 }

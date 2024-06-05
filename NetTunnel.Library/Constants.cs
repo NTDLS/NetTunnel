@@ -12,7 +12,7 @@
 
         public enum NtTunnelStatus
         {
-            Undefiend,
+            Undefined,
             Connecting,
             Established,
             Disconnected

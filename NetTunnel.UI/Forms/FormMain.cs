@@ -8,7 +8,7 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormMain : Form
     {
-        private int _allPairIdHashs = -1;
+        private int _allPairIdHashes = -1;
         private bool _needToRepopulateTunnels = false;
         private NtClient? _client;
         private bool _inTimerTick = false;
@@ -68,7 +68,10 @@ namespace NetTunnel.UI.Forms
                 {
                     if (formLogin.ShowDialog() == DialogResult.OK)
                     {
-                        _client = new NtClient(formLogin.Address, formLogin.Username, formLogin.Password);
+                        _client = new NtClient(formLogin.ServerURL, formLogin.Username, formLogin.Password);
+
+                        Text = $"{Constants.FriendlyName} : {formLogin.Address} {(formLogin.UseSSL ? "" : " : [INSECURE]")}";
+
                         RepopulateTunnelsGrid();
                         return true;
                     }
@@ -109,13 +112,13 @@ namespace NetTunnel.UI.Forms
                     {
                         if (o.Result.Success)
                         {
-                            int allPairIdHashs = o.Result.AllPairIdHashs();
+                            int allPairIdHashes = o.Result.AllPairIdHashs();
 
-                            if (allPairIdHashs != _allPairIdHashs && _allPairIdHashs != -1)
+                            if (allPairIdHashes != _allPairIdHashes && _allPairIdHashes != -1)
                             {
                                 _needToRepopulateTunnels = true;
                             }
-                            _allPairIdHashs = allPairIdHashs;
+                            _allPairIdHashes = allPairIdHashes;
 
                             PopulateEndpointStatistics(o.Result.Statistics);
                             PopulateTunnelStatistics(o.Result.Statistics);
@@ -328,9 +331,9 @@ namespace NetTunnel.UI.Forms
                             });
 
                         }
-                        else if (itemUnderMouse.Tag is NtTunnelOutboundConfiguration tunneloutbound)
+                        else if (itemUnderMouse.Tag is NtTunnelOutboundConfiguration tunnelOutbound)
                         {
-                            _client.TunnelOutbound.DeletePair(tunneloutbound.PairId).ContinueWith((o) =>
+                            _client.TunnelOutbound.DeletePair(tunnelOutbound.PairId).ContinueWith((o) =>
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
@@ -340,7 +343,7 @@ namespace NetTunnel.UI.Forms
                                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                         {
                                             //If the pair deletion failed, just delete the local tunnel.
-                                            _client.TunnelOutbound.Delete(tunneloutbound.PairId).ContinueWith((o) =>
+                                            _client.TunnelOutbound.Delete(tunnelOutbound.PairId).ContinueWith((o) =>
                                             {
                                                 _needToRepopulateTunnels = true;
                                             });

@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library;
+using NTDLS.Persistence;
 using NTDLS.Semaphore;
 
 namespace NetTunnel.Service.TunnelEngine.Managers
@@ -40,18 +41,10 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         public List<NtUser> Clone()
         {
-            return _collection.Use((o) =>
-            {
-                List<NtUser> clones = new();
-                foreach (var user in o)
-                {
-                    clones.Add(user);
-                }
-                return clones;
-            });
+            return _collection.Use((o) => new List<NtUser>(o));
         }
 
-        public void SaveToDisk() => Persistence.SaveToDisk(Clone());
+        public void SaveToDisk() => CommonApplicationData.SaveToDisk(Constants.FriendlyName, Clone());
 
         private void LoadFromDisk()
         {
@@ -59,7 +52,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             {
                 if (o.Count != 0) throw new Exception("Can not load configuration on top of existing collection.");
 
-                Persistence.LoadFromDisk<List<NtUser>>()?.ForEach(o => Add(o));
+                CommonApplicationData.LoadFromDisk<List<NtUser>>(Constants.FriendlyName)?.ForEach(o => Add(o));
 
                 if (o.Count == 0)//Add debugging users:
                 {

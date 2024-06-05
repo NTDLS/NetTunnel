@@ -40,6 +40,7 @@
             textBoxPort = new TextBox();
             textBoxAddress = new TextBox();
             labelRemoteAddress = new Label();
+            checkBoxUseSSL = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)pictureBoxLogin).BeginInit();
             SuspendLayout();
             // 
@@ -75,7 +76,7 @@
             // 
             textBoxUsername.Location = new Point(90, 90);
             textBoxUsername.Name = "textBoxUsername";
-            textBoxUsername.Size = new Size(262, 23);
+            textBoxUsername.Size = new Size(275, 23);
             textBoxUsername.TabIndex = 5;
             // 
             // textBoxPassword
@@ -83,12 +84,12 @@
             textBoxPassword.Location = new Point(90, 141);
             textBoxPassword.Name = "textBoxPassword";
             textBoxPassword.PasswordChar = '*';
-            textBoxPassword.Size = new Size(262, 23);
+            textBoxPassword.Size = new Size(275, 23);
             textBoxPassword.TabIndex = 0;
             // 
             // buttonCancel
             // 
-            buttonCancel.Location = new Point(277, 189);
+            buttonCancel.Location = new Point(290, 189);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(75, 23);
             buttonCancel.TabIndex = 2;
@@ -98,7 +99,7 @@
             // 
             // buttonLogin
             // 
-            buttonLogin.Location = new Point(196, 189);
+            buttonLogin.Location = new Point(207, 189);
             buttonLogin.Name = "buttonLogin";
             buttonLogin.Size = new Size(75, 23);
             buttonLogin.TabIndex = 1;
@@ -119,7 +120,7 @@
             // 
             textBoxPort.Location = new Point(294, 34);
             textBoxPort.Name = "textBoxPort";
-            textBoxPort.Size = new Size(58, 23);
+            textBoxPort.Size = new Size(71, 23);
             textBoxPort.TabIndex = 4;
             // 
             // textBoxAddress
@@ -138,11 +139,22 @@
             labelRemoteAddress.TabIndex = 5;
             labelRemoteAddress.Text = "Address / host:";
             // 
+            // checkBoxUseSSL
+            // 
+            checkBoxUseSSL.AutoSize = true;
+            checkBoxUseSSL.Location = new Point(294, 63);
+            checkBoxUseSSL.Name = "checkBoxUseSSL";
+            checkBoxUseSSL.Size = new Size(71, 19);
+            checkBoxUseSSL.TabIndex = 9;
+            checkBoxUseSSL.Text = "Use SSL?";
+            checkBoxUseSSL.UseVisualStyleBackColor = true;
+            // 
             // FormLogin
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(369, 227);
+            ClientSize = new Size(380, 227);
+            Controls.Add(checkBoxUseSSL);
             Controls.Add(labelRemotePort);
             Controls.Add(textBoxPort);
             Controls.Add(textBoxAddress);
@@ -180,5 +192,6 @@
         private TextBox textBoxPort;
         private TextBox textBoxAddress;
         private Label labelRemoteAddress;
+        private CheckBox checkBoxUseSSL;
     }
 }

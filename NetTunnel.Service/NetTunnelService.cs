@@ -28,13 +28,22 @@ namespace NetTunnel.Service
             _thread.Join();
         }
 
-        public static X509Certificate2 CreateSelfSignedCertificate()
+        public static X509Certificate2? CreateSelfSignedCertificate()
         {
-            using RSA rsa = RSA.Create(Singletons.Configuration.RSAKeyLength);
-            var request = new CertificateRequest($"CN=NetTunnel.EndPoint.private", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-            var certificate = request.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(1));
+            try
+            {
+                using RSA rsa = RSA.Create(Singletons.Configuration.RSAKeyLength);
+                var request = new CertificateRequest($"CN=NetTunnel.EndPoint.private", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+                var certificate = request.CreateSelfSigned(DateTimeOffset.Now.AddDays(-10), DateTimeOffset.Now.AddYears(3));
 
-            return new X509Certificate2(certificate.Export(X509ContentType.Pkcs12), "");
+                return new X509Certificate2(certificate.Export(X509ContentType.Pkcs12), "");
+            }
+            catch (Exception ex)
+            {
+                Singletons.Core.Logging.Write(Constants.NtLogSeverity.Exception, $"Could not instanciate SSL: {ex.Message}.");
+            }
+
+            return null;
         }
 
         private void DoWork()
@@ -64,7 +73,10 @@ namespace NetTunnel.Service
             {
                 options.ListenAnyIP(Singletons.Configuration.ManagementPort, listenOptions =>
                 {
-                    listenOptions.UseHttps(certificate);
+                    if (certificate != null)
+                    {
+                        listenOptions.UseHttps(certificate);
+                    }
                 });
             });
 
