@@ -40,7 +40,7 @@ namespace NetTunnel.Service
             }
             catch (Exception ex)
             {
-                Singletons.Core.Logging.Write(Constants.NtLogSeverity.Exception, $"Could not instanciate SSL: {ex.Message}.");
+                Singletons.Core.Logging.Write(Constants.NtLogSeverity.Exception, $"Could not instantiate SSL: {ex.Message}.");
             }
 
             return null;
