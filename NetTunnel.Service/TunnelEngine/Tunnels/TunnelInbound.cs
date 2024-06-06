@@ -176,6 +176,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 return;
             }
 
+            Status = NtTunnelStatus.Disconnected;
+
             Core.Logging.Write(NtLogSeverity.Verbose, $"Starting inbound tunnel '{Name}' on port {DataPort}.");
             base.Start();
 
