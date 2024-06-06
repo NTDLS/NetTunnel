@@ -62,7 +62,9 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             {
                 if (_peerRmClientConnectionId != null)
                 {
-                    throw new Exception("The inbound tunnel cannot accept more than one connection.");
+                    Core.Logging.Write(NtLogSeverity.Verbose, $"The tunnel '{Name}' on port {DataPort} cannot accept more than one connection.");
+                    context.Disconnect();
+                    return;
                 }
                 _peerRmClientConnectionId = context.ConnectionId;
             };
@@ -72,11 +74,9 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 _peerRmClientConnectionId = null;
             };
 
-
             Core.Logging.Write(NtLogSeverity.Verbose, $"Starting endpoints for inbound tunnel '{Name}'.");
             Endpoints.ForEach(x => x.Start());
         }
-
 
         public override void Stop()
         {
