@@ -111,7 +111,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             if (payload is NtFramePayloadRequestKeyExchange keyExchangeRequest)
             {
                 var compoundNegotiator = new CompoundNegotiator();
-                byte[] negotiationReplyToken = compoundNegotiator.ApplyNegotiationToken(keyExchangeRequest.NegotiationToken);
+                var negotiationReplyToken = compoundNegotiator.ApplyNegotiationToken(keyExchangeRequest.NegotiationToken);
                 var negotiationReply = new NtFramePayloadKeyExchangeReply(negotiationReplyToken);
                 EncryptionKey = compoundNegotiator.SharedSecret;
                 return negotiationReply;

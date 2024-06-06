@@ -232,7 +232,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
                         //The first thing we do when we get a connection is start a new key exchange process.
                         var compoundNegotiator = new CompoundNegotiator();
-                        byte[] negotiationToken = compoundNegotiator.GenerateNegotiationToken(Singletons.Configuration.TunnelEncryptionKeySize / 12);
+                        var negotiationToken = compoundNegotiator.GenerateNegotiationToken(Singletons.Configuration.TunnelEncryptionKeySize / 12);
 
                         var query = new NtFramePayloadRequestKeyExchange(negotiationToken);
                         _client.Query(query).ContinueWith(t =>
