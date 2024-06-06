@@ -187,7 +187,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             }
             else if (payload is NtFramePayloadEndpointExchange exchange)
             {
-                Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Exchanging {exchange.Bytes.Length:n0} bytes.");
+                //Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Exchanging {exchange.Bytes.Length:n0} bytes.");
 
                 GetEndpointById(exchange.EndpointId)?
                     .SendEndpointData(exchange.StreamId, exchange.Bytes);
