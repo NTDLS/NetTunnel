@@ -30,8 +30,8 @@ namespace NetTunnel.UI.Forms
             textBoxRemoteAddress.Text = "127.0.0.1";
             textBoxTunnelDataPort.Text = "52846"; //This is the port that is used to move tunnel data between tunnels
 
-            textBoxRemoteUsername.Text = "root";
-            textBoxRemotePassword.Text = Environment.MachineName.ToLower();
+            textBoxRemoteUsername.Text = "debug";
+            textBoxRemotePassword.Text = "123456789";
 #endif
         }
 

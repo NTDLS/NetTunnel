@@ -54,8 +54,11 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
                 CommonApplicationData.LoadFromDisk<List<NtUser>>(Constants.FriendlyName)?.ForEach(o => Add(o));
 
-                if (o.Count == 0)//Add debugging users:
+                if (o.Count == 0)
                 {
+#if DEBUG
+                    Add("debug", Utility.CalculateSHA256("123456789"));
+#endif
                     Add("root", Utility.CalculateSHA256(Environment.MachineName.ToLower()));
                     SaveToDisk();
                 }
