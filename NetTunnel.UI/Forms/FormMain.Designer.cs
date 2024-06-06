@@ -89,7 +89,7 @@
             // columnHeaderTunnelAddress
             // 
             columnHeaderTunnelAddress.Text = "Address";
-            columnHeaderTunnelAddress.Width = 100;
+            columnHeaderTunnelAddress.Width = 120;
             // 
             // columnHeaderTunnelEndpoints
             // 
@@ -99,12 +99,12 @@
             // columnHeaderTunnelBytesSent
             // 
             columnHeaderTunnelBytesSent.Text = "Sent (KB)";
-            columnHeaderTunnelBytesSent.Width = 100;
+            columnHeaderTunnelBytesSent.Width = 90;
             // 
             // columnHeaderTunnelBytesReceived
             // 
             columnHeaderTunnelBytesReceived.Text = "Recvd (KB)";
-            columnHeaderTunnelBytesReceived.Width = 100;
+            columnHeaderTunnelBytesReceived.Width = 90;
             // 
             // columnHeaderTunnelStatus
             // 
