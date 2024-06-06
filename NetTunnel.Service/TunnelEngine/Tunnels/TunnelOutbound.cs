@@ -4,6 +4,7 @@ using NetTunnel.Service.FramePayloads.Notifications;
 using NetTunnel.Service.FramePayloads.Queries;
 using NetTunnel.Service.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine.Endpoints;
+using NTDLS.NASCCL;
 using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 
@@ -12,20 +13,53 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
     /// <summary>
     /// This is the class that makes an outbound TCP/IP connection to a listening tunnel.
     /// </summary>
-    internal class TunnelOutbound : BaseTunnel, ITunnel
+    internal class TunnelOutbound : ITunnel
     {
+        private readonly RmClient _client;
         private Thread? _establishConnectionThread;
+
+        #region Configuration Properties.
+
         public string Address { get; set; }
         public int ManagementPort { get; set; }
         public int DataPort { get; set; }
         public string Username { get; set; }
         public string PasswordHash { get; set; }
 
-        private readonly RmClient _client;
+        #endregion
+
+        #region Properties Common to Inbound and Outbound Tunnels.
+
+        public byte[]? EncryptionKey { get; private set; }
+        public bool SecureKeyExchangeIsComplete { get; private set; }
+        public NASCCLStream? NascclStream { get; private set; }
+        public NtTunnelStatus Status { get; set; }
+        public ulong BytesReceived { get; set; }
+        public ulong BytesSent { get; set; }
+        public ulong TotalConnections { get; private set; }
+        public ulong CurrentConnections { get; private set; }
+        public TunnelEngineCore Core { get; private set; }
+        public bool KeepRunning { get; private set; } = false;
+        public Guid TunnelId { get; private set; }
+        public string Name { get; private set; }
+        public List<IEndpoint> Endpoints { get; private set; } = new();
+        private readonly Thread _heartbeatThread;
+
+        #endregion
 
         public TunnelOutbound(TunnelEngineCore core, NtTunnelOutboundConfiguration configuration)
-            : base(core, configuration)
         {
+            Core = core;
+
+            TunnelId = configuration.TunnelId;
+            Name = configuration.Name;
+
+            configuration.EndpointInboundConfigurations.ForEach(o => Endpoints.Add(new EndpointInbound(Core, this, o)));
+            configuration.EndpointOutboundConfigurations.ForEach(o => Endpoints.Add(new EndpointOutbound(Core, this, o)));
+
+            _heartbeatThread = new Thread(HeartbeatThreadProc);
+            _heartbeatThread.Start();
+
             Address = configuration.Address;
             ManagementPort = configuration.ManagementPort;
             DataPort = configuration.DataPort;
@@ -45,6 +79,9 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                     + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
             };
         }
+
+        public IEndpoint? GetEndpointById(Guid pairId)
+            => Endpoints.Where(o => o.EndpointId == pairId).FirstOrDefault();
 
         private void _client_OnDisconnected(RmContext context)
         {
@@ -143,15 +180,15 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             return tunnelConfiguration;
         }
 
-        public override void Start()
+        public void Start()
         {
             if (KeepRunning == true)
             {
                 return;
             }
-
             Core.Logging.Write(NtLogSeverity.Verbose, $"Starting outbound tunnel '{Name}'.");
-            base.Start();
+
+            KeepRunning = true;
 
             _establishConnectionThread = new Thread(EstablishConnectionThread);
             _establishConnectionThread.Start();
@@ -160,10 +197,13 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             Endpoints.ForEach(x => x.Start());
         }
 
-        public override void Stop()
+        public void Stop()
         {
             Core.Logging.Write(NtLogSeverity.Verbose, $"Stopping outbound tunnel '{Name}'.");
-            base.Stop();
+            Endpoints.ForEach(o => o.Stop());
+
+            KeepRunning = false;
+            _heartbeatThread.Join();
 
             Utility.TryAndIgnore(_client.Disconnect);
 
@@ -175,26 +215,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             Core.Logging.Write(NtLogSeverity.Verbose, $"Stopped outbound tunnel '{Name}'.");
         }
 
-        public override Task<T> Query<T>(IRmQuery<T> query)
-        {
-            if (_client.IsConnected == false)
-            {
-                throw new Exception("The RPC client is not connected.");
-            }
-
-            return _client.Query(query);
-        }
-
-        public override void Notify(IRmNotification notification)
-        {
-            if (_client.IsConnected == false)
-            {
-                throw new Exception("The RPC client is not connected.");
-            }
-
-            _client.Notify(notification);
-        }
-
         private void EstablishConnectionThread()
         {
             Thread.CurrentThread.Name = $"EstablishConnectionThread:{Environment.CurrentManagedThreadId}";
@@ -203,7 +223,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             {
                 try
                 {
-                    if(_client.IsConnected == false)
+                    if (_client.IsConnected == false)
                     {
                         Status = NtTunnelStatus.Connecting;
 
@@ -226,6 +246,78 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 }
 
                 Thread.Sleep(1000);
+            }
+        }
+
+        #region Reliable Messaging Passthrough.
+
+        public Task<T> Query<T>(IRmQuery<T> query) where T : class, IRmQueryReply
+        {
+            if (_client.IsConnected == false)
+            {
+                throw new Exception("The RPC client is not connected.");
+            }
+
+            return _client.Query(query);
+        }
+
+        public void Notify(IRmNotification notification)
+        {
+            if (_client.IsConnected == false)
+            {
+                throw new Exception("The RPC client is not connected.");
+            }
+
+            _client.Notify(notification);
+        }
+
+        #endregion
+
+        #region Endpoint CRUD helpers.
+
+        public EndpointInbound AddInboundEndpoint(NtEndpointInboundConfiguration configuration)
+        {
+            var endpoint = new EndpointInbound(Core, this, configuration);
+            Endpoints.Add(endpoint);
+            if (this is TunnelOutbound) Core.OutboundTunnels.SaveToDisk();
+            return endpoint;
+        }
+
+        public EndpointOutbound AddOutboundEndpoint(NtEndpointOutboundConfiguration configuration)
+        {
+            var endpoint = new EndpointOutbound(Core, this, configuration);
+            Endpoints.Add(endpoint);
+            if (this is TunnelOutbound) Core.OutboundTunnels.SaveToDisk();
+            return endpoint;
+        }
+
+        public void DeleteEndpoint(Guid endpointPairId)
+        {
+            var endpoint = Endpoints.Where(o => o.EndpointId == endpointPairId).SingleOrDefault();
+            if (endpoint != null)
+            {
+                endpoint.Stop();
+                Endpoints.Remove(endpoint);
+                if (this is TunnelOutbound) Core.OutboundTunnels.SaveToDisk();
+            }
+        }
+
+        #endregion
+
+        private void HeartbeatThreadProc()
+        {
+            Thread.CurrentThread.Name = $"HeartbeatThreadProc:{Environment.CurrentManagedThreadId}";
+
+            DateTime lastHeartBeat = DateTime.UtcNow;
+
+            while (KeepRunning)
+            {
+                if ((DateTime.UtcNow - lastHeartBeat).TotalMilliseconds > Singletons.Configuration.HeartbeatDelayMs)
+                {
+                    lastHeartBeat = DateTime.UtcNow;
+                }
+
+                Thread.Sleep(100);
             }
         }
     }

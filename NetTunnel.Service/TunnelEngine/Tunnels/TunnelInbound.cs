@@ -4,6 +4,7 @@ using NetTunnel.Service.FramePayloads.Notifications;
 using NetTunnel.Service.FramePayloads.Queries;
 using NetTunnel.Service.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine.Endpoints;
+using NTDLS.NASCCL;
 using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 
@@ -12,16 +13,49 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
     /// <summary>
     /// This is the class that opens a listening TCP/IP port to wait on connections from a remote tunnel.
     /// </summary>
-    internal class TunnelInbound : BaseTunnel, ITunnel
+    internal class TunnelInbound : ITunnel
     {
-        public int DataPort { get; private set; }
-
         private readonly RmServer _server;
         private Guid? _peerRmClientConnectionId;
 
+        #region Configuration Properties.
+
+        public int DataPort { get; private set; }
+
+        #endregion
+
+        #region Properties Common to Inbound and Outbound Tunnels.
+
+        public byte[]? EncryptionKey { get; private set; }
+        public bool SecureKeyExchangeIsComplete { get; private set; }
+        public NASCCLStream? NascclStream { get; private set; }
+        public NtTunnelStatus Status { get; set; }
+        public ulong BytesReceived { get; set; }
+        public ulong BytesSent { get; set; }
+        public ulong TotalConnections { get; private set; }
+        public ulong CurrentConnections { get; private set; }
+        public TunnelEngineCore Core { get; private set; }
+        public bool KeepRunning { get; private set; } = false;
+        public Guid TunnelId { get; private set; }
+        public string Name { get; private set; }
+        public List<IEndpoint> Endpoints { get; private set; } = new();
+        private readonly Thread _heartbeatThread;
+
+        #endregion
+
         public TunnelInbound(TunnelEngineCore core, NtTunnelInboundConfiguration configuration)
-            : base(core, configuration)
         {
+            Core = core;
+
+            TunnelId = configuration.TunnelId;
+            Name = configuration.Name;
+
+            configuration.EndpointInboundConfigurations.ForEach(o => Endpoints.Add(new EndpointInbound(Core, this, o)));
+            configuration.EndpointOutboundConfigurations.ForEach(o => Endpoints.Add(new EndpointOutbound(Core, this, o)));
+
+            _heartbeatThread = new Thread(HeartbeatThreadProc);
+            _heartbeatThread.Start();
+
             DataPort = configuration.DataPort;
 
             _server = new RmServer();
@@ -37,6 +71,9 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                     + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
             };
         }
+
+        public IEndpoint? GetEndpointById(Guid pairId)
+            => Endpoints.Where(o => o.EndpointId == pairId).FirstOrDefault();
 
         private void _server_OnConnected(RmContext context)
         {
@@ -169,17 +206,17 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             return tunnelConfiguration;
         }
 
-        public override void Start()
+        public void Start()
         {
             if (KeepRunning == true)
             {
                 return;
             }
+            Core.Logging.Write(NtLogSeverity.Verbose, $"Starting inbound tunnel '{Name}' on port {DataPort}.");
+
+            KeepRunning = true;
 
             Status = NtTunnelStatus.Disconnected;
-
-            Core.Logging.Write(NtLogSeverity.Verbose, $"Starting inbound tunnel '{Name}' on port {DataPort}.");
-            base.Start();
 
             _server.Start(DataPort);
             Core.Logging.Write(NtLogSeverity.Verbose, $"Started listening for inbound tunnel '{Name}' on port {DataPort}.");
@@ -188,24 +225,22 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             Endpoints.ForEach(x => x.Start());
         }
 
-        public override void Stop()
+        public void Stop()
         {
             Core.Logging.Write(NtLogSeverity.Verbose, $"Stopping inbound tunnel '{Name}' on port {DataPort}.");
-            base.Stop();
 
+            Endpoints.ForEach(o => o.Stop());
+
+            KeepRunning = false;
+            _heartbeatThread.Join();
             Utility.TryAndIgnore(_server.Stop);
-
-            /*
-            if (Environment.CurrentManagedThreadId != _inboundConnectionThread?.ManagedThreadId)
-            {
-                _inboundConnectionThread?.Join(); //Wait on thread to finish.
-            }
-            */
 
             Core.Logging.Write(NtLogSeverity.Verbose, $"Stopped inbound tunnel '{Name}'.");
         }
 
-        public override Task<T> Query<T>(IRmQuery<T> query)
+        #region Reliable Messaging Passthrough.
+
+        public Task<T> Query<T>(IRmQuery<T> query) where T : class, IRmQueryReply
         {
             if (_peerRmClientConnectionId == null)
             {
@@ -222,7 +257,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             return _server.Query(connectionId, query);
         }
 
-        public override void Notify(IRmNotification notification)
+        public void Notify(IRmNotification notification)
         {
             if (_peerRmClientConnectionId == null)
             {
@@ -238,5 +273,56 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             _server.Notify(connectionId, notification);
         }
+
+        #endregion
+
+        #region Endpoint CRUD helpers.
+
+        public EndpointInbound AddInboundEndpoint(NtEndpointInboundConfiguration configuration)
+        {
+            var endpoint = new EndpointInbound(Core, this, configuration);
+            Endpoints.Add(endpoint);
+            if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
+            return endpoint;
+        }
+
+        public EndpointOutbound AddOutboundEndpoint(NtEndpointOutboundConfiguration configuration)
+        {
+            var endpoint = new EndpointOutbound(Core, this, configuration);
+            Endpoints.Add(endpoint);
+            if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
+            return endpoint;
+        }
+
+        public void DeleteEndpoint(Guid endpointPairId)
+        {
+            var endpoint = Endpoints.Where(o => o.EndpointId == endpointPairId).SingleOrDefault();
+            if (endpoint != null)
+            {
+                endpoint.Stop();
+                Endpoints.Remove(endpoint);
+                if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
+            }
+        }
+
+        #endregion
+
+        private void HeartbeatThreadProc()
+        {
+            Thread.CurrentThread.Name = $"HeartbeatThreadProc:{Environment.CurrentManagedThreadId}";
+
+            DateTime lastHeartBeat = DateTime.UtcNow;
+
+            while (KeepRunning)
+            {
+                if ((DateTime.UtcNow - lastHeartBeat).TotalMilliseconds > Singletons.Configuration.HeartbeatDelayMs)
+                {
+                    lastHeartBeat = DateTime.UtcNow;
+                }
+
+                Thread.Sleep(100);
+            }
+        }
+
     }
 }

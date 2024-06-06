@@ -25,7 +25,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         public Task<T> Query<T>(IRmQuery<T> query) where T : class, IRmQueryReply;
         public void Notify(IRmNotification notification);
 
-        internal List<IEndpoint> Endpoints { get; set; }
+        internal List<IEndpoint> Endpoints { get; }
 
         public ulong BytesReceived { get; set; }
         public ulong BytesSent { get; set; }
