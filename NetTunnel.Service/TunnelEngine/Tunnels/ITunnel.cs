@@ -16,8 +16,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         public string Name { get; }
         //public NASCCLStream? NascclStream { get; }
 
-        //public IRmEndpoint ReliableEndpoint { get; }
-
         public byte[]? EncryptionKey { get; }
         public bool SecureKeyExchangeIsComplete { get; }
 

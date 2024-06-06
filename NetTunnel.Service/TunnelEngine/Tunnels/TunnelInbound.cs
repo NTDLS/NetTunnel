@@ -1,7 +1,9 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
+using NetTunnel.Service.FramePayloads.Notifications;
+using NetTunnel.Service.FramePayloads.Queries;
+using NetTunnel.Service.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine.Endpoints;
-using NetTunnel.Service.TunnelEngine.MessageHandlers;
 using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 
@@ -12,7 +14,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
     /// </summary>
     internal class TunnelInbound : BaseTunnel, ITunnel
     {
-        //private Thread? _inboundConnectionThread;
         public int DataPort { get; private set; }
 
         private readonly RmServer _server;
@@ -25,13 +26,126 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             _server = new RmServer();
 
-            _server.AddHandler(new TunnelInboundMessageHandlers());
+            _server.OnNotificationReceived += _server_OnNotificationReceived;
+            _server.OnQueryReceived += _server_OnQueryReceived;
+            _server.OnConnected += _server_OnConnected;
+            _server.OnDisconnected += _server_OnDisconnected;
 
             _server.OnException += (RmContext context, Exception ex, IRmPayload? payload) =>
             {
                 Core.Logging.Write(NtLogSeverity.Exception, $"RPC server exception: '{ex.Message}'"
-                    + payload != null ? $"Payload: {payload?.GetType()?.Name}" : string.Empty);
+                    + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
             };
+        }
+
+        private void _server_OnConnected(RmContext context)
+        {
+            if (_peerRmClientConnectionId != null)
+            {
+                Core.Logging.Write(NtLogSeverity.Verbose, $"The tunnel '{Name}' on port {DataPort} cannot accept more than one connection.");
+                context.Disconnect();
+                return;
+            }
+
+            Core.Logging.Write(NtLogSeverity.Verbose, $"Accepted connection for inbound tunnel '{Name}' on port {DataPort}.");
+            Status = NtTunnelStatus.Established;
+
+            TotalConnections++;
+            CurrentConnections++;
+
+            _peerRmClientConnectionId = context.ConnectionId;
+        }
+
+        private void _server_OnDisconnected(RmContext context)
+        {
+            Status = NtTunnelStatus.Disconnected;
+
+            CurrentConnections--;
+
+            Core.Logging.Write(NtLogSeverity.Verbose, $"Disconnected inbound tunnel '{Name}' on port {DataPort}");
+
+            _peerRmClientConnectionId = null;
+        }
+
+        private IRmQueryReply _server_OnQueryReceived(RmContext context, IRmPayload payload)
+        {
+            /*
+            //We received a diffe-hellman key exhange request, respond to it so we can prop up encryption.
+            if (payload is NtFramePayloadRequestKeyExchange keyExchangeRequest)
+            {
+                var compoundNegotiator = new CompoundNegotiator();
+                byte[] negotiationReplyToken = compoundNegotiator.ApplyNegotiationToken(keyExchangeRequest.NegotiationToken);
+                var negotiationReply = new NtFramePayloadKeyExchangeReply(negotiationReplyToken);
+                EncryptionKey = compoundNegotiator.SharedSecret;
+                return negotiationReply;
+            }
+
+            if (EncryptionKey == null || SecureKeyExchangeIsComplete == false)
+            {
+                throw new Exception("Encryption has not been initialized.");
+            }
+            */
+
+            if (payload is NtFramePayloadAddEndpointInbound inboundEndpoint)
+            {
+                var endpoint = AddInboundEndpoint(inboundEndpoint.Configuration);
+                endpoint.Start();
+                return new NtFramePayloadBoolean(true);
+            }
+            else if (payload is NtFramePayloadAddEndpointOutbound outboundEndpoint)
+            {
+                var endpoint = AddOutboundEndpoint(outboundEndpoint.Configuration);
+                endpoint.Start();
+                return new NtFramePayloadBoolean(true);
+            }
+            else if (payload is NtFramePayloadDeleteEndpoint deleteEndpoint)
+            {
+                DeleteEndpoint(deleteEndpoint.EndpointId);
+                return new NtFramePayloadBoolean(true);
+            }
+
+            throw new Exception($"RPC query handler not defined for: {payload?.GetType()?.Name}");
+        }
+
+        private void _server_OnNotificationReceived(RmContext context, IRmNotification payload)
+        {
+            /*
+            if (EncryptionKey == null || SecureKeyExchangeIsComplete == false)
+            {
+                throw new Exception("Encryption has not been initialized.");
+            }
+            */
+
+            if (payload is NtFramePayloadMessage message)
+            {
+                Core.Logging.Write(NtLogSeverity.Debug, $"RPC Message: '{message.Message}'");
+            }
+            else if (payload is NtFramePayloadDeleteTunnel deleteTunnel)
+            {
+                Core.InboundTunnels.Delete(deleteTunnel.TunnelId);
+                Core.InboundTunnels.SaveToDisk();
+            }
+            else if (payload is NtFramePayloadEndpointConnect connectEndpoint)
+            {
+                Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Received endpoint connection notification.");
+
+                Endpoints.OfType<EndpointOutbound>().Where(o => o.EndpointId == connectEndpoint.EndpointId).FirstOrDefault()?
+                    .EstablishOutboundEndpointConnection(connectEndpoint.StreamId);
+            }
+            else if (payload is NtFramePayloadEndpointDisconnect disconnectEndpoint)
+            {
+                Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Received endpoint disconnection notification.");
+
+                GetEndpointById(disconnectEndpoint.EndpointId)?
+                    .Disconnect(disconnectEndpoint.StreamId);
+            }
+            else if (payload is NtFramePayloadEndpointExchange exchange)
+            {
+                Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Exchanging {exchange.Bytes.Length:n0} bytes.");
+
+                GetEndpointById(exchange.EndpointId)?
+                    .SendEndpointData(exchange.StreamId, exchange.Bytes);
+            }
         }
 
         public NtTunnelInboundConfiguration CloneConfiguration()
@@ -67,22 +181,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             _server.Start(DataPort);
             Core.Logging.Write(NtLogSeverity.Verbose, $"Started listening for inbound tunnel '{Name}' on port {DataPort}.");
-
-            _server.OnConnected += (RmContext context) =>
-            {
-                if (_peerRmClientConnectionId != null)
-                {
-                    Core.Logging.Write(NtLogSeverity.Verbose, $"The tunnel '{Name}' on port {DataPort} cannot accept more than one connection.");
-                    context.Disconnect();
-                    return;
-                }
-                _peerRmClientConnectionId = context.ConnectionId;
-            };
-
-            _server.OnDisconnected += (RmContext context) =>
-            {
-                _peerRmClientConnectionId = null;
-            };
 
             Core.Logging.Write(NtLogSeverity.Verbose, $"Starting endpoints for inbound tunnel '{Name}'.");
             Endpoints.ForEach(x => x.Start());
@@ -137,83 +235,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             }
 
             _server.Notify(connectionId, notification);
-        }
-
-        private void InboundConnectionThreadProc()
-        {
-            Thread.CurrentThread.Name = $"InboundConnectionThreadProc:{Environment.CurrentManagedThreadId}";
-
-            try
-            {
-
-                while (KeepRunning)
-                {
-                    try
-                    {
-                        Status = NtTunnelStatus.Connecting;
-
-                        Core.Logging.Write(NtLogSeverity.Verbose, $"Waiting on connection for inbound tunnel '{Name}' on port {DataPort}.");
-
-                        /*
-                        var tcpClient = _listener.AcceptTcpClient();
-                        Core.Logging.Write(NtLogSeverity.Verbose, $"Accepted connection for inbound tunnel '{Name}' on port {DataPort}.");
-
-                        if (KeepRunning)
-                        {
-                            TotalConnections++;
-                            CurrentConnections++;
-
-                            Status = NtTunnelStatus.Established;
-
-                            using (Stream = tcpClient.GetStream())
-                            {
-                                //The first thing we do when a client connects is we start a new key exchange process.
-                                var compoundNegotiator = new CompoundNegotiator();
-                                byte[] negotiationToken = compoundNegotiator.GenerateNegotiationToken(Singletons.Configuration.TunnelEncryptionKeySize / 12);
-
-                                var query = new NtFramePayloadRequestKeyExchange(negotiationToken);
-                                SendStreamFramePayloadQuery<NtFramePayloadKeyExchangeReply>(query).ContinueWith((o) =>
-                                {
-                                    if (o.IsCompletedSuccessfully && o.Result != null)
-                                    {
-                                        compoundNegotiator.ApplyNegotiationResponseToken(o.Result.NegotiationToken);
-                                        EncryptionKey = compoundNegotiator.SharedSecret;
-                                        NascclStream = new NASCCLStream(EncryptionKey);
-                                        SecureKeyExchangeIsComplete = true;
-                                    }
-                                });
-
-                                ReceiveAndProcessStreamFrames(ProcessFrameNotificationCallback, ProcessFrameQueryCallback);
-                                Utility.TryAndIgnore(Stream.Close);
-                            }
-
-                            Status = NtTunnelStatus.Disconnected;
-
-                            Core.Logging.Write(NtLogSeverity.Verbose, $"Disconnected inbound tunnel '{Name}' on port {DataPort}");
-
-                            Utility.TryAndIgnore(tcpClient.Close);
-                            Utility.TryAndIgnore(tcpClient.Dispose);
-                        }
-                        */
-                    }
-                    catch (Exception ex)
-                    {
-                        Core.Logging.Write(NtLogSeverity.Exception, $"InboundConnectionThreadProc: {ex.Message}");
-                    }
-                    finally
-                    {
-                        CurrentConnections--;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Core.Logging.Write(NtLogSeverity.Exception, $"InboundConnectionThreadProc: {ex.Message}");
-            }
-            finally
-            {
-                Utility.TryAndIgnore(_server.Stop);
-            }
         }
     }
 }

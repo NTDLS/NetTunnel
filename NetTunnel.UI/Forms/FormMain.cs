@@ -568,7 +568,7 @@ namespace NetTunnel.UI.Forms
                     var item = new ListViewItem(tunnel.Name);
                     item.Tag = tunnel;
                     item.SubItems.Add("Outbound");
-                    item.SubItems.Add($"{tunnel.Address}{tunnel.DataPort}");
+                    item.SubItems.Add($"{tunnel.Address}:{tunnel.DataPort}");
                     item.SubItems.Add($"{endpointCount:n0}");
                     item.SubItems.Add("~");
                     item.SubItems.Add("~");
