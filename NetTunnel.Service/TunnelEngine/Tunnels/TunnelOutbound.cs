@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting.Server;
-using NetTunnel.Library;
+﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NetTunnel.Service.TunnelEngine.MessageHandlers;
@@ -37,7 +36,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             _client.OnException += (RmContext context, Exception ex, IRmPayload? payload) =>
             {
-                Core.Logging.Write(NtLogSeverity.Exception, "RPC Client exception: {ex.Message}");
+                Core.Logging.Write(NtLogSeverity.Exception, $"RPC client exception: '{ex.Message}'"
+                    + payload != null ? $"Payload: {payload?.GetType()?.Name}" : string.Empty);
             };
         }
 
@@ -95,10 +95,24 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         }
 
         public override Task<T> Query<T>(IRmQuery<T> query)
-            => _client.Query(query);
+        {
+            if (_client.IsConnected == false)
+            {
+                throw new Exception("The RPC client is not connected.");
+            }
+
+            return _client.Query(query);
+        }
 
         public override void Notify(IRmNotification notification)
-            => _client.Notify(notification);
+        {
+            if (_client.IsConnected == false)
+            {
+                throw new Exception("The RPC client is not connected.");
+            }
+
+            _client.Notify(notification);
+        }
 
         private void OutboundConnectionThreadProc()
         {

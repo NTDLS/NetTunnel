@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting.Server;
-using NetTunnel.ClientAPI;
-using NetTunnel.Library;
+﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NetTunnel.Service.TunnelEngine.MessageHandlers;
@@ -31,7 +29,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             _server.OnException += (RmContext context, Exception ex, IRmPayload? payload) =>
             {
-                Core.Logging.Write(NtLogSeverity.Exception, "RPC Server exception: {ex.Message}");
+                Core.Logging.Write(NtLogSeverity.Exception, $"RPC server exception: '{ex.Message}'"
+                    + payload != null ? $"Payload: {payload?.GetType()?.Name}" : string.Empty);
             };
         }
 
@@ -107,10 +106,38 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         }
 
         public override Task<T> Query<T>(IRmQuery<T> query)
-            => _server.Query(_peerRmClientConnectionId.EnsureNotNullOrEmpty(), query);
+        {
+            if (_peerRmClientConnectionId == null)
+            {
+                throw new Exception("The RPC server is not connected.");
+            }
+
+            var connectionId = _peerRmClientConnectionId.EnsureNotNullOrEmpty();
+
+            if (_server.GetClient(connectionId) == null)
+            {
+                throw new Exception("The RPC server client was not found.");
+            }
+
+            return _server.Query(connectionId, query);
+        }
 
         public override void Notify(IRmNotification notification)
-            => _server.Notify(_peerRmClientConnectionId.EnsureNotNullOrEmpty(), notification);
+        {
+            if (_peerRmClientConnectionId == null)
+            {
+                throw new Exception("The RPC server is not connected.");
+            }
+
+            var connectionId = _peerRmClientConnectionId.EnsureNotNullOrEmpty();
+
+            if (_server.GetClient(connectionId) == null)
+            {
+                throw new Exception("The RPC server client was not found.");
+            }
+
+            _server.Notify(connectionId, notification);
+        }
 
         private void InboundConnectionThreadProc()
         {
