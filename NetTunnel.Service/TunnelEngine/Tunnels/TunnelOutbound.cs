@@ -1,6 +1,8 @@
-﻿using NetTunnel.Library;
+﻿using Microsoft.AspNetCore.Hosting.Server;
+using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.TunnelEngine.Endpoints;
+using NetTunnel.Service.TunnelEngine.MessageHandlers;
 using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 
@@ -30,6 +32,13 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             PasswordHash = configuration.PasswordHash;
 
             _client = new RmClient();
+
+            _client.AddHandler(new TunnelOutboundMessageHandlers());
+
+            _client.OnException += (RmContext context, Exception ex, IRmPayload? payload) =>
+            {
+                Core.Logging.Write(NtLogSeverity.Exception, "RPC Client exception: {ex.Message}");
+            };
         }
 
         public NtTunnelOutboundConfiguration CloneConfiguration()

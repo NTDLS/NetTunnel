@@ -1,6 +1,9 @@
-﻿using NetTunnel.Library;
+﻿using Microsoft.AspNetCore.Hosting.Server;
+using NetTunnel.ClientAPI;
+using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.TunnelEngine.Endpoints;
+using NetTunnel.Service.TunnelEngine.MessageHandlers;
 using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 
@@ -21,7 +24,15 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             : base(core, configuration)
         {
             DataPort = configuration.DataPort;
+
             _server = new RmServer();
+
+            _server.AddHandler(new TunnelInboundMessageHandlers());
+
+            _server.OnException += (RmContext context, Exception ex, IRmPayload? payload) =>
+            {
+                Core.Logging.Write(NtLogSeverity.Exception, "RPC Server exception: {ex.Message}");
+            };
         }
 
         public NtTunnelInboundConfiguration CloneConfiguration()
