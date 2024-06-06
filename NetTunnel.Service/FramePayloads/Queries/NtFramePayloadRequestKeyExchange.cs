@@ -6,7 +6,7 @@ namespace NetTunnel.Service.FramePayloads.Queries
 {
     [Serializable]
     [ProtoContract]
-    public class NtFramePayloadRequestKeyExchange : IRmQuery<NtFramePayloadBoolean>
+    public class NtFramePayloadRequestKeyExchange : IRmQuery<NtFramePayloadKeyExchangeReply>
     {
         [ProtoMember(1)]
         public byte[] NegotiationToken { get; set; }

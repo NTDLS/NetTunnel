@@ -6,6 +6,7 @@ using NetTunnel.Service.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NTDLS.NASCCL;
 using NTDLS.ReliableMessaging;
+using NTDLS.SecureKeyExchange;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
@@ -28,7 +29,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         public byte[]? EncryptionKey { get; private set; }
         public bool SecureKeyExchangeIsComplete { get; private set; }
-        public NASCCLStream? NascclStream { get; private set; }
+        public NASCCLStream? EncryptionStream { get; private set; }
         public NtTunnelStatus Status { get; set; }
         public ulong BytesReceived { get; set; }
         public ulong BytesSent { get; set; }
@@ -106,8 +107,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         private IRmQueryReply _server_OnQueryReceived(RmContext context, IRmPayload payload)
         {
-            /*
-            //We received a diffe-hellman key exhange request, respond to it so we can prop up encryption.
+            //We received a diffie–hellman key exchange request, respond to it so we can prop up encryption.
             if (payload is NtFramePayloadRequestKeyExchange keyExchangeRequest)
             {
                 var compoundNegotiator = new CompoundNegotiator();
@@ -121,7 +121,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             {
                 throw new Exception("Encryption has not been initialized.");
             }
-            */
 
             if (payload is NtFramePayloadAddEndpointInbound inboundEndpoint)
             {
@@ -146,12 +145,10 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         private void _server_OnNotificationReceived(RmContext context, IRmNotification payload)
         {
-            /*
             if (EncryptionKey == null || SecureKeyExchangeIsComplete == false)
             {
                 throw new Exception("Encryption has not been initialized.");
             }
-            */
 
             if (payload is NtFramePayloadMessage message)
             {

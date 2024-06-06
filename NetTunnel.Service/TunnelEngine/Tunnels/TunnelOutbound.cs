@@ -1,4 +1,5 @@
-﻿using NetTunnel.Library;
+﻿using NetTunnel.ClientAPI;
+using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.FramePayloads.Notifications;
 using NetTunnel.Service.FramePayloads.Queries;
@@ -6,6 +7,7 @@ using NetTunnel.Service.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NTDLS.NASCCL;
 using NTDLS.ReliableMessaging;
+using NTDLS.SecureKeyExchange;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
@@ -32,7 +34,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         public byte[]? EncryptionKey { get; private set; }
         public bool SecureKeyExchangeIsComplete { get; private set; }
-        public NASCCLStream? NascclStream { get; private set; }
+        public NASCCLStream? EncryptionStream { get; private set; }
         public NtTunnelStatus Status { get; set; }
         public ulong BytesReceived { get; set; }
         public ulong BytesSent { get; set; }
@@ -120,12 +122,10 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         private void _client_OnNotificationReceived(RmContext context, IRmNotification payload)
         {
-            /*
             if (EncryptionKey == null || SecureKeyExchangeIsComplete == false)
             {
                 throw new Exception("Encryption has not been initialized.");
             }
-            */
 
             if (payload is NtFramePayloadMessage message)
             {
@@ -229,6 +229,22 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
                         Core.Logging.Write(NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' connecting to remote at {Address}:{DataPort}.");
                         _client.Connect(Address, DataPort);
+
+                        //The first thing we do when we get a connection is start a new key exchange process.
+                        var compoundNegotiator = new CompoundNegotiator();
+                        byte[] negotiationToken = compoundNegotiator.GenerateNegotiationToken(Singletons.Configuration.TunnelEncryptionKeySize / 12);
+
+                        var query = new NtFramePayloadRequestKeyExchange(negotiationToken);
+                        _client.Query(query).ContinueWith(t =>
+                        {
+                            if (t.IsCompletedSuccessfully && t.Result != null)
+                            {
+                                compoundNegotiator.ApplyNegotiationResponseToken(t.Result.NegotiationToken);
+                                EncryptionKey = compoundNegotiator.SharedSecret;
+                                EncryptionStream = new NASCCLStream(EncryptionKey);
+                                SecureKeyExchangeIsComplete = true;
+                            }
+                        });
 
                         CurrentConnections++;
                         TotalConnections++;
