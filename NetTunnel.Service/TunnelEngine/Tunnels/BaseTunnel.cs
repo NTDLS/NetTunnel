@@ -224,10 +224,10 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             }
         }
 
-        public Task<T> Query<T>(IRmQuery<T> query) where T : IRmQueryReply
+        public virtual Task<T> Query<T>(IRmQuery<T> query) where T : class, IRmQueryReply
             => throw new Exception("Query<T>() must be overridden.");
 
-        public void Notify(IRmNotification notification)
+        public virtual void Notify(IRmNotification notification)
             => throw new Exception("Notify() must be overridden.");
 
         #endregion

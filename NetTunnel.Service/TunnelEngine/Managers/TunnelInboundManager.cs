@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting.Server;
-using NetTunnel.Library;
+﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.FramePayloads.Queries;
 using NetTunnel.Service.TunnelEngine.Tunnels;
@@ -23,13 +22,13 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// <param name="tunnelId"></param>
         /// <param name="endpointId"></param>
         /// <returns></returns>
-        public async Task<T> DispatchDeleteEndpointToAssociatedTunnelService<T>(Guid tunnelId, Guid endpointId) where T : IRmQueryReply
+        public async Task<T> DispatchDeleteEndpointToAssociatedTunnelService<T>(Guid tunnelId, Guid endpointId) where T : class, IRmQueryReply
         {
-            return await Collection.Use((o) =>
+            return (await Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                return tunnel.Query<T>(new NtFramePayloadDeleteEndpoint(endpointId));
-            });
+                return tunnel.Query(new NtFramePayloadDeleteEndpoint(endpointId));
+            }) as T).EnsureNotNull();
         }
 
         /// <summary>
@@ -39,21 +38,13 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// <param name="tunnelId"></param>
         /// <param name="endpoint"></param>
         /// <returns></returns>
-        public async Task<T> DispatchAddEndpointInboundToAssociatedTunnelService<T>(Guid tunnelId, NtEndpointInboundConfiguration endpoint) where T : IRmQueryReply
+        public async Task<T> DispatchAddEndpointInboundToAssociatedTunnelService<T>(Guid tunnelId, NtEndpointInboundConfiguration endpoint) where T : class, IRmQueryReply
         {
-            return await Collection.Use((o) =>
+            return (await Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-
-                SameSignatureQuery(new NtFramePayloadAddEndpointInbound(endpoint));
-
-                return tunnel.Query<T>(new NtFramePayloadAddEndpointInbound(endpoint));
-            });
-        }
-
-        public Task<T> SameSignatureQuery<T>(IRmQuery<T> query) where T : IRmQueryReply
-        {
-            throw new NotImplementedException();
+                return tunnel.Query(new NtFramePayloadAddEndpointInbound(endpoint));
+            }) as T).EnsureNotNull();
         }
 
         /// <summary>
@@ -63,13 +54,13 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// <param name="tunnelId"></param>
         /// <param name="endpoint"></param>
         /// <returns></returns>
-        public async Task<T> DispatchAddEndpointOutboundToAssociatedTunnelService<T>(Guid tunnelId, NtEndpointOutboundConfiguration endpoint) where T : IRmQueryReply
+        public async Task<T> DispatchAddEndpointOutboundToAssociatedTunnelService<T>(Guid tunnelId, NtEndpointOutboundConfiguration endpoint) where T : class, IRmQueryReply
         {
-            return await Collection.Use((o) =>
+            return (await Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                return tunnel.Query<T>(new NtFramePayloadAddEndpointOutbound(endpoint));
-            });
+                return tunnel.Query(new NtFramePayloadAddEndpointOutbound(endpoint));
+            }) as T).EnsureNotNull();
         }
 
         public void AddEndpointInbound(Guid tunnelId, NtEndpointInboundConfiguration endpointConfiguration)

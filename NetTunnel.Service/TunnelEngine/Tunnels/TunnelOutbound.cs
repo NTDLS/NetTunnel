@@ -85,10 +85,10 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopped outbound tunnel '{Name}'.");
         }
 
-        public new Task<T> Query<T>(IRmQuery<T> query) where T : IRmQueryReply
-            => _client.Query<T>(query);
+        public override Task<T> Query<T>(IRmQuery<T> query)
+            => _client.Query(query);
 
-        public new void Notify(IRmNotification notification)
+        public override void Notify(IRmNotification notification)
             => _client.Notify(notification);
 
         private void OutboundConnectionThreadProc()

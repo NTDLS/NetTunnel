@@ -1,6 +1,5 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NetTunnel.Service.FramePayloads.Queries;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
@@ -96,14 +95,10 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             Core.Logging.Write(NtLogSeverity.Verbose, $"Stopped inbound tunnel '{Name}'.");
         }
 
-        public new Task<T> Query<T>(IRmQuery<T> query) where T : IRmQueryReply
-        {
-            _server.Query(Guid.NewGuid(), new NtFramePayloadDeleteEndpoint());
+        public override Task<T> Query<T>(IRmQuery<T> query)
+            => _server.Query(_peerRmClientConnectionId.EnsureNotNullOrEmpty(), query);
 
-            return _server.Query<T>(_peerRmClientConnectionId.EnsureNotNullOrEmpty(), query);
-        }
-
-        public new void Notify(IRmNotification notification)
+        public override void Notify(IRmNotification notification)
             => _server.Notify(_peerRmClientConnectionId.EnsureNotNullOrEmpty(), notification);
 
         private void InboundConnectionThreadProc()

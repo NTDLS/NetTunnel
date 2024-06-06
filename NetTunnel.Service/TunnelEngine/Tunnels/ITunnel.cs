@@ -24,7 +24,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         public void Start();
         public void Stop();
 
-        public Task<T> Query<T>(IRmQuery<T> query) where T : IRmQueryReply;
+        public Task<T> Query<T>(IRmQuery<T> query) where T : class, IRmQueryReply;
         public void Notify(IRmNotification notification);
 
         internal List<IEndpoint> Endpoints { get; set; }
