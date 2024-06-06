@@ -203,7 +203,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             {
                 try
                 {
-                    if (Status != NtTunnelStatus.Established)
+                    if(_client.IsConnected == false)
                     {
                         Status = NtTunnelStatus.Connecting;
 
@@ -224,6 +224,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 {
                     CurrentConnections--;
                 }
+
+                Thread.Sleep(1000);
             }
         }
     }
