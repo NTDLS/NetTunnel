@@ -2,7 +2,7 @@
 using NetTunnel.ClientAPI.Payload;
 using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NetTunnel.Service.MessageFraming.FramePayloads.Replies;
+using NetTunnel.Service.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine;
 using Newtonsoft.Json;
 

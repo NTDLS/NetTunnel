@@ -1,9 +1,5 @@
-﻿using NetTunnel.Service.MessageFraming;
-using NetTunnel.Service.MessageFraming.FramePayloads.Notifications;
-using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
-using NetTunnel.Service.MessageFraming.FramePayloads.Replies;
-using NetTunnel.Service.TunnelEngine.Endpoints;
-using NTDLS.NASCCL;
+﻿using NetTunnel.Service.TunnelEngine.Endpoints;
+using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
@@ -18,28 +14,16 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         /// </summary>
         public Guid TunnelId { get; }
         public string Name { get; }
-        public NASCCLStream? NascclStream { get; }
-        public byte[]? EncryptionKey { get; }
+
         public bool SecureKeyExchangeIsComplete { get; }
 
         public void Start();
         public void Stop();
 
-        public Task<T?> SendStreamFramePayloadQuery<T>(INtFramePayloadQuery payload);
+        public Task<T> Query<T>(IRmQuery<T> query) where T : class, IRmQueryReply;
+        public void Notify(IRmNotification notification);
 
-        /// <summary>
-        /// Sends a reply to a INtFramePayloadQuery
-        /// </summary>
-        public void SendStreamFramePayloadReply(NtFrame queryFrame, INtFramePayloadReply payload);
-
-        /// <summary>
-        /// Sends a one way (fire and forget) INtFramePayloadNotification.
-        /// </summary>
-        public void SendStreamFrameNotification(INtFramePayloadNotification payload);
-
-        internal List<IEndpoint> Endpoints { get; set; }
-
-        public void ApplyQueryReply(Guid frameId, INtFramePayloadReply replyPayload);
+        internal List<IEndpoint> Endpoints { get; }
 
         public ulong BytesReceived { get; set; }
         public ulong BytesSent { get; set; }

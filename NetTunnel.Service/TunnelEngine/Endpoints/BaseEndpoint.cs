@@ -1,5 +1,5 @@
 ﻿using NetTunnel.Library;
-using NetTunnel.Service.MessageFraming.FramePayloads.Notifications;
+using NetTunnel.Service.FramePayloads.Notifications;
 using NetTunnel.Service.TunnelEngine.Tunnels;
 using NTDLS.Semaphore;
 
@@ -127,7 +127,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 TotalConnections++;
                 CurrentConnections++;
 
-                _tunnel.SendStreamFrameNotification(new NtFramePayloadEndpointConnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId));
+                _tunnel.Notify(new NtFramePayloadEndpointConnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId));
 
                 byte[] buffer = new byte[Singletons.Configuration.FramebufferSize];
                 while (KeepRunning && activeConnection.IsConnected && activeConnection.Read(ref buffer, out int length))
@@ -135,7 +135,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     BytesReceived += (ulong)length;
 
                     var exchnagePayload = new NtFramePayloadEndpointExchange(_tunnel.TunnelId, EndpointId, activeConnection.StreamId, buffer, length);
-                    _tunnel.SendStreamFrameNotification(exchnagePayload);
+                    _tunnel.Notify(exchnagePayload);
                 }
             }
             catch (Exception ex)
@@ -155,7 +155,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             }
 
             Utility.TryAndIgnore(() =>
-                _tunnel.SendStreamFrameNotification(new NtFramePayloadEndpointDisconnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId)));
+                _tunnel.Notify(new NtFramePayloadEndpointDisconnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId)));
         }
     }
 }

@@ -1,12 +1,13 @@
-﻿using NetTunnel.Library;
+﻿using NetTunnel.ClientAPI;
+using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NetTunnel.Service.MessageFraming.FramePayloads.Queries;
-using NetTunnel.Service.MessageFraming.FramePayloads.Replies;
+using NetTunnel.Service.FramePayloads.Notifications;
+using NetTunnel.Service.FramePayloads.Queries;
+using NetTunnel.Service.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NTDLS.NASCCL;
+using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
-using System.Net;
-using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
@@ -14,19 +15,183 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
     /// <summary>
     /// This is the class that opens a listening TCP/IP port to wait on connections from a remote tunnel.
     /// </summary>
-    internal class TunnelInbound : BaseTunnel, ITunnel
+    internal class TunnelInbound : ITunnel
     {
-        private Thread? _inboundConnectionThread;
+        private readonly RmServer _server;
+        private Guid? _peerRmClientConnectionId;
+
+        #region Configuration Properties.
+
         public int DataPort { get; private set; }
 
-        private readonly TcpListener _listener;
+        #endregion
+
+        #region Properties Common to Inbound and Outbound Tunnels.
+
+        public bool SecureKeyExchangeIsComplete { get; private set; }
+        public NtTunnelStatus Status { get; set; }
+        public ulong BytesReceived { get; set; }
+        public ulong BytesSent { get; set; }
+        public ulong TotalConnections { get; private set; }
+        public ulong CurrentConnections { get; private set; }
+        public TunnelEngineCore Core { get; private set; }
+        public bool KeepRunning { get; private set; } = false;
+        public Guid TunnelId { get; private set; }
+        public string Name { get; private set; }
+        public List<IEndpoint> Endpoints { get; private set; } = new();
+
+        private readonly Thread _heartbeatThread;
+        private FramePayloads.EncryptionProvider? _encryptionProvider;
+
+        #endregion
 
         public TunnelInbound(TunnelEngineCore core, NtTunnelInboundConfiguration configuration)
-            : base(core, configuration)
         {
+            Core = core;
+
+            TunnelId = configuration.TunnelId;
+            Name = configuration.Name;
+
+            configuration.EndpointInboundConfigurations.ForEach(o => Endpoints.Add(new EndpointInbound(Core, this, o)));
+            configuration.EndpointOutboundConfigurations.ForEach(o => Endpoints.Add(new EndpointOutbound(Core, this, o)));
+
+            _heartbeatThread = new Thread(HeartbeatThreadProc);
+            _heartbeatThread.Start();
+
             DataPort = configuration.DataPort;
 
-            _listener = new TcpListener(IPAddress.Any, DataPort);
+            _server = new RmServer();
+
+            _server.OnNotificationReceived += _server_OnNotificationReceived;
+            _server.OnQueryReceived += _server_OnQueryReceived;
+            _server.OnConnected += _server_OnConnected;
+            _server.OnDisconnected += _server_OnDisconnected;
+
+            _server.OnException += (RmContext context, Exception ex, IRmPayload? payload) =>
+            {
+                Core.Logging.Write(NtLogSeverity.Exception, $"RPC server exception: '{ex.Message}'"
+                    + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
+            };
+        }
+
+        public IEndpoint? GetEndpointById(Guid pairId)
+            => Endpoints.Where(o => o.EndpointId == pairId).FirstOrDefault();
+
+        private void _server_OnConnected(RmContext context)
+        {
+            if (_peerRmClientConnectionId != null)
+            {
+                Core.Logging.Write(NtLogSeverity.Verbose, $"The tunnel '{Name}' on port {DataPort} cannot accept more than one connection.");
+                context.Disconnect();
+                return;
+            }
+
+            Core.Logging.Write(NtLogSeverity.Verbose, $"Accepted connection for inbound tunnel '{Name}' on port {DataPort}.");
+            Status = NtTunnelStatus.Established;
+
+            TotalConnections++;
+            CurrentConnections++;
+
+            _peerRmClientConnectionId = context.ConnectionId;
+        }
+
+        private void _server_OnDisconnected(RmContext context)
+        {
+            Status = NtTunnelStatus.Disconnected;
+
+            CurrentConnections--;
+
+            Core.Logging.Write(NtLogSeverity.Verbose, $"Disconnected inbound tunnel '{Name}' on port {DataPort}");
+
+            _peerRmClientConnectionId = null;
+        }
+
+        private IRmQueryReply _server_OnQueryReceived(RmContext context, IRmPayload payload)
+        {
+            //We received a diffie–hellman key exchange request, respond to it so we can prop up encryption.
+            if (payload is NtFramePayloadRequestKeyExchange keyExchangeRequest)
+            {
+                var compoundNegotiator = new CompoundNegotiator();
+                var negotiationReplyToken = compoundNegotiator.ApplyNegotiationToken(keyExchangeRequest.NegotiationToken);
+                var negotiationReply = new NtFramePayloadKeyExchangeReply(negotiationReplyToken);
+                _encryptionProvider = new FramePayloads.EncryptionProvider(compoundNegotiator.SharedSecret);
+                return negotiationReply;
+            }
+
+            //HOW DO WE APPLY THE ENCRYPTION PROVIDER?
+            //We cant apply it before we return because that will cause the response to be encrypted.
+
+            if (SecureKeyExchangeIsComplete == false)
+            {
+                throw new Exception("Encryption has not been initialized.");
+            }
+
+            if (payload is NtFramePayloadAddEndpointInbound inboundEndpoint)
+            {
+                var endpoint = AddInboundEndpoint(inboundEndpoint.Configuration);
+                endpoint.Start();
+                return new NtFramePayloadBoolean(true);
+            }
+            else if (payload is NtFramePayloadAddEndpointOutbound outboundEndpoint)
+            {
+                var endpoint = AddOutboundEndpoint(outboundEndpoint.Configuration);
+                endpoint.Start();
+                return new NtFramePayloadBoolean(true);
+            }
+            else if (payload is NtFramePayloadDeleteEndpoint deleteEndpoint)
+            {
+                DeleteEndpoint(deleteEndpoint.EndpointId);
+                return new NtFramePayloadBoolean(true);
+            }
+
+            throw new Exception($"RPC query handler not defined for: {payload?.GetType()?.Name}");
+        }
+
+        private void _server_OnNotificationReceived(RmContext context, IRmNotification payload)
+        {
+            if (payload is NtFramePayloadEncryptionReady)
+            {
+                Core.Logging.Write(NtLogSeverity.Debug, $"Encryption is ready.'");
+
+                SecureKeyExchangeIsComplete = true;
+                _server.SetEncryptionProvider(_encryptionProvider);
+            }
+
+            if (SecureKeyExchangeIsComplete == false)
+            {
+                throw new Exception("Encryption has not been initialized.");
+            }
+
+            if (payload is NtFramePayloadMessage message)
+            {
+                Core.Logging.Write(NtLogSeverity.Debug, $"RPC Message: '{message.Message}'");
+            }
+            else if (payload is NtFramePayloadDeleteTunnel deleteTunnel)
+            {
+                Core.InboundTunnels.Delete(deleteTunnel.TunnelId);
+                Core.InboundTunnels.SaveToDisk();
+            }
+            else if (payload is NtFramePayloadEndpointConnect connectEndpoint)
+            {
+                Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Received endpoint connection notification.");
+
+                Endpoints.OfType<EndpointOutbound>().Where(o => o.EndpointId == connectEndpoint.EndpointId).FirstOrDefault()?
+                    .EstablishOutboundEndpointConnection(connectEndpoint.StreamId);
+            }
+            else if (payload is NtFramePayloadEndpointDisconnect disconnectEndpoint)
+            {
+                Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Received endpoint disconnection notification.");
+
+                GetEndpointById(disconnectEndpoint.EndpointId)?
+                    .Disconnect(disconnectEndpoint.StreamId);
+            }
+            else if (payload is NtFramePayloadEndpointExchange exchange)
+            {
+                //Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Exchanging {exchange.Bytes.Length:n0} bytes.");
+
+                GetEndpointById(exchange.EndpointId)?
+                    .SendEndpointData(exchange.StreamId, exchange.Bytes);
+            }
         }
 
         public NtTunnelInboundConfiguration CloneConfiguration()
@@ -50,115 +215,123 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             return tunnelConfiguration;
         }
 
-        public override void Start()
+        public void Start()
         {
             if (KeepRunning == true)
             {
                 return;
             }
-
             Core.Logging.Write(NtLogSeverity.Verbose, $"Starting inbound tunnel '{Name}' on port {DataPort}.");
-            base.Start();
 
-            _inboundConnectionThread = new Thread(InboundConnectionThreadProc);
-            _inboundConnectionThread.Start();
+            KeepRunning = true;
+
+            Status = NtTunnelStatus.Disconnected;
+
+            _server.Start(DataPort);
+            Core.Logging.Write(NtLogSeverity.Verbose, $"Started listening for inbound tunnel '{Name}' on port {DataPort}.");
 
             Core.Logging.Write(NtLogSeverity.Verbose, $"Starting endpoints for inbound tunnel '{Name}'.");
             Endpoints.ForEach(x => x.Start());
         }
 
-        public override void Stop()
+        public void Stop()
         {
             Core.Logging.Write(NtLogSeverity.Verbose, $"Stopping inbound tunnel '{Name}' on port {DataPort}.");
-            base.Stop();
 
-            Utility.TryAndIgnore(_listener.Stop);
-            Utility.TryAndIgnore(_listener.Stop);
+            Endpoints.ForEach(o => o.Stop());
 
-            if (Environment.CurrentManagedThreadId != _inboundConnectionThread?.ManagedThreadId)
-            {
-                _inboundConnectionThread?.Join(); //Wait on thread to finish.
-            }
+            KeepRunning = false;
+            _heartbeatThread.Join();
+            Utility.TryAndIgnore(_server.Stop);
 
             Core.Logging.Write(NtLogSeverity.Verbose, $"Stopped inbound tunnel '{Name}'.");
         }
 
-        private void InboundConnectionThreadProc()
+        #region Reliable Messaging Passthrough.
+
+        public Task<T> Query<T>(IRmQuery<T> query) where T : class, IRmQueryReply
         {
-            Thread.CurrentThread.Name = $"InboundConnectionThreadProc:{Environment.CurrentManagedThreadId}";
-
-            try
+            if (_peerRmClientConnectionId == null)
             {
-                _listener.Start();
-
-                Core.Logging.Write(NtLogSeverity.Verbose, $"Started listiening for inbound tunnel '{Name}' on port {DataPort}.");
-
-                while (KeepRunning)
-                {
-                    try
-                    {
-                        Status = NtTunnelStatus.Connecting;
-
-                        Core.Logging.Write(NtLogSeverity.Verbose, $"Waiting on connection for inbound tunnel '{Name}' on port {DataPort}.");
-
-                        var tcpClient = _listener.AcceptTcpClient();
-                        Core.Logging.Write(NtLogSeverity.Verbose, $"Accepted connection for inbound tunnel '{Name}' on port {DataPort}.");
-
-                        if (KeepRunning)
-                        {
-                            TotalConnections++;
-                            CurrentConnections++;
-
-                            Status = NtTunnelStatus.Established;
-
-                            using (Stream = tcpClient.GetStream())
-                            {
-                                //The first thing we do when a client connects is we start a new key exhange process.
-                                var compoundNegotiator = new CompoundNegotiator();
-                                byte[] negotiationToken = compoundNegotiator.GenerateNegotiationToken(Singletons.Configuration.TunnelEncryptionKeySize / 12);
-
-                                var query = new NtFramePayloadRequestKeyExchange(negotiationToken);
-                                SendStreamFramePayloadQuery<NtFramePayloadKeyExchangeReply>(query).ContinueWith((o) =>
-                                {
-                                    if (o.IsCompletedSuccessfully && o.Result != null)
-                                    {
-                                        compoundNegotiator.ApplyNegotiationResponseToken(o.Result.NegotiationToken);
-                                        EncryptionKey = compoundNegotiator.SharedSecret;
-                                        NascclStream = new NASCCLStream(EncryptionKey);
-                                        SecureKeyExchangeIsComplete = true;
-                                    }
-                                });
-
-                                ReceiveAndProcessStreamFrames(ProcessFrameNotificationCallback, ProcessFrameQueryCallback);
-                                Utility.TryAndIgnore(Stream.Close);
-                            }
-
-                            Status = NtTunnelStatus.Disconnected;
-
-                            Core.Logging.Write(NtLogSeverity.Verbose, $"Disconnected inbound tunnel '{Name}' on port {DataPort}");
-
-                            Utility.TryAndIgnore(tcpClient.Close);
-                            Utility.TryAndIgnore(tcpClient.Dispose);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Core.Logging.Write(NtLogSeverity.Exception, $"InboundConnectionThreadProc: {ex.Message}");
-                    }
-                    finally
-                    {
-                        CurrentConnections--;
-                    }
-                }
+                throw new Exception("The RPC server is not connected.");
             }
-            catch (Exception ex)
+
+            var connectionId = _peerRmClientConnectionId.EnsureNotNullOrEmpty();
+
+            if (_server.GetClient(connectionId) == null)
             {
-                Core.Logging.Write(NtLogSeverity.Exception, $"InboundConnectionThreadProc: {ex.Message}");
+                throw new Exception("The RPC server client was not found.");
             }
-            finally
+
+            return _server.Query(connectionId, query);
+        }
+
+        public void Notify(IRmNotification notification)
+        {
+            if (_peerRmClientConnectionId == null)
             {
-                Utility.TryAndIgnore(_listener.Stop);
+                throw new Exception("The RPC server is not connected.");
+            }
+
+            var connectionId = _peerRmClientConnectionId.EnsureNotNullOrEmpty();
+
+            if (_server.GetClient(connectionId) == null)
+            {
+                throw new Exception("The RPC server client was not found.");
+            }
+
+            _server.Notify(connectionId, notification);
+        }
+
+        #endregion
+
+        #region Endpoint CRUD helpers.
+
+        public EndpointInbound AddInboundEndpoint(NtEndpointInboundConfiguration configuration)
+        {
+            var endpoint = new EndpointInbound(Core, this, configuration);
+            Endpoints.Add(endpoint);
+            if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
+            return endpoint;
+        }
+
+        public EndpointOutbound AddOutboundEndpoint(NtEndpointOutboundConfiguration configuration)
+        {
+            var endpoint = new EndpointOutbound(Core, this, configuration);
+            Endpoints.Add(endpoint);
+            if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
+            return endpoint;
+        }
+
+        public void DeleteEndpoint(Guid endpointPairId)
+        {
+            var endpoint = Endpoints.Where(o => o.EndpointId == endpointPairId).SingleOrDefault();
+            if (endpoint != null)
+            {
+                endpoint.Stop();
+                Endpoints.Remove(endpoint);
+                if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
             }
         }
+
+        #endregion
+
+        private void HeartbeatThreadProc()
+        {
+            Thread.CurrentThread.Name = $"HeartbeatThreadProc:{Environment.CurrentManagedThreadId}";
+
+            DateTime lastHeartBeat = DateTime.UtcNow;
+
+            while (KeepRunning)
+            {
+                if ((DateTime.UtcNow - lastHeartBeat).TotalMilliseconds > Singletons.Configuration.HeartbeatDelayMs)
+                {
+                    lastHeartBeat = DateTime.UtcNow;
+                }
+
+                Thread.Sleep(100);
+            }
+        }
+
     }
 }
