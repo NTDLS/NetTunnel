@@ -1,4 +1,5 @@
-﻿using NetTunnel.ClientAPI;
+﻿using Microsoft.AspNetCore.Hosting.Server;
+using NetTunnel.ClientAPI;
 using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.FramePayloads.Notifications;
@@ -32,9 +33,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         #region Properties Common to Inbound and Outbound Tunnels.
 
-        public byte[]? EncryptionKey { get; private set; }
         public bool SecureKeyExchangeIsComplete { get; private set; }
-        public NASCCLStream? EncryptionStream { get; private set; }
         public NtTunnelStatus Status { get; set; }
         public ulong BytesReceived { get; set; }
         public ulong BytesSent { get; set; }
@@ -45,7 +44,9 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         public Guid TunnelId { get; private set; }
         public string Name { get; private set; }
         public List<IEndpoint> Endpoints { get; private set; } = new();
+
         private readonly Thread _heartbeatThread;
+        private FramePayloads.EncryptionProvider? _encryptionProvider;
 
         #endregion
 
@@ -122,7 +123,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         private void _client_OnNotificationReceived(RmContext context, IRmNotification payload)
         {
-            if (EncryptionKey == null || SecureKeyExchangeIsComplete == false)
+            if (SecureKeyExchangeIsComplete == false)
             {
                 throw new Exception("Encryption has not been initialized.");
             }
@@ -228,6 +229,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                         Status = NtTunnelStatus.Connecting;
 
                         Core.Logging.Write(NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' connecting to remote at {Address}:{DataPort}.");
+
+                        //Make the outbound connection to the remote tunnel service.
                         _client.Connect(Address, DataPort);
 
                         //The first thing we do when we get a connection is start a new key exchange process.
@@ -240,9 +243,12 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                             if (t.IsCompletedSuccessfully && t.Result != null)
                             {
                                 compoundNegotiator.ApplyNegotiationResponseToken(t.Result.NegotiationToken);
-                                EncryptionKey = compoundNegotiator.SharedSecret;
-                                EncryptionStream = new NASCCLStream(EncryptionKey);
+                                _encryptionProvider = new FramePayloads.EncryptionProvider(compoundNegotiator.SharedSecret);
                                 SecureKeyExchangeIsComplete = true;
+
+                                _client.Notify(new NtFramePayloadEncryptionReady());
+
+                                _client.SetEncryptionProvider(_encryptionProvider);
                             }
                         });
 

@@ -14,9 +14,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         /// </summary>
         public Guid TunnelId { get; }
         public string Name { get; }
-        //public NASCCLStream? NascclStream { get; }
 
-        public byte[]? EncryptionKey { get; }
         public bool SecureKeyExchangeIsComplete { get; }
 
         public void Start();

@@ -1,4 +1,5 @@
-﻿using NetTunnel.Library;
+﻿using NetTunnel.ClientAPI;
+using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.FramePayloads.Notifications;
 using NetTunnel.Service.FramePayloads.Queries;
@@ -27,9 +28,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         #region Properties Common to Inbound and Outbound Tunnels.
 
-        public byte[]? EncryptionKey { get; private set; }
         public bool SecureKeyExchangeIsComplete { get; private set; }
-        public NASCCLStream? EncryptionStream { get; private set; }
         public NtTunnelStatus Status { get; set; }
         public ulong BytesReceived { get; set; }
         public ulong BytesSent { get; set; }
@@ -40,7 +39,9 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         public Guid TunnelId { get; private set; }
         public string Name { get; private set; }
         public List<IEndpoint> Endpoints { get; private set; } = new();
+
         private readonly Thread _heartbeatThread;
+        private FramePayloads.EncryptionProvider? _encryptionProvider;
 
         #endregion
 
@@ -113,11 +114,14 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 var compoundNegotiator = new CompoundNegotiator();
                 var negotiationReplyToken = compoundNegotiator.ApplyNegotiationToken(keyExchangeRequest.NegotiationToken);
                 var negotiationReply = new NtFramePayloadKeyExchangeReply(negotiationReplyToken);
-                EncryptionKey = compoundNegotiator.SharedSecret;
+                _encryptionProvider = new FramePayloads.EncryptionProvider(compoundNegotiator.SharedSecret);
                 return negotiationReply;
             }
 
-            if (EncryptionKey == null || SecureKeyExchangeIsComplete == false)
+            //HOW DO WE APPLY THE ENCRYPTION PROVIDER?
+            //We cant apply it before we return because that will cause the response to be encrypted.
+
+            if (SecureKeyExchangeIsComplete == false)
             {
                 throw new Exception("Encryption has not been initialized.");
             }
@@ -145,7 +149,15 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         private void _server_OnNotificationReceived(RmContext context, IRmNotification payload)
         {
-            if (EncryptionKey == null || SecureKeyExchangeIsComplete == false)
+            if (payload is NtFramePayloadEncryptionReady)
+            {
+                Core.Logging.Write(NtLogSeverity.Debug, $"Encryption is ready.'");
+
+                SecureKeyExchangeIsComplete = true;
+                _server.SetEncryptionProvider(_encryptionProvider);
+            }
+
+            if (SecureKeyExchangeIsComplete == false)
             {
                 throw new Exception("Encryption has not been initialized.");
             }
