@@ -5,7 +5,7 @@
  AppName                          = NetTunnel
  AppVersion                       = {#AppVersion}
  AppVerName                       = NetTunnel {#AppVersion}
- AppCopyright                     = Copyright © 1995-2023 NetworkDLS.
+ AppCopyright                     = Copyright © 1995-2024 NetworkDLS.
  DefaultDirName                   = {commonpf}\NetworkDLS\NetTunnel
  DefaultGroupName                 = NetworkDLS\NetTunnel
  UninstallDisplayIcon             = {app}\UI\NetTunnel.UI.exe
