@@ -244,10 +244,10 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                             {
                                 compoundNegotiator.ApplyNegotiationResponseToken(t.Result.NegotiationToken);
                                 _encryptionProvider = new FramePayloads.EncryptionProvider(compoundNegotiator.SharedSecret);
-                                SecureKeyExchangeIsComplete = true;
 
                                 _client.Notify(new NtFramePayloadEncryptionReady());
 
+                                SecureKeyExchangeIsComplete = true;
                                 _client.SetEncryptionProvider(_encryptionProvider);
                             }
                         });
