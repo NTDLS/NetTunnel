@@ -241,7 +241,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                         var negotiationToken = compoundNegotiator.GenerateNegotiationToken(Singletons.Configuration.TunnelEncryptionKeySize / 12);
 
                         var query = new NtFramePayloadRequestKeyExchange(negotiationToken);
-                        _client.Query(query).ContinueWith(t =>
+                        _client.Query(query, Singletons.Configuration.MessageQueryTimeoutMs).ContinueWith(t =>
                         {
                             if (t.IsCompletedSuccessfully && t.Result != null)
                             {
@@ -283,7 +283,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 throw new Exception("The RPC client is not connected.");
             }
 
-            return _client.Query(query);
+            return _client.Query(query, Singletons.Configuration.MessageQueryTimeoutMs);
         }
 
         public void Notify(IRmNotification notification)
@@ -337,7 +337,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             while (KeepRunning)
             {
-                if ((DateTime.UtcNow - lastHeartBeat).TotalMilliseconds > Singletons.Configuration.HeartbeatDelayMs)
+                if ((DateTime.UtcNow - lastHeartBeat).TotalMilliseconds > Singletons.Configuration.TunnelAndEndpointHeartbeatDelayMs)
                 {
                     lastHeartBeat = DateTime.UtcNow;
                 }

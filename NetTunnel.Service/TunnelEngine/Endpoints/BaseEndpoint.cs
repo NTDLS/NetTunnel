@@ -39,11 +39,11 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
             Thread.CurrentThread.Name = $"HeartbeatThreadProc:{Environment.CurrentManagedThreadId}";
 
-            DateTime lastheartBeat = DateTime.UtcNow;
+            DateTime lastHeartBeat = DateTime.UtcNow;
 
             while (KeepRunning)
             {
-                if ((DateTime.UtcNow - lastheartBeat).TotalMilliseconds > Singletons.Configuration.HeartbeatDelayMs)
+                if ((DateTime.UtcNow - lastHeartBeat).TotalMilliseconds > Singletons.Configuration.TunnelAndEndpointHeartbeatDelayMs)
                 {
                     _activeConnections.Use((o) =>
                     {
@@ -53,8 +53,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                         {
                             Utility.TryAndIgnore(() =>
                             {
-                                //We've are connected but havent done much in a while.
-                                if (connection.Value.ActivityAgeInMiliseconds > Singletons.Configuration.MaxStaleConnectionAgeMs)
+                                //We've are connected but haven't done much in a while.
+                                if (connection.Value.ActivityAgeInMilliseconds > Singletons.Configuration.StaleEndpointExpirationMs)
                                 {
                                     connectionsToClose.Add(connection.Value);
                                 }
@@ -68,7 +68,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                         }
                     });
 
-                    lastheartBeat = DateTime.UtcNow;
+                    lastHeartBeat = DateTime.UtcNow;
                 }
 
                 Thread.Sleep(100);

@@ -79,5 +79,11 @@ namespace NetTunnel.UI.Forms
             DialogResult = DialogResult.Cancel;
             Close();
         }
+
+        private void buttonAbout_Click(object sender, EventArgs e)
+        {
+            using var form = new FormAbout();
+            form.ShowDialog();
+        }
     }
 }

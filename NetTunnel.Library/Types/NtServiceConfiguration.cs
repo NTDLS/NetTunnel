@@ -18,13 +18,34 @@
         /// The buffer size used by endpoint connections for sending and receiving data.
         /// </summary>
         public int EndpointBufferSize { get; set; } = 16384;
-        public bool DebugLogging { get; set; } = false;
-        public int FrameQueryTimeoutMs { get; set; } = 60000;
-        public int HeartbeatDelayMs { get; set; } = 10000;
-        public int TunnelEncryptionKeySize { get; set; } = 8;
-        public int MaxStaleConnectionAgeMs { get; set; } = 600000;
 
-        #region Reliable Messaging.
+        /// <summary>
+        /// Whether to log debug information to file.
+        /// </summary>
+        public bool DebugLogging { get; set; } = false;
+
+        /// <summary>
+        /// The duration in milliseconds to wait on message query operations.
+        /// </summary>
+        public int MessageQueryTimeoutMs { get; set; } = 60000;
+
+        /// <summary>
+        /// The delay in milliseconds between tunnel heartbeats.
+        /// </summary>
+        public int TunnelAndEndpointHeartbeatDelayMs { get; set; } = 10000;
+
+        /// <summary>
+        /// The number of 12-byte segments to generate for tunnel encryption.
+        /// </summary>
+        public int TunnelEncryptionKeySize { get; set; } = 8;
+
+        /// <summary>
+        /// The maximum number of milliseconds to allow an endpoint to remain connected without read/write activity.
+        /// </summary>
+        public int StaleEndpointExpirationMs { get; set; } = 600000;
+
+
+        #region Reliable Messaging Configuration.
 
         /// <summary>
         /// The frame header delimiter. Used to literally seperate and detect the beginning of each packet.

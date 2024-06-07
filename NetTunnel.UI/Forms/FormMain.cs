@@ -720,18 +720,20 @@ namespace NetTunnel.UI.Forms
 
         private void usersToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (var form = new FormUsers(_client.EnsureNotNull()))
-            {
-                form.ShowDialog();
-            }
+            using var form = new FormUsers(_client.EnsureNotNull());
+            form.ShowDialog();
         }
 
         private void configurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (var form = new FormServiceConfiguration(_client.EnsureNotNull()))
-            {
-                form.ShowDialog();
-            }
+            using var form = new FormServiceConfiguration(_client.EnsureNotNull());
+            form.ShowDialog();
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using var form = new FormAbout();
+            form.ShowDialog();
         }
 
         #endregion

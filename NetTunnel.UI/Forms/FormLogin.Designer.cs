@@ -41,6 +41,7 @@
             textBoxAddress = new TextBox();
             labelRemoteAddress = new Label();
             checkBoxUseSSL = new CheckBox();
+            buttonAbout = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBoxLogin).BeginInit();
             SuspendLayout();
             // 
@@ -149,11 +150,22 @@
             checkBoxUseSSL.Text = "Use SSL?";
             checkBoxUseSSL.UseVisualStyleBackColor = true;
             // 
+            // buttonAbout
+            // 
+            buttonAbout.Location = new Point(19, 189);
+            buttonAbout.Name = "buttonAbout";
+            buttonAbout.Size = new Size(75, 23);
+            buttonAbout.TabIndex = 10;
+            buttonAbout.Text = "About";
+            buttonAbout.UseVisualStyleBackColor = true;
+            buttonAbout.Click += buttonAbout_Click;
+            // 
             // FormLogin
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(380, 227);
+            Controls.Add(buttonAbout);
             Controls.Add(checkBoxUseSSL);
             Controls.Add(labelRemotePort);
             Controls.Add(textBoxPort);
@@ -193,5 +205,6 @@
         private TextBox textBoxAddress;
         private Label labelRemoteAddress;
         private CheckBox checkBoxUseSSL;
+        private Button buttonAbout;
     }
 }

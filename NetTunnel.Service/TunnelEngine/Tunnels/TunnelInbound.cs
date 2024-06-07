@@ -264,7 +264,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 throw new Exception("The RPC server client was not found.");
             }
 
-            return _server.Query(connectionId, query);
+            return _server.Query(connectionId, query, Singletons.Configuration.MessageQueryTimeoutMs);
         }
 
         public void Notify(IRmNotification notification)
@@ -325,7 +325,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             while (KeepRunning)
             {
-                if ((DateTime.UtcNow - lastHeartBeat).TotalMilliseconds > Singletons.Configuration.HeartbeatDelayMs)
+                if ((DateTime.UtcNow - lastHeartBeat).TotalMilliseconds > Singletons.Configuration.TunnelAndEndpointHeartbeatDelayMs)
                 {
                     lastHeartBeat = DateTime.UtcNow;
                 }

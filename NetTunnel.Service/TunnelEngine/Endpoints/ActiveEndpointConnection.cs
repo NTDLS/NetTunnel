@@ -14,8 +14,11 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         private readonly NetworkStream _stream;
 
-        public double ActivityAgeInMiliseconds => (DateTime.UtcNow - LastActivityDateTime).TotalMilliseconds;
-        public double StartAgeInMiliseconds => (DateTime.UtcNow - StartDateTime).TotalMilliseconds;
+        public double ActivityAgeInMilliseconds
+            => (DateTime.UtcNow - LastActivityDateTime).TotalMilliseconds;
+
+        public double StartAgeInMilliseconds
+            => (DateTime.UtcNow - StartDateTime).TotalMilliseconds;
 
         public ActiveEndpointConnection(Thread thread, TcpClient tcpClient, Guid streamId)
         {
