@@ -55,6 +55,7 @@
             columnHeaderEndpointTotalConnections = new ColumnHeader();
             columnHeaderEndpointCurrentConenctions = new ColumnHeader();
             labelEndpoints = new Label();
+            configurationToolStripMenuItem = new ToolStripMenuItem();
             menuStripBody.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -122,22 +123,22 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { connectToolStripMenuItem, exitToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { connectToolStripMenuItem, configurationToolStripMenuItem, exitToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            fileToolStripMenuItem.Size = new Size(37, 20);
-            fileToolStripMenuItem.Text = "File";
+            fileToolStripMenuItem.Size = new Size(56, 20);
+            fileToolStripMenuItem.Text = "Service";
             // 
             // connectToolStripMenuItem
             // 
             connectToolStripMenuItem.Name = "connectToolStripMenuItem";
-            connectToolStripMenuItem.Size = new Size(119, 22);
+            connectToolStripMenuItem.Size = new Size(180, 22);
             connectToolStripMenuItem.Text = "Connect";
             connectToolStripMenuItem.Click += connectToolStripMenuItem_Click;
             // 
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(119, 22);
+            exitToolStripMenuItem.Size = new Size(180, 22);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
@@ -252,6 +253,13 @@
             labelEndpoints.TabIndex = 2;
             labelEndpoints.Text = "Endpoints of (select a tunnel above)";
             // 
+            // configurationToolStripMenuItem
+            // 
+            configurationToolStripMenuItem.Name = "configurationToolStripMenuItem";
+            configurationToolStripMenuItem.Size = new Size(180, 22);
+            configurationToolStripMenuItem.Text = "Configuration";
+            configurationToolStripMenuItem.Click += configurationToolStripMenuItem_Click;
+            // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -307,5 +315,6 @@
         private ColumnHeader columnHeaderEndpointTotalConnections;
         private ColumnHeader columnHeaderEndpointCurrentConenctions;
         private ColumnHeader columnHeaderTunnelStatus;
+        private ToolStripMenuItem configurationToolStripMenuItem;
     }
 }

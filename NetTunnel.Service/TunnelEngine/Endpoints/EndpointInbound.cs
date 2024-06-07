@@ -69,14 +69,14 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     {
                         if (KeepRunning) //Check again, we may have received a connection while shutting down.
                         {
-                            var handlerThread = new Thread(HandleClientThreadProc);
+                            var dataExchangeThread = new Thread(EndpointDataExchangeThreadProc);
 
                             //Keep track of the connection. ActiveEndpointConnection will handle closing and disposing of the client and its stream.
-                            var activeConnection = new ActiveEndpointConnection(handlerThread, tcpClient, Guid.NewGuid());
+                            var activeConnection = new ActiveEndpointConnection(dataExchangeThread, tcpClient, Guid.NewGuid());
                             _activeConnections.Use((o) => o.Add(activeConnection.StreamId, activeConnection));
 
                             _core.Logging.Write(Constants.NtLogSeverity.Debug, $"Accepted inbound endpoint connection: {activeConnection.StreamId}");
-                            handlerThread.Start(activeConnection);
+                            dataExchangeThread.Start(activeConnection);
                         }
                     }
                 }

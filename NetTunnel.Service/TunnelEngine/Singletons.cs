@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library.Types;
+using NTDLS.Persistence;
 
 namespace NetTunnel.Service.TunnelEngine
 {
@@ -14,19 +15,22 @@ namespace NetTunnel.Service.TunnelEngine
             }
         }
 
-        private static NtServiceApplicationConfiguration? _settings = null;
-        public static NtServiceApplicationConfiguration Configuration
+        private static NtServiceConfiguration? _settings = null;
+        public static NtServiceConfiguration Configuration
         {
             get
             {
                 if (_settings == null)
                 {
-                    IConfiguration config = new ConfigurationBuilder()
-                                 .AddJsonFile("appsettings.json")
-                                 .AddEnvironmentVariables()
-                                 .Build();
+                    _settings = CommonApplicationData.LoadFromDisk<NtServiceConfiguration>(Library.Constants.FriendlyName);
 
-                    _settings = config.GetRequiredSection("Settings").Get<NtServiceApplicationConfiguration>();
+                    if (_settings == null)
+                    {
+                        //We didn't find a config file, create one with default values.
+                        _settings = new NtServiceConfiguration();
+                        CommonApplicationData.SaveToDisk(Library.Constants.FriendlyName, _settings);
+                    }
+
                     if (_settings == null)
                     {
                         throw new Exception("Failed to load configuration.");

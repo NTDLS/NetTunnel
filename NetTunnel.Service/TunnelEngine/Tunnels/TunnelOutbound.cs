@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNetCore.Hosting.Server;
-using NetTunnel.ClientAPI;
-using NetTunnel.Library;
+﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.FramePayloads.Notifications;
 using NetTunnel.Service.FramePayloads.Queries;
 using NetTunnel.Service.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine.Endpoints;
-using NTDLS.NASCCL;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
 using static NetTunnel.Library.Constants;
@@ -69,7 +66,13 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             Username = configuration.Username;
             PasswordHash = configuration.PasswordHash;
 
-            _client = new RmClient();
+            _client = new RmClient(new RmConfiguration()
+            {
+                FrameDelimiter = Singletons.Configuration.FrameDelimiter,
+                InitialReceiveBufferSize = Singletons.Configuration.InitialReceiveBufferSize,
+                MaxReceiveBufferSize = Singletons.Configuration.MaxReceiveBufferSize,
+                ReceiveBufferGrowthRate = Singletons.Configuration.ReceiveBufferGrowthRate,
+            });
 
             _client.OnNotificationReceived += _client_OnNotificationReceived;
             _client.OnQueryReceived += _client_OnQueryReceived;
@@ -301,7 +304,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         {
             var endpoint = new EndpointInbound(Core, this, configuration);
             Endpoints.Add(endpoint);
-            if (this is TunnelOutbound) Core.OutboundTunnels.SaveToDisk();
+            Core.OutboundTunnels.SaveToDisk();
             return endpoint;
         }
 
@@ -309,7 +312,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         {
             var endpoint = new EndpointOutbound(Core, this, configuration);
             Endpoints.Add(endpoint);
-            if (this is TunnelOutbound) Core.OutboundTunnels.SaveToDisk();
+            Core.OutboundTunnels.SaveToDisk();
             return endpoint;
         }
 
@@ -320,7 +323,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             {
                 endpoint.Stop();
                 Endpoints.Remove(endpoint);
-                if (this is TunnelOutbound) Core.OutboundTunnels.SaveToDisk();
+                Core.OutboundTunnels.SaveToDisk();
             }
         }
 

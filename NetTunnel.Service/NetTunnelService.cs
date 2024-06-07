@@ -32,7 +32,7 @@ namespace NetTunnel.Service
         {
             try
             {
-                using RSA rsa = RSA.Create(Singletons.Configuration.RSAKeyLength);
+                using RSA rsa = RSA.Create(Singletons.Configuration.ManagementPortRSASize);
                 var request = new CertificateRequest($"CN=NetTunnel.EndPoint.private", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
                 var certificate = request.CreateSelfSigned(DateTimeOffset.Now.AddDays(-10), DateTimeOffset.Now.AddYears(3));
 
@@ -67,15 +67,18 @@ namespace NetTunnel.Service
             builder.Logging.ClearProviders();
             builder.Logging.SetMinimumLevel(LogLevel.Warning);
 
-            var certificate = CreateSelfSignedCertificate();
-
             builder.WebHost.UseKestrel(options =>
             {
                 options.ListenAnyIP(Singletons.Configuration.ManagementPort, listenOptions =>
                 {
-                    if (certificate != null)
+                    if (Singletons.Configuration.ManagementPortUseSSL)
                     {
-                        listenOptions.UseHttps(certificate);
+                        var certificate = CreateSelfSignedCertificate();
+
+                        if (certificate != null)
+                        {
+                            listenOptions.UseHttps(certificate);
+                        }
                     }
                 });
             });

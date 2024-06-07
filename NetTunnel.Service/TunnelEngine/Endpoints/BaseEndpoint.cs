@@ -116,9 +116,9 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             outboundConnection?.Write(buffer);
         }
 
-        internal void HandleClientThreadProc(object? obj)
+        internal void EndpointDataExchangeThreadProc(object? obj)
         {
-            Thread.CurrentThread.Name = $"HandleClientThreadProc:{Environment.CurrentManagedThreadId}";
+            Thread.CurrentThread.Name = $"EndpointDataExchangeThreadProc:{Environment.CurrentManagedThreadId}";
 
             var activeConnection = ((ActiveEndpointConnection?)obj).EnsureNotNull();
 
@@ -129,18 +129,18 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                 _tunnel.Notify(new NtFramePayloadEndpointConnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId));
 
-                byte[] buffer = new byte[Singletons.Configuration.FramebufferSize];
+                var buffer = new byte[Singletons.Configuration.EndpointBufferSize];
                 while (KeepRunning && activeConnection.IsConnected && activeConnection.Read(ref buffer, out int length))
                 {
                     BytesReceived += (ulong)length;
 
-                    var exchnagePayload = new NtFramePayloadEndpointExchange(_tunnel.TunnelId, EndpointId, activeConnection.StreamId, buffer, length);
-                    _tunnel.Notify(exchnagePayload);
+                    var exchangePayload = new NtFramePayloadEndpointExchange(_tunnel.TunnelId, EndpointId, activeConnection.StreamId, buffer, length);
+                    _tunnel.Notify(exchangePayload);
                 }
             }
             catch (Exception ex)
             {
-                _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Exception, $"HandleClientThreadProc: {ex.Message}");
+                _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Exception, $"EndpointDataExchangeThreadProc: {ex.Message}");
             }
             finally
             {

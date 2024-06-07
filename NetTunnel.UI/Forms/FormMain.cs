@@ -1,4 +1,4 @@
-using NetTunnel.ClientAPI;
+﻿using NetTunnel.ClientAPI;
 using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.UI.Helpers;
@@ -42,7 +42,7 @@ namespace NetTunnel.UI.Forms
             _timer = new System.Windows.Forms.Timer()
             {
                 Enabled = true,
-                Interval = 250
+                Interval = 1000
             };
 
             _timer.Tick += _timer_Tick;
@@ -134,6 +134,8 @@ namespace NetTunnel.UI.Forms
                     }
                     else
                     {
+                        listViewEndpoints.SuspendLayout();
+
                         foreach (ListViewItem item in listViewEndpoints.Items)
                         {
                             var endpoint = ((INtEndpointConfiguration?)item.Tag).EnsureNotNull();
@@ -155,6 +157,8 @@ namespace NetTunnel.UI.Forms
                                 }
                             }
                         }
+
+                        listViewEndpoints.ResumeLayout();
                     }
                 }
 
@@ -166,6 +170,8 @@ namespace NetTunnel.UI.Forms
                     }
                     else
                     {
+                        listViewTunnels.SuspendLayout();
+
                         foreach (ListViewItem item in listViewTunnels.Items)
                         {
                             var tunnel = ((INtTunnelConfiguration?)item.Tag).EnsureNotNull();
@@ -192,6 +198,8 @@ namespace NetTunnel.UI.Forms
                                 }
                             }
                         }
+
+                        listViewTunnels.ResumeLayout();
                     }
                 }
             }
@@ -547,9 +555,9 @@ namespace NetTunnel.UI.Forms
                     item.SubItems.Add("Inbound");
                     item.SubItems.Add($"*:{tunnel.DataPort}");
                     item.SubItems.Add($"{endpointCount:n0}");
-                    item.SubItems.Add("~");
-                    item.SubItems.Add("~");
-                    item.SubItems.Add("~");
+                    item.SubItems.Add("∞");
+                    item.SubItems.Add("∞");
+                    item.SubItems.Add("∞");
                     listViewTunnels.Items.Add(item);
                 }
             }
@@ -570,9 +578,9 @@ namespace NetTunnel.UI.Forms
                     item.SubItems.Add("Outbound");
                     item.SubItems.Add($"{tunnel.Address}:{tunnel.DataPort}");
                     item.SubItems.Add($"{endpointCount:n0}");
-                    item.SubItems.Add("~");
-                    item.SubItems.Add("~");
-                    item.SubItems.Add("~");
+                    item.SubItems.Add("∞");
+                    item.SubItems.Add("∞");
+                    item.SubItems.Add("∞");
                     listViewTunnels.Items.Add(item);
                 }
             }
@@ -617,10 +625,10 @@ namespace NetTunnel.UI.Forms
                     item.Tag = endpoint;
                     item.SubItems.Add("Inbound");
                     item.SubItems.Add($"*:{endpoint.TransmissionPort}");
-                    item.SubItems.Add("~");
-                    item.SubItems.Add("~");
-                    item.SubItems.Add("~");
-                    item.SubItems.Add("~");
+                    item.SubItems.Add("∞");
+                    item.SubItems.Add("∞");
+                    item.SubItems.Add("∞");
+                    item.SubItems.Add("∞");
                     listViewEndpoints.Items.Add(item);
                 }
             }
@@ -637,10 +645,10 @@ namespace NetTunnel.UI.Forms
                     item.Tag = endpoint;
                     item.SubItems.Add("Outbound");
                     item.SubItems.Add($"{endpoint.Address}{endpoint.TransmissionPort}");
-                    item.SubItems.Add("~");
-                    item.SubItems.Add("~");
-                    item.SubItems.Add("~");
-                    item.SubItems.Add("~");
+                    item.SubItems.Add("∞");
+                    item.SubItems.Add("∞");
+                    item.SubItems.Add("∞");
+                    item.SubItems.Add("∞");
                     listViewEndpoints.Items.Add(item);
                 }
             }
@@ -712,13 +720,21 @@ namespace NetTunnel.UI.Forms
 
         private void usersToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            _client.EnsureNotNull();
-            using (var formUsers = new FormUsers(_client))
+            using (var form = new FormUsers(_client.EnsureNotNull()))
             {
-                formUsers.ShowDialog();
+                form.ShowDialog();
+            }
+        }
+
+        private void configurationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var form = new FormServiceConfiguration(_client.EnsureNotNull()))
+            {
+                form.ShowDialog();
             }
         }
 
         #endregion
+
     }
 }

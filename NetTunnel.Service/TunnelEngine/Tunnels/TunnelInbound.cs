@@ -1,11 +1,9 @@
-﻿using NetTunnel.ClientAPI;
-using NetTunnel.Library;
+﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.FramePayloads.Notifications;
 using NetTunnel.Service.FramePayloads.Queries;
 using NetTunnel.Service.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine.Endpoints;
-using NTDLS.NASCCL;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
 using static NetTunnel.Library.Constants;
@@ -60,7 +58,13 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             DataPort = configuration.DataPort;
 
-            _server = new RmServer();
+            _server = new RmServer(new RmConfiguration()
+            {
+                FrameDelimiter = Singletons.Configuration.FrameDelimiter,
+                InitialReceiveBufferSize = Singletons.Configuration.InitialReceiveBufferSize,
+                MaxReceiveBufferSize = Singletons.Configuration.MaxReceiveBufferSize,
+                ReceiveBufferGrowthRate = Singletons.Configuration.ReceiveBufferGrowthRate,
+            });
 
             _server.OnNotificationReceived += _server_OnNotificationReceived;
             _server.OnQueryReceived += _server_OnQueryReceived;
@@ -117,9 +121,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 _encryptionProvider = new FramePayloads.EncryptionProvider(compoundNegotiator.SharedSecret);
                 return negotiationReply;
             }
-
-            //HOW DO WE APPLY THE ENCRYPTION PROVIDER?
-            //We cant apply it before we return because that will cause the response to be encrypted.
 
             if (SecureKeyExchangeIsComplete == false)
             {
@@ -291,7 +292,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         {
             var endpoint = new EndpointInbound(Core, this, configuration);
             Endpoints.Add(endpoint);
-            if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
+            Core.InboundTunnels.SaveToDisk();
             return endpoint;
         }
 
@@ -299,7 +300,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         {
             var endpoint = new EndpointOutbound(Core, this, configuration);
             Endpoints.Add(endpoint);
-            if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
+            Core.InboundTunnels.SaveToDisk();
             return endpoint;
         }
 
@@ -310,7 +311,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             {
                 endpoint.Stop();
                 Endpoints.Remove(endpoint);
-                if (this is TunnelInbound) Core.InboundTunnels.SaveToDisk();
+                Core.InboundTunnels.SaveToDisk();
             }
         }
 
