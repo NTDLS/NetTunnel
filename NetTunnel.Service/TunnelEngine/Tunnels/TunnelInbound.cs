@@ -60,7 +60,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             _server = new RmServer(new RmConfiguration()
             {
-                FrameDelimiter = Singletons.Configuration.FrameDelimiter,
+                //FrameDelimiter = Singletons.Configuration.FrameDelimiter,
                 InitialReceiveBufferSize = Singletons.Configuration.InitialReceiveBufferSize,
                 MaxReceiveBufferSize = Singletons.Configuration.MaxReceiveBufferSize,
                 ReceiveBufferGrowthRate = Singletons.Configuration.ReceiveBufferGrowthRate,

@@ -68,7 +68,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             _client = new RmClient(new RmConfiguration()
             {
-                FrameDelimiter = Singletons.Configuration.FrameDelimiter,
+                //FrameDelimiter = Singletons.Configuration.FrameDelimiter,
                 InitialReceiveBufferSize = Singletons.Configuration.InitialReceiveBufferSize,
                 MaxReceiveBufferSize = Singletons.Configuration.MaxReceiveBufferSize,
                 ReceiveBufferGrowthRate = Singletons.Configuration.ReceiveBufferGrowthRate,
@@ -240,7 +240,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
                         //The first thing we do when we get a connection is start a new key exchange process.
                         var compoundNegotiator = new CompoundNegotiator();
-                        var negotiationToken = compoundNegotiator.GenerateNegotiationToken(Singletons.Configuration.TunnelEncryptionKeySize / 12);
+                        var negotiationToken = compoundNegotiator.GenerateNegotiationToken(Singletons.Configuration.TunnelEncryptionKeySize);
 
                         var query = new NtFramePayloadRequestKeyExchange(negotiationToken);
                         _client.Query(query, Singletons.Configuration.MessageQueryTimeoutMs).ContinueWith(t =>
