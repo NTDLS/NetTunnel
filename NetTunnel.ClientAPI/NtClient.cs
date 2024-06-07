@@ -1,7 +1,5 @@
-﻿using NetTunnel.ClientAPI.Payload;
-using NetTunnel.Library;
+﻿using NetTunnel.Library;
 using NetTunnel.Library.Exceptions;
-using Newtonsoft.Json;
 
 namespace NetTunnel.ClientAPI
 {
@@ -11,19 +9,13 @@ namespace NetTunnel.ClientAPI
         public bool IsConnected => _connection != null;
         public string Address { get; private set; }
         public Uri? BaseAddress { get => Connection.BaseAddress; }
-
         public TimeSpan Timeout { get; private set; } = new TimeSpan(0, 8, 0, 0, 0);
-        public HttpClient Connection
-        {
-            get
-            {
-                return _connection.EnsureNotNull();
-            }
-        }
+        public HttpClient Connection => _connection.EnsureNotNull();
 
         public Guid SessionId { get; internal set; } = Guid.Empty;
         public NtTunnelInboundClient TunnelInbound { get; private set; }
         public NtTunnelOutboundClient TunnelOutbound { get; private set; }
+        public NtServiceClient Service { get; private set; }
 
         public NtSecurityClient Security { get; private set; }
 
@@ -40,21 +32,9 @@ namespace NetTunnel.ClientAPI
             TunnelInbound = new(this);
             TunnelOutbound = new(this);
             Security = new(this);
+            Service = new(this);
 
             Connect();
-        }
-
-        public NtClient(string address, string username, string passwordHash)
-        {
-            Address = address;
-
-            TunnelInbound = new(this);
-            TunnelOutbound = new(this);
-            Security = new(this);
-
-            Connect();
-
-            Security.Login(username, passwordHash);
         }
 
         /// <summary>
@@ -69,6 +49,7 @@ namespace NetTunnel.ClientAPI
             TunnelInbound = new(this);
             TunnelOutbound = new(this);
             Security = new(this);
+            Service = new(this);
 
             Connect();
         }
@@ -108,21 +89,6 @@ namespace NetTunnel.ClientAPI
                 _connection = null;
                 throw;
             }
-        }
-
-        public async Task<NtActionResponseStatistics> GetStatistics()
-        {
-            string url = $"api/Service/{SessionId}/GetStatistics";
-
-            using var response = await Connection.GetAsync(url);
-            string resultText = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<NtActionResponseStatistics>(resultText);
-            if (result == null || result.Success == false)
-            {
-                throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
-            }
-
-            return result;
         }
 
         void Disconnect()

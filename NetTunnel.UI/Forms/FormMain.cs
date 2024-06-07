@@ -3,6 +3,7 @@ using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.UI.Helpers;
 using static NetTunnel.Library.Constants;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace NetTunnel.UI.Forms
 {
@@ -68,10 +69,8 @@ namespace NetTunnel.UI.Forms
                 {
                     if (formLogin.ShowDialog() == DialogResult.OK)
                     {
-                        _client = new NtClient(formLogin.ServerURL, formLogin.Username, formLogin.Password);
-
                         Text = $"{Constants.FriendlyName} : {formLogin.Address} {(formLogin.UseSSL ? "" : " : [INSECURE]")}";
-
+                        _client = formLogin.Client;
                         RepopulateTunnelsGrid();
                         return true;
                     }
@@ -108,7 +107,7 @@ namespace NetTunnel.UI.Forms
             {
                 if (_client != null && _client.IsConnected)
                 {
-                    _client.GetStatistics().ContinueWith(o =>
+                    _client.Service.GetStatistics().ContinueWith(o =>
                     {
                         if (o.Result.Success)
                         {
@@ -361,7 +360,7 @@ namespace NetTunnel.UI.Forms
                             });
                         }
 
-                        listViewEndpoints.InvokeClearRows();
+                        listViewEndpoints.ThreadSafeClearRows();
                     }
                 };
             }
@@ -496,7 +495,7 @@ namespace NetTunnel.UI.Forms
                             });
                         }
 
-                        listViewEndpoints.InvokeClearRows();
+                        listViewEndpoints.ThreadSafeClearRows();
                     }
                 };
             }

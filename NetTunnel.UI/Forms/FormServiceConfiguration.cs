@@ -2,7 +2,7 @@
 using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.UI.Helpers;
-using System.Configuration;
+using System.Reflection.Metadata;
 
 namespace NetTunnel.UI.Forms
 {
@@ -20,6 +20,8 @@ namespace NetTunnel.UI.Forms
         public FormServiceConfiguration(NtClient client)
         {
             InitializeComponent();
+
+            _client = client;
 
             #region Set Tool-tips.
 
@@ -61,23 +63,36 @@ namespace NetTunnel.UI.Forms
 
             #endregion
 
-            var configuration = new NtServiceConfiguration();
-
-            textBoxManagementPort.Text = $"{configuration.ManagementPort:n0}";
-            textBoxManagementPortRSASize.Text = $"{configuration.ManagementPortRSASize:n0}";
-            textBoxEndpointBufferSize.Text = $"{configuration.EndpointBufferSize:n0}";
-            textBoxMessageQueryTimeoutMs.Text = $"{configuration.MessageQueryTimeoutMs:n0}";
-            textBoxTunnelAndEndpointHeartbeatDelayMs.Text = $"{configuration.TunnelAndEndpointHeartbeatDelayMs:n0}";
-            textBoxTunnelEncryptionKeySize.Text = $"{configuration.TunnelEncryptionKeySize:n0}";
-            textBoxStaleEndpointExpirationMs.Text = $"{configuration.StaleEndpointExpirationMs:n0}";
-            textBoxInitialReceiveBufferSize.Text = $"{configuration.InitialReceiveBufferSize:n0}";
-            textBoxMaxReceiveBufferSize.Text = $"{configuration.MaxReceiveBufferSize:n0}";
-            textBoxReceiveBufferGrowthRate.Text = $"{configuration.ReceiveBufferGrowthRate:n0}";
-            checkBoxManagementUseSSL.Checked = configuration.ManagementPortUseSSL;
-            checkBoxDebugLogging.Checked = configuration.DebugLogging;
+            _client.EnsureNotNull().Service.GetConfiguration().ContinueWith(t =>
+            {
+                SetFormConfigurationValues(t.Result.Configuration);
+            });
 
             AcceptButton = buttonSave;
             CancelButton = buttonCancel;
+        }
+
+        public void SetFormConfigurationValues(NtServiceConfiguration configuration)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(() => SetFormConfigurationValues(configuration));
+            }
+            else
+            {
+                textBoxManagementPort.Text = $"{configuration.ManagementPort:n0}";
+                textBoxManagementPortRSASize.Text = $"{configuration.ManagementPortRSASize:n0}";
+                textBoxEndpointBufferSize.Text = $"{configuration.EndpointBufferSize:n0}";
+                textBoxMessageQueryTimeoutMs.Text = $"{configuration.MessageQueryTimeoutMs:n0}";
+                textBoxTunnelAndEndpointHeartbeatDelayMs.Text = $"{configuration.TunnelAndEndpointHeartbeatDelayMs:n0}";
+                textBoxTunnelEncryptionKeySize.Text = $"{configuration.TunnelEncryptionKeySize:n0}";
+                textBoxStaleEndpointExpirationMs.Text = $"{configuration.StaleEndpointExpirationMs:n0}";
+                textBoxInitialReceiveBufferSize.Text = $"{configuration.InitialReceiveBufferSize:n0}";
+                textBoxMaxReceiveBufferSize.Text = $"{configuration.MaxReceiveBufferSize:n0}";
+                textBoxReceiveBufferGrowthRate.Text = $"{configuration.ReceiveBufferGrowthRate:n2}";
+                checkBoxManagementUseSSL.Checked = configuration.ManagementPortUseSSL;
+                checkBoxDebugLogging.Checked = configuration.DebugLogging;
+            }
         }
 
         private void buttonSave_Click(object sender, EventArgs e)
@@ -100,13 +115,13 @@ namespace NetTunnel.UI.Forms
                 configuration.MessageQueryTimeoutMs = FormValidationHelpers.GetAndValidateInteger(textBoxMessageQueryTimeoutMs, 1000, 3600000,
                     "The message query timeout (ms) must be an integer value between [min] and [max].");
 
-                configuration.TunnelAndEndpointHeartbeatDelayMs = FormValidationHelpers.GetAndValidateInteger(textBoxTunnelAndEndpointHeartbeatDelayMs, 1000, 3600000,
+                configuration.TunnelAndEndpointHeartbeatDelayMs = FormValidationHelpers.GetAndValidateInteger(textBoxTunnelAndEndpointHeartbeatDelayMs, 1000, 216000000,
                     "The tunnel and endpoint heartbeat (ms) must be an integer value between [min] and [max].");
 
                 configuration.TunnelEncryptionKeySize = FormValidationHelpers.GetAndValidateInteger(textBoxTunnelEncryptionKeySize, 1, 100,
                     "The tunnel encryption key-size must be an integer value between [min] and [max].");
 
-                configuration.StaleEndpointExpirationMs = FormValidationHelpers.GetAndValidateInteger(textBoxStaleEndpointExpirationMs, 1000, 360000,
+                configuration.StaleEndpointExpirationMs = FormValidationHelpers.GetAndValidateInteger(textBoxStaleEndpointExpirationMs, 1000, 216000000,
                     "The stale endpoint expiration (ms) must be an integer value between [min] and [max].");
 
                 configuration.InitialReceiveBufferSize = FormValidationHelpers.GetAndValidateInteger(textBoxInitialReceiveBufferSize, 1024, 1073741824,
@@ -123,7 +138,19 @@ namespace NetTunnel.UI.Forms
 
                 #endregion
 
-                //SAVE via _client here.
+                buttonSave.ThreadSafeEnable(false);
+
+                _client.EnsureNotNull().Service.PutConfiguration(configuration).ContinueWith(t =>
+                {
+                    if (!t.IsCompletedSuccessfully)
+                    {
+                        buttonSave.ThreadSafeEnable(true);
+                        this.ThreadSafeMessageBox("Failed to save the configuration.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        return;
+                    }
+
+                    this.ThreadSafeClose(DialogResult.OK);
+                });
             }
             catch (Exception ex)
             {
@@ -133,6 +160,8 @@ namespace NetTunnel.UI.Forms
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
+            DialogResult = DialogResult.Cancel;
+            Close();
         }
     }
 }

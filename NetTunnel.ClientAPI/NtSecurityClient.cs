@@ -15,12 +15,12 @@ namespace NetTunnel.ClientAPI
             _client = client;
         }
 
-        public void Login(string username, string passwordHash)
+        public async Task Login(string username, string passwordHash)
         {
             string url = $"api/Security/{username}/{passwordHash}/Login";
 
-            using var response = _client.Connection.GetAsync(url);
-            string resultText = response.Result.Content.ReadAsStringAsync().Result;
+            using var response = await _client.Connection.GetAsync(url);
+            string resultText = await response.Content.ReadAsStringAsync();
             var result = JsonConvert.DeserializeObject<NtActionResponseLogin>(resultText);
             if (result == null || result.Success == false)
             {
@@ -30,12 +30,12 @@ namespace NetTunnel.ClientAPI
             _client.SessionId = result.SessionId;
         }
 
-        public void Logout()
+        public async Task Logout()
         {
             string url = $"api/Security/{_client.SessionId}/Logout";
 
-            using var response = _client.Connection.GetAsync(url);
-            string resultText = response.Result.Content.ReadAsStringAsync().Result;
+            using var response = await _client.Connection.GetAsync(url);
+            string resultText = await response.Content.ReadAsStringAsync();
             var result = JsonConvert.DeserializeObject<NtActionResponse>(resultText);
             if (result == null || result.Success == false)
             {

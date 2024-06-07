@@ -43,17 +43,20 @@ namespace NetTunnel.UI.Forms
 
                 var user = new NtUser(textBoxUsername.Text, Utility.CalculateSHA256(textBoxPassword.Text));
 
-                this.EnableControl(buttonSave, false);
+                buttonSave.ThreadSafeEnable(false);
 
-                _client.Security.ChangeUserPassword(user).ContinueWith(t =>
+               _client.Security.ChangeUserPassword(user).ContinueWith(t =>
                 {
                     if (!t.IsCompletedSuccessfully)
                     {
-                        this.EnableControl(buttonSave, true);
-                        throw new Exception("Failed to change user password.");
+                        buttonSave.ThreadSafeEnable(true);
+                        this.ThreadSafeMessageBox("Failed to change user password.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        return;
                     }
 
-                    this.CloseFormWithResult(DialogResult.OK);
+                    this.ThreadSafeMessageBox("The password has been changed.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    this.ThreadSafeClose(DialogResult.OK);
                 });
             }
             catch (Exception ex)

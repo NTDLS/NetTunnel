@@ -6,11 +6,12 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormLogin : Form
     {
-        public string Address { get; set; } = string.Empty;
-        public string ServerURL { get; set; } = string.Empty;
-        public string Username { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public bool UseSSL { get; set; }
+        public string Address { get; private set; } = string.Empty;
+        public string ServerURL { get; private set; } = string.Empty;
+        public string Username { get; private set; } = string.Empty;
+        public string Password { get; private set; } = string.Empty;
+        public bool UseSSL { get; private set; }
+        public NtClient? Client { get; private set; }
 
         public FormLogin()
         {
@@ -34,6 +35,8 @@ namespace NetTunnel.UI.Forms
 
         private void buttonLogin_Click(object sender, EventArgs e)
         {
+            buttonLogin.ThreadSafeEnable(false);
+
             try
             {
                 if (int.TryParse(textBoxPort.Text, out var port) == false)
@@ -53,20 +56,32 @@ namespace NetTunnel.UI.Forms
                     ServerURL = $"http://{textBoxAddress.Text}:{port}/";
                 }
 
-                using var _ = new NtClient(ServerURL, Username, Password);
+                var client = new NtClient(ServerURL);
 
-                var preferences = new UILoginPreferences()
+                client.Security.Login(Username, Password).ContinueWith(o =>
                 {
-                    Address = textBoxAddress.Text,
-                    Port = textBoxPort.Text,
-                    Username = textBoxUsername.Text,
-                    UseSSL = checkBoxUseSSL.Checked
-                };
+                    buttonLogin.ThreadSafeEnable(true);
 
-                LocalUserApplicationData.SaveToDisk(Constants.FriendlyName, preferences);
+                    if (!o.IsCompletedSuccessfully)
+                    {
+                        client.Dispose();
+                        this.ThreadSafeMessageBox($"Login failed: {o.Exception?.Message}.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        return;
+                    }
+                    var preferences = new UILoginPreferences()
+                    {
+                        Address = textBoxAddress.Text,
+                        Port = textBoxPort.Text,
+                        Username = textBoxUsername.Text,
+                        UseSSL = checkBoxUseSSL.Checked
+                    };
 
-                DialogResult = DialogResult.OK;
-                Close();
+                    LocalUserApplicationData.SaveToDisk(Constants.FriendlyName, preferences);
+
+                    Client = client;
+
+                    this.ThreadSafeClose(DialogResult.OK);
+                });
             }
             catch (Exception ex)
             {

@@ -39,17 +39,18 @@ namespace NetTunnel.UI.Forms
 
                 CreatedUser = new NtUser(textBoxUsername.Text, Utility.CalculateSHA256(textBoxPassword.Text));
 
-                this.EnableControl(buttonSave, false);
+                buttonSave.ThreadSafeEnable(false);
 
                 _client.Security.CreateUser(CreatedUser).ContinueWith(t =>
                 {
                     if (!t.IsCompletedSuccessfully)
                     {
-                        this.EnableControl(buttonSave, true);
-                        throw new Exception("Failed to create new user.");
+                        buttonSave.ThreadSafeEnable(true);
+                        this.ThreadSafeMessageBox("Failed to create new user.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        return;
                     }
 
-                    this.CloseFormWithResult(DialogResult.OK);
+                    this.ThreadSafeClose(DialogResult.OK);
                 });
             }
             catch (Exception ex)

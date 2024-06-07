@@ -56,7 +56,7 @@ namespace NetTunnel.UI.Forms
                 if (textBoxTunnelDataPort.Text.Length == 0 || int.TryParse(textBoxTunnelDataPort.Text, out var _) == false)
                     throw new Exception("You must specify a valid tunnel data port.");
 
-                this.EnableControl(buttonAdd, false);
+                buttonAdd.ThreadSafeEnable(false);
 
                 var tunnelId = Guid.NewGuid(); //The TunnelId is the same on both services.
 
@@ -75,7 +75,7 @@ namespace NetTunnel.UI.Forms
                 }
                 catch (Exception ex)
                 {
-                    this.EnableControl(buttonAdd, true);
+                    buttonAdd.ThreadSafeEnable(true);
                     throw new Exception($"Failed to connect to the remote tunnel: {ex.Message}.");
                 }
 
@@ -86,7 +86,7 @@ namespace NetTunnel.UI.Forms
                 }
                 catch (Exception ex)
                 {
-                    this.EnableControl(buttonAdd, true);
+                    buttonAdd.ThreadSafeEnable(true);
                     throw new Exception($"Failed to login to the remote tunnel: {ex.Message}.");
                 }
 
@@ -95,8 +95,9 @@ namespace NetTunnel.UI.Forms
                 {
                     if (!t.IsCompletedSuccessfully)
                     {
-                        this.EnableControl(buttonAdd, true);
-                        throw new Exception("Failed to create local outbound tunnel.");
+                        buttonAdd.ThreadSafeEnable(true);
+                        this.ThreadSafeMessageBox("Failed to create local outbound tunnel.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        return;
                     }
 
                     //Add the inbound tunnel config to the remote tunnel instance.
@@ -107,8 +108,9 @@ namespace NetTunnel.UI.Forms
                             //If we failed to create the remote tunnel config, remove the local config.
                             _client.TunnelOutbound.Delete(outboundTunnel.TunnelId).ContinueWith(t =>
                             {
-                                this.EnableControl(buttonAdd, true);
-                                throw new Exception("Failed to create remote inbound tunnel.");
+                                buttonAdd.ThreadSafeEnable(true);
+                                this.ThreadSafeMessageBox("Failed to create remote inbound tunnel.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                return;
                             });
                         }
 
@@ -118,7 +120,7 @@ namespace NetTunnel.UI.Forms
                         //Start the outbound-connecting tunnel:
                         _client.TunnelOutbound.Start(outboundTunnel.TunnelId).Wait();
 
-                        this.CloseFormWithResult(DialogResult.OK);
+                        this.ThreadSafeClose(DialogResult.OK);
                     });
                 });
             }

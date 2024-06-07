@@ -92,10 +92,11 @@ namespace NetTunnel.UI.Forms
                                 {
                                     if (!t.IsCompletedSuccessfully)
                                     {
-                                        throw new Exception("Failed to delete user.");
+                                        this.ThreadSafeMessageBox("Failed to delete user.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                        return;
                                     }
 
-                                    this.CloseFormWithResult(DialogResult.OK);
+                                    this.ThreadSafeClose(DialogResult.OK);
                                 });
                             }
                         }

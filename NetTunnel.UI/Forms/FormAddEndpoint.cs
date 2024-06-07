@@ -57,7 +57,7 @@ namespace NetTunnel.UI.Forms
                 if (textBoxTerminationPort.Text.Length == 0 || int.TryParse(textBoxTerminationPort.Text, out var _) == false)
                     throw new Exception("You must specify a valid termination port.");
 
-                this.EnableControl(buttonAdd, false);
+                buttonAdd.ThreadSafeEnable(false);
 
                 var endpointId = Guid.NewGuid(); //The endpointId is the same on both services.
 
@@ -74,10 +74,11 @@ namespace NetTunnel.UI.Forms
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
-                                this.EnableControl(buttonAdd, true);
-                                throw new Exception("Failed to add inbound endpoint pair to inbound tunnel.");
+                                buttonAdd.ThreadSafeEnable(true);
+                                this.ThreadSafeMessageBox("Failed to add inbound endpoint pair to inbound tunnel.", FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                return;
                             }
-                            this.CloseFormWithResult(DialogResult.OK);
+                            this.ThreadSafeClose(DialogResult.OK);
 
                         });
                     }
@@ -87,10 +88,11 @@ namespace NetTunnel.UI.Forms
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
-                                this.EnableControl(buttonAdd, true);
-                                throw new Exception("Failed to add outbound endpoint pair to inbound tunnel.");
+                                buttonAdd.ThreadSafeEnable(true);
+                                this.ThreadSafeMessageBox("Failed to add outbound endpoint pair to inbound tunnel.", FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                return;
                             }
-                            this.CloseFormWithResult(DialogResult.OK);
+                            this.ThreadSafeClose(DialogResult.OK);
                         });
                     }
                 }
@@ -102,10 +104,11 @@ namespace NetTunnel.UI.Forms
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
-                                this.EnableControl(buttonAdd, true);
-                                throw new Exception("Failed to add outbound endpoint pair to outbound tunnel.");
+                                buttonAdd.ThreadSafeEnable(true);
+                                this.ThreadSafeMessageBox("Failed to add outbound endpoint pair to outbound tunnel.", FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                return;
                             }
-                            this.CloseFormWithResult(DialogResult.OK);
+                            this.ThreadSafeClose(DialogResult.OK);
                         });
                     }
                     else
@@ -114,10 +117,11 @@ namespace NetTunnel.UI.Forms
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
-                                this.EnableControl(buttonAdd, true);
-                                throw new Exception("Failed to add outbound endpoint pair to outbound tunnel.");
+                                buttonAdd.ThreadSafeEnable(true);
+                                this.ThreadSafeMessageBox("Failed to add outbound endpoint pair to outbound tunnel.", FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                return;
                             }
-                            this.CloseFormWithResult(DialogResult.OK);
+                            this.ThreadSafeClose(DialogResult.OK);
                         });
                     }
                 }
