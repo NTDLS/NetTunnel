@@ -11,7 +11,6 @@ namespace NetTunnel.Library.Exceptions
 
         public NtAssertException(string? message)
             : base($"Assert exception: {message}.")
-
         {
             Severity = NtLogSeverity.Exception;
         }

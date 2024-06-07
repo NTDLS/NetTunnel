@@ -11,7 +11,6 @@ namespace NetTunnel.Library.Exceptions
 
         public NtAPIResponseException(string? message)
             : base($"API exception: {message}.")
-
         {
             Severity = NtLogSeverity.Exception;
         }

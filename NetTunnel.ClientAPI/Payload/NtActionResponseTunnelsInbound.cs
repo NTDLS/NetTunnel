@@ -6,7 +6,9 @@ namespace NetTunnel.ClientAPI.Payload
     {
         public List<NtTunnelInboundConfiguration> Collection { get; set; } = new();
 
-        public NtActionResponseTunnelsInbound() { }
+        public NtActionResponseTunnelsInbound()
+        {
+        }
 
         public NtActionResponseTunnelsInbound(Exception ex)
         {

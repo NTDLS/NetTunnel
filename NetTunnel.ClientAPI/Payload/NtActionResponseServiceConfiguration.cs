@@ -6,7 +6,9 @@ namespace NetTunnel.ClientAPI.Payload
     {
         public NtServiceConfiguration Configuration { get; set; } = new();
 
-        public NtActionResponseServiceConfiguration() { }
+        public NtActionResponseServiceConfiguration()
+        {
+        }
 
         public NtActionResponseServiceConfiguration(NtServiceConfiguration configuration)
         {

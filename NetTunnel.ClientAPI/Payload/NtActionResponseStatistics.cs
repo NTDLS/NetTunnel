@@ -26,7 +26,9 @@ namespace NetTunnel.ClientAPI.Payload
             return rollingTotal;
         }
 
-        public NtActionResponseStatistics() { }
+        public NtActionResponseStatistics()
+        {
+        }
 
         public NtActionResponseStatistics(Exception ex)
         {

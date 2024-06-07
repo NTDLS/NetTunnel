@@ -11,7 +11,6 @@ namespace NetTunnel.Library.Exceptions
 
         public NtNullException(string? message)
             : base($"Null exception: {message}.")
-
         {
             Severity = NtLogSeverity.Exception;
         }

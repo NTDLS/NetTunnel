@@ -6,7 +6,9 @@ namespace NetTunnel.ClientAPI.Payload
     {
         public List<NtUser> Collection { get; set; } = new();
 
-        public NtActionResponseUsers() { }
+        public NtActionResponseUsers()
+        {
+        }
 
         public NtActionResponseUsers(Exception ex)
         {

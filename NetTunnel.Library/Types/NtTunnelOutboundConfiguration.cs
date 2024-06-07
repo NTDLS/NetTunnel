@@ -12,7 +12,9 @@
         public List<NtEndpointOutboundConfiguration> EndpointOutboundConfigurations { get; set; } = new();
         public List<NtEndpointInboundConfiguration> EndpointInboundConfigurations { get; set; } = new();
 
-        public NtTunnelOutboundConfiguration() { }
+        public NtTunnelOutboundConfiguration()
+        {
+        }
 
         public NtTunnelOutboundConfiguration(Guid tunnelId, string name, string address, int managementPort, int dataPort, string username, string passwordHash)
         {

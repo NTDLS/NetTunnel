@@ -36,6 +36,7 @@ namespace NetTunnel.UI.Forms
         private void buttonLogin_Click(object sender, EventArgs e)
         {
             buttonLogin.ThreadSafeEnable(false);
+            buttonCancel.ThreadSafeEnable(false);
 
             try
             {
@@ -61,6 +62,7 @@ namespace NetTunnel.UI.Forms
                 client.Security.Login(Username, Password).ContinueWith(o =>
                 {
                     buttonLogin.ThreadSafeEnable(true);
+                    buttonCancel.ThreadSafeEnable(true);
 
                     if (!o.IsCompletedSuccessfully)
                     {

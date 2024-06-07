@@ -8,6 +8,7 @@ namespace NetTunnel.Library.Types
     {
         [ProtoMember(1)]
         public NtEndpointInboundConfiguration Inbound { get; private set; } = new();
+
         [ProtoMember(2)]
         public NtEndpointOutboundConfiguration Outbound { get; private set; } = new();
 

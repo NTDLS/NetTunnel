@@ -13,7 +13,6 @@ namespace NetTunnel.Library.Exceptions
 
         public NtExceptionBase(string? message)
             : base(message)
-
         {
             Severity = NtLogSeverity.Exception;
         }

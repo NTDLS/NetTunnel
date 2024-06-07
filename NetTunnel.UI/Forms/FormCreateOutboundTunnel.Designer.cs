@@ -35,14 +35,14 @@
             textBoxRemoteAddress = new TextBox();
             textBoxRemoteUsername = new TextBox();
             textBoxRemotePassword = new TextBox();
-            textBoxRemotePort = new TextBox();
-            labelRemotePort = new Label();
+            textBoxManagementPort = new TextBox();
+            labelManagementPort = new Label();
             buttonAdd = new Button();
             buttonCancel = new Button();
             textBoxName = new TextBox();
             labelName = new Label();
             textBoxTunnelDataPort = new TextBox();
-            labelEndpointDataPort = new Label();
+            labelTunnelDataPort = new Label();
             groupBoxLoginInfo = new GroupBox();
             groupBoxLoginInfo.SuspendLayout();
             SuspendLayout();
@@ -96,21 +96,21 @@
             textBoxRemotePassword.Size = new Size(239, 23);
             textBoxRemotePassword.TabIndex = 5;
             // 
-            // textBoxRemotePort
+            // textBoxManagementPort
             // 
-            textBoxRemotePort.Location = new Point(180, 40);
-            textBoxRemotePort.Name = "textBoxRemotePort";
-            textBoxRemotePort.Size = new Size(77, 23);
-            textBoxRemotePort.TabIndex = 3;
+            textBoxManagementPort.Location = new Point(180, 40);
+            textBoxManagementPort.Name = "textBoxManagementPort";
+            textBoxManagementPort.Size = new Size(77, 23);
+            textBoxManagementPort.TabIndex = 3;
             // 
-            // labelRemotePort
+            // labelManagementPort
             // 
-            labelRemotePort.AutoSize = true;
-            labelRemotePort.Location = new Point(180, 22);
-            labelRemotePort.Name = "labelRemotePort";
-            labelRemotePort.Size = new Size(68, 15);
-            labelRemotePort.TabIndex = 4;
-            labelRemotePort.Text = "Mgmt. Port";
+            labelManagementPort.AutoSize = true;
+            labelManagementPort.Location = new Point(180, 22);
+            labelManagementPort.Name = "labelManagementPort";
+            labelManagementPort.Size = new Size(68, 15);
+            labelManagementPort.TabIndex = 4;
+            labelManagementPort.Text = "Mgmt. Port";
             // 
             // buttonAdd
             // 
@@ -155,14 +155,14 @@
             textBoxTunnelDataPort.Size = new Size(103, 23);
             textBoxTunnelDataPort.TabIndex = 1;
             // 
-            // labelEndpointDataPort
+            // labelTunnelDataPort
             // 
-            labelEndpointDataPort.AutoSize = true;
-            labelEndpointDataPort.Location = new Point(17, 61);
-            labelEndpointDataPort.Name = "labelEndpointDataPort";
-            labelEndpointDataPort.Size = new Size(100, 15);
-            labelEndpointDataPort.TabIndex = 8;
-            labelEndpointDataPort.Text = "Transmission port";
+            labelTunnelDataPort.AutoSize = true;
+            labelTunnelDataPort.Location = new Point(17, 61);
+            labelTunnelDataPort.Name = "labelTunnelDataPort";
+            labelTunnelDataPort.Size = new Size(100, 15);
+            labelTunnelDataPort.TabIndex = 8;
+            labelTunnelDataPort.Text = "Transmission port";
             // 
             // groupBoxLoginInfo
             // 
@@ -172,8 +172,8 @@
             groupBoxLoginInfo.Controls.Add(textBoxRemoteAddress);
             groupBoxLoginInfo.Controls.Add(textBoxRemoteUsername);
             groupBoxLoginInfo.Controls.Add(textBoxRemotePassword);
-            groupBoxLoginInfo.Controls.Add(textBoxRemotePort);
-            groupBoxLoginInfo.Controls.Add(labelRemotePort);
+            groupBoxLoginInfo.Controls.Add(textBoxManagementPort);
+            groupBoxLoginInfo.Controls.Add(labelManagementPort);
             groupBoxLoginInfo.Location = new Point(17, 117);
             groupBoxLoginInfo.Name = "groupBoxLoginInfo";
             groupBoxLoginInfo.Size = new Size(278, 179);
@@ -187,7 +187,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(312, 339);
             Controls.Add(groupBoxLoginInfo);
-            Controls.Add(labelEndpointDataPort);
+            Controls.Add(labelTunnelDataPort);
             Controls.Add(textBoxTunnelDataPort);
             Controls.Add(textBoxName);
             Controls.Add(labelName);
@@ -216,14 +216,14 @@
         private TextBox textBoxRemoteAddress;
         private TextBox textBoxRemoteUsername;
         private TextBox textBoxRemotePassword;
-        private TextBox textBoxRemotePort;
-        private Label labelRemotePort;
+        private TextBox textBoxManagementPort;
+        private Label labelManagementPort;
         private Button buttonAdd;
         private Button buttonCancel;
         private TextBox textBoxName;
         private Label labelName;
         private TextBox textBoxTunnelDataPort;
-        private Label labelEndpointDataPort;
+        private Label labelTunnelDataPort;
         private GroupBox groupBoxLoginInfo;
     }
 }

@@ -11,7 +11,6 @@ namespace NetTunnel.Library.Exceptions
 
         public NtGenericException(string? message)
             : base($"Generic exception: {message}.")
-
         {
             Severity = NtLogSeverity.Exception;
         }

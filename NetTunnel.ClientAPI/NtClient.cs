@@ -11,7 +11,6 @@ namespace NetTunnel.ClientAPI
         public Uri? BaseAddress { get => Connection.BaseAddress; }
         public TimeSpan Timeout { get; private set; } = new TimeSpan(0, 8, 0, 0, 0);
         public HttpClient Connection => _connection.EnsureNotNull();
-
         public Guid SessionId { get; internal set; } = Guid.Empty;
         public NtTunnelInboundClient TunnelInbound { get; private set; }
         public NtTunnelOutboundClient TunnelOutbound { get; private set; }
@@ -91,7 +90,7 @@ namespace NetTunnel.ClientAPI
             }
         }
 
-        void Disconnect()
+        public void Disconnect()
         {
             try
             {

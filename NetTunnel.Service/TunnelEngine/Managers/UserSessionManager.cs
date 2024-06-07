@@ -7,7 +7,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
     {
         private readonly TunnelEngineCore _core;
 
-        private PessimisticCriticalResource<List<NtUserSession>> _collection = new();
+        private readonly PessimisticCriticalResource<List<NtUserSession>> _collection = new();
 
         public UserSessionManager(TunnelEngineCore core)
         {
@@ -27,11 +27,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         public NtUserSession Validate(Guid sessionId, string? clientIpAddress)
         {
-            var session = _collection.Use((o) => o.Where(o => o.SessionId == sessionId).FirstOrDefault());
-            if (session == null)
-            {
-                throw new Exception("Session was not found.");
-            }
+            var session = _collection.Use((o) => o.Where(o => o.SessionId == sessionId).FirstOrDefault())
+                ?? throw new Exception("Session was not found.");
 
             if (session.ClientIpAddress != clientIpAddress)
             {
