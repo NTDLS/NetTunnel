@@ -218,21 +218,30 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         public void Start()
         {
-            if (KeepRunning == true)
+            try
             {
-                return;
+                if (KeepRunning == true)
+                {
+                    return;
+                }
+                Core.Logging.Write(NtLogSeverity.Verbose, $"Starting inbound tunnel '{Name}' on port {DataPort}.");
+
+                KeepRunning = true;
+
+                Status = NtTunnelStatus.Disconnected;
+
+                _server.Start(DataPort);
+                Core.Logging.Write(NtLogSeverity.Verbose, $"Started listening for inbound tunnel '{Name}' on port {DataPort}.");
+
+                Core.Logging.Write(NtLogSeverity.Verbose, $"Starting endpoints for inbound tunnel '{Name}'.");
+                Endpoints.ForEach(x => x.Start());
             }
-            Core.Logging.Write(NtLogSeverity.Verbose, $"Starting inbound tunnel '{Name}' on port {DataPort}.");
+            catch (Exception ex)
+            {
+                Core.Logging.Write(NtLogSeverity.Exception, $"Failed to start tunnel '{Name}', exception: {ex.Message}.");
 
-            KeepRunning = true;
-
-            Status = NtTunnelStatus.Disconnected;
-
-            _server.Start(DataPort);
-            Core.Logging.Write(NtLogSeverity.Verbose, $"Started listening for inbound tunnel '{Name}' on port {DataPort}.");
-
-            Core.Logging.Write(NtLogSeverity.Verbose, $"Starting endpoints for inbound tunnel '{Name}'.");
-            Endpoints.ForEach(x => x.Start());
+                Utility.TryAndIgnore(Stop);
+            }
         }
 
         public void Stop()
