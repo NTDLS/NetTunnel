@@ -57,17 +57,16 @@ namespace NetTunnel.Service.Controllers
         }
 
         [HttpPost]
-        [Route("{sessionId}/Add")]
-        public NtActionResponse Add(Guid sessionId, [FromBody] string value)
+        [Route("{sessionId}/PutConfiguration")]
+        public NtActionResponse PutConfiguration(Guid sessionId, [FromBody] string value)
         {
             try
             {
                 Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
 
-                var tunnel = JsonConvert.DeserializeObject<NtServiceConfiguration>(value).EnsureNotNull();
+                var configuration = JsonConvert.DeserializeObject<NtServiceConfiguration>(value).EnsureNotNull();
 
-                //Singletons.Core.InboundTunnels.Add(tunnel);
-                //Singletons.Core.InboundTunnels.SaveToDisk();
+                Singletons.UpdateConfiguration(configuration);
 
                 return new NtActionResponse { Success = true };
             }

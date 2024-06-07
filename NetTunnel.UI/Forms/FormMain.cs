@@ -3,7 +3,6 @@ using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.UI.Helpers;
 using static NetTunnel.Library.Constants;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace NetTunnel.UI.Forms
 {
@@ -736,6 +735,5 @@ namespace NetTunnel.UI.Forms
         }
 
         #endregion
-
     }
 }

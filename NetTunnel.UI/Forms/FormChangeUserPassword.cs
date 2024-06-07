@@ -45,19 +45,19 @@ namespace NetTunnel.UI.Forms
 
                 buttonSave.ThreadSafeEnable(false);
 
-               _client.Security.ChangeUserPassword(user).ContinueWith(t =>
-                {
-                    if (!t.IsCompletedSuccessfully)
-                    {
-                        buttonSave.ThreadSafeEnable(true);
-                        this.ThreadSafeMessageBox("Failed to change user password.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                        return;
-                    }
+                _client.Security.ChangeUserPassword(user).ContinueWith(t =>
+                 {
+                     if (!t.IsCompletedSuccessfully)
+                     {
+                         buttonSave.ThreadSafeEnable(true);
+                         this.ThreadSafeMessageBox("Failed to change user password.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                         return;
+                     }
 
-                    this.ThreadSafeMessageBox("The password has been changed.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                     this.ThreadSafeMessageBox("The password has been changed.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    this.ThreadSafeClose(DialogResult.OK);
-                });
+                     this.ThreadSafeClose(DialogResult.OK);
+                 });
             }
             catch (Exception ex)
             {

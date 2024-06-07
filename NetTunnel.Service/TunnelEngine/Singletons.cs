@@ -15,29 +15,35 @@ namespace NetTunnel.Service.TunnelEngine
             }
         }
 
-        private static NtServiceConfiguration? _settings = null;
+        public static void UpdateConfiguration(NtServiceConfiguration configuration)
+        {
+            _configuration = configuration;
+            CommonApplicationData.SaveToDisk(Library.Constants.FriendlyName, _configuration);
+        }
+
+        private static NtServiceConfiguration? _configuration = null;
         public static NtServiceConfiguration Configuration
         {
             get
             {
-                if (_settings == null)
+                if (_configuration == null)
                 {
-                    _settings = CommonApplicationData.LoadFromDisk<NtServiceConfiguration>(Library.Constants.FriendlyName);
+                    _configuration = CommonApplicationData.LoadFromDisk<NtServiceConfiguration>(Library.Constants.FriendlyName);
 
-                    if (_settings == null)
+                    if (_configuration == null)
                     {
                         //We didn't find a config file, create one with default values.
-                        _settings = new NtServiceConfiguration();
-                        CommonApplicationData.SaveToDisk(Library.Constants.FriendlyName, _settings);
+                        _configuration = new NtServiceConfiguration();
+                        CommonApplicationData.SaveToDisk(Library.Constants.FriendlyName, _configuration);
                     }
 
-                    if (_settings == null)
+                    if (_configuration == null)
                     {
                         throw new Exception("Failed to load configuration.");
                     }
                 }
 
-                return _settings;
+                return _configuration;
             }
         }
     }
