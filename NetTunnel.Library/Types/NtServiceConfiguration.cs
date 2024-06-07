@@ -15,9 +15,9 @@
         /// </summary>
         public int ManagementPortRSASize { get; set; } = 2048;
         /// <summary>
-        /// The buffer size used by endpoint connections for sending and receiving data.
+        /// The buffer size (in bytes) used by endpoint connections for sending and receiving data.
         /// </summary>
-        public int EndpointBufferSize { get; set; } = 16384;
+        public int EndpointBufferSize { get; set; } = 16 * 1024;
 
         /// <summary>
         /// Whether to log debug information to file.
@@ -55,7 +55,7 @@
         /// <summary>
         /// The initial size of the receive buffer. If the buffer ever gets full while receiving data it will be automatically resized up to MaxReceiveBufferSize.
         /// </summary>
-        public int InitialReceiveBufferSize { get; private set; } = 16 * 1024;
+        public int InitialReceiveBufferSize { get; set; } = 16 * 1024;
 
         /// <summary>
         ///The maximum size of the receive buffer. If the buffer ever gets full while receiving data it will be automatically resized up to MaxReceiveBufferSize.
@@ -63,7 +63,7 @@
         public int MaxReceiveBufferSize { get; set; } = 1024 * 1024;
 
         /// <summary>
-        ///The growth rate of the auto-resizing for the receive buffer.
+        ///The growth rate for auto-resizing the receive buffer from its initial size to its maximum size..
         /// </summary>
         public double ReceiveBufferGrowthRate { get; set; } = 0.2;
 

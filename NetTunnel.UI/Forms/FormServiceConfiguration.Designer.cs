@@ -46,7 +46,7 @@
             textBoxTunnelEncryptionKeySize = new TextBox();
             textBoxStaleEndpointExpirationMs = new TextBox();
             checkBoxDebugLogging = new CheckBox();
-            checkBox1 = new CheckBox();
+            checkBoxManagementUseSSL = new CheckBox();
             labelInitialReceiveBufferSize = new Label();
             labelMaxReceiveBufferSize = new Label();
             labelReceiveBufferGrowthRate = new Label();
@@ -73,6 +73,7 @@
             buttonCancel.TabIndex = 2;
             buttonCancel.Text = "Cancel";
             buttonCancel.UseVisualStyleBackColor = true;
+            buttonCancel.Click += buttonCancel_Click;
             // 
             // buttonSave
             // 
@@ -82,6 +83,7 @@
             buttonSave.TabIndex = 1;
             buttonSave.Text = "Save";
             buttonSave.UseVisualStyleBackColor = true;
+            buttonSave.Click += buttonSave_Click;
             // 
             // labelManagementPort
             // 
@@ -205,15 +207,15 @@
             checkBoxDebugLogging.Text = "Debug logging?";
             checkBoxDebugLogging.UseVisualStyleBackColor = true;
             // 
-            // checkBox1
+            // checkBoxManagementUseSSL
             // 
-            checkBox1.AutoSize = true;
-            checkBox1.Location = new Point(244, 22);
-            checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(71, 19);
-            checkBox1.TabIndex = 21;
-            checkBox1.Text = "Use SSL?";
-            checkBox1.UseVisualStyleBackColor = true;
+            checkBoxManagementUseSSL.AutoSize = true;
+            checkBoxManagementUseSSL.Location = new Point(244, 22);
+            checkBoxManagementUseSSL.Name = "checkBoxManagementUseSSL";
+            checkBoxManagementUseSSL.Size = new Size(71, 19);
+            checkBoxManagementUseSSL.TabIndex = 21;
+            checkBoxManagementUseSSL.Text = "Use SSL?";
+            checkBoxManagementUseSSL.UseVisualStyleBackColor = true;
             // 
             // labelInitialReceiveBufferSize
             // 
@@ -281,7 +283,7 @@
             tabPageManagement.Controls.Add(labelManagementPort);
             tabPageManagement.Controls.Add(labelManagementPortRSASize);
             tabPageManagement.Controls.Add(textBoxManagementPort);
-            tabPageManagement.Controls.Add(checkBox1);
+            tabPageManagement.Controls.Add(checkBoxManagementUseSSL);
             tabPageManagement.Location = new Point(4, 24);
             tabPageManagement.Name = "tabPageManagement";
             tabPageManagement.Padding = new Padding(3);
@@ -381,7 +383,7 @@
         private TextBox textBoxTunnelEncryptionKeySize;
         private TextBox textBoxStaleEndpointExpirationMs;
         private CheckBox checkBoxDebugLogging;
-        private CheckBox checkBox1;
+        private CheckBox checkBoxManagementUseSSL;
         private Label labelInitialReceiveBufferSize;
         private Label labelMaxReceiveBufferSize;
         private Label labelReceiveBufferGrowthRate;
