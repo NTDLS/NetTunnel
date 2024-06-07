@@ -15,9 +15,9 @@
             Undefined,
             Connecting,
             Established,
-            Disconnected
+            Disconnected,
+            Stopped
         }
-
 
         public enum NtLogSeverity
         {

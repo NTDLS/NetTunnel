@@ -254,6 +254,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             _heartbeatThread.Join();
             Utility.TryAndIgnore(_server.Stop);
 
+            Status = NtTunnelStatus.Stopped;
+
             Core.Logging.Write(NtLogSeverity.Verbose, $"Stopped inbound tunnel '{Name}'.");
         }
 

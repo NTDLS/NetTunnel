@@ -216,6 +216,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 _establishConnectionThread?.Join(); //Wait on thread to finish.
             }
 
+            Status = NtTunnelStatus.Stopped;
+
             Core.Logging.Write(NtLogSeverity.Verbose, $"Stopped outbound tunnel '{Name}'.");
         }
 
