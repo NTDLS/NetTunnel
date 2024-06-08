@@ -6,6 +6,7 @@ using NetTunnel.Service.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
+using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
@@ -279,10 +280,22 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                         TotalConnections++;
                     }
                 }
-                catch (Exception ex)
+                catch (SocketException ex)
                 {
                     Status = NtTunnelStatus.Disconnected;
 
+                    if (ex.SocketErrorCode == SocketError.ConnectionRefused)
+                    {
+                        Core.Logging.Write(NtLogSeverity.Warning, $"EstablishConnectionThread: {ex.Message}");
+                    }
+                    else
+                    {
+                        Core.Logging.Write(NtLogSeverity.Exception, $"EstablishConnectionThread: {ex.Message}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Status = NtTunnelStatus.Disconnected; //TODO: Are we really disconneced here??
                     Core.Logging.Write(NtLogSeverity.Exception, $"EstablishConnectionThread: {ex.Message}");
                 }
                 finally
