@@ -190,8 +190,14 @@ namespace NetTunnel.UI.Forms
                                     case NtTunnelStatus.Disconnected:
                                         item.BackColor = Color.FromArgb(255, 200, 200);
                                         break;
+                                    case NtTunnelStatus.Stopped:
+                                        item.BackColor = Color.FromArgb(255, 200, 0);
+                                        break;
                                     case NtTunnelStatus.Established:
                                         item.BackColor = Color.FromArgb(200, 255, 200);
+                                        break;
+                                    default:
+                                        item.BackColor = Color.FromArgb(255, 255, 255);
                                         break;
                                 }
                             }
@@ -494,6 +500,43 @@ namespace NetTunnel.UI.Forms
                         listViewEndpoints.ThreadSafeClearRows();
                     }
                     // Stop ↑
+                    else if (e.ClickedItem?.Text == "Start")
+                    {
+                        _client.EnsureNotNull();
+                        rowUnderMouse.EnsureNotNull();
+
+                        var tunnel = ((INtTunnelConfiguration?)rowUnderMouse.Tag).EnsureNotNull();
+
+                        if (rowUnderMouse.Tag is NtTunnelInboundConfiguration tunnelInbound)
+                        {
+                            _client.TunnelInbound.Start(tunnelInbound.TunnelId).ContinueWith((o) =>
+                            {
+                                if (o.IsCompletedSuccessfully == false)
+                                {
+                                    this.ThreadSafeMessageBox($"Failed to start the tunnel.",
+                                        FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+
+                                    _needToRepopulateTunnels = true;
+                                }
+                            });
+                        }
+                        else if (rowUnderMouse.Tag is NtTunnelOutboundConfiguration tunnelOutbound)
+                        {
+                            _client.TunnelOutbound.Start(tunnelOutbound.TunnelId).ContinueWith((o) =>
+                            {
+                                if (o.IsCompletedSuccessfully == false)
+                                {
+                                    this.ThreadSafeMessageBox($"Failed to start the tunnel.",
+                                        FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+
+                                    _needToRepopulateTunnels = true;
+                                }
+                            });
+                        }
+
+                        listViewEndpoints.ThreadSafeClearRows();
+                    }
+                    //Start ↑
                     else if (e.ClickedItem?.Text == "Delete Tunnel")
                     {
                         _client.EnsureNotNull();
