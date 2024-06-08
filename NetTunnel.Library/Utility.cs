@@ -9,21 +9,20 @@ namespace NetTunnel.Library
 {
     public static class Utility
     {
-        public static string CalculateSHA256(string input)
+        public static string ComputeSha256Hash(string input)
+            => ComputeSha256Hash(Encoding.UTF8.GetBytes(input));
+
+        public static string ComputeSha256Hash(byte[] inputBytes)
         {
-            using (SHA256 sha256 = SHA256.Create())
+            var stringBuilder = new StringBuilder();
+
+            var hashBytes = SHA256.HashData(inputBytes);
+            for (int i = 0; i < hashBytes.Length; i++)
             {
-                byte[] inputBytes = Encoding.UTF8.GetBytes(input);
-                byte[] hashBytes = sha256.ComputeHash(inputBytes);
-
-                StringBuilder stringBuilder = new StringBuilder();
-                for (int i = 0; i < hashBytes.Length; i++)
-                {
-                    stringBuilder.Append(hashBytes[i].ToString("x2"));
-                }
-
-                return stringBuilder.ToString();
+                stringBuilder.Append(hashBytes[i].ToString("x2"));
             }
+
+            return stringBuilder.ToString();
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]

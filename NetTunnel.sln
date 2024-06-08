@@ -16,10 +16,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		@Installers\Installer.Iss = @Installers\Installer.Iss
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTDLS.ReliableMessaging", "..\NTDLS.ReliableMessaging\NTDLS.ReliableMessaging\NTDLS.ReliableMessaging.csproj", "{52E8BE3E-6A1A-4B18-819C-BADBC120DB38}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NTDLS.NASCCL", "..\NTDLS.NASCCL\NTDLS.NASCCL\NTDLS.NASCCL.csproj", "{F0E591F9-7E64-4FE2-91E2-1632EC0F4B20}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,14 +38,6 @@ Global
 		{1D602D6B-348B-41FE-ABC8-9A98FD6CD247}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D602D6B-348B-41FE-ABC8-9A98FD6CD247}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D602D6B-348B-41FE-ABC8-9A98FD6CD247}.Release|Any CPU.Build.0 = Release|Any CPU
-		{52E8BE3E-6A1A-4B18-819C-BADBC120DB38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{52E8BE3E-6A1A-4B18-819C-BADBC120DB38}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{52E8BE3E-6A1A-4B18-819C-BADBC120DB38}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{52E8BE3E-6A1A-4B18-819C-BADBC120DB38}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F0E591F9-7E64-4FE2-91E2-1632EC0F4B20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F0E591F9-7E64-4FE2-91E2-1632EC0F4B20}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F0E591F9-7E64-4FE2-91E2-1632EC0F4B20}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F0E591F9-7E64-4FE2-91E2-1632EC0F4B20}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

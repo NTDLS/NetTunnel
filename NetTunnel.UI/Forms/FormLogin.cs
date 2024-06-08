@@ -44,7 +44,7 @@ namespace NetTunnel.UI.Forms
                     throw new Exception("Invalid port.");
 
                 Username = textBoxUsername.Text;
-                Password = Utility.CalculateSHA256(textBoxPassword.Text);
+                Password = Utility.ComputeSha256Hash(textBoxPassword.Text);
                 UseSSL = checkBoxUseSSL.Checked;
                 Address = textBoxAddress.Text;
 

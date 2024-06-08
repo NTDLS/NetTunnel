@@ -57,9 +57,9 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 if (o.Count == 0)
                 {
 #if DEBUG
-                    Add("debug", Utility.CalculateSHA256("123456789"));
+                    Add("debug", Utility.ComputeSha256Hash("123456789"));
 #endif
-                    Add("root", Utility.CalculateSHA256(Environment.MachineName.ToLower()));
+                    Add("root", Utility.ComputeSha256Hash(Environment.MachineName.ToLower()));
                     SaveToDisk();
                 }
             });

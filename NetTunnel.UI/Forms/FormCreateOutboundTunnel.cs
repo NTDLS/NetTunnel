@@ -2,7 +2,6 @@
 using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.UI.Helpers;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace NetTunnel.UI.Forms
 {
@@ -87,7 +86,7 @@ namespace NetTunnel.UI.Forms
 
                 var outboundTunnel = new NtTunnelOutboundConfiguration(tunnelId, textBoxName.Text,
                     textBoxRemoteAddress.Text, int.Parse(textBoxManagementPort.Text), int.Parse(textBoxTunnelDataPort.Text),
-                    textBoxRemoteUsername.Text, Utility.CalculateSHA256(textBoxRemotePassword.Text));
+                    textBoxRemoteUsername.Text, Utility.ComputeSha256Hash(textBoxRemotePassword.Text));
 
                 var inboundTunnel = new NtTunnelInboundConfiguration(tunnelId, textBoxName.Text, int.Parse(textBoxTunnelDataPort.Text));
 

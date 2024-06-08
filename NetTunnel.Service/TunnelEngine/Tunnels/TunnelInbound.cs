@@ -6,7 +6,6 @@ using NetTunnel.Service.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
-using System.Text;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
@@ -72,7 +71,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             _server.OnConnected += _server_OnConnected;
             _server.OnDisconnected += _server_OnDisconnected;
 
-            _server.OnException += (RmContext context, Exception ex, IRmPayload? payload) =>
+            _server.OnException += (RmContext? context, Exception ex, IRmPayload? payload) =>
             {
                 Core.Logging.Write(NtLogSeverity.Exception, $"RPC server exception: '{ex.Message}'"
                     + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
@@ -129,7 +128,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 var negotiationReply = new NtFramePayloadKeyExchangeReply(negotiationReplyToken);
                 _encryptionProvider = new FramePayloads.EncryptionProvider(compoundNegotiator.SharedSecret);
 
-                Core.Logging.Write(NtLogSeverity.Verbose, $"Encryption Key: {Convert.ToBase64String(compoundNegotiator.SharedSecret)}");
+                Core.Logging.Write(NtLogSeverity.Verbose, $"Encryption Key generated, hash: {Utility.ComputeSha256Hash(compoundNegotiator.SharedSecret)}");
 
                 return negotiationReply;
             }
@@ -164,12 +163,11 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         {
             if (payload is NtFramePayloadEncryptionReady)
             {
-                Core.Logging.Write(NtLogSeverity.Debug, $"Encryption is ready.'");
-
                 SecureKeyExchangeIsComplete = true;
                 _server.SetEncryptionProvider(_encryptionProvider);
 
-                Core.Logging.Write(NtLogSeverity.Verbose, $"Encryption is ready for '{Name}'.");
+                Core.Logging.Write(NtLogSeverity.Verbose, $"End-to-end encryption has been established for '{Name}'.");
+
             }
 
             if (SecureKeyExchangeIsComplete == false)

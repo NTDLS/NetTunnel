@@ -37,7 +37,7 @@ namespace NetTunnel.UI.Forms
                 if (textBoxPassword.Text != textBoxConfirmPassword.Text)
                     throw new Exception("The password and confirm-passwords must match.");
 
-                CreatedUser = new NtUser(textBoxUsername.Text, Utility.CalculateSHA256(textBoxPassword.Text));
+                CreatedUser = new NtUser(textBoxUsername.Text, Utility.ComputeSha256Hash(textBoxPassword.Text));
 
                 buttonSave.ThreadSafeEnable(false);
 

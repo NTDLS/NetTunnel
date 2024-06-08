@@ -6,7 +6,6 @@ using NetTunnel.Service.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
-using System.Text;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
@@ -80,7 +79,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             _client.OnConnected += _client_OnConnected;
             _client.OnDisconnected += _client_OnDisconnected;
 
-            _client.OnException += (RmContext context, Exception ex, IRmPayload? payload) =>
+            _client.OnException += (RmContext? context, Exception ex, IRmPayload? payload) =>
             {
                 Core.Logging.Write(NtLogSeverity.Exception, $"RPC client exception: '{ex.Message}'"
                     + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
@@ -265,14 +264,14 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                                 compoundNegotiator.ApplyNegotiationResponseToken(t.Result.NegotiationToken);
                                 _encryptionProvider = new FramePayloads.EncryptionProvider(compoundNegotiator.SharedSecret);
 
-                                Core.Logging.Write(NtLogSeverity.Verbose, $"Encryption Key: {Convert.ToBase64String(compoundNegotiator.SharedSecret)}");
+                                Core.Logging.Write(NtLogSeverity.Verbose, $"Encryption Key generated, hash: {Utility.ComputeSha256Hash(compoundNegotiator.SharedSecret)}");
 
                                 _client.Notify(new NtFramePayloadEncryptionReady());
 
                                 SecureKeyExchangeIsComplete = true;
                                 _client.SetEncryptionProvider(_encryptionProvider);
 
-                                Core.Logging.Write(NtLogSeverity.Verbose, $"Encryption is ready for '{Name}'.");
+                                Core.Logging.Write(NtLogSeverity.Verbose, $"End-to-end encryption has been established for '{Name}'.");
                             }
                         });
 

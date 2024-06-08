@@ -12,14 +12,10 @@ namespace NetTunnel.Service.FramePayloads
             _streamCryptography = new NASCCLStream(encryptionKey);
         }
 
-
         public byte[] Decrypt(byte[] encryptedPayload)
         {
-            //return encryptedPayload;
             lock (_streamCryptography)
             {
-                Console.WriteLine($"Decrypt Key CRC: {CRC16.ComputeChecksum(_streamCryptography._keyBuffer)}");
-
                 _streamCryptography.Cipher(ref encryptedPayload);
                 _streamCryptography.ResetStream();
             }
@@ -28,17 +24,13 @@ namespace NetTunnel.Service.FramePayloads
 
         public byte[] Encrypt(byte[] payload)
         {
-            //return payload;
             lock (_streamCryptography)
             {
-                Console.WriteLine($"Encrypt Key CRC: {CRC16.ComputeChecksum(_streamCryptography._keyBuffer)}");
-
                 _streamCryptography.Cipher(ref payload);
                 _streamCryptography.ResetStream();
             }
             return payload;
         }
-
 
         internal static class CRC16
         {
