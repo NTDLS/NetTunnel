@@ -93,12 +93,20 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         private void _client_OnDisconnected(RmContext context)
         {
             Status = NtTunnelStatus.Disconnected;
+
+            _encryptionProvider = null;
+            SecureKeyExchangeIsComplete = false;
+
             Core.Logging.Write(NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' disconnected.");
         }
 
         private void _client_OnConnected(RmContext context)
         {
             Status = NtTunnelStatus.Established;
+
+            _encryptionProvider = null;
+            SecureKeyExchangeIsComplete = false;
+
             Core.Logging.Write(NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' connection successful.");
         }
 
@@ -233,6 +241,9 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                     if (_client.IsConnected == false)
                     {
                         Status = NtTunnelStatus.Connecting;
+
+                        _encryptionProvider = null;
+                        SecureKeyExchangeIsComplete = false;
 
                         Core.Logging.Write(NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' connecting to remote at {Address}:{DataPort}.");
 
