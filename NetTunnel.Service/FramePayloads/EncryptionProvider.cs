@@ -15,14 +15,22 @@ namespace NetTunnel.Service.FramePayloads
         public byte[] Decrypt(byte[] encryptedPayload)
         {
             //return encryptedPayload;
-            _streamCryptography.Cipher(ref encryptedPayload);
+            lock (_streamCryptography)
+            {
+                _streamCryptography.Cipher(ref encryptedPayload);
+                _streamCryptography.ResetStream();
+            }
             return encryptedPayload;
         }
 
         public byte[] Encrypt(byte[] payload)
         {
             //return payload;
-            _streamCryptography.Cipher(ref payload);
+            lock (_streamCryptography)
+            {
+                _streamCryptography.Cipher(ref payload);
+                _streamCryptography.ResetStream();
+            }
             return payload;
         }
     }
