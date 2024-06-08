@@ -22,6 +22,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.6" />
     <PackageReference Include="NTDLS.NASCCL" Version="1.1.1" />
+    <PackageReference Include="NTDLS.ReliableMessaging" Version="1.7.5" />
     <PackageReference Include="NTDLS.SecureKeyExchange" Version="2.2.1" />
     <PackageReference Include="NTDLS.Semaphore" Version="3.3.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
@@ -29,7 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\NTDLS.ReliableMessaging\NTDLS.ReliableMessaging\NTDLS.ReliableMessaging.csproj" />
     <ProjectReference Include="..\NetTunnel.ClientAPI\NetTunnel.ClientAPI.csproj" />
     <ProjectReference Include="..\NetTunnel.Library\NetTunnel.Library.csproj" />
   </ItemGroup>
