@@ -27,7 +27,7 @@
         /// <summary>
         /// The duration in milliseconds to wait on message query operations.
         /// </summary>
-        public int MessageQueryTimeoutMs { get; set; } = 60000;
+        public int MessageQueryTimeoutMs { get; set; } = 10000;
 
         /// <summary>
         /// The delay in milliseconds between tunnel heartbeats.
