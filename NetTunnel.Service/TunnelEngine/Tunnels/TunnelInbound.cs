@@ -277,6 +277,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         public Task<T> Query<T>(IRmQuery<T> query) where T : class, IRmQueryReply
         {
+            Console.WriteLine($"Query: {query.GetType().Name}");
+
             if (_peerRmClientConnectionId == null)
             {
                 throw new Exception("The RPC server is not connected.");
@@ -294,6 +296,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         public void Notify(IRmNotification notification)
         {
+            Console.WriteLine($"Notify: {notification.GetType().Name}");
+
             if (_peerRmClientConnectionId == null)
             {
                 throw new Exception("The RPC server is not connected.");
