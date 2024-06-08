@@ -97,7 +97,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             SecureKeyExchangeIsComplete = false;
             _client.ClearEncryptionProvider();
 
-            Core.Logging.Write(NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' disconnected.");
+            Core.Logging.Write(NtLogSeverity.Warning, $"Outbound tunnel '{Name}' disconnected.");
         }
 
         private void _client_OnConnected(RmContext context)
