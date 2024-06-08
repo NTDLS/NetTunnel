@@ -16,7 +16,7 @@ namespace NetTunnel.Service.FramePayloads
         {
             lock (_streamCryptography)
             {
-                Console.WriteLine($"Decrypt {encryptedPayload.Length:n0} bytes.");
+                //Console.WriteLine($"Decrypt {encryptedPayload.Length:n0} bytes.");
                 _streamCryptography.Cipher(ref encryptedPayload);
                 _streamCryptography.ResetStream();
             }
@@ -27,7 +27,7 @@ namespace NetTunnel.Service.FramePayloads
         {
             lock (_streamCryptography)
             {
-                Console.WriteLine($"Encrypt {payload.Length:n0} bytes.");
+                //Console.WriteLine($"Encrypt {payload.Length:n0} bytes.");
                 _streamCryptography.Cipher(ref payload);
                 _streamCryptography.ResetStream();
             }

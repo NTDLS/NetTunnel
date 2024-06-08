@@ -13,17 +13,20 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
     {
         private Thread? _inboundConnectionThread;
 
-        private readonly TcpListener _listener;
+        private TcpListener? _listener;
+        private readonly NtEndpointInboundConfiguration _configuration;
 
         public EndpointInbound(TunnelEngineCore core, ITunnel tunnel, NtEndpointInboundConfiguration configuration)
             : base(core, tunnel, configuration.EndpointId, configuration.Name, configuration.TransmissionPort)
         {
-            _listener = new TcpListener(IPAddress.Any, configuration.TransmissionPort);
+            _configuration = configuration;
         }
 
         public override void Start()
         {
             base.Start();
+
+            _listener = new TcpListener(IPAddress.Any, _configuration.TransmissionPort);
 
             _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Starting inbound endpoint '{Name}' on port {TransmissionPort}.");
 
@@ -35,7 +38,11 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
             base.Stop();
 
-            Utility.TryAndIgnore(_listener.Stop);
+            if (_listener != null)
+            {
+                Utility.TryAndIgnore(_listener.Stop);
+                Utility.TryAndIgnore(_listener.Dispose);
+            }
 
             _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopping inbound endpoint '{Name}' on port {TransmissionPort}.");
 
@@ -57,7 +64,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
             try
             {
-                _listener.Start();
+                _listener.EnsureNotNull().Start();
 
                 _core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Listening inbound endpoint '{Name}' on port {TransmissionPort}");
 
@@ -87,7 +94,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             }
             finally
             {
-                Utility.TryAndIgnore(_listener.Stop);
+                if (_listener != null)
+                {
+                    Utility.TryAndIgnore(_listener.Stop);
+                }
             }
         }
     }

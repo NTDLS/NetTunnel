@@ -93,8 +93,6 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 endpoint.Stop();
 
                 tunnel.DeleteEndpoint(endpointId);
-
-                endpoint.Start();
             });
         }
 
