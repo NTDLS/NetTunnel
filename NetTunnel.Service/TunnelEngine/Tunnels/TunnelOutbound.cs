@@ -254,6 +254,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
                                 SecureKeyExchangeIsComplete = true;
                                 _client.SetEncryptionProvider(_encryptionProvider);
+
+                                Core.Logging.Write(NtLogSeverity.Verbose, $"Encryption is ready for '{Name}'.");
                             }
                         });
 
