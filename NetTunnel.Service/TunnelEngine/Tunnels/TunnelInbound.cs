@@ -91,6 +91,10 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 return;
             }
 
+            SecureKeyExchangeIsComplete = false;
+            _encryptionProvider = null;
+            _server.ClearEncryptionProvider();
+
             Core.Logging.Write(NtLogSeverity.Verbose, $"Accepted connection for inbound tunnel '{Name}' on port {DataPort}.");
             Status = NtTunnelStatus.Established;
 
@@ -103,6 +107,10 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         private void _server_OnDisconnected(RmContext context)
         {
             Status = NtTunnelStatus.Disconnected;
+
+            SecureKeyExchangeIsComplete = false;
+            _encryptionProvider = null;
+            _server.ClearEncryptionProvider();
 
             CurrentConnections--;
 
