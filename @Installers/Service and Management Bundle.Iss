@@ -32,13 +32,13 @@
  Source: "..\NetTunnel.UI\bin\Release\net8.0-windows\*.json";    DestDir: "{app}";           Flags: IgnoreVersion;
   
 [Icons]
- Name: "{commondesktop}\NetTunnel Manager";  Filename: "{app}\UI\NetTunnel.UI.exe";
+ Name: "{commondesktop}\NetTunnel Manager"; Filename: "{app}\NetTunnel.UI.exe";
+ Name: "{group}\NetTunnel Manager";         Filename: "{app}\NetTunnel.UI.exe";
 
 [Run]
  Filename: "{app}\NetTunnel.Service.exe"; Parameters: "install"; Flags: runhidden; StatusMsg: "Installing service..."
  Filename: "{app}\NetTunnel.Service.exe"; Parameters: "start"; Flags: runhidden; StatusMsg: "Starting service..."
  Filename: "{app}\NetTunnel.UI.exe"; Description: "Run NetTunnel Manager now?"; Flags: postinstall nowait skipifsilent shellexec;
-
 
 [UninstallRun]
  Filename: "{app}\NetTunnel.Service.exe"; Parameters: "uninstall"; Flags: runhidden; StatusMsg: "Installing service..."; RunOnceId: "ServiceRemoval"
