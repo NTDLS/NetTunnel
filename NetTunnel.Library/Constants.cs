@@ -3,6 +3,7 @@
     public static class Constants
     {
         public const string FriendlyName = "NetTunnel";
+        public const string EventSourceName = "NetTunnel";
 
         public enum NtDirection
         {

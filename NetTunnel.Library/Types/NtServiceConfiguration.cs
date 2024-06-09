@@ -20,9 +20,14 @@
         public int EndpointBufferSize { get; set; } = 16 * 1024;
 
         /// <summary>
-        /// Whether to log debug information to file.
+        /// Whether to log debug information.
         /// </summary>
         public bool DebugLogging { get; set; } = false;
+
+        /// <summary>
+        /// Whether to log verbose information.
+        /// </summary>
+        public bool VerboseLogging { get; set; } = true;
 
         /// <summary>
         /// The duration in milliseconds to wait on message query operations.

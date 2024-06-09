@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Topshelf;
 
 namespace NetTunnel.Service
@@ -26,6 +27,14 @@ namespace NetTunnel.Service
                 x.SetDescription("Omni-directional network tunneling service.");
                 x.SetDisplayName("NetworkDLS NetTunnel");
                 x.SetServiceName("NtNetTunnel");
+
+                x.BeforeInstall(() =>
+                {
+                    if (!EventLog.SourceExists(Library.Constants.EventSourceName))
+                    {
+                        EventLog.CreateEventSource(Library.Constants.EventSourceName, "Application");
+                    }
+                });
             });
         }
     }
