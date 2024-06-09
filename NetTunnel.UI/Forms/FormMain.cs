@@ -742,7 +742,7 @@ namespace NetTunnel.UI.Forms
                     var item = new ListViewItem(endpoint.Name);
                     item.Tag = endpoint;
                     item.SubItems.Add("Outbound");
-                    item.SubItems.Add($"{endpoint.Address}{endpoint.TransmissionPort}");
+                    item.SubItems.Add($"{endpoint.Address}:{endpoint.TransmissionPort}");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
