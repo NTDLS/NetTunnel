@@ -2,6 +2,7 @@
 using NetTunnel.Service.FramePayloads.Notifications;
 using NetTunnel.Service.TunnelEngine.Tunnels;
 using NTDLS.Semaphore;
+using System.Net.Sockets;
 
 namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
@@ -136,6 +137,25 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                     var exchangePayload = new NtFramePayloadEndpointExchange(_tunnel.TunnelId, EndpointId, activeConnection.StreamId, buffer, length);
                     _tunnel.Notify(exchangePayload);
+                }
+            }
+            catch (IOException ex)
+            {
+                if (ex?.InnerException is SocketException sockEx)
+                {
+                    if (sockEx.SocketErrorCode == SocketError.ConnectionAborted)
+                    {
+                        //We don't typically care about this. This is something as simple as a user closing a web-browswr.
+                        _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"EndpointDataExchangeThreadProc: {ex.Message}");
+                    }
+                    else
+                    {
+                        _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Exception, $"EndpointDataExchangeThreadProc: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Exception, $"EndpointDataExchangeThreadProc: {ex.Message}");
                 }
             }
             catch (Exception ex)
