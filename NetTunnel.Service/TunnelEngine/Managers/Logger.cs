@@ -49,7 +49,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
                 Console.WriteLine($"{severity} ({dt.ToShortDateString()} {dt.ToShortTimeString()}): {text}");
                 Console.ResetColor();
-                Utility.TryAndIgnore(() => EventLog.WriteEntry(Library.Constants.EventSourceName, text, eventLogType));
+                Utility.TryAndIgnore(() => EventLog.WriteEntry(Constants.EventSourceName, text, eventLogType));
             }
         }
     }
