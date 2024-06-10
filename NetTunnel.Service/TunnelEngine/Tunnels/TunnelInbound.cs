@@ -39,7 +39,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         public List<IEndpoint> Endpoints { get; private set; } = new();
 
         private readonly Thread _heartbeatThread;
-        private FramePayloads.EncryptionProvider? _encryptionProvider;
+        private FramePayloads.CryptographyProvider? _encryptionProvider;
 
         #endregion
 
@@ -92,7 +92,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             SecureKeyExchangeIsComplete = false;
             _encryptionProvider = null;
-            _server.ClearEncryptionProvider();
+            _server.ClearCryptographyProvider();
 
             Core.Logging.Write(NtLogSeverity.Verbose, $"Accepted connection for inbound tunnel '{Name}' on port {DataPort}.");
             Status = NtTunnelStatus.Established;
@@ -126,7 +126,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 var compoundNegotiator = new CompoundNegotiator();
                 var negotiationReplyToken = compoundNegotiator.ApplyNegotiationToken(keyExchangeRequest.NegotiationToken);
                 var negotiationReply = new NtFramePayloadKeyExchangeReply(negotiationReplyToken);
-                _encryptionProvider = new FramePayloads.EncryptionProvider(compoundNegotiator.SharedSecret);
+                _encryptionProvider = new FramePayloads.CryptographyProvider(compoundNegotiator.SharedSecret);
 
                 Core.Logging.Write(NtLogSeverity.Verbose, $"Encryption Key generated, hash: {Utility.ComputeSha256Hash(compoundNegotiator.SharedSecret)}");
 
@@ -164,7 +164,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             if (payload is NtFramePayloadEncryptionReady)
             {
                 SecureKeyExchangeIsComplete = true;
-                _server.SetEncryptionProvider(_encryptionProvider);
+                _server.SetCryptographyProvider(_encryptionProvider);
 
                 Core.Logging.Write(NtLogSeverity.Verbose, $"End-to-end encryption has been established for '{Name}'.");
 
@@ -282,9 +282,10 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             var connectionId = _peerRmClientConnectionId.EnsureNotNullOrEmpty();
 
-            if (_server.GetClient(connectionId) == null)
+            if (_server.GetContext(connectionId) == null)
             {
-                throw new Exception("The RPC server client was not found.");
+                //Is there a reason we check this?
+                throw new Exception("The RPC server context was not found.");
             }
 
             return _server.Query(connectionId, query, Singletons.Configuration.MessageQueryTimeoutMs);
@@ -299,9 +300,9 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             var connectionId = _peerRmClientConnectionId.EnsureNotNullOrEmpty();
 
-            if (_server.GetClient(connectionId) == null)
+            if (_server.GetContext(connectionId) == null)
             {
-                throw new Exception("The RPC server client was not found.");
+                throw new Exception("The RPC server context was not found.");
             }
 
             _server.Notify(connectionId, notification);

@@ -141,11 +141,11 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             }
             catch (IOException ex)
             {
-                if (ex?.InnerException is SocketException sockEx)
+                if (ex.InnerException is SocketException sockEx)
                 {
                     if (sockEx.SocketErrorCode == SocketError.ConnectionAborted)
                     {
-                        //We don't typically care about this. This is something as simple as a user closing a web-browswr.
+                        //We don't typically care about this. This is something as simple as a user closing a web-browser.
                         _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"EndpointDataExchangeThreadProc: {ex.Message}");
                     }
                     else

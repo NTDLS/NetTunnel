@@ -3,16 +3,16 @@ using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Service.FramePayloads
 {
-    public class EncryptionProvider : IRmEncryptionProvider
+    public class CryptographyProvider : IRmCryptographyProvider
     {
         private readonly NASCCLStream _streamCryptography;
 
-        public EncryptionProvider(byte[] encryptionKey)
+        public CryptographyProvider(byte[] encryptionKey)
         {
             _streamCryptography = new NASCCLStream(encryptionKey);
         }
 
-        public byte[] Decrypt(byte[] encryptedPayload)
+        public byte[] Decrypt(RmContext context, byte[] encryptedPayload)
         {
             lock (_streamCryptography)
             {
@@ -23,7 +23,7 @@ namespace NetTunnel.Service.FramePayloads
             return encryptedPayload;
         }
 
-        public byte[] Encrypt(byte[] payload)
+        public byte[] Encrypt(RmContext context, byte[] payload)
         {
             lock (_streamCryptography)
             {

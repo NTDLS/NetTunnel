@@ -44,7 +44,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         public List<IEndpoint> Endpoints { get; private set; } = new();
 
         private readonly Thread _heartbeatThread;
-        private FramePayloads.EncryptionProvider? _encryptionProvider;
+        private FramePayloads.CryptographyProvider? _encryptionProvider;
 
         #endregion
 
@@ -246,7 +246,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
                         _encryptionProvider = null;
                         SecureKeyExchangeIsComplete = false;
-                        _client.ClearEncryptionProvider();
+                        _client.ClearCryptographyProvider();
 
                         Core.Logging.Write(NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' connecting to remote at {Address}:{DataPort}.");
 
@@ -263,14 +263,14 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                             if (t.IsCompletedSuccessfully && t.Result != null)
                             {
                                 compoundNegotiator.ApplyNegotiationResponseToken(t.Result.NegotiationToken);
-                                _encryptionProvider = new FramePayloads.EncryptionProvider(compoundNegotiator.SharedSecret);
+                                _encryptionProvider = new FramePayloads.CryptographyProvider(compoundNegotiator.SharedSecret);
 
                                 Core.Logging.Write(NtLogSeverity.Verbose, $"Encryption Key generated, hash: {Utility.ComputeSha256Hash(compoundNegotiator.SharedSecret)}");
 
                                 _client.Notify(new NtFramePayloadEncryptionReady());
 
                                 SecureKeyExchangeIsComplete = true;
-                                _client.SetEncryptionProvider(_encryptionProvider);
+                                _client.SetCryptographyProvider(_encryptionProvider);
 
                                 Core.Logging.Write(NtLogSeverity.Verbose, $"End-to-end encryption has been established for '{Name}'.");
                             }
