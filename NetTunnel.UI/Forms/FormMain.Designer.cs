@@ -56,8 +56,9 @@
             columnHeaderEndpointAddress = new ColumnHeader();
             columnHeaderEndpointBytesSent = new ColumnHeader();
             columnHeaderEndpointBytesReceived = new ColumnHeader();
-            columnHeaderEndpointTotalConnections = new ColumnHeader();
+            columnHeaderCompressionRatio = new ColumnHeader();
             columnHeaderEndpointCurrentConenctions = new ColumnHeader();
+            columnHeaderEndpointTotalConnections = new ColumnHeader();
             labelEndpoints = new Label();
             menuStripBody.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -225,7 +226,7 @@
             // 
             // listViewEndpoints
             // 
-            listViewEndpoints.Columns.AddRange(new ColumnHeader[] { columnHeaderEndpointName, columnHeaderEndpointDirection, columnHeaderEndpointAddress, columnHeaderEndpointBytesSent, columnHeaderEndpointBytesReceived, columnHeaderEndpointTotalConnections, columnHeaderEndpointCurrentConenctions });
+            listViewEndpoints.Columns.AddRange(new ColumnHeader[] { columnHeaderEndpointName, columnHeaderEndpointDirection, columnHeaderEndpointAddress, columnHeaderEndpointBytesSent, columnHeaderEndpointBytesReceived, columnHeaderCompressionRatio, columnHeaderEndpointCurrentConenctions, columnHeaderEndpointTotalConnections });
             listViewEndpoints.Dock = DockStyle.Fill;
             listViewEndpoints.FullRowSelect = true;
             listViewEndpoints.GridLines = true;
@@ -255,22 +256,27 @@
             // columnHeaderEndpointBytesSent
             // 
             columnHeaderEndpointBytesSent.Text = "Sent (KB)";
-            columnHeaderEndpointBytesSent.Width = 100;
+            columnHeaderEndpointBytesSent.Width = 90;
             // 
             // columnHeaderEndpointBytesReceived
             // 
             columnHeaderEndpointBytesReceived.Text = "Recvd (KB)";
-            columnHeaderEndpointBytesReceived.Width = 100;
+            columnHeaderEndpointBytesReceived.Width = 90;
+            // 
+            // columnHeaderCompressionRatio
+            // 
+            columnHeaderCompressionRatio.Text = "Comp. Ratio";
+            columnHeaderCompressionRatio.Width = 90;
+            // 
+            // columnHeaderEndpointCurrentConenctions
+            // 
+            columnHeaderEndpointCurrentConenctions.Text = "Current Conn.";
+            columnHeaderEndpointCurrentConenctions.Width = 100;
             // 
             // columnHeaderEndpointTotalConnections
             // 
             columnHeaderEndpointTotalConnections.Text = "Total Conn.";
             columnHeaderEndpointTotalConnections.Width = 100;
-            // 
-            // columnHeaderEndpointCurrentConenctions
-            // 
-            columnHeaderEndpointCurrentConenctions.Text = "Curnt Conn.";
-            columnHeaderEndpointCurrentConenctions.Width = 100;
             // 
             // labelEndpoints
             // 
@@ -341,5 +347,6 @@
         private ToolStripMenuItem aboutToolStripMenuItem;
         private ToolStripMenuItem configurationToolStripMenuItem1;
         private ToolStripSeparator toolStripMenuItem1;
+        private ColumnHeader columnHeaderCompressionRatio;
     }
 }

@@ -138,7 +138,6 @@ namespace NetTunnel.UI.Forms
                         {
                             var endpoint = ((INtEndpointConfiguration?)item.Tag).EnsureNotNull();
 
-
                             var direction = (endpoint is NtEndpointInboundConfiguration) ? NtDirection.Inbound : NtDirection.Outbound;
 
                             var tunnelStats = statistics.Where(o => o.TunnelId == endpoint.TunnelId).ToList();
@@ -148,10 +147,24 @@ namespace NetTunnel.UI.Forms
                                     .Where(o => o.EndpointId == endpoint.EndpointId && o.Direction == direction).SingleOrDefault();
                                 if (endpointStats != null)
                                 {
+                                    double compressionRatio = 0;
+                                    if (endpointStats.BytesSentKb > 0 && endpointStats.BytesReceivedKb > 0)
+                                    {
+                                        if (direction == NtDirection.Outbound)
+                                        {
+                                            compressionRatio = 100 - (endpointStats.BytesReceivedKb / endpointStats.BytesSentKb) * 100.0;
+                                        }
+                                        else
+                                        {
+                                            compressionRatio = 100 - (endpointStats.BytesSentKb / endpointStats.BytesReceivedKb) * 100.0;
+                                        }
+                                    }
+
                                     item.SubItems[columnHeaderEndpointBytesSent.Index].Text = $"{endpointStats.BytesSentKb:n0}";
                                     item.SubItems[columnHeaderEndpointBytesReceived.Index].Text = $"{endpointStats.BytesReceivedKb:n0}";
                                     item.SubItems[columnHeaderEndpointTotalConnections.Index].Text = $"{endpointStats.TotalConnections:n0}";
                                     item.SubItems[columnHeaderEndpointCurrentConenctions.Index].Text = $"{endpointStats.CurrentConnections:n0}";
+                                    item.SubItems[columnHeaderCompressionRatio.Index].Text = $"{compressionRatio:n2}";
                                 }
                             }
                         }
@@ -727,6 +740,7 @@ namespace NetTunnel.UI.Forms
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
+                    item.SubItems.Add("∞");
                     listViewEndpoints.Items.Add(item);
                 }
             }
@@ -743,6 +757,7 @@ namespace NetTunnel.UI.Forms
                     item.Tag = endpoint;
                     item.SubItems.Add("Outbound");
                     item.SubItems.Add($"{endpoint.Address}:{endpoint.TransmissionPort}");
+                    item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
