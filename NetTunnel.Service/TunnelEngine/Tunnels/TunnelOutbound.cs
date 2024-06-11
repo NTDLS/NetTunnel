@@ -1,6 +1,8 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.ReliableMessages;
+using NetTunnel.Service.ReliableMessages.Notification;
+using NetTunnel.Service.ReliableMessages.Query;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
@@ -172,7 +174,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         public void InitializeCryptographyProvider(byte[] sharedSecret)
         {
-            _cryptographyProvider = new FramePayloads.CryptographyProvider(sharedSecret);
+            _cryptographyProvider = new CryptographyProvider(sharedSecret);
 
             Core.Logging.Write(NtLogSeverity.Verbose,
                 $"Encryption Key generated, hash: {Utility.ComputeSha256Hash(sharedSecret)}");

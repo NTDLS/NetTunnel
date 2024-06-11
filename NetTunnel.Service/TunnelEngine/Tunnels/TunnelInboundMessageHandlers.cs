@@ -8,6 +8,12 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 {
     internal class TunnelInboundMessageHandlers : TunnelMessageHandlerBase, IRmMessageHandler
     {
+        /// <summary>
+        /// The remote service is letting us know that they are about to start using the cryptography provider,
+        /// so we need to apply the one that we have ready on this end.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="notification"></param>
         public void OnNotificationApplyCryptography(RmContext context, NotificationApplyCryptography notification)
         {
             var tunnel = GetTunnel<TunnelInbound>(context);
@@ -18,6 +24,11 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 $"End-to-end encryption has been established for '{tunnel.Name}'.");
         }
 
+        /// <summary>
+        /// The remote service is asking us to delete a tunnel based on its id
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="notification"></param>
         public void OnNotificationDeleteTunnel(RmContext context, NotificationDeleteTunnel notification)
         {
             var tunnel = EnforceCryptographyAndGetTunnel<TunnelInbound>(context);
@@ -26,14 +37,20 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             tunnel.Core.InboundTunnels.SaveToDisk();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="notification"></param>
         public void OnNotificationEndpointConnect(RmContext context, NotificationEndpointConnect notification)
         {
             var tunnel = EnforceCryptographyAndGetTunnel<TunnelInbound>(context);
 
-            tunnel.Core.Logging.Write(Constants.NtLogSeverity.Debug,
+            tunnel.Core.Logging.Write(NtLogSeverity.Debug,
                 $"Received endpoint connection notification.");
 
-            tunnel.Endpoints.OfType<EndpointOutbound>().Where(o => o.EndpointId == notification.EndpointId).FirstOrDefault()?
+            tunnel.Endpoints.OfType<EndpointOutbound>()
+                .Where(o => o.EndpointId == notification.EndpointId).FirstOrDefault()?
                 .EstablishOutboundEndpointConnection(notification.StreamId);
         }
 
@@ -41,7 +58,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         {
             var tunnel = EnforceCryptographyAndGetTunnel<TunnelInbound>(context);
 
-            tunnel.Core.Logging.Write(Constants.NtLogSeverity.Debug,
+            tunnel.Core.Logging.Write(NtLogSeverity.Debug,
                 $"Received endpoint disconnection notification.");
 
             tunnel.GetEndpointById(notification.EndpointId)?

@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library;
+using NetTunnel.Service.ReliableMessages.Notification;
 using NetTunnel.Service.TunnelEngine.Tunnels;
 using NTDLS.Semaphore;
 using System.Net.Sockets;

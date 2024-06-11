@@ -20,9 +20,11 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         {
             var tunnel = EnforceCryptographyAndGetTunnel<TunnelOutbound>(context);
 
-            tunnel.Core.Logging.Write(NtLogSeverity.Debug, $"Received endpoint connection notification.");
+            tunnel.Core.Logging.Write(NtLogSeverity.Debug,
+                $"Received endpoint connection notification.");
 
-            tunnel.Endpoints.OfType<EndpointOutbound>().Where(o => o.EndpointId == notification.EndpointId).FirstOrDefault()?
+            tunnel.Endpoints.OfType<EndpointOutbound>()
+                .Where(o => o.EndpointId == notification.EndpointId).FirstOrDefault()?
                 .EstablishOutboundEndpointConnection(notification.StreamId);
         }
 
