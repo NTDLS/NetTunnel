@@ -8,20 +8,16 @@ namespace NetTunnel.Service.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class SecurityController : ControllerBase
+    public class SecurityController(IHttpContextAccessor httpContextAccessor)
+        : ControllerBase(httpContextAccessor)
     {
-        public SecurityController(IHttpContextAccessor httpContextAccessor)
-            : base(httpContextAccessor)
-        {
-        }
-
         [HttpGet]
         [Route("{sessionId}/ListUsers")]
         public NtActionResponseUsers ListUsers(Guid sessionId)
         {
             try
             {
-                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+                ValidateAndEnforceLoginSession(sessionId);
 
                 return new NtActionResponseUsers
                 {
@@ -41,7 +37,7 @@ namespace NetTunnel.Service.Controllers
         {
             try
             {
-                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+                ValidateAndEnforceLoginSession(sessionId);
 
                 var content = JsonConvert.DeserializeObject<NtUser>(value).EnsureNotNull();
 
@@ -65,7 +61,7 @@ namespace NetTunnel.Service.Controllers
         {
             try
             {
-                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+                ValidateAndEnforceLoginSession(sessionId);
 
                 var content = JsonConvert.DeserializeObject<NtUser>(value).EnsureNotNull();
 
@@ -89,7 +85,7 @@ namespace NetTunnel.Service.Controllers
         {
             try
             {
-                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+                ValidateAndEnforceLoginSession(sessionId);
 
                 var content = JsonConvert.DeserializeObject<NtUser>(value).EnsureNotNull();
 
@@ -140,7 +136,7 @@ namespace NetTunnel.Service.Controllers
         {
             try
             {
-                var userSession = Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+                var userSession = ValidateAndEnforceLoginSession(sessionId);
 
                 Singletons.Core.Sessions.Logout(userSession);
 

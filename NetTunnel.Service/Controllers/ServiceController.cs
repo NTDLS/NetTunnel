@@ -9,20 +9,16 @@ namespace NetTunnel.Service.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ServiceController : ControllerBase
+    public class ServiceController(IHttpContextAccessor httpContextAccessor)
+        : ControllerBase(httpContextAccessor)
     {
-        public ServiceController(IHttpContextAccessor httpContextAccessor)
-            : base(httpContextAccessor)
-        {
-        }
-
         [HttpGet]
         [Route("{sessionId}/GetStatistics")]
         public NtActionResponseStatistics GetStatistics(Guid sessionId)
         {
             try
             {
-                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+                ValidateAndEnforceLoginSession(sessionId);
 
                 var stats = new NtActionResponseStatistics()
                 {
@@ -46,7 +42,7 @@ namespace NetTunnel.Service.Controllers
         {
             try
             {
-                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+                ValidateAndEnforceLoginSession(sessionId);
 
                 return new NtActionResponseServiceConfiguration(Singletons.Configuration);
             }
@@ -62,7 +58,7 @@ namespace NetTunnel.Service.Controllers
         {
             try
             {
-                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+                ValidateAndEnforceLoginSession(sessionId);
 
                 var configuration = JsonConvert.DeserializeObject<NtServiceConfiguration>(value).EnsureNotNull();
 

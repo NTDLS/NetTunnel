@@ -10,20 +10,16 @@ namespace NetTunnel.Service.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class TunnelInboundController : ControllerBase
+    public class TunnelInboundController(IHttpContextAccessor httpContextAccessor)
+        : ControllerBase(httpContextAccessor)
     {
-        public TunnelInboundController(IHttpContextAccessor httpContextAccessor)
-            : base(httpContextAccessor)
-        {
-        }
-
         [HttpGet]
         [Route("{sessionId}/List")]
         public NtActionResponseTunnelsInbound List(Guid sessionId)
         {
             try
             {
-                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+                ValidateAndEnforceLoginSession(sessionId);
 
                 return new NtActionResponseTunnelsInbound
                 {
@@ -43,7 +39,7 @@ namespace NetTunnel.Service.Controllers
         {
             try
             {
-                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+                ValidateAndEnforceLoginSession(sessionId);
 
                 Singletons.Core.InboundTunnels.Delete(tunnelId);
                 Singletons.Core.InboundTunnels.SaveToDisk();
@@ -62,7 +58,7 @@ namespace NetTunnel.Service.Controllers
         {
             try
             {
-                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+                ValidateAndEnforceLoginSession(sessionId);
 
                 Singletons.Core.InboundTunnels.DeletePair(tunnelId);
                 Singletons.Core.InboundTunnels.SaveToDisk();
@@ -81,7 +77,7 @@ namespace NetTunnel.Service.Controllers
         {
             try
             {
-                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+                ValidateAndEnforceLoginSession(sessionId);
 
                 Singletons.Core.InboundTunnels.Start(tunnelId);
 
@@ -99,7 +95,7 @@ namespace NetTunnel.Service.Controllers
         {
             try
             {
-                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+                ValidateAndEnforceLoginSession(sessionId);
 
                 Singletons.Core.InboundTunnels.Stop(tunnelId);
 
@@ -123,7 +119,7 @@ namespace NetTunnel.Service.Controllers
         {
             try
             {
-                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+                ValidateAndEnforceLoginSession(sessionId);
 
                 var tunnel = JsonConvert.DeserializeObject<NtTunnelInboundConfiguration>(value).EnsureNotNull();
 
@@ -144,7 +140,7 @@ namespace NetTunnel.Service.Controllers
         {
             try
             {
-                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+                ValidateAndEnforceLoginSession(sessionId);
 
                 var endpoints = JsonConvert.DeserializeObject<NtEndpointPairConfiguration>(value).EnsureNotNull();
 
@@ -168,7 +164,7 @@ namespace NetTunnel.Service.Controllers
         {
             try
             {
-                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+                ValidateAndEnforceLoginSession(sessionId);
 
                 var endpoints = JsonConvert.DeserializeObject<NtEndpointPairConfiguration>(value).EnsureNotNull();
 
@@ -193,7 +189,7 @@ namespace NetTunnel.Service.Controllers
         {
             try
             {
-                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+                ValidateAndEnforceLoginSession(sessionId);
 
                 //Remove the the endpoint to the local tunnel.
                 Singletons.Core.InboundTunnels.DeleteEndpoint(tunnelId, endpointId);
@@ -216,7 +212,7 @@ namespace NetTunnel.Service.Controllers
         {
             try
             {
-                Singletons.Core.Sessions.Validate(sessionId, GetPeerIpAddress());
+                ValidateAndEnforceLoginSession(sessionId);
 
                 //Remove the the endpoint to the local tunnel.
                 Singletons.Core.InboundTunnels.DeleteEndpoint(tunnelId, endpointId);
