@@ -2,7 +2,7 @@
 
 ## NetTunnel is a TCP/IP tool that is designed to allow ingress traversal through firewalls where the rules can not be altered. 
 
-![image](https://github.com/NTDLS/NetTunnel/assets/11428567/6177b0bb-a726-441f-a069-bd6fe10b9c33)
+![image](https://github.com/NTDLS/NetTunnel/assets/11428567/b31e5080-1593-4ded-80e3-94f8b4e29849)
 
 This is accomplished by installing the NetTunnel software at each location where the connection needs to be made FROM and TO. You will then create an OUTBOUND tunnel at the location that is behind a firewall, by doing so the NetTunnel software will reach out to the other remote installation and create an associated INBOUND tunnel. The INBOUND installation would be at a location where you can receive an inbound connection (such as home).
 
