@@ -16,6 +16,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="FramePayloads\**" />
+    <Content Remove="FramePayloads\**" />
+    <EmbeddedResource Remove="FramePayloads\**" />
+    <None Remove="FramePayloads\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Multi.ico" />
   </ItemGroup>
 
@@ -32,10 +39,6 @@
   <ItemGroup>
     <ProjectReference Include="..\NetTunnel.ClientAPI\NetTunnel.ClientAPI.csproj" />
     <ProjectReference Include="..\NetTunnel.Library\NetTunnel.Library.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="FramePayloads\" />
   </ItemGroup>
 
 </Project>

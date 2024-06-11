@@ -4,6 +4,7 @@ using NetTunnel.Service.ReliableMessages;
 using NetTunnel.Service.ReliableMessages.Notification;
 using NetTunnel.Service.ReliableMessages.Query;
 using NetTunnel.Service.TunnelEngine.Endpoints;
+using NetTunnel.Service.TunnelEngine.Tunnels.MessageHandlers;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
 using System.Net.Sockets;
@@ -177,7 +178,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             _cryptographyProvider = new CryptographyProvider(sharedSecret);
 
             Core.Logging.Write(NtLogSeverity.Verbose,
-                $"Encryption Key generated, hash: {Utility.ComputeSha256Hash(sharedSecret)}");
+                $"Cryptography Key generated, hash: {Utility.ComputeSha256Hash(sharedSecret)}");
         }
 
         public void ApplyCryptographyProvider()
@@ -185,7 +186,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             SecureKeyExchangeIsComplete = true;
             _client.SetCryptographyProvider(_cryptographyProvider);
 
-            Core.Logging.Write(NtLogSeverity.Verbose, $"End-to-end encryption has been established for '{Name}'.");
+            Core.Logging.Write(NtLogSeverity.Verbose,
+                $"End-to-end encryption has been established for '{Name}'.");
         }
 
         private void EstablishConnectionThread()
@@ -211,7 +213,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
                         //The first thing we do when we get a connection is start a new key exchange process.
                         var compoundNegotiator = new CompoundNegotiator();
-                        var negotiationToken = compoundNegotiator.GenerateNegotiationToken(Singletons.Configuration.TunnelEncryptionKeySize);
+                        var negotiationToken = compoundNegotiator.GenerateNegotiationToken(Singletons.Configuration.TunnelCryptographyKeySize);
 
                         var query = new QueryRequestKeyExchange(negotiationToken);
                         _client.Query(query, Singletons.Configuration.MessageQueryTimeoutMs).ContinueWith(t =>

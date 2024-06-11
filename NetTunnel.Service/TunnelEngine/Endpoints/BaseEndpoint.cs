@@ -128,7 +128,12 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 TotalConnections++;
                 CurrentConnections++;
 
-                _tunnel.Notify(new NotificationEndpointConnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId));
+                if (this is EndpointInbound)
+                {
+                    //If this is an inbound endpoint, then let the remote service know that we just received a
+                    //  connection so that it came make an associated outbound connection.
+                    _tunnel.Notify(new NotificationEndpointConnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId));
+                }
 
                 var buffer = new byte[Singletons.Configuration.EndpointBufferSize];
                 while (KeepRunning && activeConnection.IsConnected && activeConnection.Read(ref buffer, out int length))

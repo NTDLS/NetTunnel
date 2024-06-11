@@ -2,6 +2,7 @@
 using NetTunnel.Library.Types;
 using NetTunnel.Service.ReliableMessages;
 using NetTunnel.Service.TunnelEngine.Endpoints;
+using NetTunnel.Service.TunnelEngine.Tunnels.MessageHandlers;
 using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 
@@ -122,7 +123,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             _cryptographyProvider = new CryptographyProvider(sharedSecret);
 
             Core.Logging.Write(NtLogSeverity.Verbose,
-                $"Encryption Key generated, hash: {Utility.ComputeSha256Hash(sharedSecret)}");
+                $"Cryptography Key generated, hash: {Utility.ComputeSha256Hash(sharedSecret)}");
         }
 
         public void ApplyCryptographyProvider()
@@ -130,7 +131,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             SecureKeyExchangeIsComplete = true;
             _server.SetCryptographyProvider(_cryptographyProvider);
 
-            Core.Logging.Write(NtLogSeverity.Verbose, $"End-to-end encryption has been established for '{Name}'.");
+            Core.Logging.Write(NtLogSeverity.Verbose,
+                $"End-to-end encryption has been established for '{Name}'.");
         }
 
         public NtTunnelInboundConfiguration CloneConfiguration()

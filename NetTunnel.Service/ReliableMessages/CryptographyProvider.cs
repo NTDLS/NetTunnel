@@ -7,9 +7,9 @@ namespace NetTunnel.Service.ReliableMessages
     {
         private readonly NASCCLStream _streamCryptography;
 
-        public CryptographyProvider(byte[] encryptionKey)
+        public CryptographyProvider(byte[] cryptographyKey)
         {
-            _streamCryptography = new NASCCLStream(encryptionKey);
+            _streamCryptography = new NASCCLStream(cryptographyKey);
         }
 
         public byte[] Decrypt(RmContext context, byte[] encryptedPayload)

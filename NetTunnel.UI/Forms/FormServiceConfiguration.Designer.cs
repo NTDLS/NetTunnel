@@ -36,14 +36,14 @@
             labelEndpointBufferSize = new Label();
             labelMessageQueryTimeoutMs = new Label();
             labelTunnelAndEndpointHeartbeatDelayMs = new Label();
-            labelTunnelEncryptionKeySize = new Label();
+            labelTunnelCryptographyKeySize = new Label();
             labelStaleEndpointExpirationMs = new Label();
             textBoxManagementPort = new TextBox();
             textBoxManagementPortRSASize = new TextBox();
             textBoxEndpointBufferSize = new TextBox();
             textBoxMessageQueryTimeoutMs = new TextBox();
             textBoxTunnelAndEndpointHeartbeatDelayMs = new TextBox();
-            textBoxTunnelEncryptionKeySize = new TextBox();
+            textBoxTunnelCryptographyKeySize = new TextBox();
             textBoxStaleEndpointExpirationMs = new TextBox();
             checkBoxDebugLogging = new CheckBox();
             checkBoxManagementUseSSL = new CheckBox();
@@ -58,11 +58,14 @@
             tabPageTunnels = new TabPage();
             tabPageEndpoints = new TabPage();
             tabPageMisc = new TabPage();
+            groupBoxBuffering = new GroupBox();
+            checkBoxVerboseLogging = new CheckBox();
             tabControlBody.SuspendLayout();
             tabPageManagement.SuspendLayout();
             tabPageTunnels.SuspendLayout();
             tabPageEndpoints.SuspendLayout();
             tabPageMisc.SuspendLayout();
+            groupBoxBuffering.SuspendLayout();
             SuspendLayout();
             // 
             // buttonCancel
@@ -106,7 +109,7 @@
             // labelEndpointBufferSize
             // 
             labelEndpointBufferSize.AutoSize = true;
-            labelEndpointBufferSize.Location = new Point(88, 84);
+            labelEndpointBufferSize.Location = new Point(91, 86);
             labelEndpointBufferSize.Name = "labelEndpointBufferSize";
             labelEndpointBufferSize.Size = new Size(112, 15);
             labelEndpointBufferSize.TabIndex = 5;
@@ -115,7 +118,7 @@
             // labelMessageQueryTimeoutMs
             // 
             labelMessageQueryTimeoutMs.AutoSize = true;
-            labelMessageQueryTimeoutMs.Location = new Point(20, 137);
+            labelMessageQueryTimeoutMs.Location = new Point(22, 50);
             labelMessageQueryTimeoutMs.Name = "labelMessageQueryTimeoutMs";
             labelMessageQueryTimeoutMs.Size = new Size(158, 15);
             labelMessageQueryTimeoutMs.TabIndex = 8;
@@ -124,25 +127,25 @@
             // labelTunnelAndEndpointHeartbeatDelayMs
             // 
             labelTunnelAndEndpointHeartbeatDelayMs.AutoSize = true;
-            labelTunnelAndEndpointHeartbeatDelayMs.Location = new Point(3, 21);
+            labelTunnelAndEndpointHeartbeatDelayMs.Location = new Point(6, 23);
             labelTunnelAndEndpointHeartbeatDelayMs.Name = "labelTunnelAndEndpointHeartbeatDelayMs";
             labelTunnelAndEndpointHeartbeatDelayMs.Size = new Size(197, 15);
             labelTunnelAndEndpointHeartbeatDelayMs.TabIndex = 9;
             labelTunnelAndEndpointHeartbeatDelayMs.Text = "Tunnel and endpoint heartbeat (ms)";
             // 
-            // labelTunnelEncryptionKeySize
+            // labelTunnelCryptographyKeySize
             // 
-            labelTunnelEncryptionKeySize.AutoSize = true;
-            labelTunnelEncryptionKeySize.Location = new Point(30, 21);
-            labelTunnelEncryptionKeySize.Name = "labelTunnelEncryptionKeySize";
-            labelTunnelEncryptionKeySize.Size = new Size(148, 15);
-            labelTunnelEncryptionKeySize.TabIndex = 10;
-            labelTunnelEncryptionKeySize.Text = "Tunnel encryption key-size";
+            labelTunnelCryptographyKeySize.AutoSize = true;
+            labelTunnelCryptographyKeySize.Location = new Point(18, 21);
+            labelTunnelCryptographyKeySize.Name = "labelTunnelCryptographyKeySize";
+            labelTunnelCryptographyKeySize.Size = new Size(162, 15);
+            labelTunnelCryptographyKeySize.TabIndex = 10;
+            labelTunnelCryptographyKeySize.Text = "Tunnel cryptography key-size";
             // 
             // labelStaleEndpointExpirationMs
             // 
             labelStaleEndpointExpirationMs.AutoSize = true;
-            labelStaleEndpointExpirationMs.Location = new Point(34, 50);
+            labelStaleEndpointExpirationMs.Location = new Point(37, 52);
             labelStaleEndpointExpirationMs.Name = "labelStaleEndpointExpirationMs";
             labelStaleEndpointExpirationMs.Size = new Size(166, 15);
             labelStaleEndpointExpirationMs.TabIndex = 11;
@@ -164,35 +167,35 @@
             // 
             // textBoxEndpointBufferSize
             // 
-            textBoxEndpointBufferSize.Location = new Point(206, 81);
+            textBoxEndpointBufferSize.Location = new Point(209, 83);
             textBoxEndpointBufferSize.Name = "textBoxEndpointBufferSize";
             textBoxEndpointBufferSize.Size = new Size(100, 23);
             textBoxEndpointBufferSize.TabIndex = 14;
             // 
             // textBoxMessageQueryTimeoutMs
             // 
-            textBoxMessageQueryTimeoutMs.Location = new Point(184, 134);
+            textBoxMessageQueryTimeoutMs.Location = new Point(186, 47);
             textBoxMessageQueryTimeoutMs.Name = "textBoxMessageQueryTimeoutMs";
             textBoxMessageQueryTimeoutMs.Size = new Size(100, 23);
             textBoxMessageQueryTimeoutMs.TabIndex = 16;
             // 
             // textBoxTunnelAndEndpointHeartbeatDelayMs
             // 
-            textBoxTunnelAndEndpointHeartbeatDelayMs.Location = new Point(206, 18);
+            textBoxTunnelAndEndpointHeartbeatDelayMs.Location = new Point(209, 20);
             textBoxTunnelAndEndpointHeartbeatDelayMs.Name = "textBoxTunnelAndEndpointHeartbeatDelayMs";
             textBoxTunnelAndEndpointHeartbeatDelayMs.Size = new Size(100, 23);
             textBoxTunnelAndEndpointHeartbeatDelayMs.TabIndex = 17;
             // 
-            // textBoxTunnelEncryptionKeySize
+            // textBoxTunnelCryptographyKeySize
             // 
-            textBoxTunnelEncryptionKeySize.Location = new Point(184, 18);
-            textBoxTunnelEncryptionKeySize.Name = "textBoxTunnelEncryptionKeySize";
-            textBoxTunnelEncryptionKeySize.Size = new Size(100, 23);
-            textBoxTunnelEncryptionKeySize.TabIndex = 18;
+            textBoxTunnelCryptographyKeySize.Location = new Point(186, 18);
+            textBoxTunnelCryptographyKeySize.Name = "textBoxTunnelCryptographyKeySize";
+            textBoxTunnelCryptographyKeySize.Size = new Size(100, 23);
+            textBoxTunnelCryptographyKeySize.TabIndex = 18;
             // 
             // textBoxStaleEndpointExpirationMs
             // 
-            textBoxStaleEndpointExpirationMs.Location = new Point(206, 47);
+            textBoxStaleEndpointExpirationMs.Location = new Point(209, 49);
             textBoxStaleEndpointExpirationMs.Name = "textBoxStaleEndpointExpirationMs";
             textBoxStaleEndpointExpirationMs.Size = new Size(100, 23);
             textBoxStaleEndpointExpirationMs.TabIndex = 19;
@@ -220,7 +223,7 @@
             // labelInitialReceiveBufferSize
             // 
             labelInitialReceiveBufferSize.AutoSize = true;
-            labelInitialReceiveBufferSize.Location = new Point(46, 50);
+            labelInitialReceiveBufferSize.Location = new Point(26, 25);
             labelInitialReceiveBufferSize.Name = "labelInitialReceiveBufferSize";
             labelInitialReceiveBufferSize.Size = new Size(132, 15);
             labelInitialReceiveBufferSize.TabIndex = 22;
@@ -229,7 +232,7 @@
             // labelMaxReceiveBufferSize
             // 
             labelMaxReceiveBufferSize.AutoSize = true;
-            labelMaxReceiveBufferSize.Location = new Point(52, 79);
+            labelMaxReceiveBufferSize.Location = new Point(32, 54);
             labelMaxReceiveBufferSize.Name = "labelMaxReceiveBufferSize";
             labelMaxReceiveBufferSize.Size = new Size(126, 15);
             labelMaxReceiveBufferSize.TabIndex = 23;
@@ -238,7 +241,7 @@
             // labelReceiveBufferGrowthRate
             // 
             labelReceiveBufferGrowthRate.AutoSize = true;
-            labelReceiveBufferGrowthRate.Location = new Point(54, 108);
+            labelReceiveBufferGrowthRate.Location = new Point(34, 83);
             labelReceiveBufferGrowthRate.Name = "labelReceiveBufferGrowthRate";
             labelReceiveBufferGrowthRate.Size = new Size(124, 15);
             labelReceiveBufferGrowthRate.TabIndex = 24;
@@ -246,21 +249,21 @@
             // 
             // textBoxInitialReceiveBufferSize
             // 
-            textBoxInitialReceiveBufferSize.Location = new Point(184, 47);
+            textBoxInitialReceiveBufferSize.Location = new Point(164, 22);
             textBoxInitialReceiveBufferSize.Name = "textBoxInitialReceiveBufferSize";
             textBoxInitialReceiveBufferSize.Size = new Size(100, 23);
             textBoxInitialReceiveBufferSize.TabIndex = 25;
             // 
             // textBoxMaxReceiveBufferSize
             // 
-            textBoxMaxReceiveBufferSize.Location = new Point(184, 76);
+            textBoxMaxReceiveBufferSize.Location = new Point(164, 51);
             textBoxMaxReceiveBufferSize.Name = "textBoxMaxReceiveBufferSize";
             textBoxMaxReceiveBufferSize.Size = new Size(100, 23);
             textBoxMaxReceiveBufferSize.TabIndex = 26;
             // 
             // textBoxReceiveBufferGrowthRate
             // 
-            textBoxReceiveBufferGrowthRate.Location = new Point(184, 105);
+            textBoxReceiveBufferGrowthRate.Location = new Point(164, 80);
             textBoxReceiveBufferGrowthRate.Name = "textBoxReceiveBufferGrowthRate";
             textBoxReceiveBufferGrowthRate.Size = new Size(100, 23);
             textBoxReceiveBufferGrowthRate.TabIndex = 27;
@@ -294,16 +297,11 @@
             // 
             // tabPageTunnels
             // 
-            tabPageTunnels.Controls.Add(textBoxTunnelEncryptionKeySize);
-            tabPageTunnels.Controls.Add(textBoxReceiveBufferGrowthRate);
+            tabPageTunnels.Controls.Add(groupBoxBuffering);
+            tabPageTunnels.Controls.Add(textBoxTunnelCryptographyKeySize);
             tabPageTunnels.Controls.Add(textBoxMessageQueryTimeoutMs);
-            tabPageTunnels.Controls.Add(textBoxMaxReceiveBufferSize);
             tabPageTunnels.Controls.Add(labelMessageQueryTimeoutMs);
-            tabPageTunnels.Controls.Add(labelTunnelEncryptionKeySize);
-            tabPageTunnels.Controls.Add(textBoxInitialReceiveBufferSize);
-            tabPageTunnels.Controls.Add(labelInitialReceiveBufferSize);
-            tabPageTunnels.Controls.Add(labelReceiveBufferGrowthRate);
-            tabPageTunnels.Controls.Add(labelMaxReceiveBufferSize);
+            tabPageTunnels.Controls.Add(labelTunnelCryptographyKeySize);
             tabPageTunnels.Location = new Point(4, 24);
             tabPageTunnels.Name = "tabPageTunnels";
             tabPageTunnels.Padding = new Padding(3);
@@ -329,6 +327,7 @@
             // 
             // tabPageMisc
             // 
+            tabPageMisc.Controls.Add(checkBoxVerboseLogging);
             tabPageMisc.Controls.Add(checkBoxDebugLogging);
             tabPageMisc.Location = new Point(4, 24);
             tabPageMisc.Name = "tabPageMisc";
@@ -336,6 +335,31 @@
             tabPageMisc.TabIndex = 3;
             tabPageMisc.Text = "Misc.";
             tabPageMisc.UseVisualStyleBackColor = true;
+            // 
+            // groupBoxBuffering
+            // 
+            groupBoxBuffering.Controls.Add(labelInitialReceiveBufferSize);
+            groupBoxBuffering.Controls.Add(labelMaxReceiveBufferSize);
+            groupBoxBuffering.Controls.Add(textBoxReceiveBufferGrowthRate);
+            groupBoxBuffering.Controls.Add(labelReceiveBufferGrowthRate);
+            groupBoxBuffering.Controls.Add(textBoxInitialReceiveBufferSize);
+            groupBoxBuffering.Controls.Add(textBoxMaxReceiveBufferSize);
+            groupBoxBuffering.Location = new Point(22, 82);
+            groupBoxBuffering.Name = "groupBoxBuffering";
+            groupBoxBuffering.Size = new Size(280, 125);
+            groupBoxBuffering.TabIndex = 28;
+            groupBoxBuffering.TabStop = false;
+            groupBoxBuffering.Text = "Buffering";
+            // 
+            // checkBoxVerboseLogging
+            // 
+            checkBoxVerboseLogging.AutoSize = true;
+            checkBoxVerboseLogging.Location = new Point(14, 46);
+            checkBoxVerboseLogging.Name = "checkBoxVerboseLogging";
+            checkBoxVerboseLogging.Size = new Size(116, 19);
+            checkBoxVerboseLogging.TabIndex = 21;
+            checkBoxVerboseLogging.Text = "Verbose logging?";
+            checkBoxVerboseLogging.UseVisualStyleBackColor = true;
             // 
             // FormServiceConfiguration
             // 
@@ -362,6 +386,8 @@
             tabPageEndpoints.PerformLayout();
             tabPageMisc.ResumeLayout(false);
             tabPageMisc.PerformLayout();
+            groupBoxBuffering.ResumeLayout(false);
+            groupBoxBuffering.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -373,14 +399,14 @@
         private Label labelEndpointBufferSize;
         private Label labelMessageQueryTimeoutMs;
         private Label labelTunnelAndEndpointHeartbeatDelayMs;
-        private Label labelTunnelEncryptionKeySize;
+        private Label labelTunnelCryptographyKeySize;
         private Label labelStaleEndpointExpirationMs;
         private TextBox textBoxManagementPort;
         private TextBox textBoxManagementPortRSASize;
         private TextBox textBoxEndpointBufferSize;
         private TextBox textBoxMessageQueryTimeoutMs;
         private TextBox textBoxTunnelAndEndpointHeartbeatDelayMs;
-        private TextBox textBoxTunnelEncryptionKeySize;
+        private TextBox textBoxTunnelCryptographyKeySize;
         private TextBox textBoxStaleEndpointExpirationMs;
         private CheckBox checkBoxDebugLogging;
         private CheckBox checkBoxManagementUseSSL;
@@ -395,5 +421,7 @@
         private TabPage tabPageTunnels;
         private TabPage tabPageEndpoints;
         private TabPage tabPageMisc;
+        private GroupBox groupBoxBuffering;
+        private CheckBox checkBoxVerboseLogging;
     }
 }

@@ -39,8 +39,8 @@ namespace NetTunnel.UI.Forms
             ToolTipHelpers.SetToolTip(_toolTips, [labelTunnelAndEndpointHeartbeatDelayMs, textBoxTunnelAndEndpointHeartbeatDelayMs],
                 "The delay in milliseconds between tunnel heartbeats.");
 
-            ToolTipHelpers.SetToolTip(_toolTips, [labelTunnelEncryptionKeySize, textBoxTunnelEncryptionKeySize],
-                "The number of 12-byte segments to generate for tunnel encryption.");
+            ToolTipHelpers.SetToolTip(_toolTips, [labelTunnelCryptographyKeySize, textBoxTunnelCryptographyKeySize],
+                "The number of 12-byte segments to generate for tunnel cryptography.");
 
             ToolTipHelpers.SetToolTip(_toolTips, [labelStaleEndpointExpirationMs, textBoxStaleEndpointExpirationMs],
                 "The maximum number of milliseconds to allow an endpoint to remain connected without read/write activity.");
@@ -58,7 +58,10 @@ namespace NetTunnel.UI.Forms
                 "The growth rate for auto-resizing the receive buffer from its initial size to its maximum size.");
 
             ToolTipHelpers.SetToolTip(_toolTips, [checkBoxDebugLogging],
-                "Whether to log debug information to file.");
+                "Whether to log debug information to the console and event log.");
+
+            ToolTipHelpers.SetToolTip(_toolTips, [checkBoxVerboseLogging],
+                "Whether to log verbose information to the console and event log.");
 
             #endregion
 
@@ -84,13 +87,14 @@ namespace NetTunnel.UI.Forms
                 textBoxEndpointBufferSize.Text = $"{configuration.EndpointBufferSize:n0}";
                 textBoxMessageQueryTimeoutMs.Text = $"{configuration.MessageQueryTimeoutMs:n0}";
                 textBoxTunnelAndEndpointHeartbeatDelayMs.Text = $"{configuration.TunnelAndEndpointHeartbeatDelayMs:n0}";
-                textBoxTunnelEncryptionKeySize.Text = $"{configuration.TunnelEncryptionKeySize:n0}";
+                textBoxTunnelCryptographyKeySize.Text = $"{configuration.TunnelCryptographyKeySize:n0}";
                 textBoxStaleEndpointExpirationMs.Text = $"{configuration.StaleEndpointExpirationMs:n0}";
                 textBoxInitialReceiveBufferSize.Text = $"{configuration.InitialReceiveBufferSize:n0}";
                 textBoxMaxReceiveBufferSize.Text = $"{configuration.MaxReceiveBufferSize:n0}";
                 textBoxReceiveBufferGrowthRate.Text = $"{configuration.ReceiveBufferGrowthRate:n2}";
                 checkBoxManagementUseSSL.Checked = configuration.ManagementPortUseSSL;
                 checkBoxDebugLogging.Checked = configuration.DebugLogging;
+                checkBoxVerboseLogging.Checked = configuration.VerboseLogging;
             }
         }
 
@@ -117,8 +121,8 @@ namespace NetTunnel.UI.Forms
                 configuration.TunnelAndEndpointHeartbeatDelayMs = FormValidationHelpers.GetAndValidateInteger(textBoxTunnelAndEndpointHeartbeatDelayMs, 1000, 216000000,
                     "The tunnel and endpoint heartbeat (ms) must be an integer value between [min] and [max].");
 
-                configuration.TunnelEncryptionKeySize = FormValidationHelpers.GetAndValidateInteger(textBoxTunnelEncryptionKeySize, 1, 100,
-                    "The tunnel encryption key-size must be an integer value between [min] and [max].");
+                configuration.TunnelCryptographyKeySize = FormValidationHelpers.GetAndValidateInteger(textBoxTunnelCryptographyKeySize, 1, 100,
+                    "The tunnel cryptography key-size must be an integer value between [min] and [max].");
 
                 configuration.StaleEndpointExpirationMs = FormValidationHelpers.GetAndValidateInteger(textBoxStaleEndpointExpirationMs, 1000, 216000000,
                     "The stale endpoint expiration (ms) must be an integer value between [min] and [max].");
@@ -134,6 +138,7 @@ namespace NetTunnel.UI.Forms
 
                 configuration.ManagementPortUseSSL = checkBoxManagementUseSSL.Checked;
                 configuration.DebugLogging = checkBoxDebugLogging.Checked;
+                configuration.VerboseLogging = checkBoxVerboseLogging.Checked;
 
                 #endregion
 

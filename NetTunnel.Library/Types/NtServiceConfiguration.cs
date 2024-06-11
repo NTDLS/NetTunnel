@@ -40,9 +40,9 @@
         public int TunnelAndEndpointHeartbeatDelayMs { get; set; } = 10000;
 
         /// <summary>
-        /// The number of 12-byte segments to generate for tunnel encryption.
+        /// The number of 12-byte segments to generate for tunnel cryptography.
         /// </summary>
-        public int TunnelEncryptionKeySize { get; set; } = 8;
+        public int TunnelCryptographyKeySize { get; set; } = 8;
 
         /// <summary>
         /// The maximum number of milliseconds to allow an endpoint to remain connected without read/write activity.
