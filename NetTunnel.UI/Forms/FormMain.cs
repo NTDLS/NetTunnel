@@ -150,7 +150,7 @@ namespace NetTunnel.UI.Forms
                                     double compressionRatio = 0;
                                     if (endpointStats.BytesSentKb > 0 && endpointStats.BytesReceivedKb > 0)
                                     {
-                                        if (direction == NtDirection.Inbound)
+                                        if (endpointStats.BytesReceivedKb > endpointStats.BytesSentKb)
                                         {
                                             compressionRatio = 100 - (endpointStats.BytesReceivedKb / endpointStats.BytesSentKb) * 100.0;
                                         }
