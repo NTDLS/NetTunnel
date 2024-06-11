@@ -1,46 +1,35 @@
-﻿using NetTunnel.Library;
-using NetTunnel.Service.FramePayloads.Queries;
-using NetTunnel.Service.FramePayloads.Replies;
+﻿using NetTunnel.Service.ReliableMessages.Query;
+using NetTunnel.Service.ReliableMessages.Query.Reply;
 using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
 {
-    public class TunnelOutboundQueryHandlers : IRmMessageHandler
+    internal class TunnelOutboundQueryHandlers : TunnelMessageHandlerBase, IRmMessageHandler
     {
-        private static TunnelOutbound EnforceCryptography(RmContext context)
+        public QueryReplyPayloadBoolean OnQueryAddEndpointInbound(RmContext context, QueryAddEndpointInbound query)
         {
-            var outboundTunnel = (context.Endpoint.Parameter as TunnelOutbound).EnsureNotNull();
-            if (!outboundTunnel.SecureKeyExchangeIsComplete)
-            {
-                throw new Exception("Cryptography has not been initialized.");
-            }
-            return outboundTunnel;
-        }
+            var tunnel = EnforceCryptographyAndGetTunnel<TunnelOutbound>(context);
 
-        public NtFramePayloadBoolean OnNtFramePayloadAddEndpointInbound(RmContext context, NtFramePayloadAddEndpointInbound query)
-        {
-            var outboundTunnel = EnforceCryptography(context);
-
-            var endpoint = outboundTunnel.AddInboundEndpoint(query.Configuration);
+            var endpoint = tunnel.AddInboundEndpoint(query.Configuration);
             endpoint.Start();
-            return new NtFramePayloadBoolean(true);
+            return new QueryReplyPayloadBoolean(true);
         }
 
-        public NtFramePayloadBoolean OnNtFramePayloadAddEndpointOutbound(RmContext context, NtFramePayloadAddEndpointOutbound query)
+        public QueryReplyPayloadBoolean OnQueryAddEndpointOutbound(RmContext context, QueryAddEndpointOutbound query)
         {
-            var outboundTunnel = EnforceCryptography(context);
+            var tunnel = EnforceCryptographyAndGetTunnel<TunnelOutbound>(context);
 
-            var endpoint = outboundTunnel.AddOutboundEndpoint(query.Configuration);
+            var endpoint = tunnel.AddOutboundEndpoint(query.Configuration);
             endpoint.Start();
-            return new NtFramePayloadBoolean(true);
+            return new QueryReplyPayloadBoolean(true);
         }
 
-        public NtFramePayloadBoolean OnNtFramePayloadDeleteEndpoint(RmContext context, NtFramePayloadDeleteEndpoint query)
+        public QueryReplyPayloadBoolean OnQueryDeleteEndpoint(RmContext context, QueryDeleteEndpoint query)
         {
-            var outboundTunnel = EnforceCryptography(context);
+            var tunnel = EnforceCryptographyAndGetTunnel<TunnelOutbound>(context);
 
-            outboundTunnel.DeleteEndpoint(query.EndpointId);
-            return new NtFramePayloadBoolean(true);
+            tunnel.DeleteEndpoint(query.EndpointId);
+            return new QueryReplyPayloadBoolean(true);
         }
     }
 }

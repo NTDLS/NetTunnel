@@ -1,18 +1,18 @@
 ﻿using NTDLS.ReliableMessaging;
 using ProtoBuf;
 
-namespace NetTunnel.Service.FramePayloads.Notifications
+namespace NetTunnel.Service.ReliableMessages.Notification
 {
     [Serializable]
     [ProtoContract]
-    public class NtFramePayloadDeleteTunnel : IRmNotification
+    public class NotificationDeleteTunnel : IRmNotification
     {
         [ProtoMember(1)]
         public Guid TunnelId { get; set; }
 
-        public NtFramePayloadDeleteTunnel() { }
+        public NotificationDeleteTunnel() { }
 
-        public NtFramePayloadDeleteTunnel(Guid tunnelId)
+        public NotificationDeleteTunnel(Guid tunnelId)
         {
             TunnelId = tunnelId;
         }

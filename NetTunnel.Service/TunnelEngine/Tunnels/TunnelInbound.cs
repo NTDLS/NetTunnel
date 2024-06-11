@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
+using NetTunnel.Service.ReliableMessages;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
@@ -35,7 +36,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         public List<IEndpoint> Endpoints { get; private set; } = new();
 
         private readonly Thread _heartbeatThread;
-        private FramePayloads.CryptographyProvider? _cryptographyProvider;
+        private CryptographyProvider? _cryptographyProvider;
 
         #endregion
 

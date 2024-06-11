@@ -1,5 +1,4 @@
 ﻿using NetTunnel.Library;
-using NetTunnel.Service.FramePayloads.Notifications;
 using NetTunnel.Service.TunnelEngine.Tunnels;
 using NTDLS.Semaphore;
 using System.Net.Sockets;
@@ -128,14 +127,14 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 TotalConnections++;
                 CurrentConnections++;
 
-                _tunnel.Notify(new NtFramePayloadEndpointConnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId));
+                _tunnel.Notify(new NotificationEndpointConnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId));
 
                 var buffer = new byte[Singletons.Configuration.EndpointBufferSize];
                 while (KeepRunning && activeConnection.IsConnected && activeConnection.Read(ref buffer, out int length))
                 {
                     BytesReceived += (ulong)length;
 
-                    var exchangePayload = new NtFramePayloadEndpointExchange(_tunnel.TunnelId, EndpointId, activeConnection.StreamId, buffer, length);
+                    var exchangePayload = new NotificationEndpointExchange(_tunnel.TunnelId, EndpointId, activeConnection.StreamId, buffer, length);
                     _tunnel.Notify(exchangePayload);
                 }
             }
@@ -175,7 +174,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             }
 
             Utility.TryAndIgnore(() =>
-                _tunnel.Notify(new NtFramePayloadEndpointDisconnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId)));
+                _tunnel.Notify(new NotificationEndpointDisconnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId)));
         }
     }
 }

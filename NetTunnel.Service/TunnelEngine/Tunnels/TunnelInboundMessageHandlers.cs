@@ -1,76 +1,61 @@
 ﻿using NetTunnel.Library;
-using NetTunnel.Service.FramePayloads.Notifications;
+using NetTunnel.Service.ReliableMessages.Notification;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
 {
-    public class TunnelInboundMessageHandlers : IRmMessageHandler
+    internal class TunnelInboundMessageHandlers : TunnelMessageHandlerBase, IRmMessageHandler
     {
-        private static TunnelInbound EnforceCryptography(RmContext context)
+        public void OnNotificationApplyCryptography(RmContext context, NotificationApplyCryptography notification)
         {
-            var inboundTunnel = (context.Endpoint.Parameter as TunnelInbound).EnsureNotNull();
-            if (!inboundTunnel.SecureKeyExchangeIsComplete)
-            {
-                throw new Exception("Cryptography has not been initialized.");
-            }
-            return inboundTunnel;
+            var tunnel = GetTunnel<TunnelInbound>(context);
+
+            tunnel.ApplyCryptographyProvider();
+
+            tunnel.Core.Logging.Write(NtLogSeverity.Verbose,
+                $"End-to-end encryption has been established for '{tunnel.Name}'.");
         }
 
-        public void OnNtFramePayloadEncryptionReady(RmContext context, NtFramePayloadEncryptionReady notification)
+        public void OnNotificationDeleteTunnel(RmContext context, NotificationDeleteTunnel notification)
         {
-            var inboundTunnel = (context.Endpoint.Parameter as TunnelInbound).EnsureNotNull();
+            var tunnel = EnforceCryptographyAndGetTunnel<TunnelInbound>(context);
 
-            inboundTunnel.ApplyCryptographyProvider();
-            inboundTunnel.Core.Logging.Write(NtLogSeverity.Verbose,
-                $"End-to-end encryption has been established for '{inboundTunnel.Name}'.");
+            tunnel.Core.InboundTunnels.Delete(notification.TunnelId);
+            tunnel.Core.InboundTunnels.SaveToDisk();
         }
 
-        public void OnNtFramePayloadMessage(RmContext context, NtFramePayloadMessage notification)
+        public void OnNotificationEndpointConnect(RmContext context, NotificationEndpointConnect notification)
         {
-            var inboundTunnel = EnforceCryptography(context);
+            var tunnel = EnforceCryptographyAndGetTunnel<TunnelInbound>(context);
 
-            inboundTunnel.Core.Logging.Write(NtLogSeverity.Debug,
-                $"RPC Message: '{notification.Message}'");
-        }
-
-        public void OnNtFramePayloadDeleteTunnel(RmContext context, NtFramePayloadDeleteTunnel notification)
-        {
-            var inboundTunnel = EnforceCryptography(context);
-
-            inboundTunnel.Core.InboundTunnels.Delete(notification.TunnelId);
-            inboundTunnel.Core.InboundTunnels.SaveToDisk();
-        }
-
-        public void On(RmContext context, NtFramePayloadEndpointConnect notification)
-        {
-            var inboundTunnel = EnforceCryptography(context);
-
-            inboundTunnel.Core.Logging.Write(Constants.NtLogSeverity.Debug,
+            tunnel.Core.Logging.Write(Constants.NtLogSeverity.Debug,
                 $"Received endpoint connection notification.");
 
-            inboundTunnel.Endpoints.OfType<EndpointOutbound>().Where(o => o.EndpointId == notification.EndpointId).FirstOrDefault()?
+            tunnel.Endpoints.OfType<EndpointOutbound>().Where(o => o.EndpointId == notification.EndpointId).FirstOrDefault()?
                 .EstablishOutboundEndpointConnection(notification.StreamId);
         }
 
-        public void OnNtFramePayloadEndpointDisconnect(RmContext context, NtFramePayloadEndpointDisconnect notification)
+        public void OnNotificationEndpointDisconnect(RmContext context, NotificationEndpointDisconnect notification)
         {
-            var inboundTunnel = EnforceCryptography(context);
+            var tunnel = EnforceCryptographyAndGetTunnel<TunnelInbound>(context);
 
-            inboundTunnel.Core.Logging.Write(Constants.NtLogSeverity.Debug,
+            tunnel.Core.Logging.Write(Constants.NtLogSeverity.Debug,
                 $"Received endpoint disconnection notification.");
 
-            inboundTunnel.GetEndpointById(notification.EndpointId)?
+            tunnel.GetEndpointById(notification.EndpointId)?
                 .Disconnect(notification.StreamId);
         }
 
-        public void OnNtFramePayloadEndpointExchange(RmContext context, NtFramePayloadEndpointExchange notification)
+        public void OnNotificationEndpointExchange(RmContext context, NotificationEndpointExchange notification)
         {
-            var inboundTunnel = EnforceCryptography(context);
+            var tunnel = EnforceCryptographyAndGetTunnel<TunnelInbound>(context);
 
-            inboundTunnel.GetEndpointById(notification.EndpointId)?
-                .SendEndpointData(notification.StreamId, notification.Bytes);
+            var endpoint = tunnel.GetEndpointById(notification.EndpointId)
+                .EnsureNotNull($"The outbound tunnel endpoint could not be found: '{notification.EndpointId}'.");
+
+            endpoint.SendEndpointData(notification.StreamId, notification.Bytes);
         }
     }
 }

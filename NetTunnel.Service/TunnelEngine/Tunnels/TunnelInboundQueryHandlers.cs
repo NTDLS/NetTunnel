@@ -1,61 +1,50 @@
-﻿using NetTunnel.Library;
-using NetTunnel.Service.FramePayloads.Queries;
-using NetTunnel.Service.FramePayloads.Replies;
+﻿using NetTunnel.Service.ReliableMessages.Query;
+using NetTunnel.Service.ReliableMessages.Query.Reply;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
 {
-    public class TunnelInboundQueryHandlers : IRmMessageHandler
+    internal class TunnelInboundQueryHandlers : TunnelMessageHandlerBase, IRmMessageHandler
     {
-        private static TunnelInbound EnforceCryptography(RmContext context)
+        public QueryReplyKeyExchangeReply OnQueryRequestKeyExchange(RmContext context, QueryRequestKeyExchange query)
         {
-            var inboundTunnel = (context.Endpoint.Parameter as TunnelInbound).EnsureNotNull();
-            if (!inboundTunnel.SecureKeyExchangeIsComplete)
-            {
-                throw new Exception("Cryptography has not been initialized.");
-            }
-            return inboundTunnel;
-        }
-
-        public NtFramePayloadKeyExchangeReply OnNtFramePayloadRequestKeyExchange(RmContext context, NtFramePayloadRequestKeyExchange query)
-        {
-            var inboundTunnel = (context.Endpoint.Parameter as TunnelInbound).EnsureNotNull();
+            var tunnel = GetTunnel<TunnelInbound>(context);
 
             //We received a diffie–hellman key exchange request, respond to it so we can prop up encryption.
             var compoundNegotiator = new CompoundNegotiator();
             var negotiationReplyToken = compoundNegotiator.ApplyNegotiationToken(query.NegotiationToken);
-            var negotiationReply = new NtFramePayloadKeyExchangeReply(negotiationReplyToken);
+            var negotiationReply = new QueryReplyKeyExchangeReply(negotiationReplyToken);
 
-            inboundTunnel.InitializeCryptographyProvider(compoundNegotiator.SharedSecret);
+            tunnel.InitializeCryptographyProvider(compoundNegotiator.SharedSecret);
 
             return negotiationReply;
         }
 
-        public NtFramePayloadBoolean OnNtFramePayloadAddEndpointInbound(RmContext context, NtFramePayloadAddEndpointInbound query)
+        public QueryReplyPayloadBoolean OnQueryAddEndpointInbound(RmContext context, QueryAddEndpointInbound query)
         {
-            var inboundTunnel = EnforceCryptography(context);
+            var tunnel = EnforceCryptographyAndGetTunnel<TunnelInbound>(context);
 
-            var endpoint = inboundTunnel.AddInboundEndpoint(query.Configuration);
+            var endpoint = tunnel.AddInboundEndpoint(query.Configuration);
             endpoint.Start();
-            return new NtFramePayloadBoolean(true);
+            return new QueryReplyPayloadBoolean(true);
         }
 
-        public NtFramePayloadBoolean OnNtFramePayloadAddEndpointOutbound(RmContext context, NtFramePayloadAddEndpointOutbound query)
+        public QueryReplyPayloadBoolean OnQueryAddEndpointOutbound(RmContext context, QueryAddEndpointOutbound query)
         {
-            var inboundTunnel = EnforceCryptography(context);
+            var tunnel = EnforceCryptographyAndGetTunnel<TunnelInbound>(context);
 
-            var endpoint = inboundTunnel.AddOutboundEndpoint(query.Configuration);
+            var endpoint = tunnel.AddOutboundEndpoint(query.Configuration);
             endpoint.Start();
-            return new NtFramePayloadBoolean(true);
+            return new QueryReplyPayloadBoolean(true);
         }
 
-        public NtFramePayloadBoolean OnNtFramePayloadDeleteEndpoint(RmContext context, NtFramePayloadDeleteEndpoint query)
+        public QueryReplyPayloadBoolean OnQueryDeleteEndpoint(RmContext context, QueryDeleteEndpoint query)
         {
-            var inboundTunnel = EnforceCryptography(context);
+            var tunnel = EnforceCryptographyAndGetTunnel<TunnelInbound>(context);
 
-            inboundTunnel.DeleteEndpoint(query.EndpointId);
-            return new NtFramePayloadBoolean(true);
+            tunnel.DeleteEndpoint(query.EndpointId);
+            return new QueryReplyPayloadBoolean(true);
         }
     }
 }

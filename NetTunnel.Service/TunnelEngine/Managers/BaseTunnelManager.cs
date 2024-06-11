@@ -1,6 +1,5 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NetTunnel.Service.FramePayloads.Notifications;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NetTunnel.Service.TunnelEngine.Tunnels;
 using NTDLS.Semaphore;
@@ -47,7 +46,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                tunnel.Notify(new NtFramePayloadDeleteTunnel(tunnelId));
+                tunnel.Notify(new NotificationDeleteTunnel(tunnelId));
             });
         }
 

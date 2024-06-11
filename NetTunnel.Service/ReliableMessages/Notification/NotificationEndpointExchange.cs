@@ -1,11 +1,11 @@
 ﻿using NTDLS.ReliableMessaging;
 using ProtoBuf;
 
-namespace NetTunnel.Service.FramePayloads.Notifications
+namespace NetTunnel.Service.ReliableMessages.Notification
 {
     [Serializable]
     [ProtoContract]
-    public class NtFramePayloadEndpointExchange : IRmNotification
+    public class NotificationEndpointExchange : IRmNotification
     {
         [ProtoMember(1)]
         public Guid StreamId { get; set; }
@@ -19,7 +19,7 @@ namespace NetTunnel.Service.FramePayloads.Notifications
         [ProtoMember(4)]
         public byte[] Bytes { get; set; }
 
-        public NtFramePayloadEndpointExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
+        public NotificationEndpointExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
         {
             StreamId = streamId;
             TunnelId = tunnelId;
@@ -29,7 +29,7 @@ namespace NetTunnel.Service.FramePayloads.Notifications
             Array.Copy(bytes, Bytes, length);
         }
 
-        public NtFramePayloadEndpointExchange()
+        public NotificationEndpointExchange()
         {
             Bytes = Array.Empty<byte>();
         }

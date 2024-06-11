@@ -1,21 +1,21 @@
 ﻿using NTDLS.ReliableMessaging;
 using ProtoBuf;
 
-namespace NetTunnel.Service.FramePayloads.Replies
+namespace NetTunnel.Service.ReliableMessages.Query.Reply
 {
     [Serializable]
     [ProtoContract]
-    public class NtFramePayloadKeyExchangeReply : IRmQueryReply
+    public class QueryReplyKeyExchangeReply : IRmQueryReply
     {
         [ProtoMember(1)]
         public byte[] NegotiationToken { get; set; }
 
-        public NtFramePayloadKeyExchangeReply()
+        public QueryReplyKeyExchangeReply()
         {
             NegotiationToken = new byte[0];
         }
 
-        public NtFramePayloadKeyExchangeReply(byte[] negotiationToken)
+        public QueryReplyKeyExchangeReply(byte[] negotiationToken)
         {
             NegotiationToken = negotiationToken;
         }

@@ -1,22 +1,22 @@
-﻿using NetTunnel.Service.FramePayloads.Replies;
+﻿using NetTunnel.Service.ReliableMessages.Query.Reply;
 using NTDLS.ReliableMessaging;
 using ProtoBuf;
 
-namespace NetTunnel.Service.FramePayloads.Queries
+namespace NetTunnel.Service.ReliableMessages.Query
 {
     [Serializable]
     [ProtoContract]
-    public class NtFramePayloadRequestKeyExchange : IRmQuery<NtFramePayloadKeyExchangeReply>
+    public class QueryRequestKeyExchange : IRmQuery<QueryReplyKeyExchangeReply>
     {
         [ProtoMember(1)]
         public byte[] NegotiationToken { get; set; }
 
-        public NtFramePayloadRequestKeyExchange()
+        public QueryRequestKeyExchange()
         {
             NegotiationToken = new byte[0];
         }
 
-        public NtFramePayloadRequestKeyExchange(byte[] negotiationToken)
+        public QueryRequestKeyExchange(byte[] negotiationToken)
         {
             NegotiationToken = negotiationToken;
         }

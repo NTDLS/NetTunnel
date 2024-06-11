@@ -1,22 +1,22 @@
 ﻿using NetTunnel.Library.Types;
-using NetTunnel.Service.FramePayloads.Replies;
+using NetTunnel.Service.ReliableMessages.Query.Reply;
 using NTDLS.ReliableMessaging;
 using ProtoBuf;
 
-namespace NetTunnel.Service.FramePayloads.Queries
+namespace NetTunnel.Service.ReliableMessages.Query
 {
     [Serializable]
     [ProtoContract]
-    public class NtFramePayloadAddEndpointInbound : IRmQuery<NtFramePayloadBoolean>
+    public class QueryAddEndpointInbound : IRmQuery<QueryReplyPayloadBoolean>
     {
         [ProtoMember(1)]
         public string Label { get; set; } = string.Empty;
         [ProtoMember(2)]
         public NtEndpointInboundConfiguration Configuration { get; set; } = new();
 
-        public NtFramePayloadAddEndpointInbound() { }
+        public QueryAddEndpointInbound() { }
 
-        public NtFramePayloadAddEndpointInbound(NtEndpointInboundConfiguration configuration)
+        public QueryAddEndpointInbound(NtEndpointInboundConfiguration configuration)
         {
             Configuration = configuration;
         }

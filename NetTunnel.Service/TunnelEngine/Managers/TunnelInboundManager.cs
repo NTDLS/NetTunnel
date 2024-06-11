@@ -1,6 +1,5 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NetTunnel.Service.FramePayloads.Queries;
 using NetTunnel.Service.TunnelEngine.Tunnels;
 using NTDLS.Persistence;
 using NTDLS.ReliableMessaging;
@@ -27,7 +26,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             return (await Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                return tunnel.Query(new NtFramePayloadDeleteEndpoint(endpointId));
+                return tunnel.Query(new QueryDeleteEndpoint(endpointId));
             }) as T).EnsureNotNull();
         }
 
@@ -43,7 +42,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             return (await Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                return tunnel.Query(new NtFramePayloadAddEndpointInbound(endpoint));
+                return tunnel.Query(new QueryAddEndpointInbound(endpoint));
             }) as T).EnsureNotNull();
         }
 
@@ -59,7 +58,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             return (await Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                return tunnel.Query(new NtFramePayloadAddEndpointOutbound(endpoint));
+                return tunnel.Query(new QueryAddEndpointOutbound(endpoint));
             }) as T).EnsureNotNull();
         }
 

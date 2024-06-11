@@ -1,11 +1,11 @@
 ﻿using NTDLS.ReliableMessaging;
 using ProtoBuf;
 
-namespace NetTunnel.Service.FramePayloads.Replies
+namespace NetTunnel.Service.ReliableMessages.Query.Reply
 {
     [Serializable]
     [ProtoContract]
-    public class NtFramePayloadBoolean : IRmQueryReply
+    public class QueryReplyPayloadBoolean : IRmQueryReply
     {
         [ProtoMember(1)]
         public bool Value { get; set; }
@@ -13,16 +13,16 @@ namespace NetTunnel.Service.FramePayloads.Replies
         [ProtoMember(2)]
         public string Message { get; set; } = string.Empty;
 
-        public NtFramePayloadBoolean()
+        public QueryReplyPayloadBoolean()
         {
         }
 
-        public NtFramePayloadBoolean(bool value)
+        public QueryReplyPayloadBoolean(bool value)
         {
             Value = value;
         }
 
-        public NtFramePayloadBoolean(Exception exception)
+        public QueryReplyPayloadBoolean(Exception exception)
         {
             Value = false;
             Message = exception.Message;

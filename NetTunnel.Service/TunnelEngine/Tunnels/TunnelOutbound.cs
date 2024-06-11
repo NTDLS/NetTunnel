@@ -1,7 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NetTunnel.Service.FramePayloads.Notifications;
-using NetTunnel.Service.FramePayloads.Queries;
+using NetTunnel.Service.ReliableMessages;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
@@ -43,7 +42,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         public List<IEndpoint> Endpoints { get; private set; } = new();
 
         private readonly Thread _heartbeatThread;
-        private FramePayloads.CryptographyProvider? _cryptographyProvider;
+        private CryptographyProvider? _cryptographyProvider;
 
         #endregion
 
@@ -212,7 +211,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                         var compoundNegotiator = new CompoundNegotiator();
                         var negotiationToken = compoundNegotiator.GenerateNegotiationToken(Singletons.Configuration.TunnelEncryptionKeySize);
 
-                        var query = new NtFramePayloadRequestKeyExchange(negotiationToken);
+                        var query = new QueryRequestKeyExchange(negotiationToken);
                         _client.Query(query, Singletons.Configuration.MessageQueryTimeoutMs).ContinueWith(t =>
                         {
                             if (t.IsCompletedSuccessfully && t.Result != null)
@@ -221,7 +220,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
                                 InitializeCryptographyProvider(compoundNegotiator.SharedSecret);
 
-                                _client.Notify(new NtFramePayloadEncryptionReady());
+                                _client.Notify(new NotificationApplyCryptography());
 
                                 ApplyCryptographyProvider();
                             }

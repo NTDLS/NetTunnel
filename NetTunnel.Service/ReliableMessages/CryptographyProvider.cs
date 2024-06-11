@@ -1,7 +1,7 @@
 ﻿using NTDLS.NASCCL;
 using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Service.FramePayloads
+namespace NetTunnel.Service.ReliableMessages
 {
     public class CryptographyProvider : IRmCryptographyProvider
     {

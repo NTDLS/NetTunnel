@@ -2,7 +2,7 @@
 using NetTunnel.ClientAPI.Payload;
 using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NetTunnel.Service.FramePayloads.Replies;
+using NetTunnel.Service.ReliableMessages.Query.Reply;
 using NetTunnel.Service.TunnelEngine;
 using Newtonsoft.Json;
 
@@ -152,7 +152,7 @@ namespace NetTunnel.Service.Controllers
                 Singletons.Core.InboundTunnels.AddEndpointInbound(tunnelId, endpoints.Inbound);
                 Singletons.Core.InboundTunnels.SaveToDisk();
 
-                var result = await Singletons.Core.InboundTunnels.DispatchAddEndpointOutboundToAssociatedTunnelService<NtFramePayloadBoolean>(tunnelId, endpoints.Outbound);
+                var result = await Singletons.Core.InboundTunnels.DispatchAddEndpointOutboundToAssociatedTunnelService<QueryReplyPayloadBoolean>(tunnelId, endpoints.Outbound);
 
                 return new NtActionResponse { Success = result?.Value ?? false };
             }
@@ -177,7 +177,7 @@ namespace NetTunnel.Service.Controllers
                 Singletons.Core.InboundTunnels.SaveToDisk();
 
                 //Tell the remote tunnel service to add the endpoint.
-                var result = await Singletons.Core.InboundTunnels.DispatchAddEndpointInboundToAssociatedTunnelService<NtFramePayloadBoolean>(tunnelId, endpoints.Inbound);
+                var result = await Singletons.Core.InboundTunnels.DispatchAddEndpointInboundToAssociatedTunnelService<QueryReplyPayloadBoolean>(tunnelId, endpoints.Inbound);
 
                 return new NtActionResponse { Success = result?.Value ?? false };
             }
@@ -200,7 +200,7 @@ namespace NetTunnel.Service.Controllers
                 Singletons.Core.InboundTunnels.SaveToDisk();
 
                 //Tell the remote tunnel service to delete the endpoint.
-                var result = await Singletons.Core.InboundTunnels.DispatchDeleteEndpointToAssociatedTunnelService<NtFramePayloadBoolean>(tunnelId, endpointId);
+                var result = await Singletons.Core.InboundTunnels.DispatchDeleteEndpointToAssociatedTunnelService<QueryReplyPayloadBoolean>(tunnelId, endpointId);
 
                 return new NtActionResponse { Success = result?.Value ?? false };
             }
