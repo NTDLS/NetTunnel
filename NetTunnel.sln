@@ -13,7 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetTunnel.Service", "NetTun
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F927DF22-97CB-409B-9B79-1B2C77DE1952}"
 	ProjectSection(SolutionItems) = preProject
-		@Installers\Installer.Iss = @Installers\Installer.Iss
+		@Installers\Service and Management Bundle.Iss = @Installers\Service and Management Bundle.Iss
+		@Installers\Standalone Management.Iss = @Installers\Standalone Management.Iss
 	EndProjectSection
 EndProject
 Global
