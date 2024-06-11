@@ -8,6 +8,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
     internal class BaseEndpoint : IEndpoint
     {
+        private object _statisticsLock = new object();
+
         public int TransmissionPort { get; private set; }
         public ulong BytesReceived { get; internal set; }
         public ulong BytesSent { get; internal set; }
@@ -102,8 +104,11 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         public void SendEndpointData(Guid streamId, byte[] buffer)
         {
-            BytesSent += (ulong)buffer.Length;
-            _tunnel.BytesReceived += (ulong)buffer.Length;
+            lock (_statisticsLock)
+            {
+                BytesSent += (ulong)buffer.Length;
+                _tunnel.BytesReceived += (ulong)buffer.Length;
+            }
 
             var outboundConnection = _activeConnections.Use((o) =>
             {
@@ -124,11 +129,14 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
             var activeConnection = ((ActiveEndpointConnection?)obj).EnsureNotNull();
 
-            try
+            lock (_statisticsLock)
             {
                 TotalConnections++;
                 CurrentConnections++;
+            }
 
+            try
+            {
                 if (this is EndpointInbound)
                 {
                     //If this is an inbound endpoint, then let the remote service know that we just received a
@@ -139,8 +147,11 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 var buffer = new byte[Singletons.Configuration.EndpointBufferSize];
                 while (KeepRunning && activeConnection.IsConnected && activeConnection.Read(ref buffer, out int length))
                 {
-                    BytesReceived += (ulong)length;
-                    _tunnel.BytesReceived += (ulong)length;
+                    lock (_statisticsLock)
+                    {
+                        BytesReceived += (ulong)length;
+                        _tunnel.BytesReceived += (ulong)length;
+                    }
 
                     var exchangePayload = new NotificationEndpointExchange(_tunnel.TunnelId, EndpointId, activeConnection.StreamId, buffer, length);
                     _tunnel.Notify(exchangePayload);
@@ -171,7 +182,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             }
             finally
             {
-                CurrentConnections--;
+                lock (_statisticsLock)
+                {
+                    CurrentConnections--;
+                }
 
                 Utility.TryAndIgnore(activeConnection.Disconnect);
 
