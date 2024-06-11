@@ -1,11 +1,7 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NetTunnel.Service.FramePayloads.Notifications;
-using NetTunnel.Service.FramePayloads.Queries;
-using NetTunnel.Service.FramePayloads.Replies;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NTDLS.ReliableMessaging;
-using NTDLS.SecureKeyExchange;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
@@ -39,7 +35,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         public List<IEndpoint> Endpoints { get; private set; } = new();
 
         private readonly Thread _heartbeatThread;
-        private FramePayloads.CryptographyProvider? _encryptionProvider;
+        private FramePayloads.CryptographyProvider? _cryptographyProvider;
 
         #endregion
 
@@ -60,14 +56,16 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             _server = new RmServer(new RmConfiguration()
             {
+                Parameter = this,
                 //FrameDelimiter = Singletons.Configuration.FrameDelimiter,
                 InitialReceiveBufferSize = Singletons.Configuration.InitialReceiveBufferSize,
                 MaxReceiveBufferSize = Singletons.Configuration.MaxReceiveBufferSize,
                 ReceiveBufferGrowthRate = Singletons.Configuration.ReceiveBufferGrowthRate,
             });
 
-            _server.OnNotificationReceived += _server_OnNotificationReceived;
-            _server.OnQueryReceived += _server_OnQueryReceived;
+            _server.AddHandler(new TunnelInboundMessageHandlers());
+            _server.AddHandler(new TunnelInboundQueryHandlers());
+
             _server.OnConnected += _server_OnConnected;
             _server.OnDisconnected += _server_OnDisconnected;
 
@@ -91,7 +89,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             }
 
             SecureKeyExchangeIsComplete = false;
-            _encryptionProvider = null;
+            _cryptographyProvider = null;
             _server.ClearCryptographyProvider();
 
             Core.Logging.Write(NtLogSeverity.Verbose, $"Accepted connection for inbound tunnel '{Name}' on port {DataPort}.");
@@ -108,8 +106,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             Status = NtTunnelStatus.Disconnected;
 
             SecureKeyExchangeIsComplete = false;
-            _encryptionProvider = null;
-            //_server.ClearEncryptionProvider(); //This can cause blocking.
+            _cryptographyProvider = null;
+            //_server.ClearCryptographyProvider(); //This can cause blocking.
 
             CurrentConnections--;
 
@@ -118,93 +116,20 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             _peerRmClientConnectionId = null;
         }
 
-        private IRmQueryReply _server_OnQueryReceived(RmContext context, IRmPayload payload)
+        public void InitializeCryptographyProvider(byte[] sharedSecret)
         {
-            //We received a diffie–hellman key exchange request, respond to it so we can prop up encryption.
-            if (payload is NtFramePayloadRequestKeyExchange keyExchangeRequest)
-            {
-                var compoundNegotiator = new CompoundNegotiator();
-                var negotiationReplyToken = compoundNegotiator.ApplyNegotiationToken(keyExchangeRequest.NegotiationToken);
-                var negotiationReply = new NtFramePayloadKeyExchangeReply(negotiationReplyToken);
-                _encryptionProvider = new FramePayloads.CryptographyProvider(compoundNegotiator.SharedSecret);
+            _cryptographyProvider = new FramePayloads.CryptographyProvider(sharedSecret);
 
-                Core.Logging.Write(NtLogSeverity.Verbose, $"Encryption Key generated, hash: {Utility.ComputeSha256Hash(compoundNegotiator.SharedSecret)}");
-
-                return negotiationReply;
-            }
-
-            if (SecureKeyExchangeIsComplete == false)
-            {
-                throw new Exception("Encryption has not been initialized.");
-            }
-
-            if (payload is NtFramePayloadAddEndpointInbound inboundEndpoint)
-            {
-                var endpoint = AddInboundEndpoint(inboundEndpoint.Configuration);
-                endpoint.Start();
-                return new NtFramePayloadBoolean(true);
-            }
-            else if (payload is NtFramePayloadAddEndpointOutbound outboundEndpoint)
-            {
-                var endpoint = AddOutboundEndpoint(outboundEndpoint.Configuration);
-                endpoint.Start();
-                return new NtFramePayloadBoolean(true);
-            }
-            else if (payload is NtFramePayloadDeleteEndpoint deleteEndpoint)
-            {
-                DeleteEndpoint(deleteEndpoint.EndpointId);
-                return new NtFramePayloadBoolean(true);
-            }
-
-            throw new Exception($"RPC query handler not defined for: {payload?.GetType()?.Name}");
+            Core.Logging.Write(NtLogSeverity.Verbose,
+                $"Encryption Key generated, hash: {Utility.ComputeSha256Hash(sharedSecret)}");
         }
 
-        private void _server_OnNotificationReceived(RmContext context, IRmNotification payload)
+        public void ApplyCryptographyProvider()
         {
-            if (payload is NtFramePayloadEncryptionReady)
-            {
-                SecureKeyExchangeIsComplete = true;
-                _server.SetCryptographyProvider(_encryptionProvider);
+            SecureKeyExchangeIsComplete = true;
+            _server.SetCryptographyProvider(_cryptographyProvider);
 
-                Core.Logging.Write(NtLogSeverity.Verbose, $"End-to-end encryption has been established for '{Name}'.");
-
-            }
-
-            if (SecureKeyExchangeIsComplete == false)
-            {
-                throw new Exception("Encryption has not been initialized.");
-            }
-
-            if (payload is NtFramePayloadMessage message)
-            {
-                Core.Logging.Write(NtLogSeverity.Debug, $"RPC Message: '{message.Message}'");
-            }
-            else if (payload is NtFramePayloadDeleteTunnel deleteTunnel)
-            {
-                Core.InboundTunnels.Delete(deleteTunnel.TunnelId);
-                Core.InboundTunnels.SaveToDisk();
-            }
-            else if (payload is NtFramePayloadEndpointConnect connectEndpoint)
-            {
-                Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Received endpoint connection notification.");
-
-                Endpoints.OfType<EndpointOutbound>().Where(o => o.EndpointId == connectEndpoint.EndpointId).FirstOrDefault()?
-                    .EstablishOutboundEndpointConnection(connectEndpoint.StreamId);
-            }
-            else if (payload is NtFramePayloadEndpointDisconnect disconnectEndpoint)
-            {
-                Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Received endpoint disconnection notification.");
-
-                GetEndpointById(disconnectEndpoint.EndpointId)?
-                    .Disconnect(disconnectEndpoint.StreamId);
-            }
-            else if (payload is NtFramePayloadEndpointExchange exchange)
-            {
-                //Core.Logging.Write(Constants.NtLogSeverity.Debug, $"Exchanging {exchange.Bytes.Length:n0} bytes.");
-
-                GetEndpointById(exchange.EndpointId)?
-                    .SendEndpointData(exchange.StreamId, exchange.Bytes);
-            }
+            Core.Logging.Write(NtLogSeverity.Verbose, $"End-to-end encryption has been established for '{Name}'.");
         }
 
         public NtTunnelInboundConfiguration CloneConfiguration()
