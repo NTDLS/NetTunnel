@@ -62,7 +62,7 @@
             textBoxListenPort.Location = new Point(16, 83);
             textBoxListenPort.Name = "textBoxListenPort";
             textBoxListenPort.Size = new Size(74, 23);
-            textBoxListenPort.TabIndex = 4;
+            textBoxListenPort.TabIndex = 1;
             // 
             // labelListenPort
             // 
@@ -78,7 +78,7 @@
             textBoxTerminationAddress.Location = new Point(96, 83);
             textBoxTerminationAddress.Name = "textBoxTerminationAddress";
             textBoxTerminationAddress.Size = new Size(191, 23);
-            textBoxTerminationAddress.TabIndex = 5;
+            textBoxTerminationAddress.TabIndex = 2;
             // 
             // labelTerminationAddress
             // 
@@ -94,7 +94,7 @@
             textBoxTerminationPort.Location = new Point(293, 83);
             textBoxTerminationPort.Name = "textBoxTerminationPort";
             textBoxTerminationPort.Size = new Size(92, 23);
-            textBoxTerminationPort.TabIndex = 6;
+            textBoxTerminationPort.TabIndex = 3;
             // 
             // labelTerminationPort
             // 
@@ -107,20 +107,20 @@
             // 
             // buttonAdd
             // 
-            buttonAdd.Location = new Point(229, 124);
+            buttonAdd.Location = new Point(310, 124);
             buttonAdd.Name = "buttonAdd";
             buttonAdd.Size = new Size(75, 23);
-            buttonAdd.TabIndex = 7;
+            buttonAdd.TabIndex = 4;
             buttonAdd.Text = "Add";
             buttonAdd.UseVisualStyleBackColor = true;
             buttonAdd.Click += buttonAdd_Click;
             // 
             // buttonCancel
             // 
-            buttonCancel.Location = new Point(310, 124);
+            buttonCancel.Location = new Point(229, 124);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(75, 23);
-            buttonCancel.TabIndex = 8;
+            buttonCancel.TabIndex = 5;
             buttonCancel.Text = "Cancel";
             buttonCancel.UseVisualStyleBackColor = true;
             // 

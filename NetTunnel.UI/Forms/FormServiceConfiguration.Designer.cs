@@ -56,34 +56,34 @@
             tabControlBody = new TabControl();
             tabPageManagement = new TabPage();
             tabPageTunnels = new TabPage();
+            groupBoxBuffering = new GroupBox();
             tabPageEndpoints = new TabPage();
             tabPageMisc = new TabPage();
-            groupBoxBuffering = new GroupBox();
             checkBoxVerboseLogging = new CheckBox();
             tabControlBody.SuspendLayout();
             tabPageManagement.SuspendLayout();
             tabPageTunnels.SuspendLayout();
+            groupBoxBuffering.SuspendLayout();
             tabPageEndpoints.SuspendLayout();
             tabPageMisc.SuspendLayout();
-            groupBoxBuffering.SuspendLayout();
             SuspendLayout();
             // 
             // buttonCancel
             // 
-            buttonCancel.Location = new Point(433, 428);
+            buttonCancel.Location = new Point(350, 431);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(75, 23);
-            buttonCancel.TabIndex = 2;
+            buttonCancel.TabIndex = 1;
             buttonCancel.Text = "Cancel";
             buttonCancel.UseVisualStyleBackColor = true;
             buttonCancel.Click += buttonCancel_Click;
             // 
             // buttonSave
             // 
-            buttonSave.Location = new Point(350, 428);
+            buttonSave.Location = new Point(431, 431);
             buttonSave.Name = "buttonSave";
             buttonSave.Size = new Size(75, 23);
-            buttonSave.TabIndex = 1;
+            buttonSave.TabIndex = 0;
             buttonSave.Text = "Save";
             buttonSave.UseVisualStyleBackColor = true;
             buttonSave.Click += buttonSave_Click;
@@ -156,49 +156,49 @@
             textBoxManagementPort.Location = new Point(138, 20);
             textBoxManagementPort.Name = "textBoxManagementPort";
             textBoxManagementPort.Size = new Size(100, 23);
-            textBoxManagementPort.TabIndex = 12;
+            textBoxManagementPort.TabIndex = 0;
             // 
             // textBoxManagementPortRSASize
             // 
             textBoxManagementPortRSASize.Location = new Point(138, 49);
             textBoxManagementPortRSASize.Name = "textBoxManagementPortRSASize";
             textBoxManagementPortRSASize.Size = new Size(100, 23);
-            textBoxManagementPortRSASize.TabIndex = 13;
+            textBoxManagementPortRSASize.TabIndex = 2;
             // 
             // textBoxEndpointBufferSize
             // 
             textBoxEndpointBufferSize.Location = new Point(209, 83);
             textBoxEndpointBufferSize.Name = "textBoxEndpointBufferSize";
             textBoxEndpointBufferSize.Size = new Size(100, 23);
-            textBoxEndpointBufferSize.TabIndex = 14;
+            textBoxEndpointBufferSize.TabIndex = 2;
             // 
             // textBoxMessageQueryTimeoutMs
             // 
             textBoxMessageQueryTimeoutMs.Location = new Point(186, 47);
             textBoxMessageQueryTimeoutMs.Name = "textBoxMessageQueryTimeoutMs";
             textBoxMessageQueryTimeoutMs.Size = new Size(100, 23);
-            textBoxMessageQueryTimeoutMs.TabIndex = 16;
+            textBoxMessageQueryTimeoutMs.TabIndex = 1;
             // 
             // textBoxTunnelAndEndpointHeartbeatDelayMs
             // 
             textBoxTunnelAndEndpointHeartbeatDelayMs.Location = new Point(209, 20);
             textBoxTunnelAndEndpointHeartbeatDelayMs.Name = "textBoxTunnelAndEndpointHeartbeatDelayMs";
             textBoxTunnelAndEndpointHeartbeatDelayMs.Size = new Size(100, 23);
-            textBoxTunnelAndEndpointHeartbeatDelayMs.TabIndex = 17;
+            textBoxTunnelAndEndpointHeartbeatDelayMs.TabIndex = 0;
             // 
             // textBoxTunnelCryptographyKeySize
             // 
             textBoxTunnelCryptographyKeySize.Location = new Point(186, 18);
             textBoxTunnelCryptographyKeySize.Name = "textBoxTunnelCryptographyKeySize";
             textBoxTunnelCryptographyKeySize.Size = new Size(100, 23);
-            textBoxTunnelCryptographyKeySize.TabIndex = 18;
+            textBoxTunnelCryptographyKeySize.TabIndex = 0;
             // 
             // textBoxStaleEndpointExpirationMs
             // 
             textBoxStaleEndpointExpirationMs.Location = new Point(209, 49);
             textBoxStaleEndpointExpirationMs.Name = "textBoxStaleEndpointExpirationMs";
             textBoxStaleEndpointExpirationMs.Size = new Size(100, 23);
-            textBoxStaleEndpointExpirationMs.TabIndex = 19;
+            textBoxStaleEndpointExpirationMs.TabIndex = 1;
             // 
             // checkBoxDebugLogging
             // 
@@ -206,7 +206,7 @@
             checkBoxDebugLogging.Location = new Point(14, 21);
             checkBoxDebugLogging.Name = "checkBoxDebugLogging";
             checkBoxDebugLogging.Size = new Size(110, 19);
-            checkBoxDebugLogging.TabIndex = 20;
+            checkBoxDebugLogging.TabIndex = 0;
             checkBoxDebugLogging.Text = "Debug logging?";
             checkBoxDebugLogging.UseVisualStyleBackColor = true;
             // 
@@ -216,7 +216,7 @@
             checkBoxManagementUseSSL.Location = new Point(244, 22);
             checkBoxManagementUseSSL.Name = "checkBoxManagementUseSSL";
             checkBoxManagementUseSSL.Size = new Size(71, 19);
-            checkBoxManagementUseSSL.TabIndex = 21;
+            checkBoxManagementUseSSL.TabIndex = 1;
             checkBoxManagementUseSSL.Text = "Use SSL?";
             checkBoxManagementUseSSL.UseVisualStyleBackColor = true;
             // 
@@ -252,21 +252,21 @@
             textBoxInitialReceiveBufferSize.Location = new Point(164, 22);
             textBoxInitialReceiveBufferSize.Name = "textBoxInitialReceiveBufferSize";
             textBoxInitialReceiveBufferSize.Size = new Size(100, 23);
-            textBoxInitialReceiveBufferSize.TabIndex = 25;
+            textBoxInitialReceiveBufferSize.TabIndex = 2;
             // 
             // textBoxMaxReceiveBufferSize
             // 
             textBoxMaxReceiveBufferSize.Location = new Point(164, 51);
             textBoxMaxReceiveBufferSize.Name = "textBoxMaxReceiveBufferSize";
             textBoxMaxReceiveBufferSize.Size = new Size(100, 23);
-            textBoxMaxReceiveBufferSize.TabIndex = 26;
+            textBoxMaxReceiveBufferSize.TabIndex = 3;
             // 
             // textBoxReceiveBufferGrowthRate
             // 
             textBoxReceiveBufferGrowthRate.Location = new Point(164, 80);
             textBoxReceiveBufferGrowthRate.Name = "textBoxReceiveBufferGrowthRate";
             textBoxReceiveBufferGrowthRate.Size = new Size(100, 23);
-            textBoxReceiveBufferGrowthRate.TabIndex = 27;
+            textBoxReceiveBufferGrowthRate.TabIndex = 4;
             // 
             // tabControlBody
             // 
@@ -310,6 +310,21 @@
             tabPageTunnels.Text = "Tunnels";
             tabPageTunnels.UseVisualStyleBackColor = true;
             // 
+            // groupBoxBuffering
+            // 
+            groupBoxBuffering.Controls.Add(labelInitialReceiveBufferSize);
+            groupBoxBuffering.Controls.Add(labelMaxReceiveBufferSize);
+            groupBoxBuffering.Controls.Add(textBoxReceiveBufferGrowthRate);
+            groupBoxBuffering.Controls.Add(labelReceiveBufferGrowthRate);
+            groupBoxBuffering.Controls.Add(textBoxInitialReceiveBufferSize);
+            groupBoxBuffering.Controls.Add(textBoxMaxReceiveBufferSize);
+            groupBoxBuffering.Location = new Point(22, 82);
+            groupBoxBuffering.Name = "groupBoxBuffering";
+            groupBoxBuffering.Size = new Size(280, 125);
+            groupBoxBuffering.TabIndex = 28;
+            groupBoxBuffering.TabStop = false;
+            groupBoxBuffering.Text = "Buffering";
+            // 
             // tabPageEndpoints
             // 
             tabPageEndpoints.Controls.Add(labelTunnelAndEndpointHeartbeatDelayMs);
@@ -336,28 +351,13 @@
             tabPageMisc.Text = "Misc.";
             tabPageMisc.UseVisualStyleBackColor = true;
             // 
-            // groupBoxBuffering
-            // 
-            groupBoxBuffering.Controls.Add(labelInitialReceiveBufferSize);
-            groupBoxBuffering.Controls.Add(labelMaxReceiveBufferSize);
-            groupBoxBuffering.Controls.Add(textBoxReceiveBufferGrowthRate);
-            groupBoxBuffering.Controls.Add(labelReceiveBufferGrowthRate);
-            groupBoxBuffering.Controls.Add(textBoxInitialReceiveBufferSize);
-            groupBoxBuffering.Controls.Add(textBoxMaxReceiveBufferSize);
-            groupBoxBuffering.Location = new Point(22, 82);
-            groupBoxBuffering.Name = "groupBoxBuffering";
-            groupBoxBuffering.Size = new Size(280, 125);
-            groupBoxBuffering.TabIndex = 28;
-            groupBoxBuffering.TabStop = false;
-            groupBoxBuffering.Text = "Buffering";
-            // 
             // checkBoxVerboseLogging
             // 
             checkBoxVerboseLogging.AutoSize = true;
             checkBoxVerboseLogging.Location = new Point(14, 46);
             checkBoxVerboseLogging.Name = "checkBoxVerboseLogging";
             checkBoxVerboseLogging.Size = new Size(116, 19);
-            checkBoxVerboseLogging.TabIndex = 21;
+            checkBoxVerboseLogging.TabIndex = 1;
             checkBoxVerboseLogging.Text = "Verbose logging?";
             checkBoxVerboseLogging.UseVisualStyleBackColor = true;
             // 
@@ -382,12 +382,12 @@
             tabPageManagement.PerformLayout();
             tabPageTunnels.ResumeLayout(false);
             tabPageTunnels.PerformLayout();
+            groupBoxBuffering.ResumeLayout(false);
+            groupBoxBuffering.PerformLayout();
             tabPageEndpoints.ResumeLayout(false);
             tabPageEndpoints.PerformLayout();
             tabPageMisc.ResumeLayout(false);
             tabPageMisc.PerformLayout();
-            groupBoxBuffering.ResumeLayout(false);
-            groupBoxBuffering.PerformLayout();
             ResumeLayout(false);
         }
 

@@ -114,7 +114,7 @@
             // 
             // buttonAdd
             // 
-            buttonAdd.Location = new Point(139, 302);
+            buttonAdd.Location = new Point(220, 304);
             buttonAdd.Name = "buttonAdd";
             buttonAdd.Size = new Size(75, 23);
             buttonAdd.TabIndex = 6;
@@ -124,7 +124,7 @@
             // 
             // buttonCancel
             // 
-            buttonCancel.Location = new Point(220, 302);
+            buttonCancel.Location = new Point(139, 304);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(75, 23);
             buttonCancel.TabIndex = 7;

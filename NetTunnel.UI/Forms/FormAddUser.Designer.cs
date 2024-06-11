@@ -44,7 +44,7 @@
             buttonSave.Location = new Point(173, 191);
             buttonSave.Name = "buttonSave";
             buttonSave.Size = new Size(75, 23);
-            buttonSave.TabIndex = 4;
+            buttonSave.TabIndex = 3;
             buttonSave.Text = "Save";
             buttonSave.UseVisualStyleBackColor = true;
             buttonSave.Click += buttonSave_Click;
@@ -54,7 +54,7 @@
             buttonCancel.Location = new Point(92, 191);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(75, 23);
-            buttonCancel.TabIndex = 3;
+            buttonCancel.TabIndex = 4;
             buttonCancel.Text = "Cancel";
             buttonCancel.UseVisualStyleBackColor = true;
             buttonCancel.Click += buttonCancel_Click;
@@ -113,7 +113,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(268, 249);
+            ClientSize = new Size(268, 231);
             Controls.Add(textBoxConfirmPassword);
             Controls.Add(textBoxPassword);
             Controls.Add(textBoxUsername);

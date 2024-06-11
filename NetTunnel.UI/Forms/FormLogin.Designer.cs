@@ -78,7 +78,7 @@
             textBoxUsername.Location = new Point(90, 90);
             textBoxUsername.Name = "textBoxUsername";
             textBoxUsername.Size = new Size(275, 23);
-            textBoxUsername.TabIndex = 5;
+            textBoxUsername.TabIndex = 6;
             // 
             // textBoxPassword
             // 
@@ -90,7 +90,7 @@
             // 
             // buttonCancel
             // 
-            buttonCancel.Location = new Point(290, 189);
+            buttonCancel.Location = new Point(209, 189);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(75, 23);
             buttonCancel.TabIndex = 2;
@@ -100,7 +100,7 @@
             // 
             // buttonLogin
             // 
-            buttonLogin.Location = new Point(207, 189);
+            buttonLogin.Location = new Point(290, 189);
             buttonLogin.Name = "buttonLogin";
             buttonLogin.Size = new Size(75, 23);
             buttonLogin.TabIndex = 1;
@@ -146,7 +146,7 @@
             checkBoxUseSSL.Location = new Point(294, 63);
             checkBoxUseSSL.Name = "checkBoxUseSSL";
             checkBoxUseSSL.Size = new Size(71, 19);
-            checkBoxUseSSL.TabIndex = 9;
+            checkBoxUseSSL.TabIndex = 5;
             checkBoxUseSSL.Text = "Use SSL?";
             checkBoxUseSSL.UseVisualStyleBackColor = true;
             // 
