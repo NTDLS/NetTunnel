@@ -132,7 +132,7 @@ namespace NetTunnel.UI.Forms
                     }
                     else
                     {
-                        listViewEndpoints.SuspendLayout();
+                        listViewEndpoints.BeginUpdate();
 
                         foreach (ListViewItem item in listViewEndpoints.Items)
                         {
@@ -150,7 +150,7 @@ namespace NetTunnel.UI.Forms
                                     double compressionRatio = 0;
                                     if (endpointStats.BytesSentKb > 0 && endpointStats.BytesReceivedKb > 0)
                                     {
-                                        if (endpointStats.BytesReceivedKb > endpointStats.BytesSentKb)
+                                        if (endpointStats.BytesSentKb > endpointStats.BytesReceivedKb)
                                         {
                                             compressionRatio = 100 - (endpointStats.BytesReceivedKb / endpointStats.BytesSentKb) * 100.0;
                                         }
@@ -169,7 +169,7 @@ namespace NetTunnel.UI.Forms
                             }
                         }
 
-                        listViewEndpoints.ResumeLayout();
+                        listViewEndpoints.EndUpdate();
                     }
                 }
 
@@ -181,7 +181,7 @@ namespace NetTunnel.UI.Forms
                     }
                     else
                     {
-                        listViewTunnels.SuspendLayout();
+                        listViewTunnels.BeginUpdate();
 
                         foreach (ListViewItem item in listViewTunnels.Items)
                         {
@@ -216,7 +216,7 @@ namespace NetTunnel.UI.Forms
                             }
                         }
 
-                        listViewTunnels.ResumeLayout();
+                        listViewTunnels.EndUpdate();
                     }
                 }
             }
