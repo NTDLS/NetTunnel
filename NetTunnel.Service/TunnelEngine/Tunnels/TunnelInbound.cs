@@ -272,6 +272,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             DateTime lastHeartBeat = DateTime.UtcNow;
 
+
             while (KeepRunning)
             {
                 if ((DateTime.UtcNow - lastHeartBeat).TotalMilliseconds > Singletons.Configuration.TunnelAndEndpointHeartbeatDelayMs)
