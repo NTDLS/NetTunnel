@@ -103,6 +103,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         public void SendEndpointData(Guid streamId, byte[] buffer)
         {
             BytesSent += (ulong)buffer.Length;
+            _tunnel.BytesReceived += (ulong)buffer.Length;
 
             var outboundConnection = _activeConnections.Use((o) =>
             {
@@ -139,6 +140,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 while (KeepRunning && activeConnection.IsConnected && activeConnection.Read(ref buffer, out int length))
                 {
                     BytesReceived += (ulong)length;
+                    _tunnel.BytesReceived += (ulong)length;
 
                     var exchangePayload = new NotificationEndpointExchange(_tunnel.TunnelId, EndpointId, activeConnection.StreamId, buffer, length);
                     _tunnel.Notify(exchangePayload);
