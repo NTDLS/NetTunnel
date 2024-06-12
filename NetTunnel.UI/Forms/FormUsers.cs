@@ -2,6 +2,7 @@
 using NetTunnel.Library;
 using NetTunnel.Service;
 using NTDLS.NullExtensions;
+using NTDLS.WinFormsHelpers;
 
 namespace NetTunnel.UI.Forms
 {
@@ -93,11 +94,11 @@ namespace NetTunnel.UI.Forms
                                 {
                                     if (!t.IsCompletedSuccessfully)
                                     {
-                                        this.ThreadSafeMessageBox("Failed to delete user.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                        this.InvokeMessageBox("Failed to delete user.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                                         return;
                                     }
 
-                                    this.ThreadSafeClose(DialogResult.OK);
+                                    this.InvokeClose(DialogResult.OK);
                                 });
                             }
                         }

@@ -3,6 +3,7 @@ using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.UI.Helpers;
 using NTDLS.NullExtensions;
+using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms
@@ -379,7 +380,7 @@ namespace NetTunnel.UI.Forms
                             });
                         }
 
-                        listViewEndpoints.ThreadSafeClearRows();
+                        listViewEndpoints.InvokeClearListViewRows();
                     }
                 };
             }
@@ -490,7 +491,7 @@ namespace NetTunnel.UI.Forms
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
-                                    this.ThreadSafeMessageBox($"Failed to stop the tunnel.",
+                                    this.InvokeMessageBox($"Failed to stop the tunnel.",
                                         FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 
                                     _needToRepopulateTunnels = true;
@@ -503,7 +504,7 @@ namespace NetTunnel.UI.Forms
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
-                                    this.ThreadSafeMessageBox($"Failed to stop the tunnel.",
+                                    this.InvokeMessageBox($"Failed to stop the tunnel.",
                                         FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 
                                     _needToRepopulateTunnels = true;
@@ -511,7 +512,7 @@ namespace NetTunnel.UI.Forms
                             });
                         }
 
-                        listViewEndpoints.ThreadSafeClearRows();
+                        listViewEndpoints.InvokeClearListViewRows();
                     }
                     // Stop ↑
                     else if (e.ClickedItem?.Text == "Start")
@@ -527,7 +528,7 @@ namespace NetTunnel.UI.Forms
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
-                                    this.ThreadSafeMessageBox($"Failed to start the tunnel.",
+                                    this.InvokeMessageBox($"Failed to start the tunnel.",
                                         FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 
                                     _needToRepopulateTunnels = true;
@@ -540,7 +541,7 @@ namespace NetTunnel.UI.Forms
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
-                                    this.ThreadSafeMessageBox($"Failed to start the tunnel.",
+                                    this.InvokeMessageBox($"Failed to start the tunnel.",
                                         FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 
                                     _needToRepopulateTunnels = true;
@@ -548,7 +549,7 @@ namespace NetTunnel.UI.Forms
                             });
                         }
 
-                        listViewEndpoints.ThreadSafeClearRows();
+                        listViewEndpoints.InvokeClearListViewRows();
                     }
                     //Start ↑
                     else if (e.ClickedItem?.Text == "Delete Tunnel")
@@ -608,7 +609,7 @@ namespace NetTunnel.UI.Forms
                             });
                         }
 
-                        listViewEndpoints.ThreadSafeClearRows();
+                        listViewEndpoints.InvokeClearListViewRows();
                     }
                 };
             }

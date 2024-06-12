@@ -1,6 +1,7 @@
 ﻿using NetTunnel.ClientAPI;
 using NetTunnel.Library;
 using NTDLS.Persistence;
+using NTDLS.WinFormsHelpers;
 
 namespace NetTunnel.UI.Forms
 {
@@ -35,8 +36,8 @@ namespace NetTunnel.UI.Forms
 
         private void buttonLogin_Click(object sender, EventArgs e)
         {
-            buttonLogin.ThreadSafeEnable(false);
-            buttonCancel.ThreadSafeEnable(false);
+            buttonLogin.InvokeEnableControl(false);
+            buttonCancel.InvokeEnableControl(false);
 
             try
             {
@@ -61,13 +62,14 @@ namespace NetTunnel.UI.Forms
 
                 client.Security.Login(Username, Password).ContinueWith(o =>
                 {
-                    buttonLogin.ThreadSafeEnable(true);
-                    buttonCancel.ThreadSafeEnable(true);
-
                     if (!o.IsCompletedSuccessfully)
                     {
                         client.Dispose();
-                        this.ThreadSafeMessageBox($"Login failed: {o.Exception?.Message}.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        this.InvokeMessageBox($"Login failed: {o.Exception?.Message}.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+
+                        buttonLogin.InvokeEnableControl(true);
+                        buttonCancel.InvokeEnableControl(true);
+
                         return;
                     }
                     var preferences = new UILoginPreferences()
@@ -82,7 +84,7 @@ namespace NetTunnel.UI.Forms
 
                     Client = client;
 
-                    this.ThreadSafeClose(DialogResult.OK);
+                    this.InvokeClose(DialogResult.OK);
                 });
             }
             catch (Exception ex)

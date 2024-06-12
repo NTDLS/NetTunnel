@@ -2,6 +2,7 @@
 using NetTunnel.Library;
 using NetTunnel.Service;
 using NTDLS.NullExtensions;
+using NTDLS.WinFormsHelpers;
 
 namespace NetTunnel.UI.Forms
 {
@@ -40,18 +41,18 @@ namespace NetTunnel.UI.Forms
 
                 CreatedUser = new NtUser(textBoxUsername.Text, Utility.ComputeSha256Hash(textBoxPassword.Text));
 
-                buttonSave.ThreadSafeEnable(false);
+                buttonSave.InvokeEnableControl(false);
 
                 _client.Security.CreateUser(CreatedUser).ContinueWith(t =>
                 {
                     if (!t.IsCompletedSuccessfully)
                     {
-                        buttonSave.ThreadSafeEnable(true);
-                        this.ThreadSafeMessageBox("Failed to create new user.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        this.InvokeMessageBox("Failed to create new user.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        buttonSave.InvokeEnableControl(true);
                         return;
                     }
 
-                    this.ThreadSafeClose(DialogResult.OK);
+                    this.InvokeClose(DialogResult.OK);
                 });
             }
             catch (Exception ex)

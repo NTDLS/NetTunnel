@@ -2,6 +2,7 @@
 using NetTunnel.Library;
 using NetTunnel.Service;
 using NTDLS.NullExtensions;
+using NTDLS.WinFormsHelpers;
 
 namespace NetTunnel.UI.Forms
 {
@@ -44,20 +45,20 @@ namespace NetTunnel.UI.Forms
 
                 var user = new NtUser(textBoxUsername.Text, Utility.ComputeSha256Hash(textBoxPassword.Text));
 
-                buttonSave.ThreadSafeEnable(false);
+                buttonSave.InvokeEnableControl(false);
 
                 _client.Security.ChangeUserPassword(user).ContinueWith(t =>
                  {
                      if (!t.IsCompletedSuccessfully)
                      {
-                         buttonSave.ThreadSafeEnable(true);
-                         this.ThreadSafeMessageBox("Failed to change user password.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                         this.InvokeMessageBox("Failed to change user password.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                         buttonSave.InvokeEnableControl(true);
                          return;
                      }
 
-                     this.ThreadSafeMessageBox("The password has been changed.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                     this.InvokeMessageBox("The password has been changed.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                     this.ThreadSafeClose(DialogResult.OK);
+                     this.InvokeClose(DialogResult.OK);
                  });
             }
             catch (Exception ex)

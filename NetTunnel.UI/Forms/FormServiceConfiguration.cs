@@ -1,7 +1,6 @@
 ﻿using NetTunnel.ClientAPI;
 using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NetTunnel.UI.Helpers;
 using NTDLS.NullExtensions;
 using NTDLS.WinFormsHelpers;
 
@@ -10,8 +9,6 @@ namespace NetTunnel.UI.Forms
     public partial class FormServiceConfiguration : Form
     {
         private readonly NtClient? _client;
-
-        private readonly ToolTip _toolTips = ToolTipHelpers.CreateToolTipControl();
 
         public FormServiceConfiguration()
         {
@@ -26,43 +23,45 @@ namespace NetTunnel.UI.Forms
 
             #region Set Tool-tips.
 
-            ToolTipHelpers.SetToolTip(_toolTips, [labelManagementPort, textBoxManagementPort],
+            var toolTips = ToolTipHelpers.CreateToolTipControl(this);
+
+            toolTips.AddControls([labelManagementPort, textBoxManagementPort],
                 "The management port is used by both the user-interface and a remote NetTunnel service to communicate configuration changes to this NetTunnel service.");
 
-            ToolTipHelpers.SetToolTip(_toolTips, [labelManagementPortRSASize, textBoxManagementPortRSASize],
+            toolTips.AddControls([labelManagementPortRSASize, textBoxManagementPortRSASize],
                 "The key size to use when generating the self-signed SSL certificate for the management port.");
 
-            ToolTipHelpers.SetToolTip(_toolTips, [labelEndpointBufferSize, textBoxEndpointBufferSize],
+            toolTips.AddControls([labelEndpointBufferSize, textBoxEndpointBufferSize],
                 "The buffer size (in bytes) used by endpoint connections for sending and receiving data.");
 
-            ToolTipHelpers.SetToolTip(_toolTips, [labelMessageQueryTimeoutMs, textBoxMessageQueryTimeoutMs],
+            toolTips.AddControls([labelMessageQueryTimeoutMs, textBoxMessageQueryTimeoutMs],
                 "The duration in milliseconds to wait on message query operations.");
 
-            ToolTipHelpers.SetToolTip(_toolTips, [labelTunnelAndEndpointHeartbeatDelayMs, textBoxTunnelAndEndpointHeartbeatDelayMs],
+            toolTips.AddControls([labelTunnelAndEndpointHeartbeatDelayMs, textBoxTunnelAndEndpointHeartbeatDelayMs],
                 "The delay in milliseconds between tunnel heartbeats.");
 
-            ToolTipHelpers.SetToolTip(_toolTips, [labelTunnelCryptographyKeySize, textBoxTunnelCryptographyKeySize],
+            toolTips.AddControls([labelTunnelCryptographyKeySize, textBoxTunnelCryptographyKeySize],
                 "The number of 12-byte segments to generate for tunnel cryptography.");
 
-            ToolTipHelpers.SetToolTip(_toolTips, [labelStaleEndpointExpirationMs, textBoxStaleEndpointExpirationMs],
+            toolTips.AddControls([labelStaleEndpointExpirationMs, textBoxStaleEndpointExpirationMs],
                 "The maximum number of milliseconds to allow an endpoint to remain connected without read/write activity.");
 
-            ToolTipHelpers.SetToolTip(_toolTips, [checkBoxManagementUseSSL],
+            toolTips.AddControls([checkBoxManagementUseSSL],
                 "Whether the management web-services should use SSL or not. If checked, the NetTunnel service will generate a self-signed SSL certificate with the encryption key size denoted by the 'Management RSA size'.");
 
-            ToolTipHelpers.SetToolTip(_toolTips, [labelInitialReceiveBufferSize, textBoxInitialReceiveBufferSize],
+            toolTips.AddControls([labelInitialReceiveBufferSize, textBoxInitialReceiveBufferSize],
                 "The initial size of the receive buffer. If the buffer ever gets full while receiving data it will be automatically resized up to MaxReceiveBufferSize.");
 
-            ToolTipHelpers.SetToolTip(_toolTips, [labelMaxReceiveBufferSize, textBoxMaxReceiveBufferSize],
+            toolTips.AddControls([labelMaxReceiveBufferSize, textBoxMaxReceiveBufferSize],
                 "The maximum size of the receive buffer. If the buffer ever gets full while receiving data it will be automatically resized up to MaxReceiveBufferSize.");
 
-            ToolTipHelpers.SetToolTip(_toolTips, [labelReceiveBufferGrowthRate, textBoxReceiveBufferGrowthRate],
+            toolTips.AddControls([labelReceiveBufferGrowthRate, textBoxReceiveBufferGrowthRate],
                 "The growth rate for auto-resizing the receive buffer from its initial size to its maximum size.");
 
-            ToolTipHelpers.SetToolTip(_toolTips, [checkBoxDebugLogging],
+            toolTips.AddControls([checkBoxDebugLogging],
                 "Whether to log debug information to the console and event log.");
 
-            ToolTipHelpers.SetToolTip(_toolTips, [checkBoxVerboseLogging],
+            toolTips.AddControls([checkBoxVerboseLogging],
                 "Whether to log verbose information to the console and event log.");
 
             #endregion
@@ -144,18 +143,18 @@ namespace NetTunnel.UI.Forms
 
                 #endregion
 
-                buttonSave.ThreadSafeEnable(false);
+                buttonSave.InvokeEnableControl(false);
 
                 _client.EnsureNotNull().Service.PutConfiguration(configuration).ContinueWith(t =>
                 {
                     if (!t.IsCompletedSuccessfully)
                     {
-                        buttonSave.ThreadSafeEnable(true);
-                        this.ThreadSafeMessageBox("Failed to save the configuration.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        this.InvokeMessageBox("Failed to save the configuration.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        buttonSave.InvokeEnableControl(true);
                         return;
                     }
 
-                    this.ThreadSafeClose(DialogResult.OK);
+                    this.InvokeClose(DialogResult.OK);
                 });
             }
             catch (Exception ex)

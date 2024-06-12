@@ -1,15 +1,14 @@
 ﻿using NetTunnel.ClientAPI;
 using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NetTunnel.UI.Helpers;
 using NTDLS.NullExtensions;
+using NTDLS.WinFormsHelpers;
 
 namespace NetTunnel.UI.Forms
 {
     public partial class FormCreateOutboundTunnel : Form
     {
         private readonly NtClient? _client;
-        private readonly ToolTip _toolTips = ToolTipHelpers.CreateToolTipControl();
 
         public FormCreateOutboundTunnel()
         {
@@ -24,22 +23,24 @@ namespace NetTunnel.UI.Forms
 
             #region Set Tool-tips.
 
-            ToolTipHelpers.SetToolTip(_toolTips, [labelRemoteAddress, textBoxRemoteAddress],
-                    "The IP address or hostname of the remote TunnelService instance. This is used so that this instance can reach out to the remote TunnelService instance and configure an inbound tunnel for this outbound tunnel.");
+            var toolTips = ToolTipHelpers.CreateToolTipControl(this);
 
-            ToolTipHelpers.SetToolTip(_toolTips, [labelRemoteUsername, textBoxRemoteUsername],
+            toolTips.AddControls([labelRemoteAddress, textBoxRemoteAddress],
+                        "The IP address or hostname of the remote TunnelService instance. This is used so that this instance can reach out to the remote TunnelService instance and configure an inbound tunnel for this outbound tunnel.");
+
+            toolTips.AddControls([labelRemoteUsername, textBoxRemoteUsername],
                     "The username at the remote TunnelService instance.");
 
-            ToolTipHelpers.SetToolTip(_toolTips, [labelRemotePassword, textBoxRemotePassword],
+            toolTips.AddControls([labelRemotePassword, textBoxRemotePassword],
                     "The password for the specified user name. This user and password need to exist at the remote TunnelService instance.");
 
-            ToolTipHelpers.SetToolTip(_toolTips, [labelManagementPort, textBoxManagementPort],
+            toolTips.AddControls([labelManagementPort, textBoxManagementPort],
                     "The management port of the remote TunnelService. This is used so that this instance can reach out to the remote TunnelService instance and configure an inbound tunnel for this outbound tunnel.");
 
-            ToolTipHelpers.SetToolTip(_toolTips, [labelName, textBoxName],
+            toolTips.AddControls([labelName, textBoxName],
                     "The user friendly name of this tunnel.");
 
-            ToolTipHelpers.SetToolTip(_toolTips, [labelTunnelDataPort, textBoxTunnelDataPort],
+            toolTips.AddControls([labelTunnelDataPort, textBoxTunnelDataPort],
                     "The port which the tunnel will use to listen and transmit data. This outbound tunnel will reach out to the specified remote TunnelService on the specified 'Management Port' and ask it to create a corresponding inbound tunnel for this outbound tunnel. The remote inbound tunnel will be configured to listen on this port and this outbound tunnel will make the outbound connection to it.");
 
             #endregion
@@ -68,20 +69,12 @@ namespace NetTunnel.UI.Forms
 
             try
             {
-                if (textBoxName.Text.Length == 0)
-                    throw new Exception("You must specify a name This is for your identification only.");
-                if (textBoxRemoteAddress.Text.Length == 0)
-                    throw new Exception("You must specify a remote tunnel address.");
-                if (textBoxManagementPort.Text.Length == 0 || int.TryParse(textBoxManagementPort.Text, out var _) == false)
-                    throw new Exception("You must specify a valid remote tunnel port.");
-                if (textBoxRemoteUsername.Text.Length == 0)
-                    throw new Exception("You must specify a remote tunnel username.");
-                if (textBoxRemotePassword.Text.Length == 0)
-                    throw new Exception("You must specify a valid remote tunnel password.");
-                if (textBoxTunnelDataPort.Text.Length == 0 || int.TryParse(textBoxTunnelDataPort.Text, out var _) == false)
-                    throw new Exception("You must specify a valid tunnel data port.");
-
-                buttonAdd.ThreadSafeEnable(false);
+                textBoxName.GetAndValidateText("You must specify a name. This is for your identification only.");
+                textBoxRemoteAddress.GetAndValidateText("You must specify a remote tunnel address.");
+                textBoxManagementPort.GetAndValidateNumeric(1, 65535, "You must specify a valid remote tunnel management port between [min] and [max].");
+                textBoxRemoteUsername.GetAndValidateText("You must specify a remote tunnel username.");
+                textBoxRemotePassword.GetAndValidateText("You must specify a valid remote tunnel password.");
+                textBoxTunnelDataPort.GetAndValidateNumeric(1, 65535, "You must specify a tunnel data port between [min] and [max].");
 
                 var tunnelId = Guid.NewGuid(); //The TunnelId is the same on both services.
 
@@ -91,10 +84,10 @@ namespace NetTunnel.UI.Forms
 
                 var inboundTunnel = new NtTunnelInboundConfiguration(tunnelId, textBoxName.Text, int.Parse(textBoxTunnelDataPort.Text));
 
-                NtClient remoteClient;
+                buttonAdd.InvokeEnableControl(false);
+                buttonCancel.InvokeEnableControl(false);
 
-                buttonAdd.ThreadSafeEnable(false);
-                buttonCancel.ThreadSafeEnable(false);
+                NtClient remoteClient;
 
                 try
                 {
@@ -102,8 +95,6 @@ namespace NetTunnel.UI.Forms
                 }
                 catch (Exception ex)
                 {
-                    buttonAdd.ThreadSafeEnable(true);
-                    buttonCancel.ThreadSafeEnable(true);
                     throw new Exception($"Failed to connect to the remote tunnel: {ex.Message}.");
                 }
 
@@ -112,31 +103,33 @@ namespace NetTunnel.UI.Forms
                     //Log into the remote tunnel.
                     remoteClient.Security.Login(outboundTunnel.Username, outboundTunnel.PasswordHash).ContinueWith(o =>
                     {
-                        buttonAdd.ThreadSafeEnable(true);
-                        buttonCancel.ThreadSafeEnable(true);
-
                         if (!o.IsCompletedSuccessfully)
                         {
                             remoteClient.Dispose();
-                            this.ThreadSafeMessageBox($"Login failed: {o.Exception?.Message}.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                            this.InvokeMessageBox($"Login failed: {o.Exception?.Message}.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+
+                            buttonAdd.InvokeEnableControl(true);
+                            buttonCancel.InvokeEnableControl(true);
+
                             return;
                         }
 
                         ConfigureTunnelPair(remoteClient, outboundTunnel, inboundTunnel);
 
-                        this.ThreadSafeClose(DialogResult.OK);
+                        this.InvokeClose(DialogResult.OK);
                     });
 
                 }
                 catch (Exception ex)
                 {
-                    buttonAdd.ThreadSafeEnable(true);
                     throw new Exception($"Failed to login to the remote tunnel: {ex.Message}.");
                 }
-
             }
             catch (Exception ex)
             {
+                buttonAdd.InvokeEnableControl(true);
+                buttonCancel.InvokeEnableControl(true);
+
                 MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK);
             }
         }
@@ -148,8 +141,8 @@ namespace NetTunnel.UI.Forms
             {
                 if (!t.IsCompletedSuccessfully)
                 {
-                    buttonAdd.ThreadSafeEnable(true);
-                    this.ThreadSafeMessageBox("Failed to create local outbound tunnel.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    buttonAdd.InvokeEnableControl(true);
+                    this.InvokeMessageBox("Failed to create local outbound tunnel.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     return;
                 }
 
@@ -161,8 +154,8 @@ namespace NetTunnel.UI.Forms
                         //If we failed to create the remote tunnel config, remove the local config.
                         _client.TunnelOutbound.Delete(outboundTunnel.TunnelId).ContinueWith(t =>
                         {
-                            buttonAdd.ThreadSafeEnable(true);
-                            this.ThreadSafeMessageBox("Failed to create remote inbound tunnel.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                            buttonAdd.InvokeEnableControl(true);
+                            this.InvokeMessageBox("Failed to create remote inbound tunnel.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                             return;
                         });
                     }
@@ -173,7 +166,7 @@ namespace NetTunnel.UI.Forms
                     //Start the outbound-connecting tunnel:
                     _client.TunnelOutbound.Start(outboundTunnel.TunnelId).Wait();
 
-                    this.ThreadSafeClose(DialogResult.OK);
+                    this.InvokeClose(DialogResult.OK);
                 });
             });
         }

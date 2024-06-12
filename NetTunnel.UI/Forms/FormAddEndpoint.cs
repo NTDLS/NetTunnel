@@ -1,6 +1,7 @@
 ﻿using NetTunnel.ClientAPI;
 using NetTunnel.Library.Types;
 using NTDLS.NullExtensions;
+using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms
@@ -57,7 +58,7 @@ namespace NetTunnel.UI.Forms
                 if (textBoxTerminationPort.Text.Length == 0 || int.TryParse(textBoxTerminationPort.Text, out var _) == false)
                     throw new Exception("You must specify a valid termination port.");
 
-                buttonAdd.ThreadSafeEnable(false);
+                buttonAdd.InvokeEnableControl(false);
 
                 var endpointId = Guid.NewGuid(); //The endpointId is the same on both services.
 
@@ -74,11 +75,13 @@ namespace NetTunnel.UI.Forms
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
-                                buttonAdd.ThreadSafeEnable(true);
-                                this.ThreadSafeMessageBox("Failed to add inbound endpoint pair to inbound tunnel.", FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                this.InvokeMessageBox("Failed to add inbound endpoint pair to inbound tunnel.", FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+
+                                buttonAdd.InvokeEnableControl(true);
+
                                 return;
                             }
-                            this.ThreadSafeClose(DialogResult.OK);
+                            this.InvokeClose(DialogResult.OK);
 
                         });
                     }
@@ -88,11 +91,13 @@ namespace NetTunnel.UI.Forms
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
-                                buttonAdd.ThreadSafeEnable(true);
-                                this.ThreadSafeMessageBox("Failed to add outbound endpoint pair to inbound tunnel.", FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                this.InvokeMessageBox("Failed to add outbound endpoint pair to inbound tunnel.", FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+
+                                buttonAdd.InvokeEnableControl(true);
+
                                 return;
                             }
-                            this.ThreadSafeClose(DialogResult.OK);
+                            this.InvokeClose(DialogResult.OK);
                         });
                     }
                 }
@@ -104,11 +109,13 @@ namespace NetTunnel.UI.Forms
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
-                                buttonAdd.ThreadSafeEnable(true);
-                                this.ThreadSafeMessageBox("Failed to add outbound endpoint pair to outbound tunnel.", FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                this.InvokeMessageBox("Failed to add outbound endpoint pair to outbound tunnel.", FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+
+                                buttonAdd.InvokeEnableControl(true);
+
                                 return;
                             }
-                            this.ThreadSafeClose(DialogResult.OK);
+                            this.InvokeClose(DialogResult.OK);
                         });
                     }
                     else
@@ -117,11 +124,13 @@ namespace NetTunnel.UI.Forms
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
-                                buttonAdd.ThreadSafeEnable(true);
-                                this.ThreadSafeMessageBox("Failed to add outbound endpoint pair to outbound tunnel.", FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                this.InvokeMessageBox("Failed to add outbound endpoint pair to outbound tunnel.", FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+
+                                buttonAdd.InvokeEnableControl(true);
+
                                 return;
                             }
-                            this.ThreadSafeClose(DialogResult.OK);
+                            this.InvokeClose(DialogResult.OK);
                         });
                     }
                 }
