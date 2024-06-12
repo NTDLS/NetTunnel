@@ -33,14 +33,12 @@
             buttonSave = new Button();
             labelManagementPort = new Label();
             labelManagementPortRSASize = new Label();
-            labelEndpointBufferSize = new Label();
             labelMessageQueryTimeoutMs = new Label();
             labelTunnelAndEndpointHeartbeatDelayMs = new Label();
             labelTunnelCryptographyKeySize = new Label();
             labelStaleEndpointExpirationMs = new Label();
             textBoxManagementPort = new TextBox();
             textBoxManagementPortRSASize = new TextBox();
-            textBoxEndpointBufferSize = new TextBox();
             textBoxMessageQueryTimeoutMs = new TextBox();
             textBoxTunnelAndEndpointHeartbeatDelayMs = new TextBox();
             textBoxTunnelCryptographyKeySize = new TextBox();
@@ -106,15 +104,6 @@
             labelManagementPortRSASize.TabIndex = 4;
             labelManagementPortRSASize.Text = "Management RSA size";
             // 
-            // labelEndpointBufferSize
-            // 
-            labelEndpointBufferSize.AutoSize = true;
-            labelEndpointBufferSize.Location = new Point(91, 86);
-            labelEndpointBufferSize.Name = "labelEndpointBufferSize";
-            labelEndpointBufferSize.Size = new Size(112, 15);
-            labelEndpointBufferSize.TabIndex = 5;
-            labelEndpointBufferSize.Text = "Endpoint buffer size";
-            // 
             // labelMessageQueryTimeoutMs
             // 
             labelMessageQueryTimeoutMs.AutoSize = true;
@@ -164,13 +153,6 @@
             textBoxManagementPortRSASize.Name = "textBoxManagementPortRSASize";
             textBoxManagementPortRSASize.Size = new Size(100, 23);
             textBoxManagementPortRSASize.TabIndex = 2;
-            // 
-            // textBoxEndpointBufferSize
-            // 
-            textBoxEndpointBufferSize.Location = new Point(209, 83);
-            textBoxEndpointBufferSize.Name = "textBoxEndpointBufferSize";
-            textBoxEndpointBufferSize.Size = new Size(100, 23);
-            textBoxEndpointBufferSize.TabIndex = 2;
             // 
             // textBoxMessageQueryTimeoutMs
             // 
@@ -329,8 +311,6 @@
             // 
             tabPageEndpoints.Controls.Add(labelTunnelAndEndpointHeartbeatDelayMs);
             tabPageEndpoints.Controls.Add(labelStaleEndpointExpirationMs);
-            tabPageEndpoints.Controls.Add(textBoxEndpointBufferSize);
-            tabPageEndpoints.Controls.Add(labelEndpointBufferSize);
             tabPageEndpoints.Controls.Add(textBoxStaleEndpointExpirationMs);
             tabPageEndpoints.Controls.Add(textBoxTunnelAndEndpointHeartbeatDelayMs);
             tabPageEndpoints.Location = new Point(4, 24);
@@ -396,14 +376,12 @@
         private Button buttonSave;
         private Label labelManagementPort;
         private Label labelManagementPortRSASize;
-        private Label labelEndpointBufferSize;
         private Label labelMessageQueryTimeoutMs;
         private Label labelTunnelAndEndpointHeartbeatDelayMs;
         private Label labelTunnelCryptographyKeySize;
         private Label labelStaleEndpointExpirationMs;
         private TextBox textBoxManagementPort;
         private TextBox textBoxManagementPortRSASize;
-        private TextBox textBoxEndpointBufferSize;
         private TextBox textBoxMessageQueryTimeoutMs;
         private TextBox textBoxTunnelAndEndpointHeartbeatDelayMs;
         private TextBox textBoxTunnelCryptographyKeySize;

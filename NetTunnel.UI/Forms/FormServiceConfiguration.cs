@@ -85,7 +85,6 @@ namespace NetTunnel.UI.Forms
             {
                 textBoxManagementPort.Text = $"{configuration.ManagementPort:n0}";
                 textBoxManagementPortRSASize.Text = $"{configuration.ManagementPortRSASize:n0}";
-                textBoxEndpointBufferSize.Text = $"{configuration.EndpointBufferSize:n0}";
                 textBoxMessageQueryTimeoutMs.Text = $"{configuration.MessageQueryTimeoutMs:n0}";
                 textBoxTunnelAndEndpointHeartbeatDelayMs.Text = $"{configuration.TunnelAndEndpointHeartbeatDelayMs:n0}";
                 textBoxTunnelCryptographyKeySize.Text = $"{configuration.TunnelCryptographyKeySize:n0}";
@@ -112,9 +111,6 @@ namespace NetTunnel.UI.Forms
 
                 configuration.ManagementPortRSASize = textBoxManagementPortRSASize.GetAndValidateNumeric(2048, 4096,
                     "The management RSA size must be an integer value between [min] and 4096.");
-
-                configuration.EndpointBufferSize = textBoxEndpointBufferSize.GetAndValidateNumeric(1024, 1073741824,
-                    "The endpoint buffer size must be an integer value between [min] and [max].");
 
                 configuration.MessageQueryTimeoutMs = textBoxMessageQueryTimeoutMs.GetAndValidateNumeric(1000, 3600000,
                     "The message query timeout (ms) must be an integer value between [min] and [max].");

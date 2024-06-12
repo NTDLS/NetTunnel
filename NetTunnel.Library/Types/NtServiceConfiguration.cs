@@ -14,10 +14,6 @@
         /// The key size to use when generating the self signed SSL certificate.
         /// </summary>
         public int ManagementPortRSASize { get; set; } = 2048;
-        /// <summary>
-        /// The buffer size (in bytes) used by endpoint connections for sending and receiving data.
-        /// </summary>
-        public int EndpointBufferSize { get; set; } = 16 * 1024;
 
         /// <summary>
         /// Whether to log debug information.

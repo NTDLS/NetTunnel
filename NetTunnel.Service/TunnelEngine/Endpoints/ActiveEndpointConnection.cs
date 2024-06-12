@@ -42,11 +42,17 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             _stream.Write(buffer);
         }
 
-        public bool Read(ref byte[] buffer, out int length)
+        public void Write(PumpBuffer buffer)
         {
             LastActivityDateTime = DateTime.UtcNow;
-            length = _stream.Read(buffer, 0, buffer.Length);
-            return length > 0;
+            _stream.Write(buffer.Bytes, 0, buffer.Length);
+        }
+
+        public bool Read(ref PumpBuffer buffer)
+        {
+            LastActivityDateTime = DateTime.UtcNow;
+            buffer.Length = _stream.Read(buffer.Bytes, 0, buffer.Bytes.Length);
+            return buffer.Length > 0;
         }
 
         public void Dispose()

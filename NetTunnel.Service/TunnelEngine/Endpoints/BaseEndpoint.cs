@@ -58,7 +58,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                             Utility.TryAndIgnore(() =>
                             {
                                 //We've are connected but haven't done much in a while.
-                                if (connection.Value.ActivityAgeInMilliseconds > Singletons.Configuration.StaleEndpointExpirationMs)
+                                if (Singletons.Configuration.StaleEndpointExpirationMs > 0 
+                                    && connection.Value.ActivityAgeInMilliseconds > Singletons.Configuration.StaleEndpointExpirationMs)
                                 {
                                     connectionsToClose.Add(connection.Value);
                                 }
@@ -124,6 +125,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             outboundConnection?.Write(buffer);
         }
 
+        /// <summary>
+        /// This is where data is received by the endpoint client connections (e.g. web-browser, web-server, etc).
+        /// </summary>
+        /// <param name="obj"></param>
         internal void EndpointDataExchangeThreadProc(object? obj)
         {
             Thread.CurrentThread.Name = $"EndpointDataExchangeThreadProc:{Environment.CurrentManagedThreadId}";
@@ -141,20 +146,23 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 if (this is EndpointInbound)
                 {
                     //If this is an inbound endpoint, then let the remote service know that we just received a
-                    //  connection so that it came make an associated outbound connection.
+                    //  connection so that it came make the associated outbound connection.
                     _tunnel.Notify(new NotificationEndpointConnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId));
                 }
 
-                var buffer = new byte[Singletons.Configuration.EndpointBufferSize];
-                while (KeepRunning && activeConnection.IsConnected && activeConnection.Read(ref buffer, out int length))
+                var buffer = new PumpBuffer(Singletons.Configuration.InitialReceiveBufferSize);
+
+                while (KeepRunning && activeConnection.IsConnected && activeConnection.Read(ref buffer))
                 {
                     lock (_statisticsLock)
                     {
-                        BytesReceived += (ulong)length;
-                        _tunnel.BytesReceived += (ulong)length;
+                        BytesReceived += (ulong)buffer.Length;
+                        _tunnel.BytesReceived += (ulong)buffer.Length;
                     }
 
-                    var exchangePayload = new NotificationEndpointExchange(_tunnel.TunnelId, EndpointId, activeConnection.StreamId, buffer, length);
+                    buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);
+
+                    var exchangePayload = new NotificationEndpointExchange(_tunnel.TunnelId, EndpointId, activeConnection.StreamId, buffer.Bytes, buffer.Length);
                     _tunnel.Notify(exchangePayload);
                 }
             }
