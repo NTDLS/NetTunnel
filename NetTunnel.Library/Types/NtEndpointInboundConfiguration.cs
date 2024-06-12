@@ -1,4 +1,6 @@
-﻿namespace NetTunnel.Library.Types
+﻿using static NetTunnel.Library.Constants;
+
+namespace NetTunnel.Library.Types
 {
     /// <summary>
     /// The inbound endpoint contains information that defines an inbound/listening connection for an established endpoint.
@@ -13,7 +15,13 @@
 
         public int TransmissionPort { get; set; }
 
-        public NtEndpointInboundConfiguration() { }
+        public NtTrafficType TrafficType { get; set; } = NtTrafficType.Raw;
+
+        public NtHTTPHeaderRules HttpHeaderRules { get; set; } = new();
+
+        public NtEndpointInboundConfiguration()
+        {
+        }
 
         public NtEndpointInboundConfiguration(Guid tunnelId, Guid endpointId, string name, int transmissionPort)
         {

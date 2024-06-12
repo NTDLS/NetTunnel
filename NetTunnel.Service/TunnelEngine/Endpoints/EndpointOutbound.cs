@@ -12,9 +12,12 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
     {
         public string Address { get; private set; }
 
+        public NtEndpointOutboundConfiguration Configuration { get; private set; }
+
         public EndpointOutbound(TunnelEngineCore core, ITunnel tunnel, NtEndpointOutboundConfiguration configuration)
             : base(core, tunnel, configuration.EndpointId, configuration.Name, configuration.TransmissionPort)
         {
+            Configuration = configuration;
             Address = configuration.Address;
         }
 

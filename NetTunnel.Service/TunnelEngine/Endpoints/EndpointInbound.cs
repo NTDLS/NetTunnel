@@ -15,19 +15,19 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         private Thread? _inboundConnectionThread;
 
         private TcpListener? _listener;
-        private readonly NtEndpointInboundConfiguration _configuration;
+        public NtEndpointInboundConfiguration Configuration { get; private set; }
 
         public EndpointInbound(TunnelEngineCore core, ITunnel tunnel, NtEndpointInboundConfiguration configuration)
             : base(core, tunnel, configuration.EndpointId, configuration.Name, configuration.TransmissionPort)
         {
-            _configuration = configuration;
+            Configuration = configuration;
         }
 
         public override void Start()
         {
             base.Start();
 
-            _listener = new TcpListener(IPAddress.Any, _configuration.TransmissionPort);
+            _listener = new TcpListener(IPAddress.Any, Configuration.TransmissionPort);
 
             _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Starting inbound endpoint '{Name}' on port {TransmissionPort}.");
 

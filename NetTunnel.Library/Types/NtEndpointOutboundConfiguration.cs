@@ -1,4 +1,6 @@
-﻿namespace NetTunnel.Library.Types
+﻿using static NetTunnel.Library.Constants;
+
+namespace NetTunnel.Library.Types
 {
     /// <summary>
     /// The tunnel connector contains information that defines an outbound termination connection from an established endpoint.
@@ -14,6 +16,10 @@
         public string Address { get; set; } = string.Empty;
 
         public int TransmissionPort { get; set; }
+
+        public NtTrafficType TrafficType { get; set; } = NtTrafficType.Raw;
+
+        public NtHTTPHeaderRules HttpHeaderRules { get; set; } = new();
 
         public NtEndpointOutboundConfiguration() { }
 
