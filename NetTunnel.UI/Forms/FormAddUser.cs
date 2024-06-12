@@ -1,6 +1,7 @@
 ﻿using NetTunnel.ClientAPI;
 using NetTunnel.Library;
 using NetTunnel.Service;
+using NTDLS.NullExtensions;
 
 namespace NetTunnel.UI.Forms
 {

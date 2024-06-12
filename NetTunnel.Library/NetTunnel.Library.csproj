@@ -19,4 +19,8 @@
     <Content Include="Multi.ico" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="NTDLS.NullHelpers" Version="1.0.0" />
+  </ItemGroup>
+
 </Project>

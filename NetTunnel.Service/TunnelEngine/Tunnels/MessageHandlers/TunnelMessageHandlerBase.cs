@@ -1,4 +1,4 @@
-﻿using NetTunnel.Library;
+﻿using NTDLS.NullExtensions;
 using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels.MessageHandlers

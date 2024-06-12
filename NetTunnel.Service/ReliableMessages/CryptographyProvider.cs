@@ -1,6 +1,4 @@
-﻿using NetTunnel.Library;
-using NetTunnel.Service.TunnelEngine.Tunnels;
-using NTDLS.NASCCL;
+﻿using NTDLS.NASCCL;
 using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Service.ReliableMessages

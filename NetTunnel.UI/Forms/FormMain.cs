@@ -2,6 +2,7 @@
 using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.UI.Helpers;
+using NTDLS.NullExtensions;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms

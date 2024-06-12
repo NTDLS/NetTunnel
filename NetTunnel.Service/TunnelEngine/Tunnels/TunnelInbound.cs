@@ -3,6 +3,7 @@ using NetTunnel.Library.Types;
 using NetTunnel.Service.ReliableMessages;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NetTunnel.Service.TunnelEngine.Tunnels.MessageHandlers;
+using NTDLS.NullExtensions;
 using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 

@@ -2,6 +2,8 @@
 using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.UI.Helpers;
+using NTDLS.NullExtensions;
+using NTDLS.WinFormsHelpers;
 
 namespace NetTunnel.UI.Forms
 {
@@ -106,34 +108,34 @@ namespace NetTunnel.UI.Forms
 
                 #region Get and validate form values .
 
-                configuration.ManagementPort = FormValidationHelpers.GetAndValidateInteger(textBoxManagementPort, 1, 65535,
+                configuration.ManagementPort = textBoxManagementPort.GetAndValidate(1, 65535,
                     "The management port must be an integer value between [min] and [max].");
 
-                configuration.ManagementPortRSASize = FormValidationHelpers.GetAndValidateInteger(textBoxManagementPortRSASize, 2048, 4096,
+                configuration.ManagementPortRSASize = textBoxManagementPortRSASize.GetAndValidate(2048, 4096,
                     "The management RSA size must be an integer value between [min] and 4096.");
 
-                configuration.EndpointBufferSize = FormValidationHelpers.GetAndValidateInteger(textBoxEndpointBufferSize, 1024, 1073741824,
+                configuration.EndpointBufferSize = textBoxEndpointBufferSize.GetAndValidate(1024, 1073741824,
                     "The endpoint buffer size must be an integer value between [min] and [max].");
 
-                configuration.MessageQueryTimeoutMs = FormValidationHelpers.GetAndValidateInteger(textBoxMessageQueryTimeoutMs, 1000, 3600000,
+                configuration.MessageQueryTimeoutMs = textBoxMessageQueryTimeoutMs.GetAndValidate(1000, 3600000,
                     "The message query timeout (ms) must be an integer value between [min] and [max].");
 
-                configuration.TunnelAndEndpointHeartbeatDelayMs = FormValidationHelpers.GetAndValidateInteger(textBoxTunnelAndEndpointHeartbeatDelayMs, 1000, 216000000,
+                configuration.TunnelAndEndpointHeartbeatDelayMs = textBoxTunnelAndEndpointHeartbeatDelayMs.GetAndValidate(1000, 216000000,
                     "The tunnel and endpoint heartbeat (ms) must be an integer value between [min] and [max].");
 
-                configuration.TunnelCryptographyKeySize = FormValidationHelpers.GetAndValidateInteger(textBoxTunnelCryptographyKeySize, 1, 100,
+                configuration.TunnelCryptographyKeySize = textBoxTunnelCryptographyKeySize.GetAndValidate(1, 100,
                     "The tunnel cryptography key-size must be an integer value between [min] and [max].");
 
-                configuration.StaleEndpointExpirationMs = FormValidationHelpers.GetAndValidateInteger(textBoxStaleEndpointExpirationMs, 1000, 216000000,
+                configuration.StaleEndpointExpirationMs = textBoxStaleEndpointExpirationMs.GetAndValidate(1000, 216000000,
                     "The stale endpoint expiration (ms) must be an integer value between [min] and [max].");
 
-                configuration.InitialReceiveBufferSize = FormValidationHelpers.GetAndValidateInteger(textBoxInitialReceiveBufferSize, 1024, 1073741824,
+                configuration.InitialReceiveBufferSize = textBoxInitialReceiveBufferSize.GetAndValidate(1024, 1073741824,
                     "The initial buffer size (bytes) must be an integer value between [min] and [max].");
 
-                configuration.MaxReceiveBufferSize = FormValidationHelpers.GetAndValidateInteger(textBoxMaxReceiveBufferSize, 1024, 1073741824,
+                configuration.MaxReceiveBufferSize = textBoxMaxReceiveBufferSize.GetAndValidate(1024, 1073741824,
                     "The max buffer size (bytes) must be an integer value between [min] and [max].");
 
-                configuration.ReceiveBufferGrowthRate = FormValidationHelpers.GetAndValidateDouble(textBoxReceiveBufferGrowthRate, 0.01, 1.0,
+                configuration.ReceiveBufferGrowthRate = textBoxReceiveBufferGrowthRate.GetAndValidate(0.01, 1.0,
                     "The buffer growth rate (%) must be an decimal value between [min] and [max].");
 
                 configuration.ManagementPortUseSSL = checkBoxManagementUseSSL.Checked;

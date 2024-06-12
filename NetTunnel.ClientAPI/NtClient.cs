@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Exceptions;
+using NTDLS.NullExtensions;
 
 namespace NetTunnel.ClientAPI
 {
