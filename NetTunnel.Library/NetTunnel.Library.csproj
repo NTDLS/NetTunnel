@@ -19,9 +19,4 @@
     <Content Include="Multi.ico" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NTDLS.Persistence" Version="1.2.0" />
-  </ItemGroup>
-
 </Project>
