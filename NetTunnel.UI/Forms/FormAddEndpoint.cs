@@ -16,11 +16,38 @@ namespace NetTunnel.UI.Forms
         {
             InitializeComponent();
 
+            dataGridViewHTTPHeaders.DataError += DataGridViewHTTPHeaders_DataError;
+
             _client = client;
             _tunnel = tunnel;
             _direction = direction;
 
             Text = $"NetTunnel : Add {direction} Endpoint";
+
+            var trafficTypes = new List<ComboItem>
+            {
+                new ComboItem("Raw", NtTrafficType.Raw),
+                new ComboItem("HTTP", NtTrafficType.Http),
+                new ComboItem("HTTPS", NtTrafficType.Https)
+            };
+
+            comboBoxTrafficType.DisplayMember = "Display";
+            comboBoxTrafficType.ValueMember = "Value";
+            comboBoxTrafficType.DataSource = trafficTypes;
+            comboBoxTrafficType.SelectedValue = NtTrafficType.Raw;
+
+#if DEBUG
+
+            textBoxName.Text = "Website Redirector Endpoint";
+            textBoxListenPort.Text = "8080";
+            textBoxTerminationAddress.Text = "127.0.0.1";
+            textBoxTerminationPort.Text = "80";
+#endif
+        }
+
+        private void DataGridViewHTTPHeaders_DataError(object? sender, DataGridViewDataErrorEventArgs e)
+        {
+            
         }
 
         public FormAddEndpoint()
@@ -32,14 +59,6 @@ namespace NetTunnel.UI.Forms
         {
             AcceptButton = buttonAdd;
             CancelButton = buttonCancel;
-
-#if DEBUG
-
-            textBoxName.Text = "Website Redirector Endpoint";
-            textBoxListenPort.Text = "8080";
-            textBoxTerminationAddress.Text = "127.0.0.1";
-            textBoxTerminationPort.Text = "80";
-#endif
         }
 
         private void buttonAdd_Click(object sender, EventArgs e)

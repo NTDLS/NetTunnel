@@ -1,7 +1,6 @@
 ﻿using NetTunnel.Library;
 using System.Diagnostics;
 using static NetTunnel.Library.Constants;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace NetTunnel.Service.TunnelEngine.Managers
 {

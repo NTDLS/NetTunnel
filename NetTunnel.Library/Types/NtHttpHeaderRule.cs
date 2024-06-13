@@ -11,7 +11,7 @@ namespace NetTunnel.Library
         public string Value { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
 
-        public NtHttpHeaderRule( NtHttpVerb verb, string name, NtHttpHeaderAction action, string value)
+        public NtHttpHeaderRule(NtHttpVerb verb, string name, NtHttpHeaderAction action, string value)
         {
             Verb = verb;
             Name = name;
