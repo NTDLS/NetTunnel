@@ -53,7 +53,7 @@ namespace NetTunnel.UI.Forms
 #if DEBUG
             textBoxName.Text = "My First Tunnel";
 
-            textBoxRemoteAddress.Text = "127.0.0.1";
+            textBoxRemoteAddress.Text = "10.20.1.120";
             textBoxTunnelDataPort.Text = "52846"; //This is the port that is used to move tunnel data between tunnels
 
             textBoxRemoteUsername.Text = "debug";
@@ -79,10 +79,10 @@ namespace NetTunnel.UI.Forms
                 var tunnelId = Guid.NewGuid(); //The TunnelId is the same on both services.
 
                 var outboundTunnel = new NtTunnelOutboundConfiguration(tunnelId, textBoxName.Text,
-                    textBoxRemoteAddress.Text, int.Parse(textBoxManagementPort.Text), int.Parse(textBoxTunnelDataPort.Text),
+                    textBoxRemoteAddress.Text, textBoxManagementPort.ValueAs<int>(), textBoxTunnelDataPort.ValueAs<int>(),
                     textBoxRemoteUsername.Text, Utility.ComputeSha256Hash(textBoxRemotePassword.Text));
 
-                var inboundTunnel = new NtTunnelInboundConfiguration(tunnelId, textBoxName.Text, int.Parse(textBoxTunnelDataPort.Text));
+                var inboundTunnel = new NtTunnelInboundConfiguration(tunnelId, textBoxName.Text, textBoxTunnelDataPort.ValueAs<int>());
 
                 buttonAdd.InvokeEnableControl(false);
                 buttonCancel.InvokeEnableControl(false);

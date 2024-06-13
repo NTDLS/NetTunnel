@@ -5,6 +5,41 @@
         public const string FriendlyName = "NetTunnel";
         public const string EventSourceName = "NetTunnel";
 
+        public enum NtTrafficType
+        {
+            Raw,
+            Http,
+            Https
+        }
+
+        public enum NtHttpVerb
+        {
+            Any,
+            Connect,
+            Delete,
+            Get,
+            Head,
+            Options,
+            Post,
+            Put
+        }
+
+        public enum NtHttpHeaderAction
+        {
+            Insert,
+            Update,
+            Delete,
+            Upsert
+        }
+
+        public enum NtHttpHeaderType
+        {
+            None,
+            Request,
+            Response,
+            Any
+        }
+
         public enum NtDirection
         {
             Inbound,

@@ -40,12 +40,12 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// <param name="tunnelId"></param>
         /// <param name="endpoint"></param>
         /// <returns></returns>
-        public async Task<T> DispatchAddEndpointInboundToAssociatedTunnelService<T>(Guid tunnelId, NtEndpointInboundConfiguration endpoint) where T : class, IRmQueryReply
+        public async Task<T> DispatchUpsertEndpointInboundToAssociatedTunnelService<T>(Guid tunnelId, NtEndpointInboundConfiguration endpoint) where T : class, IRmQueryReply
         {
             return (await Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                return tunnel.Query(new QueryAddEndpointInbound(endpoint));
+                return tunnel.Query(new QueryUpsertEndpointInbound(endpoint));
             }) as T).EnsureNotNull();
         }
 
@@ -56,30 +56,30 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// <param name="tunnelId"></param>
         /// <param name="endpoint"></param>
         /// <returns></returns>
-        public async Task<T> DispatchAddEndpointOutboundToAssociatedTunnelService<T>(Guid tunnelId, NtEndpointOutboundConfiguration endpoint) where T : class, IRmQueryReply
+        public async Task<T> DispatchUpsertEndpointOutboundToAssociatedTunnelService<T>(Guid tunnelId, NtEndpointOutboundConfiguration endpoint) where T : class, IRmQueryReply
         {
             return (await Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                return tunnel.Query(new QueryAddEndpointOutbound(endpoint));
+                return tunnel.Query(new QueryUpsertEndpointOutbound(endpoint));
             }) as T).EnsureNotNull();
         }
 
-        public void AddEndpointInbound(Guid tunnelId, NtEndpointInboundConfiguration endpoint)
+        public void UpsertEndpointInbound(Guid tunnelId, NtEndpointInboundConfiguration endpoint)
         {
             Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                tunnel.AddInboundEndpoint(endpoint);
+                tunnel.UpsertInboundEndpoint(endpoint);
             });
         }
 
-        public void AddEndpointOutbound(Guid tunnelId, NtEndpointOutboundConfiguration endpoint)
+        public void UpsertEndpointOutbound(Guid tunnelId, NtEndpointOutboundConfiguration endpoint)
         {
             Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                tunnel.AddOutboundEndpoint(endpoint);
+                tunnel.UpsertOutboundEndpoint(endpoint);
                 //tunnel.Start();
             });
         }

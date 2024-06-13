@@ -14,6 +14,12 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             _core = core;
         }
 
+        public void Write(Exception ex)
+            => Write(NtLogSeverity.Exception, ex.Message);
+
+        public void Write(Exception ex, string message)
+            => Write(NtLogSeverity.Exception, $"{message}: {ex.Message}");
+
         public void Write(NtLogSeverity severity, string text)
         {
             if (severity == NtLogSeverity.Debug && Singletons.Configuration.DebugLogging == false

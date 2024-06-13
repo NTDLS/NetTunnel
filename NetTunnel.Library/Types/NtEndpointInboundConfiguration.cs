@@ -1,4 +1,6 @@
-﻿namespace NetTunnel.Library.Types
+﻿using static NetTunnel.Library.Constants;
+
+namespace NetTunnel.Library.Types
 {
     /// <summary>
     /// The inbound endpoint contains information that defines an inbound/listening connection for an established endpoint.
@@ -6,21 +8,41 @@
     public class NtEndpointInboundConfiguration : INtEndpointConfiguration
     {
         public Guid EndpointId { get; set; }
-
         public Guid TunnelId { get; set; }
-
         public string Name { get; set; } = string.Empty;
+        public string OutboundAddress { get; set; } = string.Empty;
+        public int InboundPort { get; set; }
+        public int OutboundPort { get; set; }
+        public NtTrafficType TrafficType { get; set; } = NtTrafficType.Raw;
+        public List<NtHttpHeaderRule> HttpHeaderRules { get; set; } = new();
 
-        public int TransmissionPort { get; set; }
+        public NtEndpointInboundConfiguration()
+        {
+        }
 
-        public NtEndpointInboundConfiguration() { }
-
-        public NtEndpointInboundConfiguration(Guid tunnelId, Guid endpointId, string name, int transmissionPort)
+        public NtEndpointInboundConfiguration(Guid tunnelId, Guid endpointId, string name,
+            string outboundAddress, int inboundPort, int outboundPort, List<NtHttpHeaderRule> httpHeaderRules, NtTrafficType trafficType)
         {
             TunnelId = tunnelId;
             EndpointId = endpointId;
             Name = name;
-            TransmissionPort = transmissionPort;
+            OutboundAddress = outboundAddress;
+            InboundPort = inboundPort;
+            OutboundPort = outboundPort;
+            TrafficType = trafficType;
+            HttpHeaderRules.AddRange(httpHeaderRules);
+        }
+
+        public override int GetHashCode()
+        {
+            return EndpointId.GetHashCode()
+                + TunnelId.GetHashCode()
+                + Name.GetHashCode()
+                + OutboundAddress.GetHashCode()
+                + InboundPort.GetHashCode()
+                + OutboundPort.GetHashCode()
+                + TrafficType.GetHashCode()
+                + HttpHeaderRules.GetHashCode();
         }
     }
 }

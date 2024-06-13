@@ -4,6 +4,10 @@ namespace NetTunnel.Library.Types
 {
     public class NtTunnelStatistics
     {
+        /// <summary>
+        /// Used to determine if anything has changed.
+        /// </summary>
+        public int ChangeHash { get; set; }
         public List<NtEndpointStatistics> EndpointStatistics { get; set; } = new();
         public NtTunnelStatus Status { get; set; }
         public ulong CurrentConnections { get; set; }

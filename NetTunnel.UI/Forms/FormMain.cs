@@ -60,6 +60,33 @@ namespace NetTunnel.UI.Forms
             listViewEndpoints.ListViewItemSorter = _endpointsListViewItemComparer;
             listViewEndpoints.ColumnClick += ListViewEndpoints_ColumnClick;
             listViewEndpoints.MouseUp += listViewEndpoints_MouseUp;
+            listViewEndpoints.MouseDoubleClick += ListViewEndpoints_MouseDoubleClick;
+        }
+
+        private void ListViewEndpoints_MouseDoubleClick(object? sender, MouseEventArgs e)
+        {
+            _client.EnsureNotNull();
+
+            var selectedTunnelRow = listViewTunnels.SelectedItems?.Count > 0 ? listViewTunnels.SelectedItems[0] : null;
+            if (selectedTunnelRow == null)
+            {
+                return;
+            }
+
+            var selectedTunnel = (selectedTunnelRow.Tag as INtTunnelConfiguration).EnsureNotNull();
+
+            var selectedEndpointRow = listViewEndpoints.GetItemAt(e.X, e.Y);
+            if (selectedEndpointRow != null)
+            {
+                var selectedEndpoint = (selectedEndpointRow.Tag as INtEndpointConfiguration).EnsureNotNull();
+
+                using var form = new FormAddEditEndpoint(_client, selectedTunnel, selectedEndpoint);
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    RepopulateTunnelsGrid();
+                }
+            }
+
         }
 
         private bool ChangeConnection()
@@ -305,24 +332,20 @@ namespace NetTunnel.UI.Forms
                     {
                         _client.EnsureNotNull();
 
-                        using (var formAddEndpoint = new FormAddEndpoint(_client, selectedTunnel, NtDirection.Inbound))
+                        using var form = new FormAddEditEndpoint(_client, selectedTunnel, NtDirection.Inbound);
+                        if (form.ShowDialog() == DialogResult.OK)
                         {
-                            if (formAddEndpoint.ShowDialog() == DialogResult.OK)
-                            {
-                                RepopulateTunnelsGrid();
-                            }
+                            RepopulateTunnelsGrid();
                         }
                     }
                     else if (e.ClickedItem?.Text == "Add Outbound Endpoint to Tunnel")
                     {
                         _client.EnsureNotNull();
 
-                        using (var formAddEndpoint = new FormAddEndpoint(_client, selectedTunnel, NtDirection.Outbound))
+                        using var form = new FormAddEditEndpoint(_client, selectedTunnel, NtDirection.Outbound);
+                        if (form.ShowDialog() == DialogResult.OK)
                         {
-                            if (formAddEndpoint.ShowDialog() == DialogResult.OK)
-                            {
-                                RepopulateTunnelsGrid();
-                            }
+                            RepopulateTunnelsGrid();
                         }
                     }
                     else if (e.ClickedItem?.Text == "Delete Endpoint")
@@ -449,12 +472,10 @@ namespace NetTunnel.UI.Forms
 
                         var tunnel = ((INtTunnelConfiguration?)rowUnderMouse.Tag).EnsureNotNull();
 
-                        using (var formAddEndpoint = new FormAddEndpoint(_client, tunnel, NtDirection.Inbound))
+                        using var form = new FormAddEditEndpoint(_client, tunnel, NtDirection.Inbound);
+                        if (form.ShowDialog() == DialogResult.OK)
                         {
-                            if (formAddEndpoint.ShowDialog() == DialogResult.OK)
-                            {
-                                RepopulateTunnelsGrid();
-                            }
+                            RepopulateTunnelsGrid();
                         }
                     }
                     else if (e.ClickedItem?.Text == "Add Outbound Endpoint to Tunnel")
@@ -464,12 +485,10 @@ namespace NetTunnel.UI.Forms
 
                         var tunnel = ((INtTunnelConfiguration?)rowUnderMouse.Tag).EnsureNotNull();
 
-                        using (var formAddEndpoint = new FormAddEndpoint(_client, tunnel, NtDirection.Outbound))
+                        using var form = new FormAddEditEndpoint(_client, tunnel, NtDirection.Outbound);
+                        if (form.ShowDialog() == DialogResult.OK)
                         {
-                            if (formAddEndpoint.ShowDialog() == DialogResult.OK)
-                            {
-                                RepopulateTunnelsGrid();
-                            }
+                            RepopulateTunnelsGrid();
                         }
                     }
                     else if (e.ClickedItem?.Text == "Stop")
@@ -641,6 +660,7 @@ namespace NetTunnel.UI.Forms
             _client.EnsureNotNull();
 
             listViewTunnels.Items.Clear();
+            listViewEndpoints.Items.Clear();
 
             _client.TunnelInbound.List().ContinueWith(t =>
             {
@@ -737,7 +757,7 @@ namespace NetTunnel.UI.Forms
                     var item = new ListViewItem(endpoint.Name);
                     item.Tag = endpoint;
                     item.SubItems.Add("Inbound");
-                    item.SubItems.Add($"*:{endpoint.TransmissionPort}");
+                    item.SubItems.Add($"*:{endpoint.InboundPort}");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
@@ -758,7 +778,7 @@ namespace NetTunnel.UI.Forms
                     var item = new ListViewItem(endpoint.Name);
                     item.Tag = endpoint;
                     item.SubItems.Add("Outbound");
-                    item.SubItems.Add($"{endpoint.Address}:{endpoint.TransmissionPort}");
+                    item.SubItems.Add($"{endpoint.OutboundAddress}:{endpoint.OutboundPort}");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");

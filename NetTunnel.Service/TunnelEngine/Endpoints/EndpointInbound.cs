@@ -15,21 +15,23 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         private Thread? _inboundConnectionThread;
 
         private TcpListener? _listener;
-        private readonly NtEndpointInboundConfiguration _configuration;
+
+        public override int GetHashCode()
+            => Configuration.GetHashCode();
 
         public EndpointInbound(TunnelEngineCore core, ITunnel tunnel, NtEndpointInboundConfiguration configuration)
-            : base(core, tunnel, configuration.EndpointId, configuration.Name, configuration.TransmissionPort)
+            : base(core, tunnel, configuration.EndpointId, configuration)
         {
-            _configuration = configuration;
         }
 
         public override void Start()
         {
             base.Start();
 
-            _listener = new TcpListener(IPAddress.Any, _configuration.TransmissionPort);
+            _listener = new TcpListener(IPAddress.Any, Configuration.InboundPort);
 
-            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Starting inbound endpoint '{Name}' on port {TransmissionPort}.");
+            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose,
+                $"Starting inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort}.");
 
             _inboundConnectionThread = new Thread(InboundConnectionThreadProc);
             _inboundConnectionThread.Start();
@@ -45,7 +47,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 Utility.TryAndIgnore(_listener.Dispose);
             }
 
-            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopping inbound endpoint '{Name}' on port {TransmissionPort}.");
+            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose,
+                $"Stopping inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort}.");
 
             _activeConnections.Use((o) =>
             {
@@ -56,7 +59,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 o.Clear();
             });
 
-            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopped inbound endpoint '{Name}' on port {TransmissionPort}.");
+            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose,
+                $"Stopped inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort}.");
         }
 
         void InboundConnectionThreadProc()
@@ -67,7 +71,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             {
                 _listener.EnsureNotNull().Start();
 
-                _core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Listening inbound endpoint '{Name}' on port {TransmissionPort}");
+                _core.Logging.Write(Constants.NtLogSeverity.Verbose,
+                    $"Listening inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort}");
 
                 while (KeepRunning)
                 {
@@ -83,7 +88,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                             var activeConnection = new ActiveEndpointConnection(dataExchangeThread, tcpClient, Guid.NewGuid());
                             _activeConnections.Use((o) => o.Add(activeConnection.StreamId, activeConnection));
 
-                            _core.Logging.Write(Constants.NtLogSeverity.Debug, $"Accepted inbound endpoint connection: {activeConnection.StreamId}");
+                            _core.Logging.Write(Constants.NtLogSeverity.Debug,
+                                $"Accepted inbound endpoint connection: {activeConnection.StreamId}");
                             dataExchangeThread.Start(activeConnection);
                         }
                     }
@@ -91,7 +97,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             }
             catch (Exception ex)
             {
-                _core.Logging.Write(Constants.NtLogSeverity.Exception, $"InboundConnectionThreadProc: {ex.Message}");
+                _core.Logging.Write(Constants.NtLogSeverity.Exception,
+                    $"InboundConnectionThreadProc: {ex.Message}");
             }
             finally
             {

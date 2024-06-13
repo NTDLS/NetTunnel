@@ -36,11 +36,11 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels.MessageHandlers
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public QueryReplyPayloadBoolean OnQueryAddEndpointInbound(RmContext context, QueryAddEndpointInbound query)
+        public QueryReplyPayloadBoolean OnQueryUpsertEndpointInbound(RmContext context, QueryUpsertEndpointInbound query)
         {
             var tunnel = EnforceCryptographyAndGetTunnel<TunnelInbound>(context);
 
-            var endpoint = tunnel.AddInboundEndpoint(query.Configuration);
+            var endpoint = tunnel.UpsertInboundEndpoint(query.Configuration);
             endpoint.Start();
             return new QueryReplyPayloadBoolean(true);
         }
@@ -51,11 +51,11 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels.MessageHandlers
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public QueryReplyPayloadBoolean OnQueryAddEndpointOutbound(RmContext context, QueryAddEndpointOutbound query)
+        public QueryReplyPayloadBoolean OnQueryUpsertEndpointOutbound(RmContext context, QueryUpsertEndpointOutbound query)
         {
             var tunnel = EnforceCryptographyAndGetTunnel<TunnelInbound>(context);
 
-            var endpoint = tunnel.AddOutboundEndpoint(query.Configuration);
+            var endpoint = tunnel.UpsertOutboundEndpoint(query.Configuration);
             endpoint.Start();
             return new QueryReplyPayloadBoolean(true);
         }

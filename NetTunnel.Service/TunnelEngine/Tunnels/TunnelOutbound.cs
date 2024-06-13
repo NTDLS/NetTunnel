@@ -20,6 +20,17 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         private readonly RmClient _client;
         private Thread? _establishConnectionThread;
 
+        public override int GetHashCode()
+        {
+            return TunnelId.GetHashCode()
+                + Name.GetHashCode()
+                + DataPort.GetHashCode()
+                + Endpoints.Sum(o => o.GetHashCode());
+        }
+
+        public int ChangeHash
+            => TunnelId.GetHashCode() + Name.GetHashCode() + DataPort.GetHashCode();
+
         #region Configuration Properties.
 
         public string Address { get; set; }
@@ -91,7 +102,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         }
 
         public IEndpoint? GetEndpointById(Guid pairId)
-            => Endpoints.Where(o => o.EndpointId == pairId).FirstOrDefault();
+            => Endpoints.Where(o => o.EndpointId == pairId).SingleOrDefault();
 
         private void _client_OnDisconnected(RmContext context)
         {
@@ -121,14 +132,22 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             foreach (var endpoint in Endpoints)
             {
-                if (endpoint is EndpointInbound inboundEndpoint)
+                if (endpoint is EndpointInbound ibe)
                 {
-                    var endpointConfiguration = new NtEndpointInboundConfiguration(TunnelId, inboundEndpoint.EndpointId, inboundEndpoint.Name, inboundEndpoint.TransmissionPort);
+                    var endpointConfiguration = new NtEndpointInboundConfiguration(TunnelId,
+                        ibe.EndpointId, ibe.Configuration.Name, ibe.Configuration.OutboundAddress,
+                        ibe.Configuration.InboundPort, ibe.Configuration.OutboundPort,
+                        ibe.Configuration.HttpHeaderRules, ibe.Configuration.TrafficType);
+
                     tunnelConfiguration.EndpointInboundConfigurations.Add(endpointConfiguration);
                 }
-                else if (endpoint is EndpointOutbound outboundEndpoint)
+                else if (endpoint is EndpointOutbound obe)
                 {
-                    var endpointConfiguration = new NtEndpointOutboundConfiguration(TunnelId, outboundEndpoint.EndpointId, outboundEndpoint.Name, outboundEndpoint.Address, outboundEndpoint.TransmissionPort);
+                    var endpointConfiguration = new NtEndpointOutboundConfiguration(TunnelId,
+                        obe.EndpointId, obe.Configuration.Name, obe.Configuration.OutboundAddress,
+                        obe.Configuration.InboundPort, obe.Configuration.OutboundPort,
+                        obe.Configuration.HttpHeaderRules, obe.Configuration.TrafficType);
+
                     tunnelConfiguration.EndpointOutboundConfigurations.Add(endpointConfiguration);
                 }
             }
@@ -287,16 +306,28 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         #region Endpoint CRUD helpers.
 
-        public EndpointInbound AddInboundEndpoint(NtEndpointInboundConfiguration configuration)
+        public EndpointInbound UpsertInboundEndpoint(NtEndpointInboundConfiguration configuration)
         {
+            var existingEndpoint = GetEndpointById(configuration.EndpointId);
+            if (existingEndpoint != null)
+            {
+                DeleteEndpoint(existingEndpoint.EndpointId);
+            }
+
             var endpoint = new EndpointInbound(Core, this, configuration);
             Endpoints.Add(endpoint);
             Core.OutboundTunnels.SaveToDisk();
             return endpoint;
         }
 
-        public EndpointOutbound AddOutboundEndpoint(NtEndpointOutboundConfiguration configuration)
+        public EndpointOutbound UpsertOutboundEndpoint(NtEndpointOutboundConfiguration configuration)
         {
+            var existingEndpoint = GetEndpointById(configuration.EndpointId);
+            if (existingEndpoint != null)
+            {
+                DeleteEndpoint(existingEndpoint.EndpointId);
+            }
+
             var endpoint = new EndpointOutbound(Core, this, configuration);
             Endpoints.Add(endpoint);
             Core.OutboundTunnels.SaveToDisk();
@@ -305,7 +336,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         public void DeleteEndpoint(Guid endpointPairId)
         {
-            var endpoint = Endpoints.Where(o => o.EndpointId == endpointPairId).SingleOrDefault();
+            var endpoint = GetEndpointById(endpointPairId);
             if (endpoint != null)
             {
                 endpoint.Stop();

@@ -31,9 +31,6 @@ namespace NetTunnel.UI.Forms
             toolTips.AddControls([labelManagementPortRSASize, textBoxManagementPortRSASize],
                 "The key size to use when generating the self-signed SSL certificate for the management port.");
 
-            toolTips.AddControls([labelEndpointBufferSize, textBoxEndpointBufferSize],
-                "The buffer size (in bytes) used by endpoint connections for sending and receiving data.");
-
             toolTips.AddControls([labelMessageQueryTimeoutMs, textBoxMessageQueryTimeoutMs],
                 "The duration in milliseconds to wait on message query operations.");
 
