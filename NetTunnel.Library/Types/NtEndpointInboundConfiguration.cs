@@ -30,7 +30,7 @@ namespace NetTunnel.Library.Types
             InboundPort = inboundPort;
             OutboundPort = outboundPort;
             TrafficType = trafficType;
-            httpHeaderRules.AddRange(httpHeaderRules);
+            HttpHeaderRules.AddRange(httpHeaderRules);
         }
     }
 }
