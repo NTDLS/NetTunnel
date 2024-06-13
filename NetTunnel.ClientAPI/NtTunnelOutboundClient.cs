@@ -110,9 +110,9 @@ namespace NetTunnel.ClientAPI
         /// <param name="tunnel"></param>
         /// <returns></returns>
         /// <exception cref="NtAPIResponseException"></exception>
-        public async Task AddEndpointInboundPair(Guid tunnelId, NtEndpointInboundConfiguration inboundEndpoint, NtEndpointOutboundConfiguration outboundEndpoint)
+        public async Task UpsertEndpointInboundPair(Guid tunnelId, NtEndpointInboundConfiguration inboundEndpoint, NtEndpointOutboundConfiguration outboundEndpoint)
         {
-            string url = $"api/TunnelOutbound/{_client.SessionId}/AddEndpointInboundPair/{tunnelId}";
+            string url = $"api/TunnelOutbound/{_client.SessionId}/UpsertEndpointInboundPair/{tunnelId}";
 
             var postContent = new StringContent(JsonConvert.SerializeObject(
                 new NtEndpointPairConfiguration(inboundEndpoint, outboundEndpoint)), Encoding.UTF8, "text/plain");
@@ -133,9 +133,9 @@ namespace NetTunnel.ClientAPI
         /// <param name="tunnel"></param>
         /// <returns></returns>
         /// <exception cref="NtAPIResponseException"></exception>
-        public async Task AddEndpointOutboundPair(Guid tunnelId, NtEndpointInboundConfiguration inboundEndpoint, NtEndpointOutboundConfiguration outboundEndpoint)
+        public async Task UpsertEndpointOutboundPair(Guid tunnelId, NtEndpointInboundConfiguration inboundEndpoint, NtEndpointOutboundConfiguration outboundEndpoint)
         {
-            string url = $"api/TunnelOutbound/{_client.SessionId}/AddEndpointOutboundPair/{tunnelId}";
+            string url = $"api/TunnelOutbound/{_client.SessionId}/UpsertEndpointOutboundPair/{tunnelId}";
 
             var postContent = new StringContent(JsonConvert.SerializeObject(
                 new NtEndpointPairConfiguration(inboundEndpoint, outboundEndpoint)), Encoding.UTF8, "text/plain");

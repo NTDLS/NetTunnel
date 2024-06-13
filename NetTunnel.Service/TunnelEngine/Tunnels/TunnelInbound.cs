@@ -80,7 +80,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         }
 
         public IEndpoint? GetEndpointById(Guid pairId)
-            => Endpoints.Where(o => o.EndpointId == pairId).FirstOrDefault();
+            => Endpoints.Where(o => o.EndpointId == pairId).SingleOrDefault();
 
         private void _server_OnConnected(RmContext context)
         {
@@ -245,16 +245,28 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         #region Endpoint CRUD helpers.
 
-        public EndpointInbound AddInboundEndpoint(NtEndpointInboundConfiguration configuration)
+        public EndpointInbound UpsertInboundEndpoint(NtEndpointInboundConfiguration configuration)
         {
+            var existingEndpoint = GetEndpointById(configuration.EndpointId);
+            if (existingEndpoint != null)
+            {
+                DeleteEndpoint(existingEndpoint.EndpointId);
+            }
+
             var endpoint = new EndpointInbound(Core, this, configuration);
             Endpoints.Add(endpoint);
             Core.InboundTunnels.SaveToDisk();
             return endpoint;
         }
 
-        public EndpointOutbound AddOutboundEndpoint(NtEndpointOutboundConfiguration configuration)
+        public EndpointOutbound UpsertOutboundEndpoint(NtEndpointOutboundConfiguration configuration)
         {
+            var existingEndpoint = GetEndpointById(configuration.EndpointId);
+            if (existingEndpoint != null)
+            {
+                DeleteEndpoint(existingEndpoint.EndpointId);
+            }
+
             var endpoint = new EndpointOutbound(Core, this, configuration);
             Endpoints.Add(endpoint);
             Core.InboundTunnels.SaveToDisk();
@@ -263,7 +275,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         public void DeleteEndpoint(Guid endpointPairId)
         {
-            var endpoint = Endpoints.Where(o => o.EndpointId == endpointPairId).SingleOrDefault();
+            var endpoint = GetEndpointById(endpointPairId);
             if (endpoint != null)
             {
                 endpoint.Stop();

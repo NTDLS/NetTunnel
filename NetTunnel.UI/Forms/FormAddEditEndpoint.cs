@@ -167,7 +167,7 @@ namespace NetTunnel.UI.Forms
                 {
                     if (_direction == NtDirection.Inbound)
                     {
-                        _client.TunnelInbound.AddEndpointInboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
+                        _client.TunnelInbound.UpsertEndpointInboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
@@ -184,7 +184,7 @@ namespace NetTunnel.UI.Forms
                     }
                     else
                     {
-                        _client.TunnelInbound.AddEndpointOutboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
+                        _client.TunnelInbound.UpsertEndpointOutboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
@@ -203,7 +203,7 @@ namespace NetTunnel.UI.Forms
                 {
                     if (_direction == NtDirection.Inbound)
                     {
-                        _client.TunnelOutbound.AddEndpointInboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
+                        _client.TunnelOutbound.UpsertEndpointInboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
@@ -219,7 +219,7 @@ namespace NetTunnel.UI.Forms
                     }
                     else
                     {
-                        _client.TunnelOutbound.AddEndpointOutboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
+                        _client.TunnelOutbound.UpsertEndpointOutboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
                         {
                             if (!o.IsCompletedSuccessfully)
                             {

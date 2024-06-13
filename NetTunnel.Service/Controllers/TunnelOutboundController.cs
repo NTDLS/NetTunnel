@@ -135,20 +135,22 @@ namespace NetTunnel.Service.Controllers
         }
 
         [HttpPost]
-        [Route("{sessionId}/AddEndpointInboundPair/{tunnelId}")]
-        public async Task<NtActionResponse> AddEndpointInboundPair(Guid sessionId, Guid tunnelId, [FromBody] string value)
+        [Route("{sessionId}/UpsertEndpointInboundPair/{tunnelId}")]
+        public async Task<NtActionResponse> UpsertEndpointInboundPair(Guid sessionId, Guid tunnelId, [FromBody] string value)
         {
             try
             {
                 ValidateAndEnforceLoginSession(sessionId);
 
-                var endpoints = JsonConvert.DeserializeObject<NtEndpointPairConfiguration>(value).EnsureNotNull();
+                var endpoint = JsonConvert.DeserializeObject<NtEndpointPairConfiguration>(value).EnsureNotNull();
 
                 //Add the inbound endpoint to the local tunnel.
-                Singletons.Core.OutboundTunnels.AddEndpointInbound(tunnelId, endpoints.Inbound);
+                Singletons.Core.OutboundTunnels.UpsertEndpointInbound(tunnelId, endpoint.Inbound);
                 Singletons.Core.OutboundTunnels.SaveToDisk();
 
-                var result = await Singletons.Core.OutboundTunnels.DispatchAddEndpointOutboundToAssociatedTunnelService<QueryReplyPayloadBoolean>(tunnelId, endpoints.Outbound);
+                //Since we have a tunnel, we will communicate the alteration of endpoints though the tunnel.
+                var result = await Singletons.Core.OutboundTunnels
+                    .DispatchUpsertEndpointOutboundToAssociatedTunnelService<QueryReplyPayloadBoolean>(tunnelId, endpoint.Outbound);
 
                 return new NtActionResponse { Success = result?.Value ?? false };
             }
@@ -159,21 +161,22 @@ namespace NetTunnel.Service.Controllers
         }
 
         [HttpPost]
-        [Route("{sessionId}/AddEndpointOutboundPair/{tunnelId}")]
-        public async Task<NtActionResponse> AddEndpointOutboundPair(Guid sessionId, Guid tunnelId, [FromBody] string value)
+        [Route("{sessionId}/UpsertEndpointOutboundPair/{tunnelId}")]
+        public async Task<NtActionResponse> UpsertEndpointOutboundPair(Guid sessionId, Guid tunnelId, [FromBody] string value)
         {
             try
             {
                 ValidateAndEnforceLoginSession(sessionId);
 
-                var endpoints = JsonConvert.DeserializeObject<NtEndpointPairConfiguration>(value).EnsureNotNull();
+                var endpoint = JsonConvert.DeserializeObject<NtEndpointPairConfiguration>(value).EnsureNotNull();
 
                 //Add the Outbound endpoint to the local tunnel.
-                Singletons.Core.OutboundTunnels.AddEndpointOutbound(tunnelId, endpoints.Outbound);
+                Singletons.Core.OutboundTunnels.UpsertEndpointOutbound(tunnelId, endpoint.Outbound);
                 Singletons.Core.OutboundTunnels.SaveToDisk();
 
-                //Tell the remote tunnel service to add the endpoint.
-                var result = await Singletons.Core.OutboundTunnels.DispatchAddEndpointInboundToAssociatedTunnelService<QueryReplyPayloadBoolean>(tunnelId, endpoints.Inbound);
+                //Since we have a tunnel, we will communicate the alteration of endpoints though the tunnel.
+                var result = await Singletons.Core.OutboundTunnels
+                    .DispatchUpsertEndpointInboundToAssociatedTunnelService<QueryReplyPayloadBoolean>(tunnelId, endpoint.Inbound);
 
                 return new NtActionResponse { Success = result?.Value ?? false };
             }
@@ -195,8 +198,9 @@ namespace NetTunnel.Service.Controllers
                 Singletons.Core.OutboundTunnels.DeleteEndpoint(tunnelId, endpointId);
                 Singletons.Core.OutboundTunnels.SaveToDisk();
 
-                //Tell the remote tunnel service to delete the endpoint.
-                var result = await Singletons.Core.OutboundTunnels.DispatchDeleteEndpointToAssociatedTunnelService<QueryReplyPayloadBoolean>(tunnelId, endpointId);
+                //Since we have a tunnel, we will communicate the alteration of endpoints though the tunnel.
+                var result = await Singletons.Core.OutboundTunnels
+                    .DispatchDeleteEndpointToAssociatedTunnelService<QueryReplyPayloadBoolean>(tunnelId, endpointId);
 
                 return new NtActionResponse { Success = result?.Value ?? false };
             }
