@@ -141,6 +141,7 @@ namespace NetTunnel.UI.Forms
                         endpointHttpHeaderRules.Add(new NtHttpHeaderRule
                         {
                             Enabled = bool.Parse(row.Cells[columnEnabled.Index].Value?.ToString() ?? "True"),
+                            HeaderType = Enum.Parse<NtHttpHeaderType>($"{row.Cells[columnType.Index].Value}"),
                             Action = Enum.Parse<NtHttpHeaderAction>($"{row.Cells[columnAction.Index].Value}"),
                             Name = $"{row.Cells[columnHeader.Index].Value}",
                             Value = $"{row.Cells[columnValue.Index].Value}",
