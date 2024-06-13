@@ -12,9 +12,11 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
     internal class BaseEndpoint
     {
-        private readonly object _statisticsLock = new object();
+        private readonly object _statisticsLock = new();
 
-        public int TransmissionPort { get; private set; }
+        public int InboundPort { get; private set; }
+        public int OutboundPort { get; private set; }
+        public string OutboundAddress { get; private set; }
         public ulong BytesReceived { get; internal set; }
         public ulong BytesSent { get; internal set; }
         public ulong TotalConnections { get; internal set; }
@@ -30,14 +32,16 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         internal readonly PessimisticCriticalResource<Dictionary<Guid, ActiveEndpointConnection>> _activeConnections = new();
 
-        public BaseEndpoint(TunnelEngineCore core, ITunnel tunnel, Guid endpointId, string name, int transmissionPort)
+        public BaseEndpoint(TunnelEngineCore core, ITunnel tunnel,
+            Guid endpointId, INtEndpointConfiguration config)
         {
             _core = core;
             _tunnel = tunnel;
-            Name = name;
+            Name = config.Name;
             EndpointId = endpointId;
-            TransmissionPort = transmissionPort;
-
+            InboundPort = config.InboundPort;
+            OutboundPort = config.OutboundPort;
+            OutboundAddress = config.OutboundAddress;
             _heartbeatThread = new Thread(HeartbeatThreadProc);
             _heartbeatThread.Start();
         }

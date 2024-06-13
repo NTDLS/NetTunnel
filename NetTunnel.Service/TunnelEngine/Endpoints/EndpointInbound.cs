@@ -18,7 +18,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         public NtEndpointInboundConfiguration Configuration { get; private set; }
 
         public EndpointInbound(TunnelEngineCore core, ITunnel tunnel, NtEndpointInboundConfiguration configuration)
-            : base(core, tunnel, configuration.EndpointId, configuration.Name, configuration.TransmissionPort)
+            : base(core, tunnel, configuration.EndpointId, configuration)
         {
             Configuration = configuration;
         }
@@ -27,9 +27,9 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
             base.Start();
 
-            _listener = new TcpListener(IPAddress.Any, Configuration.TransmissionPort);
+            _listener = new TcpListener(IPAddress.Any, Configuration.InboundPort);
 
-            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Starting inbound endpoint '{Name}' on port {TransmissionPort}.");
+            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Starting inbound endpoint '{Name}' on port {InboundPort}.");
 
             _inboundConnectionThread = new Thread(InboundConnectionThreadProc);
             _inboundConnectionThread.Start();
@@ -45,7 +45,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 Utility.TryAndIgnore(_listener.Dispose);
             }
 
-            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopping inbound endpoint '{Name}' on port {TransmissionPort}.");
+            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopping inbound endpoint '{Name}' on port {InboundPort}.");
 
             _activeConnections.Use((o) =>
             {
@@ -56,7 +56,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 o.Clear();
             });
 
-            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopped inbound endpoint '{Name}' on port {TransmissionPort}.");
+            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopped inbound endpoint '{Name}' on port {InboundPort}.");
         }
 
         void InboundConnectionThreadProc()
@@ -67,7 +67,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             {
                 _listener.EnsureNotNull().Start();
 
-                _core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Listening inbound endpoint '{Name}' on port {TransmissionPort}");
+                _core.Logging.Write(Constants.NtLogSeverity.Verbose, $"Listening inbound endpoint '{Name}' on port {InboundPort}");
 
                 while (KeepRunning)
                 {

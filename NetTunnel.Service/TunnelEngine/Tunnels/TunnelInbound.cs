@@ -142,14 +142,18 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             foreach (var endpoint in Endpoints)
             {
-                if (endpoint is EndpointInbound inboundEndpoint)
+                if (endpoint is EndpointInbound ibe)
                 {
-                    var endpointConfiguration = new NtEndpointInboundConfiguration(TunnelId, inboundEndpoint.EndpointId, inboundEndpoint.Name, inboundEndpoint.TransmissionPort);
+                    var endpointConfiguration = new NtEndpointInboundConfiguration(TunnelId,
+                        ibe.EndpointId, ibe.Name, ibe.OutboundAddress, ibe.InboundPort, ibe.OutboundPort);
+
                     tunnelConfiguration.EndpointInboundConfigurations.Add(endpointConfiguration);
                 }
-                else if (endpoint is EndpointOutbound outboundEndpoint)
+                else if (endpoint is EndpointOutbound obe)
                 {
-                    var endpointConfiguration = new NtEndpointOutboundConfiguration(TunnelId, outboundEndpoint.EndpointId, outboundEndpoint.Name, outboundEndpoint.Address, outboundEndpoint.TransmissionPort);
+                    var endpointConfiguration = new NtEndpointOutboundConfiguration(TunnelId,
+                        obe.EndpointId, obe.Name, obe.OutboundAddress, obe.InboundPort, obe.OutboundPort);
+
                     tunnelConfiguration.EndpointOutboundConfigurations.Add(endpointConfiguration);
                 }
             }

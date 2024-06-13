@@ -7,7 +7,9 @@ namespace NetTunnel.Library.Types
         public Guid EndpointId { get; }
         public Guid TunnelId { get; }
         public string Name { get; }
-        public int TransmissionPort { get; }
+        public string OutboundAddress { get; }
+        public int InboundPort { get; }
+        public int OutboundPort { get; }
         public NtTrafficType TrafficType { get; }
         public List<NtHttpHeaderRule> HttpHeaderRules { get; }
     }

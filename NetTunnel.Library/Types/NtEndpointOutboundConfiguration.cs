@@ -8,28 +8,26 @@ namespace NetTunnel.Library.Types
     public class NtEndpointOutboundConfiguration : INtEndpointConfiguration
     {
         public Guid EndpointId { get; set; }
-
         public Guid TunnelId { get; set; }
-
         public string Name { get; set; } = string.Empty;
-
-        public string Address { get; set; } = string.Empty;
-
-        public int TransmissionPort { get; set; }
-
+        public string OutboundAddress { get; set; } = string.Empty;
+        public int InboundPort { get; set; }
+        public int OutboundPort { get; set; }
         public NtTrafficType TrafficType { get; set; } = NtTrafficType.Raw;
-
         public List<NtHttpHeaderRule> HttpHeaderRules { get; set; } = new();
 
-        public NtEndpointOutboundConfiguration() { }
+        public NtEndpointOutboundConfiguration()
+        {
+        }
 
-        public NtEndpointOutboundConfiguration(Guid tunnelId, Guid endpointId, string name, string address, int transmissionPort)
+        public NtEndpointOutboundConfiguration(Guid tunnelId, Guid endpointId, string name, string address, int inboundPort, int outboundPort)
         {
             TunnelId = tunnelId;
             EndpointId = endpointId;
             Name = name;
-            Address = address;
-            TransmissionPort = transmissionPort;
+            OutboundAddress = address;
+            InboundPort = inboundPort;
+            OutboundPort = outboundPort;
         }
     }
 }
