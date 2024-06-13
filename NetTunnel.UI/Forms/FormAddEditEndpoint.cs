@@ -32,6 +32,12 @@ namespace NetTunnel.UI.Forms
             {
                 _direction = NtDirection.Outbound;
             }
+            else
+            {
+                throw new Exception("Unknown endpoint type.");
+            }
+
+            PopulateForm();
         }
 
         public FormAddEditEndpoint(NtClient client, INtTunnelConfiguration tunnel, NtDirection direction)
@@ -43,9 +49,11 @@ namespace NetTunnel.UI.Forms
             _client = client;
             _tunnel = tunnel;
             _direction = direction;
+
+            PopulateForm();
         }
 
-        private void PropForm()
+        private void PopulateForm()
         {
             Text = $"NetTunnel : {(_endpoint == null ? "Add" : "Edit")} {_direction} Endpoint";
 

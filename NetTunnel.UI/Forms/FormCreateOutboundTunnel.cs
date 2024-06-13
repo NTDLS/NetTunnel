@@ -53,7 +53,7 @@ namespace NetTunnel.UI.Forms
 #if DEBUG
             textBoxName.Text = "My First Tunnel";
 
-            textBoxRemoteAddress.Text = "127.0.0.1";
+            textBoxRemoteAddress.Text = "10.20.1.120";
             textBoxTunnelDataPort.Text = "52846"; //This is the port that is used to move tunnel data between tunnels
 
             textBoxRemoteUsername.Text = "debug";
