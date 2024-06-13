@@ -79,10 +79,10 @@ namespace NetTunnel.UI.Forms
                 var tunnelId = Guid.NewGuid(); //The TunnelId is the same on both services.
 
                 var outboundTunnel = new NtTunnelOutboundConfiguration(tunnelId, textBoxName.Text,
-                    textBoxRemoteAddress.Text, int.Parse(textBoxManagementPort.Text), int.Parse(textBoxTunnelDataPort.Text),
+                    textBoxRemoteAddress.Text, textBoxManagementPort.ValueAs<int>(), textBoxTunnelDataPort.ValueAs<int>(),
                     textBoxRemoteUsername.Text, Utility.ComputeSha256Hash(textBoxRemotePassword.Text));
 
-                var inboundTunnel = new NtTunnelInboundConfiguration(tunnelId, textBoxName.Text, int.Parse(textBoxTunnelDataPort.Text));
+                var inboundTunnel = new NtTunnelInboundConfiguration(tunnelId, textBoxName.Text, textBoxTunnelDataPort.ValueAs<int>());
 
                 buttonAdd.InvokeEnableControl(false);
                 buttonCancel.InvokeEnableControl(false);

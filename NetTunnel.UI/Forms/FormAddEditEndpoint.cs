@@ -148,7 +148,7 @@ namespace NetTunnel.UI.Forms
                 var endpointId = Guid.NewGuid(); //The endpointId is the same on both services.
 
                 var endpointInbound = new NtEndpointInboundConfiguration(_tunnel.TunnelId, endpointId,
-                    textBoxName.Text, textBoxOutboundAddress.Text, int.Parse(textBoxInboundPort.Text), int.Parse(textBoxOutboundPort.Text))
+                    textBoxName.Text, textBoxOutboundAddress.Text, textBoxInboundPort.ValueAs<int>(), textBoxOutboundPort.ValueAs<int>())
                 {
                     TrafficType = Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"),
                     //We give both endpoints the rules, but they will only execute the rules that match their direction type.
@@ -156,7 +156,7 @@ namespace NetTunnel.UI.Forms
                 };
 
                 var endpointOutbound = new NtEndpointOutboundConfiguration(_tunnel.TunnelId, endpointId,
-                    textBoxName.Text, textBoxOutboundAddress.Text, int.Parse(textBoxInboundPort.Text), int.Parse(textBoxOutboundPort.Text))
+                    textBoxName.Text, textBoxOutboundAddress.Text, textBoxInboundPort.ValueAs<int>(), textBoxOutboundPort.ValueAs<int>())
                 {
                     TrafficType = Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"),
                     //We give both endpoints the rules, but they will only execute the rules that match their direction type.
