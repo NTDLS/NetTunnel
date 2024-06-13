@@ -95,8 +95,7 @@ namespace NetTunnel.UI.Forms
                 textBoxTerminationPort.GetAndValidateNumeric(1, 65535, "You must specify a valid termination port between [min] and [max].");
 
 
-                var endpointInboundHttpRules = new List<NtHttpHeaderRule>();
-                var endpointOutboundHttpRules = new List<NtHttpHeaderRule>();
+                var endpointHttpHeaderRules = new List<NtHttpHeaderRule>();
 
                 foreach (DataGridViewRow row in dataGridViewHTTPHeaders.Rows)
                 {
@@ -104,23 +103,14 @@ namespace NetTunnel.UI.Forms
                     {
                         var headerType = (NtHttpHeaderType)Enum.Parse(typeof(NtHttpHeaderType), row.Cells[columnType.Index].Value?.ToString() ?? "");
 
-                        var httpHeaderRule = new NtHttpHeaderRule
+                        endpointHttpHeaderRules.Add(new NtHttpHeaderRule
                         {
                             Enabled = bool.Parse(row.Cells[columnEnabled.Index].Value?.ToString() ?? "True"),
                             Action = (NtHttpHeaderAction)Enum.Parse(typeof(NtHttpHeaderAction), row.Cells[columnAction.Index].Value?.ToString() ?? ""),
                             Name = row.Cells[columnHeader.Index].Value?.ToString() ?? "",
                             Value = row.Cells[columnValue.Index].Value?.ToString() ?? "",
                             Verb = (NtHttpVerb)Enum.Parse(typeof(NtHttpVerb), row.Cells[columnVerb.Index].Value?.ToString() ?? "")
-                        };
-
-                        if (headerType == NtHttpHeaderType.Request)
-                        {
-                            endpointInboundHttpRules.Add(httpHeaderRule);
-                        }
-                        else if (headerType == NtHttpHeaderType.Response)
-                        {
-                            endpointOutboundHttpRules.Add(httpHeaderRule);
-                        }
+                        });
                     }
                 }
 
@@ -131,14 +121,16 @@ namespace NetTunnel.UI.Forms
                 var endpointInbound = new NtEndpointInboundConfiguration(_tunnel.TunnelId, endpointId, textBoxName.Text, int.Parse(textBoxListenPort.Text))
                 {
                     TrafficType = (NtTrafficType)Enum.Parse(typeof(NtTrafficType), comboBoxTrafficType.SelectedValue?.ToString() ?? ""),
-                    HttpHeaderRules = endpointInboundHttpRules
+                    //We give both endpoints the rules, but they will only execute the rules that match their direction type.
+                    HttpHeaderRules = endpointHttpHeaderRules
                 };
 
                 var endpointOutbound = new NtEndpointOutboundConfiguration(_tunnel.TunnelId, endpointId, textBoxName.Text,
                     textBoxTerminationAddress.Text, int.Parse(textBoxTerminationPort.Text))
                 {
                     TrafficType = (NtTrafficType)Enum.Parse(typeof(NtTrafficType), comboBoxTrafficType.SelectedValue?.ToString() ?? ""),
-                    HttpHeaderRules = endpointOutboundHttpRules
+                    //We give both endpoints the rules, but they will only execute the rules that match their direction type.
+                    HttpHeaderRules = endpointHttpHeaderRules
                 };
 
                 if (_tunnel is NtTunnelInboundConfiguration)

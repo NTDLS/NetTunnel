@@ -179,11 +179,17 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                          endpointConfig?.TrafficType == NtTrafficType.Http
                          &&
                          (
-                             // and the direction is inbound and we have request rules.
-                             (this is EndpointInbound && endpointConfig.HttpHeaderRules.Count > 0)
-                             ||
-                             // or the direction is outbound and we have response rules.
-                             (this is EndpointOutbound && endpointConfig.HttpHeaderRules.Count > 0)
+                            // and the direction is inbound/any and we have request rules.
+                            (
+                             this is EndpointInbound && endpointConfig.HttpHeaderRules
+                                .Where(o => o.Enabled && (new[] { NtHttpHeaderType.Request, NtHttpHeaderType.Any }).Contains(o.HeaderType)).Any()
+                            )
+                            ||
+                            (
+                                // or the direction is outbound/any and we have response rules.
+                                this is EndpointOutbound && endpointConfig.HttpHeaderRules
+                                    .Where(o => o.Enabled && (new[] { NtHttpHeaderType.Request, NtHttpHeaderType.Any }).Contains(o.HeaderType)).Any()
+                            )
                          )
                      )
                     {

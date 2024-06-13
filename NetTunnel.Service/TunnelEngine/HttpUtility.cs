@@ -42,8 +42,8 @@ namespace NetTunnel.Service
                 {
                     var headerType = IsHttpHeader(httpHeaderBuilder.ToString(), out string? requestVerb);
 
-                    //TODO:We should throw an exception if this is an inbound endpoint and the headerType == NtHttpHeaderType.Response
-                    //TODO:We should throw an exception if this is an outbound endpoint and the headerType == NtHttpHeaderType.Request
+                    //TODO: We should throw an exception if this is an inbound endpoint and the headerType == NtHttpHeaderType.Response
+                    //TODO: We should throw an exception if this is an outbound endpoint and the headerType == NtHttpHeaderType.Request
 
                     if (headerType != NtHttpHeaderType.None && requestVerb != null)
                     {
@@ -85,7 +85,7 @@ namespace NetTunnel.Service
 
                         //Apply the header rules, replacing the original http header builder.
                         httpHeaderBuilder = new StringBuilder(
-                            ApplyHttpHeaderRules(endpointConfig, httpHeaderBuilder.ToString(), requestVerb, headerDelimiter));
+                            ApplyHttpHeaderRules(endpointConfig, httpHeaderBuilder.ToString(), headerType, requestVerb, headerDelimiter));
 
                         return HTTPHeaderResult.Present;
                     }
@@ -119,14 +119,16 @@ namespace NetTunnel.Service
             return -1;
         }
 
-        public static string ApplyHttpHeaderRules(INtEndpointConfiguration endpointConfig, string httpHeader, string httpRequestVerb, string headerDelimiter)
+        public static string ApplyHttpHeaderRules(INtEndpointConfiguration endpointConfig,
+            string httpHeader, NtHttpHeaderType headerType, string httpRequestVerb, string headerDelimiter)
         {
             try
             {
-                var availableRules = (from o in endpointConfig.HttpHeaderRules
-                                      where (o.Verb.ToString().Equals(httpRequestVerb, StringComparison.CurrentCultureIgnoreCase) || o.Verb == NtHttpVerb.Any)
+                var availableRules = endpointConfig.HttpHeaderRules.Where(o =>
+                                      (o.HeaderType == headerType || o.HeaderType == NtHttpHeaderType.Any)
+                                      && (o.Verb.ToString().Equals(httpRequestVerb, StringComparison.CurrentCultureIgnoreCase) || o.Verb == NtHttpVerb.Any)
                                       && o.Enabled == true
-                                      select o).ToList();
+                                      ).ToList();
 
                 foreach (var rule in availableRules)
                 {

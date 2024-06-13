@@ -32,7 +32,6 @@
             Upsert
         }
 
-
         public enum NtHttpHeaderType
         {
             None,
