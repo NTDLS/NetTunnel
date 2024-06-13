@@ -32,5 +32,17 @@ namespace NetTunnel.Library.Types
             TrafficType = trafficType;
             HttpHeaderRules.AddRange(httpHeaderRules);
         }
+
+        public override int GetHashCode()
+        {
+            return EndpointId.GetHashCode()
+                + TunnelId.GetHashCode()
+                + Name.GetHashCode()
+                + OutboundAddress.GetHashCode()
+                + InboundPort.GetHashCode()
+                + OutboundPort.GetHashCode()
+                + TrafficType.GetHashCode()
+                + HttpHeaderRules.GetHashCode();
+        }
     }
 }

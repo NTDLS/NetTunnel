@@ -8,7 +8,6 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         /// This ID is distinct among an instance of the service but the associated remote service endpoint has the same id.
         /// </summary>
         public Guid EndpointId { get; }
-        public int ChangeHash { get; }
         public bool KeepRunning { get; }
         public void Disconnect(Guid streamId);
         public void SendEndpointData(Guid streamId, byte[] buffer);

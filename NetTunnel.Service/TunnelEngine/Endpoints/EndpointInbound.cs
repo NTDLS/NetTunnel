@@ -16,8 +16,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         private TcpListener? _listener;
 
-        public int ChangeHash
-            => Configuration.TunnelId.GetHashCode() + Configuration.EndpointId.GetHashCode() + Configuration.Name.GetHashCode();
+        public override int GetHashCode()
+        {
+            return Configuration.GetHashCode();
+        }
 
         public EndpointInbound(TunnelEngineCore core, ITunnel tunnel, NtEndpointInboundConfiguration configuration)
             : base(core, tunnel, configuration.EndpointId, configuration)

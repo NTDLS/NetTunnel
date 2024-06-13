@@ -50,6 +50,17 @@ namespace NetTunnel.Library
             Value = value;
         }
 
-        public NtHttpHeaderRule() { }
+        public NtHttpHeaderRule()
+        {
+        }
+
+        public override int GetHashCode()
+        {
+            return Name.GetHashCode()
+                + Verb.GetHashCode()
+                + Action.GetHashCode()
+                + Value.GetHashCode()
+                + Description.GetHashCode();
+        }
     }
 }

@@ -80,7 +80,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                         BytesSent = tunnel.BytesSent,
                         CurrentConnections = tunnel.CurrentConnections,
                         TotalConnections = tunnel.TotalConnections,
-                        ChangeHash = tunnel.ChangeHash
+                        ChangeHash = tunnel.GetHashCode()
                     };
 
                     foreach (var endpoint in tunnel.Endpoints)
@@ -94,7 +94,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                             TunnelId = tunnel.TunnelId,
                             CurrentConnections = endpoint.CurrentConnections,
                             TotalConnections = endpoint.TotalConnections,
-                            ChangeHash = endpoint.ChangeHash
+                            ChangeHash = endpoint.GetHashCode()
                         };
                         tunnelStats.EndpointStatistics.Add(endpointStats);
                     }

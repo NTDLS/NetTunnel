@@ -2,6 +2,7 @@
 using NetTunnel.Library.Types;
 using NetTunnel.Service.TunnelEngine.Tunnels;
 using System.Net.Sockets;
+using System.Xml.Linq;
 
 namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
@@ -10,8 +11,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
     /// </summary>
     internal class EndpointOutbound : BaseEndpoint, IEndpoint
     {
-        public int ChangeHash
-            => Configuration.TunnelId.GetHashCode() + Configuration.EndpointId.GetHashCode() + Configuration.Name.GetHashCode();
+        public override int GetHashCode()
+        {
+            return Configuration.GetHashCode();
+        }
 
         public EndpointOutbound(TunnelEngineCore core, ITunnel tunnel, NtEndpointOutboundConfiguration configuration)
             : base(core, tunnel, configuration.EndpointId, configuration)
