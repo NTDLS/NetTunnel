@@ -1,4 +1,5 @@
-﻿using static NetTunnel.Library.Constants;
+﻿using Newtonsoft.Json.Converters;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library
 {
@@ -7,16 +8,19 @@ namespace NetTunnel.Library
         /// <summary>
         /// Inbound, outbound, etc.
         /// </summary>
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public NtHttpHeaderType HeaderType { get; set; }
 
         /// <summary>
         /// Insert, update, delete, etc.
         /// </summary>
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public NtHttpHeaderAction Action { get; set; }
         /// <summary>
 
         /// Get, put, post, etc.
         /// </summary>
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public NtHttpVerb Verb { get; set; }
 
         /// <summary>

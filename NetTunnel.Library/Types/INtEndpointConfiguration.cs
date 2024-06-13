@@ -1,4 +1,5 @@
-﻿using static NetTunnel.Library.Constants;
+﻿using Newtonsoft.Json.Converters;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library.Types
 {
@@ -10,6 +11,8 @@ namespace NetTunnel.Library.Types
         public string OutboundAddress { get; }
         public int InboundPort { get; }
         public int OutboundPort { get; }
+
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public NtTrafficType TrafficType { get; }
         public List<NtHttpHeaderRule> HttpHeaderRules { get; }
     }
