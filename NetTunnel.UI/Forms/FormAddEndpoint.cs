@@ -27,9 +27,9 @@ namespace NetTunnel.UI.Forms
 
             var trafficTypes = new List<ComboItem>
             {
-                new ComboItem("Raw", NtTrafficType.Raw),
-                new ComboItem("HTTP", NtTrafficType.Http),
-                new ComboItem("HTTPS", NtTrafficType.Https)
+                new ("Raw", NtTrafficType.Raw),
+                new ("HTTP", NtTrafficType.Http),
+                new ("HTTPS", NtTrafficType.Https)
             };
 
             /*
@@ -100,15 +100,15 @@ namespace NetTunnel.UI.Forms
                 {
                     if (string.IsNullOrWhiteSpace($"{row.Cells[columnHeader.Index].Value}") == false)
                     {
-                        var headerType = Enum.Parse<NtHttpHeaderType>(row.Cells[columnType.Index].Value?.ToString() ?? "");
+                        var headerType = Enum.Parse<NtHttpHeaderType>($"{row.Cells[columnType.Index].Value}");
 
                         endpointHttpHeaderRules.Add(new NtHttpHeaderRule
                         {
                             Enabled = bool.Parse(row.Cells[columnEnabled.Index].Value?.ToString() ?? "True"),
-                            Action = Enum.Parse<NtHttpHeaderAction>(row.Cells[columnAction.Index].Value?.ToString() ?? ""),
-                            Name = row.Cells[columnHeader.Index].Value?.ToString() ?? "",
-                            Value = row.Cells[columnValue.Index].Value?.ToString() ?? "",
-                            Verb = Enum.Parse<NtHttpVerb>(row.Cells[columnVerb.Index].Value?.ToString() ?? "")
+                            Action = Enum.Parse<NtHttpHeaderAction>($"{row.Cells[columnAction.Index].Value}"),
+                            Name = $"{row.Cells[columnHeader.Index].Value}",
+                            Value = $"{row.Cells[columnValue.Index].Value}",
+                            Verb = Enum.Parse<NtHttpVerb>($"{row.Cells[columnVerb.Index].Value}")
                         });
                     }
                 }
@@ -119,7 +119,7 @@ namespace NetTunnel.UI.Forms
 
                 var endpointInbound = new NtEndpointInboundConfiguration(_tunnel.TunnelId, endpointId, textBoxName.Text, int.Parse(textBoxListenPort.Text))
                 {
-                    TrafficType = Enum.Parse<NtTrafficType>(comboBoxTrafficType.SelectedValue?.ToString() ?? ""),
+                    TrafficType = Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"),
                     //We give both endpoints the rules, but they will only execute the rules that match their direction type.
                     HttpHeaderRules = endpointHttpHeaderRules
                 };
@@ -127,7 +127,7 @@ namespace NetTunnel.UI.Forms
                 var endpointOutbound = new NtEndpointOutboundConfiguration(_tunnel.TunnelId, endpointId, textBoxName.Text,
                     textBoxTerminationAddress.Text, int.Parse(textBoxTerminationPort.Text))
                 {
-                    TrafficType = Enum.Parse<NtTrafficType>(comboBoxTrafficType.SelectedValue?.ToString() ?? ""),
+                    TrafficType = Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"),
                     //We give both endpoints the rules, but they will only execute the rules that match their direction type.
                     HttpHeaderRules = endpointHttpHeaderRules
                 };
