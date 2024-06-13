@@ -180,10 +180,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                          &&
                          (
                              // and the direction is inbound and we have request rules.
-                             (this is EndpointInbound && endpointConfig.HttpHeaderRules.Collection.Count > 0)
+                             (this is EndpointInbound && endpointConfig.HttpHeaderRules.Count > 0)
                              ||
                              // or the direction is outbound and we have response rules.
-                             (this is EndpointOutbound && endpointConfig.HttpHeaderRules.Collection.Count > 0)
+                             (this is EndpointOutbound && endpointConfig.HttpHeaderRules.Count > 0)
                          )
                      )
                     {

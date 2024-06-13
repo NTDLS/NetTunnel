@@ -19,7 +19,7 @@ namespace NetTunnel.Library.Types
 
         public NtTrafficType TrafficType { get; set; } = NtTrafficType.Raw;
 
-        public NtHTTPHeaderRules HttpHeaderRules { get; set; } = new();
+        public List<NtHttpHeaderRule> HttpHeaderRules { get; set; } = new();
 
         public NtEndpointOutboundConfiguration() { }
 

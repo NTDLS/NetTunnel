@@ -123,7 +123,7 @@ namespace NetTunnel.Service
         {
             try
             {
-                var availableRules = (from o in endpointConfig.HttpHeaderRules.Collection
+                var availableRules = (from o in endpointConfig.HttpHeaderRules
                                       where (o.Verb.ToString().Equals(httpRequestVerb, StringComparison.CurrentCultureIgnoreCase) || o.Verb == NtHttpVerb.Any)
                                       && o.Enabled == true
                                       select o).ToList();

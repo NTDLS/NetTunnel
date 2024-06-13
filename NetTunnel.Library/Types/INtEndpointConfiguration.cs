@@ -9,6 +9,6 @@ namespace NetTunnel.Library.Types
         public string Name { get; }
         public int TransmissionPort { get; }
         public NtTrafficType TrafficType { get; }
-        public NtHTTPHeaderRules HttpHeaderRules { get; }
+        public List<NtHttpHeaderRule> HttpHeaderRules { get; }
     }
 }

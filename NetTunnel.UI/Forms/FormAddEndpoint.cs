@@ -1,4 +1,5 @@
 ﻿using NetTunnel.ClientAPI;
+using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NTDLS.NullExtensions;
 using NTDLS.WinFormsHelpers;
@@ -31,6 +32,26 @@ namespace NetTunnel.UI.Forms
                 new ComboItem("HTTPS", NtTrafficType.Https)
             };
 
+            /*
+            //Populate inbound rules:
+            foreach (var config in tunnel.EndpointInboundConfigurations)
+            {
+                dataGridViewHTTPHeaders.Rows.Add(
+                    [ $"{httpHeaderRule.Enabled}", $"{httpHeaderRule.HeaderType}",
+                    $"{httpHeaderRule.Verb}", httpHeaderRule.Name, $"{httpHeaderRule.Action}", httpHeaderRule.Value ]
+                );
+            }
+
+            //Populate outbound rules:
+            foreach (var httpHeaderRule in proxy.HttpHeaderRules.Collection)
+            {
+                dataGridViewHTTPHeaders.Rows.Add(
+                    [ $"{httpHeaderRule.Enabled}", $"{httpHeaderRule.HeaderType}",
+                    $"{httpHeaderRule.Verb}", httpHeaderRule.Name, $"{httpHeaderRule.Action}", httpHeaderRule.Value ]
+                );
+            }
+            */
+
             comboBoxTrafficType.DisplayMember = "Display";
             comboBoxTrafficType.ValueMember = "Value";
             comboBoxTrafficType.DataSource = trafficTypes;
@@ -47,7 +68,7 @@ namespace NetTunnel.UI.Forms
 
         private void DataGridViewHTTPHeaders_DataError(object? sender, DataGridViewDataErrorEventArgs e)
         {
-            
+
         }
 
         public FormAddEndpoint()
@@ -68,23 +89,57 @@ namespace NetTunnel.UI.Forms
 
             try
             {
-                if (textBoxName.Text.Length == 0)
-                    throw new Exception("You must specify a name This is for your identification only.");
-                if (textBoxListenPort.Text.Length == 0 || int.TryParse(textBoxListenPort.Text, out var _) == false)
-                    throw new Exception("You must specify a valid listen port.");
-                if (textBoxTerminationAddress.Text.Length == 0)
-                    throw new Exception("You must specify a termination endpoint address.");
-                if (textBoxTerminationPort.Text.Length == 0 || int.TryParse(textBoxTerminationPort.Text, out var _) == false)
-                    throw new Exception("You must specify a valid termination port.");
+                textBoxName.GetAndValidateText("You must specify a name This is for your identification only.");
+                textBoxListenPort.GetAndValidateNumeric(1, 65535, "You must specify a valid listen port between [min] and [max].");
+                textBoxTerminationAddress.GetAndValidateText("You must specify a termination endpoint address (ip, hostname or domain). ");
+                textBoxTerminationPort.GetAndValidateNumeric(1, 65535, "You must specify a valid termination port between [min] and [max].");
+
+
+                var endpointInboundHttpRules = new List<NtHttpHeaderRule>();
+                var endpointOutboundHttpRules = new List<NtHttpHeaderRule>();
+
+                foreach (DataGridViewRow row in dataGridViewHTTPHeaders.Rows)
+                {
+                    if (((string)(row.Cells[columnHeader.Index].Value ?? "")) != string.Empty)
+                    {
+                        var headerType = (NtHttpHeaderType)Enum.Parse(typeof(NtHttpHeaderType), row.Cells[columnType.Index].Value?.ToString() ?? "");
+
+                        var httpHeaderRule = new NtHttpHeaderRule
+                        {
+                            Enabled = bool.Parse(row.Cells[columnEnabled.Index].Value?.ToString() ?? "True"),
+                            Action = (NtHttpHeaderAction)Enum.Parse(typeof(NtHttpHeaderAction), row.Cells[columnAction.Index].Value?.ToString() ?? ""),
+                            Name = row.Cells[columnHeader.Index].Value?.ToString() ?? "",
+                            Value = row.Cells[columnValue.Index].Value?.ToString() ?? "",
+                            Verb = (NtHttpVerb)Enum.Parse(typeof(NtHttpVerb), row.Cells[columnVerb.Index].Value?.ToString() ?? "")
+                        };
+
+                        if (headerType == NtHttpHeaderType.Request)
+                        {
+                            endpointInboundHttpRules.Add(httpHeaderRule);
+                        }
+                        else if (headerType == NtHttpHeaderType.Response)
+                        {
+                            endpointOutboundHttpRules.Add(httpHeaderRule);
+                        }
+                    }
+                }
 
                 buttonAdd.InvokeEnableControl(false);
 
                 var endpointId = Guid.NewGuid(); //The endpointId is the same on both services.
 
-                var endpointInbound = new NtEndpointInboundConfiguration(_tunnel.TunnelId, endpointId, textBoxName.Text, int.Parse(textBoxListenPort.Text));
+                var endpointInbound = new NtEndpointInboundConfiguration(_tunnel.TunnelId, endpointId, textBoxName.Text, int.Parse(textBoxListenPort.Text))
+                {
+                    TrafficType = (NtTrafficType)Enum.Parse(typeof(NtTrafficType), comboBoxTrafficType.SelectedValue?.ToString() ?? ""),
+                    HttpHeaderRules = endpointInboundHttpRules
+                };
 
                 var endpointOutbound = new NtEndpointOutboundConfiguration(_tunnel.TunnelId, endpointId, textBoxName.Text,
-                    textBoxTerminationAddress.Text, int.Parse(textBoxTerminationPort.Text));
+                    textBoxTerminationAddress.Text, int.Parse(textBoxTerminationPort.Text))
+                {
+                    TrafficType = (NtTrafficType)Enum.Parse(typeof(NtTrafficType), comboBoxTrafficType.SelectedValue?.ToString() ?? ""),
+                    HttpHeaderRules = endpointOutboundHttpRules
+                };
 
                 if (_tunnel is NtTunnelInboundConfiguration)
                 {
