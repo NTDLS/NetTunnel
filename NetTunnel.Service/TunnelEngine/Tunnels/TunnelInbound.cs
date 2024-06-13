@@ -21,7 +21,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         {
             return TunnelId.GetHashCode()
                 + Name.GetHashCode()
-                + DataPort.GetHashCode();
+                + DataPort.GetHashCode()
+                + Endpoints.Sum(o => o.GetHashCode());
         }
 
         public int ChangeHash

@@ -57,6 +57,7 @@ namespace NetTunnel.Library
         public override int GetHashCode()
         {
             return Name.GetHashCode()
+                + Enabled.GetHashCode()
                 + Verb.GetHashCode()
                 + Action.GetHashCode()
                 + Value.GetHashCode()

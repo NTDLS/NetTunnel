@@ -20,6 +20,14 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         private readonly RmClient _client;
         private Thread? _establishConnectionThread;
 
+        public override int GetHashCode()
+        {
+            return TunnelId.GetHashCode()
+                + Name.GetHashCode()
+                + DataPort.GetHashCode()
+                + Endpoints.Sum(o => o.GetHashCode());
+        }
+
         public int ChangeHash
             => TunnelId.GetHashCode() + Name.GetHashCode() + DataPort.GetHashCode();
 

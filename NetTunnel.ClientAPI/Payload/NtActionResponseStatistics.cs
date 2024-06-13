@@ -8,21 +8,11 @@ namespace NetTunnel.ClientAPI.Payload
 
         /// <summary>
         /// This overall hash is used to determine if there has been an additions/removals of any tunnel or endpoint.
+        /// This should be the hash of tunnels, endpoints and http rules.
         /// </summary>
         /// <returns></returns>
         public int AllTunnelIdAndEndpointIdHashes()
-        {
-            int rollingTotal = 0;
-
-            foreach (var item in Statistics)
-            {
-                rollingTotal += item.ChangeHash;
-
-                item.EndpointStatistics
-                    .ForEach(kvp => rollingTotal += kvp.ChangeHash);
-            }
-            return rollingTotal;
-        }
+            => Statistics.Sum(o => o.ChangeHash);
 
         public NtActionResponseStatistics()
         {
