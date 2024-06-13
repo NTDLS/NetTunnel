@@ -21,7 +21,7 @@ namespace NetTunnel.Library.Types
         }
 
         public NtEndpointInboundConfiguration(Guid tunnelId, Guid endpointId, string name,
-            string outboundAddress, int inboundPort, int outboundPort, List<NtHttpHeaderRule> httpHeaderRules)
+            string outboundAddress, int inboundPort, int outboundPort, List<NtHttpHeaderRule> httpHeaderRules, NtTrafficType trafficType)
         {
             TunnelId = tunnelId;
             EndpointId = endpointId;
@@ -29,6 +29,7 @@ namespace NetTunnel.Library.Types
             OutboundAddress = outboundAddress;
             InboundPort = inboundPort;
             OutboundPort = outboundPort;
+            TrafficType = trafficType;
             httpHeaderRules.AddRange(httpHeaderRules);
         }
     }
