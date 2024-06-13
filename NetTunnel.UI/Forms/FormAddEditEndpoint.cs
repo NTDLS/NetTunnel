@@ -108,11 +108,11 @@ namespace NetTunnel.UI.Forms
 
         private void FormAddEndpoint_Load(object sender, EventArgs e)
         {
-            AcceptButton = buttonAdd;
+            AcceptButton = buttonSave;
             CancelButton = buttonCancel;
         }
 
-        private void buttonAdd_Click(object sender, EventArgs e)
+        private void buttonSave_Click(object sender, EventArgs e)
         {
             _client.EnsureNotNull();
             _tunnel.EnsureNotNull();
@@ -143,7 +143,7 @@ namespace NetTunnel.UI.Forms
                     }
                 }
 
-                buttonAdd.InvokeEnableControl(false);
+                buttonSave.InvokeEnableControl(false);
 
                 var endpointId = Guid.NewGuid(); //The endpointId is the same on both services.
 
@@ -174,7 +174,7 @@ namespace NetTunnel.UI.Forms
                                 this.InvokeMessageBox("Failed to add inbound endpoint pair to inbound tunnel.",
                                     FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 
-                                buttonAdd.InvokeEnableControl(true);
+                                buttonSave.InvokeEnableControl(true);
 
                                 return;
                             }
@@ -191,7 +191,7 @@ namespace NetTunnel.UI.Forms
                                 this.InvokeMessageBox("Failed to add outbound endpoint pair to inbound tunnel.",
                                     FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 
-                                buttonAdd.InvokeEnableControl(true);
+                                buttonSave.InvokeEnableControl(true);
 
                                 return;
                             }
@@ -210,7 +210,7 @@ namespace NetTunnel.UI.Forms
                                 this.InvokeMessageBox("Failed to add outbound endpoint pair to outbound tunnel.",
                                     FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 
-                                buttonAdd.InvokeEnableControl(true);
+                                buttonSave.InvokeEnableControl(true);
 
                                 return;
                             }
@@ -226,7 +226,7 @@ namespace NetTunnel.UI.Forms
                                 this.InvokeMessageBox("Failed to add outbound endpoint pair to outbound tunnel.",
                                     FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 
-                                buttonAdd.InvokeEnableControl(true);
+                                buttonSave.InvokeEnableControl(true);
 
                                 return;
                             }

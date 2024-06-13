@@ -78,16 +78,15 @@ namespace NetTunnel.UI.Forms
             var selectedEndpointRow = listViewEndpoints.GetItemAt(e.X, e.Y);
             if (selectedEndpointRow != null)
             {
-                selectedEndpointRow.Selected = true;
+                var selectedEndpoint = (selectedEndpointRow.Tag as INtEndpointConfiguration).EnsureNotNull();
+
+                using var form = new FormAddEditEndpoint(_client, selectedTunnel, selectedEndpoint);
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    RepopulateTunnelsGrid();
+                }
             }
 
-            var selectedEndpoint = (selectedTunnelRow.Tag as INtEndpointConfiguration).EnsureNotNull();
-
-            using var form = new FormAddEditEndpoint(_client, selectedTunnel, selectedEndpoint);
-            if (form.ShowDialog() == DialogResult.OK)
-            {
-                RepopulateTunnelsGrid();
-            }
         }
 
         private bool ChangeConnection()
@@ -661,6 +660,7 @@ namespace NetTunnel.UI.Forms
             _client.EnsureNotNull();
 
             listViewTunnels.Items.Clear();
+            listViewEndpoints.Items.Clear();
 
             _client.TunnelInbound.List().ContinueWith(t =>
             {

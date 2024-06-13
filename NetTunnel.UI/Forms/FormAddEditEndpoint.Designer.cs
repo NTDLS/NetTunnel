@@ -37,7 +37,7 @@
             labelTerminationAddress = new Label();
             textBoxOutboundPort = new TextBox();
             labelTerminationPort = new Label();
-            buttonAdd = new Button();
+            buttonSave = new Button();
             buttonCancel = new Button();
             tabControlBody = new TabControl();
             tabPageEndpoint = new TabPage();
@@ -74,10 +74,10 @@
             labelName.TabIndex = 8;
             labelName.Text = "Name or description";
             // 
-            // textBoxListenPort
+            // textBoxInboundPort
             // 
             textBoxInboundPort.Location = new Point(13, 82);
-            textBoxInboundPort.Name = "textBoxListenPort";
+            textBoxInboundPort.Name = "textBoxInboundPort";
             textBoxInboundPort.Size = new Size(74, 23);
             textBoxInboundPort.TabIndex = 1;
             // 
@@ -90,10 +90,10 @@
             labelListenPort.TabIndex = 13;
             labelListenPort.Text = "Listen port";
             // 
-            // textBoxTerminationAddress
+            // textBoxOutboundAddress
             // 
             textBoxOutboundAddress.Location = new Point(93, 82);
-            textBoxOutboundAddress.Name = "textBoxTerminationAddress";
+            textBoxOutboundAddress.Name = "textBoxOutboundAddress";
             textBoxOutboundAddress.Size = new Size(191, 23);
             textBoxOutboundAddress.TabIndex = 2;
             // 
@@ -106,10 +106,10 @@
             labelTerminationAddress.TabIndex = 15;
             labelTerminationAddress.Text = "Termination address / host";
             // 
-            // textBoxTerminationPort
+            // textBoxOutboundPort
             // 
             textBoxOutboundPort.Location = new Point(290, 82);
-            textBoxOutboundPort.Name = "textBoxTerminationPort";
+            textBoxOutboundPort.Name = "textBoxOutboundPort";
             textBoxOutboundPort.Size = new Size(92, 23);
             textBoxOutboundPort.TabIndex = 3;
             // 
@@ -122,15 +122,15 @@
             labelTerminationPort.TabIndex = 17;
             labelTerminationPort.Text = "Destination Port";
             // 
-            // buttonAdd
+            // buttonSave
             // 
-            buttonAdd.Location = new Point(533, 365);
-            buttonAdd.Name = "buttonAdd";
-            buttonAdd.Size = new Size(75, 23);
-            buttonAdd.TabIndex = 4;
-            buttonAdd.Text = "Add";
-            buttonAdd.UseVisualStyleBackColor = true;
-            buttonAdd.Click += buttonAdd_Click;
+            buttonSave.Location = new Point(533, 365);
+            buttonSave.Name = "buttonSave";
+            buttonSave.Size = new Size(75, 23);
+            buttonSave.TabIndex = 4;
+            buttonSave.Text = "Save";
+            buttonSave.UseVisualStyleBackColor = true;
+            buttonSave.Click += buttonSave_Click;
             // 
             // buttonCancel
             // 
@@ -264,7 +264,7 @@
             ClientSize = new Size(621, 404);
             Controls.Add(tabControlBody);
             Controls.Add(buttonCancel);
-            Controls.Add(buttonAdd);
+            Controls.Add(buttonSave);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
@@ -293,7 +293,7 @@
         private Label labelTerminationAddress;
         private TextBox textBoxOutboundPort;
         private Label labelTerminationPort;
-        private Button buttonAdd;
+        private Button buttonSave;
         private Button buttonCancel;
         private TabControl tabControlBody;
         private TabPage tabPageEndpoint;
