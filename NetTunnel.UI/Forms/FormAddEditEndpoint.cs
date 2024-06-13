@@ -12,9 +12,12 @@ namespace NetTunnel.UI.Forms
         private readonly NtClient? _client;
         private readonly INtTunnelConfiguration? _tunnel;
         private readonly NtDirection _direction;
-        private readonly INtEndpointConfiguration? _endpoint;
+        private readonly INtEndpointConfiguration? _existingEndpoint;
 
-        public FormAddEditEndpoint(NtClient client, INtTunnelConfiguration tunnel, INtEndpointConfiguration endpoint)
+        /// <summary>
+        /// Creates a form for a editing an existing endpoint.
+        /// </summary>
+        public FormAddEditEndpoint(NtClient client, INtTunnelConfiguration tunnel, INtEndpointConfiguration existingEndpoint)
         {
             InitializeComponent();
 
@@ -22,13 +25,13 @@ namespace NetTunnel.UI.Forms
 
             _client = client;
             _tunnel = tunnel;
-            _endpoint = endpoint;
+            _existingEndpoint = existingEndpoint;
 
-            if (endpoint is NtEndpointInboundConfiguration)
+            if (existingEndpoint is NtEndpointInboundConfiguration)
             {
                 _direction = NtDirection.Inbound;
             }
-            else if (endpoint is NtEndpointOutboundConfiguration)
+            else if (existingEndpoint is NtEndpointOutboundConfiguration)
             {
                 _direction = NtDirection.Outbound;
             }
@@ -40,6 +43,9 @@ namespace NetTunnel.UI.Forms
             PopulateForm();
         }
 
+        /// <summary>
+        /// Creates a form for a adding a new endpoint.
+        /// </summary>
         public FormAddEditEndpoint(NtClient client, INtTunnelConfiguration tunnel, NtDirection direction)
         {
             InitializeComponent();
@@ -55,7 +61,7 @@ namespace NetTunnel.UI.Forms
 
         private void PopulateForm()
         {
-            Text = $"NetTunnel : {(_endpoint == null ? "Add" : "Edit")} {_direction} Endpoint";
+            Text = $"NetTunnel : {(_existingEndpoint == null ? "Add" : "Edit")} {_direction} Endpoint";
 
             var trafficTypes = new List<ComboItem>
             {
@@ -68,19 +74,19 @@ namespace NetTunnel.UI.Forms
             comboBoxTrafficType.ValueMember = "Value";
             comboBoxTrafficType.DataSource = trafficTypes;
 
-            if (_endpoint != null)
+            if (_existingEndpoint != null)
             {
-                foreach (var rule in _endpoint.HttpHeaderRules)
+                foreach (var rule in _existingEndpoint.HttpHeaderRules)
                 {
                     dataGridViewHTTPHeaders.Rows.Add([$"{rule.Enabled}", $"{rule.HeaderType}", $"{rule.Verb}", rule.Name, $"{rule.Action}", rule.Value]);
                 }
 
-                comboBoxTrafficType.SelectedValue = _endpoint.TrafficType;
+                comboBoxTrafficType.SelectedValue = _existingEndpoint.TrafficType;
 
-                textBoxName.Text = _endpoint.Name;
-                textBoxInboundPort.Text = $"{_endpoint.InboundPort:n0}";
-                textBoxOutboundAddress.Text = _endpoint.OutboundAddress;
-                textBoxOutboundPort.Text = $"{_endpoint.OutboundPort:n0}";
+                textBoxName.Text = _existingEndpoint.Name;
+                textBoxInboundPort.Text = $"{_existingEndpoint.InboundPort:n0}";
+                textBoxOutboundAddress.Text = _existingEndpoint.OutboundAddress;
+                textBoxOutboundPort.Text = $"{_existingEndpoint.OutboundPort:n0}";
             }
             else
             {
@@ -145,7 +151,7 @@ namespace NetTunnel.UI.Forms
 
                 buttonSave.InvokeEnableControl(false);
 
-                var endpointId = Guid.NewGuid(); //The endpointId is the same on both services.
+                var endpointId = _existingEndpoint?.EndpointId ?? Guid.NewGuid(); //The endpointId is the same on both services.
 
                 var endpointInbound = new NtEndpointInboundConfiguration(_tunnel.TunnelId, endpointId,
                     textBoxName.Text, textBoxOutboundAddress.Text, textBoxInboundPort.ValueAs<int>(), textBoxOutboundPort.ValueAs<int>())
