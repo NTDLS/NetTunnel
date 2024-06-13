@@ -20,6 +20,9 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         private readonly RmClient _client;
         private Thread? _establishConnectionThread;
 
+        public int ChangeHash
+            => TunnelId.GetHashCode() + Name.GetHashCode() + DataPort.GetHashCode();
+
         #region Configuration Properties.
 
         public string Address { get; set; }

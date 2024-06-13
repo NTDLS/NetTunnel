@@ -17,6 +17,9 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         private readonly RmServer _server;
         private Guid? _peerRmClientConnectionId;
 
+        public int ChangeHash
+            => TunnelId.GetHashCode() + Name.GetHashCode() + DataPort.GetHashCode();
+
         #region Configuration Properties.
 
         public int DataPort { get; private set; }

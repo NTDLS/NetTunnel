@@ -10,6 +10,9 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
     /// </summary>
     internal class EndpointOutbound : BaseEndpoint, IEndpoint
     {
+        public int ChangeHash
+            => Configuration.TunnelId.GetHashCode() + Configuration.EndpointId.GetHashCode() + Configuration.Name.GetHashCode();
+
         public EndpointOutbound(TunnelEngineCore core, ITunnel tunnel, NtEndpointOutboundConfiguration configuration)
             : base(core, tunnel, configuration.EndpointId, configuration)
         {

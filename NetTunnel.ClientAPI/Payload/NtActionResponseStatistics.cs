@@ -16,12 +16,10 @@ namespace NetTunnel.ClientAPI.Payload
 
             foreach (var item in Statistics)
             {
-                rollingTotal += item.TunnelId.GetHashCode();
-                foreach (var endpoint in item.EndpointStatistics)
-                {
-                    rollingTotal += endpoint.TunnelId.GetHashCode();
-                    rollingTotal += endpoint.EndpointId.GetHashCode();
-                }
+                rollingTotal += item.ChangeHash;
+
+                item.EndpointStatistics
+                    .ForEach(kvp => rollingTotal += kvp.ChangeHash);
             }
             return rollingTotal;
         }
