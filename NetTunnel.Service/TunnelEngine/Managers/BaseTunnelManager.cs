@@ -76,7 +76,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 {
                     var tunnelStats = new NtTunnelStatistics()
                     {
-                        Direction = typeof(T) == typeof(TunnelInbound) ? Constants.NtDirection.Inbound : Constants.NtDirection.Outbound,
+                        Direction = Constants.NtDirection.Inbound, //TODO: Add some status for in/out bound tunnel.
                         Status = tunnel.Status,
                         TunnelId = tunnel.TunnelId,
                         BytesReceived = tunnel.BytesReceived,

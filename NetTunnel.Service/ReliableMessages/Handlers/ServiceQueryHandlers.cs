@@ -45,16 +45,6 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
             return new QueryLoginReply(false);
         }
 
-        public GetInboundTunnelsReply OnGetInboundTunnels(RmContext context, QueryGetInboundTunnels query)
-        {
-            var inboundTunnelContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
-
-            return new GetInboundTunnelsReply
-            {
-                Collection = Singletons.Core.InboundTunnels.CloneConfigurations(),
-            };
-        }
-
         public GetOutboundTunnelsReply OnGetOutboundTunnels(RmContext context, QueryGetOutboundTunnels query)
         {
             var inboundTunnelContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);

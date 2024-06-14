@@ -81,8 +81,6 @@ namespace NetTunnel.UI.Forms
                     textBoxRemoteAddress.Text, textBoxManagementPort.ValueAs<int>(),
                     textBoxRemoteUsername.Text, Utility.ComputeSha256Hash(textBoxRemotePassword.Text));
 
-                var inboundTunnel = new NtTunnelInboundConfiguration(tunnelId, textBoxName.Text);
-
                 buttonConnect.InvokeEnableControl(false);
                 buttonCancel.InvokeEnableControl(false);
 
@@ -108,7 +106,7 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-        public void ConfigureTunnelPair(NtClient remoteClient, NtTunnelOutboundConfiguration outboundTunnel, NtTunnelInboundConfiguration inboundTunnel)
+        public void ConfigureTunnelPair(NtClient remoteClient, NtTunnelOutboundConfiguration outboundTunnel)
         {
             /*
             //Add the outbound tunnel config to the local tunnel instance.

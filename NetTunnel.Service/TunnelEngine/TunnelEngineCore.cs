@@ -12,7 +12,6 @@ namespace NetTunnel.Service.TunnelEngine
         public Logger Logging { get; set; }
         public UserSessionManager Sessions { get; set; }
         public TunnelOutboundManager OutboundTunnels { get; set; }
-        public TunnelInboundManager InboundTunnels { get; set; }
         public UserManager Users { get; set; }
 
         public TunnelEngineCore()
@@ -20,7 +19,6 @@ namespace NetTunnel.Service.TunnelEngine
             Logging = new(this);
             Sessions = new(this);
             OutboundTunnels = new(this);
-            InboundTunnels = new(this);
             Users = new(this);
 
             CoreServer = new RmServer();
@@ -65,13 +63,11 @@ namespace NetTunnel.Service.TunnelEngine
 
             CoreServer.Start(Singletons.Configuration.ManagementPort);
 
-            InboundTunnels.StartAll();
             OutboundTunnels.StartAll();
         }
 
         public void Stop()
         {
-            InboundTunnels.StopAll();
             OutboundTunnels.StopAll();
 
             CoreServer.Stop();

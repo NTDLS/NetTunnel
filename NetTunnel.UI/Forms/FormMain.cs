@@ -210,9 +210,7 @@ namespace NetTunnel.UI.Forms
                         {
                             var tunnel = ((INtTunnelConfiguration?)item.Tag).EnsureNotNull();
 
-                            var direction = (tunnel is NtTunnelInboundConfiguration) ? NtDirection.Inbound : NtDirection.Outbound;
-
-                            var tunnelStats = statistics.Where(o => o.TunnelId == tunnel.TunnelId && o.Direction == direction).SingleOrDefault();
+                            var tunnelStats = statistics.Where(o => o.TunnelId == tunnel.TunnelId).SingleOrDefault();
                             if (tunnelStats != null)
                             {
 
@@ -264,11 +262,7 @@ namespace NetTunnel.UI.Forms
 
                 if (selectedRow.Tag is INtTunnelConfiguration tunnel)
                 {
-                    if (tunnel is NtTunnelInboundConfiguration)
-                    {
-                        labelEndpoints.Text += "inbound tunnel ";
-                    }
-                    else if (tunnel is NtTunnelOutboundConfiguration)
+                    if (tunnel is NtTunnelOutboundConfiguration)
                     {
                         labelEndpoints.Text += "outbound tunnel ";
                     }
@@ -648,35 +642,12 @@ namespace NetTunnel.UI.Forms
             listViewTunnels.Items.Clear();
             listViewEndpoints.Items.Clear();
 
-            _client.GetInboundTunnels().ContinueWith(t =>
-            {
-                t.Result.Collection.ForEach(t => AddInboundTunnelToGrid(t));
-            });
 
             _client.GetOutboundTunnels().ContinueWith(t =>
             {
                 t.Result.Collection.ForEach(t => AddOutboundTunnelToGrid(t));
             });
 
-            void AddInboundTunnelToGrid(NtTunnelInboundConfiguration tunnel)
-            {
-                if (listViewTunnels.InvokeRequired)
-                {
-                    listViewTunnels.Invoke(AddInboundTunnelToGrid, tunnel);
-                }
-                else
-                {
-                    var item = new ListViewItem(tunnel.Name);
-                    item.Tag = tunnel;
-                    item.SubItems.Add("Inbound");
-                    item.SubItems.Add($"*");
-                    item.SubItems.Add($"{tunnel.EndpointConfigurations.Count:n0}");
-                    item.SubItems.Add("∞");
-                    item.SubItems.Add("∞");
-                    item.SubItems.Add("∞");
-                    listViewTunnels.Items.Add(item);
-                }
-            }
 
             void AddOutboundTunnelToGrid(NtTunnelOutboundConfiguration tunnel)
             {
@@ -688,7 +659,7 @@ namespace NetTunnel.UI.Forms
                 {
                     var item = new ListViewItem(tunnel.Name);
                     item.Tag = tunnel;
-                    item.SubItems.Add("Outbound");
+                    item.SubItems.Add("????");
                     item.SubItems.Add($"{tunnel.Address}");
                     item.SubItems.Add($"{tunnel.EndpointConfigurations.Count:n0}");
                     item.SubItems.Add("∞");

@@ -71,11 +71,6 @@ namespace NetTunnel.Library
 
         #endregion
 
-        public async Task<GetInboundTunnelsReply> GetInboundTunnels()
-        {
-            return await Client.Query(new QueryGetInboundTunnels());
-        }
-
         public async Task<GetOutboundTunnelsReply> GetOutboundTunnels()
         {
             return await Client.Query(new QueryGetOutboundTunnels());
