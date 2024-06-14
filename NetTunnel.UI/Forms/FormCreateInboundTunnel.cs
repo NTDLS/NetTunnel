@@ -1,7 +1,9 @@
 ﻿using NetTunnel.Library;
+using NetTunnel.Library.ReliableMessages.Query;
 using NetTunnel.Library.Types;
 using NTDLS.NullExtensions;
 using NTDLS.WinFormsHelpers;
+using System.Configuration;
 
 namespace NetTunnel.UI.Forms
 {
@@ -43,35 +45,40 @@ namespace NetTunnel.UI.Forms
         {
             _client.EnsureNotNull();
 
+            buttonAdd.InvokeDisable();
+            buttonCancel.InvokeDisable();
+
             try
             {
                 textBoxName.GetAndValidateText("You must specify a name. This is for your identification only.");
 
-                var tunnelId = Guid.NewGuid(); //The TunnelId is the same on both services.
+                var tunnelId = Guid.NewGuid(); //We generate the GUIDs locally.
 
-                var outboundTunnel = new NtTunnelInboundConfiguration(tunnelId, textBoxName.Text);
+                var inboundTunnel = new NtTunnelInboundConfiguration(tunnelId, textBoxName.Text);
 
-                buttonAdd.InvokeEnableControl(false);
-                buttonCancel.InvokeEnableControl(false);
-
-                try
+                _client.CreateInboundTunnel(inboundTunnel).ContinueWith(t =>
                 {
-                    //ConfigureTunnelPair(remoteClient, outboundTunnel, inboundTunnel);
+                    if (t.IsCompletedSuccessfully)
+                    {
+                        this.InvokeClose(DialogResult.OK);
+                    }
+                    else
+                    {
+                        this.InvokeMessageBox(t.Exception?.Message ?? "An unknown error occured.",
+                            Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 
-                    this.InvokeClose(DialogResult.OK);
+                        buttonAdd.InvokeEnable();
+                        buttonCancel.InvokeEnable();
+                    }
+                });
 
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception($"Failed to login to the remote tunnel: {ex.Message}.");
-                }
             }
             catch (Exception ex)
             {
-                buttonAdd.InvokeEnableControl(true);
-                buttonCancel.InvokeEnableControl(true);
-
                 MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK);
+
+                buttonAdd.InvokeEnable();
+                buttonCancel.InvokeEnable();
             }
         }
 

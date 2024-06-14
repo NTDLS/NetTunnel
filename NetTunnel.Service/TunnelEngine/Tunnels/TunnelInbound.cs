@@ -14,7 +14,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
     internal class TunnelInbound : ITunnel
     {
         private readonly RmServer _server;
-        private Guid? _peerRmClientConnectionId;
 
         public override int GetHashCode()
         {
@@ -35,7 +34,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         #region Properties Common to Inbound and Outbound Tunnels.
 
-        public bool SecureKeyExchangeIsComplete { get; private set; }
         public NtTunnelStatus Status { get; set; }
         public ulong BytesReceived { get; set; }
         public ulong BytesSent { get; set; }
@@ -191,7 +189,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
                 Status = NtTunnelStatus.Disconnected;
 
-                _server.Start(DataPort);
+                //_server.Start(DataPort);
                 Core.Logging.Write(NtLogSeverity.Verbose, $"Started listening for inbound tunnel '{Name}' on port {DataPort}.");
 
                 Core.Logging.Write(NtLogSeverity.Verbose, $"Starting endpoints for inbound tunnel '{Name}'.");

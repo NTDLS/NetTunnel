@@ -67,6 +67,7 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
 
         public QueryCreateInboundTunnelReply OnQueryCreateInboundTunnel(RmContext context, QueryCreateInboundTunnel query)
         {
+            throw new Exception("blah");
             var inboundTunnelContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
             Singletons.Core.InboundTunnels.Add(query.Configuration);

@@ -71,7 +71,6 @@ namespace NetTunnel.Library
 
         #endregion
 
-
         public async Task<GetInboundTunnelsReply> GetInboundTunnels()
         {
             return await Client.Query(new QueryGetInboundTunnels());
@@ -82,5 +81,9 @@ namespace NetTunnel.Library
             return await Client.Query(new QueryGetOutboundTunnels());
         }
 
+        public async Task<QueryCreateInboundTunnelReply> CreateInboundTunnel(NtTunnelInboundConfiguration configuration)
+        {
+            return await Client.Query(new QueryCreateInboundTunnel(configuration));
+        }
     }
 }

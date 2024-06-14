@@ -20,7 +20,6 @@
         {
             TunnelId = tunnelId;
             Name = name;
-
         }
 
         public NtTunnelInboundConfiguration Clone()
