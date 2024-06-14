@@ -2,6 +2,8 @@
 using NetTunnel.Library.ReliableMessages.Query;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.ReliableMessages;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
 
@@ -85,5 +87,21 @@ namespace NetTunnel.Library
         {
             return await Client.Query(new QueryCreateInboundTunnel(configuration));
         }
+
+        /*
+        public void UpsertEndpointInboundPair()
+        {
+            var endpoint = JsonConvert.DeserializeObject<NtEndpointPairConfiguration>(value).EnsureNotNull();
+
+            //Add the inbound endpoint to the local tunnel.
+            Singletons.Core.InboundTunnels.UpsertEndpointInbound(tunnelId, endpoint.Inbound);
+            Singletons.Core.InboundTunnels.SaveToDisk();
+
+            //Since we have a tunnel, we will communicate the alteration of endpoints though the tunnel.
+            var result = await Singletons.Core.InboundTunnels
+                .DispatchUpsertEndpointOutboundToAssociatedTunnelService<oldQueryReplyPayloadBoolean>(tunnelId, endpoint.Outbound);
+
+        }
+        */
     }
 }

@@ -8,14 +8,14 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormServiceConfiguration : Form
     {
-        private readonly NtClient? _client;
+        private readonly NtServiceClient? _client;
 
         public FormServiceConfiguration()
         {
             InitializeComponent();
         }
 
-        public FormServiceConfiguration(NtClient client)
+        public FormServiceConfiguration(NtServiceClient client)
         {
             InitializeComponent();
 
@@ -63,10 +63,12 @@ namespace NetTunnel.UI.Forms
 
             #endregion
 
+            /*
             _client.EnsureNotNull().Service.GetConfiguration().ContinueWith(t =>
             {
                 SetFormConfigurationValues(t.Result.Configuration);
             });
+            */
 
             AcceptButton = buttonSave;
             CancelButton = buttonCancel;
@@ -138,6 +140,7 @@ namespace NetTunnel.UI.Forms
 
                 buttonSave.InvokeEnableControl(false);
 
+                /*
                 _client.EnsureNotNull().Service.PutConfiguration(configuration).ContinueWith(t =>
                 {
                     if (!t.IsCompletedSuccessfully)
@@ -149,6 +152,7 @@ namespace NetTunnel.UI.Forms
 
                     this.InvokeClose(DialogResult.OK);
                 });
+                */
             }
             catch (Exception ex)
             {

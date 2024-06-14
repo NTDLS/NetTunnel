@@ -8,14 +8,14 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormUsers : Form
     {
-        private readonly NtClient? _client;
+        private readonly NtServiceClient? _client;
 
         public FormUsers()
         {
             InitializeComponent();
         }
 
-        public FormUsers(NtClient client)
+        public FormUsers(NtServiceClient client)
         {
             InitializeComponent();
             _client = client;
@@ -25,6 +25,7 @@ namespace NetTunnel.UI.Forms
 
         private void FormUsers_Load(object sender, EventArgs e)
         {
+            /*
             _client.EnsureNotNull().Security.ListUsers().ContinueWith(t =>
             {
                 foreach (var user in t.Result.Collection)
@@ -32,6 +33,7 @@ namespace NetTunnel.UI.Forms
                     AddUserToGrid(user);
                 }
             });
+            */
         }
 
         void AddUserToGrid(NtUser? user)
@@ -52,6 +54,7 @@ namespace NetTunnel.UI.Forms
 
         private void ListViewUsers_MouseUp(object? sender, MouseEventArgs e)
         {
+            /*
             _client.EnsureNotNull();
 
             if (e.Button == MouseButtons.Right)
@@ -109,6 +112,7 @@ namespace NetTunnel.UI.Forms
                     };
                 }
             }
+            */
         }
 
         private void buttonAddUser_Click(object sender, EventArgs e)

@@ -9,7 +9,7 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormAddEditEndpoint : Form
     {
-        private readonly NtClient? _client;
+        private readonly NtServiceClient? _client;
         private readonly INtTunnelConfiguration? _tunnel;
         private readonly NtDirection _direction;
         private readonly INtEndpointConfiguration? _existingEndpoint;
@@ -17,7 +17,7 @@ namespace NetTunnel.UI.Forms
         /// <summary>
         /// Creates a form for a editing an existing endpoint.
         /// </summary>
-        public FormAddEditEndpoint(NtClient client, INtTunnelConfiguration tunnel, INtEndpointConfiguration existingEndpoint)
+        public FormAddEditEndpoint(NtServiceClient client, INtTunnelConfiguration tunnel, INtEndpointConfiguration existingEndpoint)
         {
             InitializeComponent();
 
@@ -46,7 +46,7 @@ namespace NetTunnel.UI.Forms
         /// <summary>
         /// Creates a form for a adding a new endpoint.
         /// </summary>
-        public FormAddEditEndpoint(NtClient client, INtTunnelConfiguration tunnel, NtDirection direction)
+        public FormAddEditEndpoint(NtServiceClient client, INtTunnelConfiguration tunnel, NtDirection direction)
         {
             InitializeComponent();
 
@@ -152,6 +152,7 @@ namespace NetTunnel.UI.Forms
 
                 buttonSave.InvokeEnableControl(false);
 
+                /*
                 var endpointId = _existingEndpoint?.EndpointId ?? Guid.NewGuid(); //The endpointId is the same on both services.
 
                 var endpointInbound = new NtEndpointInboundConfiguration(_tunnel.TunnelId, endpointId,
@@ -162,11 +163,12 @@ namespace NetTunnel.UI.Forms
                     textBoxName.Text, textBoxOutboundAddress.Text, textBoxInboundPort.ValueAs<int>(),
                     textBoxOutboundPort.ValueAs<int>(), endpointHttpHeaderRules, Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"));
 
+
                 if (_tunnel is NtTunnelInboundConfiguration)
                 {
                     if (_direction == NtDirection.Inbound)
                     {
-                        _client.TunnelInbound.UpsertEndpointInboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
+                        _client.UpsertEndpointInboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
                         {
                             if (!o.IsCompletedSuccessfully)
                             {
@@ -233,6 +235,7 @@ namespace NetTunnel.UI.Forms
                         });
                     }
                 }
+                */
             }
             catch (Exception ex)
             {

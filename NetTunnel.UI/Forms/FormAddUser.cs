@@ -8,7 +8,7 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormAddUser : Form
     {
-        private readonly NtClient? _client;
+        private readonly NtServiceClient? _client;
         public NtUser? CreatedUser { get; set; }
 
         public FormAddUser()
@@ -16,7 +16,7 @@ namespace NetTunnel.UI.Forms
             InitializeComponent();
         }
 
-        public FormAddUser(NtClient? client)
+        public FormAddUser(NtServiceClient? client)
         {
             InitializeComponent();
 
@@ -43,6 +43,7 @@ namespace NetTunnel.UI.Forms
 
                 buttonSave.InvokeEnableControl(false);
 
+                /*
                 _client.Security.CreateUser(CreatedUser).ContinueWith(t =>
                 {
                     if (!t.IsCompletedSuccessfully)
@@ -54,6 +55,7 @@ namespace NetTunnel.UI.Forms
 
                     this.InvokeClose(DialogResult.OK);
                 });
+                */
             }
             catch (Exception ex)
             {

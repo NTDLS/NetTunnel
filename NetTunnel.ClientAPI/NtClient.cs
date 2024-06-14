@@ -15,7 +15,7 @@ namespace NetTunnel.ClientAPI
         public Guid SessionId { get; internal set; } = Guid.Empty;
         public NtTunnelInboundClient TunnelInbound { get; private set; }
         public NtTunnelOutboundClient TunnelOutbound { get; private set; }
-        public NtServiceClient Service { get; private set; }
+        public oldNtServiceClient Service { get; private set; }
 
         public NtSecurityClient Security { get; private set; }
 

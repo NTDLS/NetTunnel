@@ -11,7 +11,6 @@ namespace NetTunnel.UI.Forms
     {
         private int _allTunnelAndEndpointHashes = -1;
         private bool _needToRepopulateTunnels = false;
-        private NtClient? OLDDELETEMECLIENT_client;
 
         private Library.NtServiceClient? _client;
 
@@ -61,8 +60,6 @@ namespace NetTunnel.UI.Forms
 
         private void ListViewEndpoints_MouseDoubleClick(object? sender, MouseEventArgs e)
         {
-            OLDDELETEMECLIENT_client.EnsureNotNull();
-
             var selectedTunnelRow = listViewTunnels.SelectedItems?.Count > 0 ? listViewTunnels.SelectedItems[0] : null;
             if (selectedTunnelRow == null)
             {
@@ -76,7 +73,7 @@ namespace NetTunnel.UI.Forms
             {
                 var selectedEndpoint = (selectedEndpointRow.Tag as INtEndpointConfiguration).EnsureNotNull();
 
-                using var form = new FormAddEditEndpoint(OLDDELETEMECLIENT_client, selectedTunnel, selectedEndpoint);
+                using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), selectedTunnel, selectedEndpoint);
                 if (form.ShowDialog() == DialogResult.OK)
                 {
                     RepopulateTunnelsGrid();
@@ -129,9 +126,10 @@ namespace NetTunnel.UI.Forms
 
             try
             {
-                if (OLDDELETEMECLIENT_client != null && OLDDELETEMECLIENT_client.IsConnected)
+                /*
+                if (_client != null && _client.IsConnected)
                 {
-                    OLDDELETEMECLIENT_client.Service.GetStatistics().ContinueWith(o =>
+                    _client.GetStatistics().ContinueWith(o =>
                     {
                         if (o.Result.Success)
                         {
@@ -148,6 +146,7 @@ namespace NetTunnel.UI.Forms
                         }
                     });
                 }
+                */
 
                 void PopulateEndpointStatistics(List<NtTunnelStatistics> statistics)
                 {
@@ -256,7 +255,7 @@ namespace NetTunnel.UI.Forms
 
         private void ListViewTunnels_SelectedIndexChanged(object? sender, EventArgs e)
         {
-            OLDDELETEMECLIENT_client.EnsureNotNull();
+            _client.EnsureNotNull();
 
             labelEndpoints.Text = "Endpoints of ";
 
@@ -326,9 +325,7 @@ namespace NetTunnel.UI.Forms
 
                     if (e.ClickedItem?.Text == "Add Inbound Endpoint to Tunnel")
                     {
-                        OLDDELETEMECLIENT_client.EnsureNotNull();
-
-                        using var form = new FormAddEditEndpoint(OLDDELETEMECLIENT_client, selectedTunnel, NtDirection.Inbound);
+                        using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), selectedTunnel, NtDirection.Inbound);
                         if (form.ShowDialog() == DialogResult.OK)
                         {
                             RepopulateTunnelsGrid();
@@ -336,9 +333,7 @@ namespace NetTunnel.UI.Forms
                     }
                     else if (e.ClickedItem?.Text == "Add Outbound Endpoint to Tunnel")
                     {
-                        OLDDELETEMECLIENT_client.EnsureNotNull();
-
-                        using var form = new FormAddEditEndpoint(OLDDELETEMECLIENT_client, selectedTunnel, NtDirection.Outbound);
+                        using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), selectedTunnel, NtDirection.Outbound);
                         if (form.ShowDialog() == DialogResult.OK)
                         {
                             RepopulateTunnelsGrid();
@@ -346,7 +341,7 @@ namespace NetTunnel.UI.Forms
                     }
                     else if (e.ClickedItem?.Text == "Delete Endpoint")
                     {
-                        OLDDELETEMECLIENT_client.EnsureNotNull();
+                        /*
                         var selectedEndpoint = (selectedEndpointRow?.Tag as INtEndpointConfiguration).EnsureNotNull();
 
                         if (MessageBox.Show($"Delete the endpoint '{selectedEndpoint.Name}'?",
@@ -357,7 +352,7 @@ namespace NetTunnel.UI.Forms
 
                         if (selectedTunnel is NtTunnelInboundConfiguration tunnelInbound)
                         {
-                            OLDDELETEMECLIENT_client.TunnelInbound.DeleteEndpointPair(tunnelInbound.TunnelId, selectedEndpoint.EndpointId).ContinueWith((o) =>
+                            _client.TunnelInbound.DeleteEndpointPair(tunnelInbound.TunnelId, selectedEndpoint.EndpointId).ContinueWith((o) =>
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
@@ -367,7 +362,7 @@ namespace NetTunnel.UI.Forms
                                         FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                         {
                                             //If the pair deletion failed, just delete the local endpoint.
-                                            OLDDELETEMECLIENT_client.TunnelInbound.DeleteEndpoint(tunnelInbound.TunnelId, selectedEndpoint.EndpointId).ContinueWith((o) =>
+                                            _client.TunnelInbound.DeleteEndpoint(tunnelInbound.TunnelId, selectedEndpoint.EndpointId).ContinueWith((o) =>
                                             {
                                                 _needToRepopulateTunnels = true;
                                             });
@@ -375,11 +370,10 @@ namespace NetTunnel.UI.Forms
                                     }));
                                 }
                             });
-
                         }
                         else if (selectedTunnel is NtTunnelOutboundConfiguration tunnelOutbound)
                         {
-                            OLDDELETEMECLIENT_client.TunnelOutbound.DeleteEndpointPair(tunnelOutbound.TunnelId, selectedEndpoint.EndpointId).ContinueWith((o) =>
+                            _client.TunnelOutbound.DeleteEndpointPair(tunnelOutbound.TunnelId, selectedEndpoint.EndpointId).ContinueWith((o) =>
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
@@ -389,7 +383,7 @@ namespace NetTunnel.UI.Forms
                                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                         {
                                             //If the pair deletion failed, just delete the local endpoint.
-                                            OLDDELETEMECLIENT_client.TunnelOutbound.DeleteEndpoint(tunnelOutbound.TunnelId, selectedEndpoint.EndpointId).ContinueWith((o) =>
+                                            _client.TunnelOutbound.DeleteEndpoint(tunnelOutbound.TunnelId, selectedEndpoint.EndpointId).ContinueWith((o) =>
                                             {
                                                 _needToRepopulateTunnels = true;
                                             });
@@ -397,8 +391,10 @@ namespace NetTunnel.UI.Forms
                                     }));
                                 }
                             });
+
                         }
 
+                    */
                         listViewEndpoints.InvokeClearListViewRows();
                     }
                 };
@@ -467,12 +463,11 @@ namespace NetTunnel.UI.Forms
                     }
                     else if (e.ClickedItem?.Text == "Add Inbound Endpoint to Tunnel")
                     {
-                        OLDDELETEMECLIENT_client.EnsureNotNull();
                         rowUnderMouse.EnsureNotNull();
 
                         var tunnel = ((INtTunnelConfiguration?)rowUnderMouse.Tag).EnsureNotNull();
 
-                        using var form = new FormAddEditEndpoint(OLDDELETEMECLIENT_client, tunnel, NtDirection.Inbound);
+                        using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tunnel, NtDirection.Inbound);
                         if (form.ShowDialog() == DialogResult.OK)
                         {
                             RepopulateTunnelsGrid();
@@ -480,12 +475,11 @@ namespace NetTunnel.UI.Forms
                     }
                     else if (e.ClickedItem?.Text == "Add Outbound Endpoint to Tunnel")
                     {
-                        OLDDELETEMECLIENT_client.EnsureNotNull();
                         rowUnderMouse.EnsureNotNull();
 
                         var tunnel = ((INtTunnelConfiguration?)rowUnderMouse.Tag).EnsureNotNull();
 
-                        using var form = new FormAddEditEndpoint(OLDDELETEMECLIENT_client, tunnel, NtDirection.Outbound);
+                        using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tunnel, NtDirection.Outbound);
                         if (form.ShowDialog() == DialogResult.OK)
                         {
                             RepopulateTunnelsGrid();
@@ -493,7 +487,7 @@ namespace NetTunnel.UI.Forms
                     }
                     else if (e.ClickedItem?.Text == "Stop")
                     {
-                        OLDDELETEMECLIENT_client.EnsureNotNull();
+                        /*
                         rowUnderMouse.EnsureNotNull();
 
                         var tunnel = ((INtTunnelConfiguration?)rowUnderMouse.Tag).EnsureNotNull();
@@ -506,7 +500,7 @@ namespace NetTunnel.UI.Forms
 
                         if (rowUnderMouse.Tag is NtTunnelInboundConfiguration tunnelInbound)
                         {
-                            OLDDELETEMECLIENT_client.TunnelInbound.Stop(tunnelInbound.TunnelId).ContinueWith((o) =>
+                            _client.TunnelInbound.Stop(tunnelInbound.TunnelId).ContinueWith((o) =>
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
@@ -519,7 +513,7 @@ namespace NetTunnel.UI.Forms
                         }
                         else if (rowUnderMouse.Tag is NtTunnelOutboundConfiguration tunnelOutbound)
                         {
-                            OLDDELETEMECLIENT_client.TunnelOutbound.Stop(tunnelOutbound.TunnelId).ContinueWith((o) =>
+                            _client.TunnelOutbound.Stop(tunnelOutbound.TunnelId).ContinueWith((o) =>
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
@@ -530,20 +524,20 @@ namespace NetTunnel.UI.Forms
                                 }
                             });
                         }
-
+                        */
                         listViewEndpoints.InvokeClearListViewRows();
                     }
                     // Stop ↑
                     else if (e.ClickedItem?.Text == "Start")
                     {
-                        OLDDELETEMECLIENT_client.EnsureNotNull();
+                        /*
                         rowUnderMouse.EnsureNotNull();
 
                         var tunnel = ((INtTunnelConfiguration?)rowUnderMouse.Tag).EnsureNotNull();
 
                         if (rowUnderMouse.Tag is NtTunnelInboundConfiguration tunnelInbound)
                         {
-                            OLDDELETEMECLIENT_client.TunnelInbound.Start(tunnelInbound.TunnelId).ContinueWith((o) =>
+                            _client.TunnelInbound.Start(tunnelInbound.TunnelId).ContinueWith((o) =>
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
@@ -556,7 +550,7 @@ namespace NetTunnel.UI.Forms
                         }
                         else if (rowUnderMouse.Tag is NtTunnelOutboundConfiguration tunnelOutbound)
                         {
-                            OLDDELETEMECLIENT_client.TunnelOutbound.Start(tunnelOutbound.TunnelId).ContinueWith((o) =>
+                            _client.TunnelOutbound.Start(tunnelOutbound.TunnelId).ContinueWith((o) =>
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
@@ -567,13 +561,14 @@ namespace NetTunnel.UI.Forms
                                 }
                             });
                         }
-
+                        */
                         listViewEndpoints.InvokeClearListViewRows();
                     }
                     //Start ↑
                     else if (e.ClickedItem?.Text == "Delete Tunnel")
                     {
-                        OLDDELETEMECLIENT_client.EnsureNotNull();
+                        /*
+                        _client.EnsureNotNull();
                         rowUnderMouse.EnsureNotNull();
 
                         var tunnel = ((INtTunnelConfiguration?)rowUnderMouse.Tag).EnsureNotNull();
@@ -586,7 +581,7 @@ namespace NetTunnel.UI.Forms
 
                         if (rowUnderMouse.Tag is NtTunnelInboundConfiguration tunnelInbound)
                         {
-                            OLDDELETEMECLIENT_client.TunnelInbound.DeletePair(tunnelInbound.TunnelId).ContinueWith((o) =>
+                            _client.TunnelInbound.DeletePair(tunnelInbound.TunnelId).ContinueWith((o) =>
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
@@ -596,7 +591,7 @@ namespace NetTunnel.UI.Forms
                                         FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                         {
                                             //If the pair deletion failed, just delete the local tunnel.
-                                            OLDDELETEMECLIENT_client.TunnelInbound.Delete(tunnelInbound.TunnelId).ContinueWith((o) =>
+                                            _client.TunnelInbound.Delete(tunnelInbound.TunnelId).ContinueWith((o) =>
                                             {
                                                 _needToRepopulateTunnels = true;
                                             });
@@ -608,7 +603,7 @@ namespace NetTunnel.UI.Forms
                         }
                         else if (rowUnderMouse.Tag is NtTunnelOutboundConfiguration tunnelOutbound)
                         {
-                            OLDDELETEMECLIENT_client.TunnelOutbound.DeletePair(tunnelOutbound.TunnelId).ContinueWith((o) =>
+                            _client.TunnelOutbound.DeletePair(tunnelOutbound.TunnelId).ContinueWith((o) =>
                             {
                                 if (o.IsCompletedSuccessfully == false)
                                 {
@@ -618,7 +613,7 @@ namespace NetTunnel.UI.Forms
                                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                         {
                                             //If the pair deletion failed, just delete the local tunnel.
-                                            OLDDELETEMECLIENT_client.TunnelOutbound.Delete(tunnelOutbound.TunnelId).ContinueWith((o) =>
+                                            _client.TunnelOutbound.Delete(tunnelOutbound.TunnelId).ContinueWith((o) =>
                                             {
                                                 _needToRepopulateTunnels = true;
                                             });
@@ -627,6 +622,7 @@ namespace NetTunnel.UI.Forms
                                 }
                             });
                         }
+                        */
 
                         listViewEndpoints.InvokeClearListViewRows();
                     }
@@ -739,7 +735,6 @@ namespace NetTunnel.UI.Forms
 
         private void RepopulateEndpointsGrid_LockRequired(INtTunnelConfiguration tunnelInbound)
         {
-            OLDDELETEMECLIENT_client.EnsureNotNull();
             listViewEndpoints.Items.Clear();
 
             tunnelInbound.EndpointInboundConfigurations.ForEach(x => AddEndpointInboundToGrid(x));
@@ -854,13 +849,13 @@ namespace NetTunnel.UI.Forms
 
         private void usersToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using var form = new FormUsers(OLDDELETEMECLIENT_client.EnsureNotNull());
+            using var form = new FormUsers(_client.EnsureNotNull());
             form.ShowDialog();
         }
 
         private void configurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using var form = new FormServiceConfiguration(OLDDELETEMECLIENT_client.EnsureNotNull());
+            using var form = new FormServiceConfiguration(_client.EnsureNotNull());
             form.ShowDialog();
         }
 

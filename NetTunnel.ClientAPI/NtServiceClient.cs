@@ -6,11 +6,11 @@ using System.Text;
 
 namespace NetTunnel.ClientAPI
 {
-    public class NtServiceClient
+    public class oldNtServiceClient
     {
         private readonly NtClient _client;
 
-        public NtServiceClient(NtClient client)
+        public oldNtServiceClient(NtClient client)
         {
             _client = client;
         }
