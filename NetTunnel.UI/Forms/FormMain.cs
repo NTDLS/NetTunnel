@@ -414,8 +414,7 @@ namespace NetTunnel.UI.Forms
 
                 var menu = new ContextMenuStrip();
 
-                menu.Items.Add("Create Inbound Tunnel");
-                menu.Items.Add("Create Outbound Tunnel");
+                menu.Items.Add("Connect Tunnel");
 
                 if (rowUnderMouse != null && selectedTunnel != null)
                 {
@@ -444,17 +443,9 @@ namespace NetTunnel.UI.Forms
                 {
                     menu.Hide();
 
-                    if (e.ClickedItem?.Text == "Create Outbound Tunnel")
+                    if (e.ClickedItem?.Text == "Connect Tunnel")
                     {
-                        using var form = new FormCreateOutboundTunnel(_client.EnsureNotNull());
-                        if (form.ShowDialog() == DialogResult.OK)
-                        {
-                            RepopulateTunnelsGrid();
-                        }
-                    }
-                    else if (e.ClickedItem?.Text == "Create Inbound Tunnel")
-                    {
-                        using var form = new FormCreateInboundTunnel(_client.EnsureNotNull());
+                        using var form = new FormConnectTunnel(_client.EnsureNotNull());
                         if (form.ShowDialog() == DialogResult.OK)
                         {
                             RepopulateTunnelsGrid();

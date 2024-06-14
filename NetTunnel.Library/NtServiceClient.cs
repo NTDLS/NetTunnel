@@ -81,11 +81,6 @@ namespace NetTunnel.Library
             return await Client.Query(new QueryGetOutboundTunnels());
         }
 
-        public async Task<QueryCreateInboundTunnelReply> CreateInboundTunnel(NtTunnelInboundConfiguration configuration)
-        {
-            return await Client.Query(new QueryCreateInboundTunnel(configuration));
-        }
-
         /*
         public void UpsertEndpointInboundPair()
         {
