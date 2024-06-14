@@ -82,7 +82,7 @@ namespace NetTunnel.UI.Forms
                     textBoxRemoteAddress.Text, textBoxManagementPort.ValueAs<int>(), textBoxTunnelDataPort.ValueAs<int>(),
                     textBoxRemoteUsername.Text, Utility.ComputeSha256Hash(textBoxRemotePassword.Text));
 
-                var inboundTunnel = new NtTunnelInboundConfiguration(tunnelId, textBoxName.Text, textBoxTunnelDataPort.ValueAs<int>());
+                var inboundTunnel = new NtTunnelInboundConfiguration(tunnelId, textBoxName.Text);
 
                 buttonAdd.InvokeEnableControl(false);
                 buttonCancel.InvokeEnableControl(false);

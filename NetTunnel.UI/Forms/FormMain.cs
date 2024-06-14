@@ -97,8 +97,8 @@ namespace NetTunnel.UI.Forms
                 {
                     if (formLogin.ShowDialog() == DialogResult.OK)
                     {
-                        Text = $"{Constants.FriendlyName} : {formLogin.Address} {(formLogin.UseSSL ? "" : " : [INSECURE]")}";
-                        _client = formLogin.Client;
+                        //Text = $"{Constants.FriendlyName} : {formLogin.Address} {(formLogin.UseSSL ? "" : " : [INSECURE]")}";
+                        //_client = formLogin.Client;
                         RepopulateTunnelsGrid();
                         return true;
                     }

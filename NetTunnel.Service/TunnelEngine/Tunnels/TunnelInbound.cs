@@ -2,7 +2,7 @@
 using NetTunnel.Library.Types;
 using NetTunnel.Service.ReliableMessages;
 using NetTunnel.Service.TunnelEngine.Endpoints;
-using NetTunnel.Service.TunnelEngine.Tunnels.MessageHandlers;
+using NetTunnel.Service.TunnelEngine.MessageHandlers;
 using NTDLS.NullExtensions;
 using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
@@ -68,6 +68,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             DataPort = configuration.DataPort;
 
+            /*
             _server = new RmServer(new RmConfiguration()
             {
                 Parameter = this,
@@ -88,6 +89,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 Core.Logging.Write(NtLogSeverity.Exception, $"RPC server exception: '{ex.Message}'"
                     + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
             };
+            */
         }
 
         public IEndpoint? GetEndpointById(Guid pairId)
@@ -149,7 +151,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         public NtTunnelInboundConfiguration CloneConfiguration()
         {
-            var tunnelConfiguration = new NtTunnelInboundConfiguration(TunnelId, Name, DataPort);
+            var tunnelConfiguration = new NtTunnelInboundConfiguration(TunnelId, Name);
 
             foreach (var endpoint in Endpoints)
             {

@@ -1,5 +1,5 @@
-﻿using NetTunnel.ClientAPI;
-using NetTunnel.Library;
+﻿using NetTunnel.Library;
+using NetTunnel.Library.Types;
 using NTDLS.Persistence;
 using NTDLS.WinFormsHelpers;
 
@@ -10,9 +10,7 @@ namespace NetTunnel.UI.Forms
         public string Address { get; private set; } = string.Empty;
         public string ServerURL { get; private set; } = string.Empty;
         public string Username { get; private set; } = string.Empty;
-        public string Password { get; private set; } = string.Empty;
-        public bool UseSSL { get; private set; }
-        public NtClient? Client { get; private set; }
+        public string PasswordHash { get; private set; } = string.Empty;
 
         public FormLogin()
         {
@@ -26,7 +24,6 @@ namespace NetTunnel.UI.Forms
             textBoxAddress.Text = preferences.Address;
             textBoxPort.Text = preferences.Port;
             textBoxUsername.Text = preferences.Username;
-            checkBoxUseSSL.Checked = preferences.UseSSL;
 
 #if DEBUG
             textBoxPassword.Text = "123456789";
@@ -41,55 +38,28 @@ namespace NetTunnel.UI.Forms
 
             try
             {
-                if (int.TryParse(textBoxPort.Text, out var port) == false)
-                    throw new Exception("Invalid port.");
+                int port = textBoxPort.GetAndValidateNumeric(1, 65535, "A port number between [min] and [max] is required.");
+                Username = textBoxUsername.GetAndValidateText("A username is required.");
+                PasswordHash = Utility.ComputeSha256Hash(textBoxPassword.Text);
+                Address = textBoxAddress.GetAndValidateText("A hostname or IP address is required.");
 
-                Username = textBoxUsername.Text;
-                Password = Utility.ComputeSha256Hash(textBoxPassword.Text);
-                UseSSL = checkBoxUseSSL.Checked;
-                Address = textBoxAddress.Text;
+                var client = ClientFactory.Establish(new NtServiceConfiguration(), Address, port, Username, PasswordHash);
 
-                if (UseSSL)
+                var preferences = new UILoginPreferences()
                 {
-                    ServerURL = $"https://{textBoxAddress.Text}:{port}/";
-                }
-                else
-                {
-                    ServerURL = $"http://{textBoxAddress.Text}:{port}/";
-                }
+                    Address = textBoxAddress.Text,
+                    Port = textBoxPort.Text,
+                    Username = textBoxUsername.Text,
+                };
 
-                var client = new NtClient(ServerURL);
-
-                client.Security.Login(Username, Password).ContinueWith(o =>
-                {
-                    if (!o.IsCompletedSuccessfully)
-                    {
-                        client.Dispose();
-                        this.InvokeMessageBox($"Login failed: {o.Exception?.Message}.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-
-                        buttonLogin.InvokeEnableControl(true);
-                        buttonCancel.InvokeEnableControl(true);
-
-                        return;
-                    }
-                    var preferences = new UILoginPreferences()
-                    {
-                        Address = textBoxAddress.Text,
-                        Port = textBoxPort.Text,
-                        Username = textBoxUsername.Text,
-                        UseSSL = checkBoxUseSSL.Checked
-                    };
-
-                    LocalUserApplicationData.SaveToDisk(Constants.FriendlyName, preferences);
-
-                    Client = client;
-
-                    this.InvokeClose(DialogResult.OK);
-                });
+                LocalUserApplicationData.SaveToDisk(Constants.FriendlyName, preferences);
+                this.InvokeClose(DialogResult.OK);
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK);
+                buttonLogin.InvokeEnableControl(true);
+                buttonCancel.InvokeEnableControl(true);
             }
         }
 

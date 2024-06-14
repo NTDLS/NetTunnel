@@ -6,7 +6,7 @@
 
         public string Name { get; set; } = string.Empty;
 
-        public int DataPort { get; set; }
+        public int DataPort { get; set; } //DELETEME
 
         public List<NtEndpointOutboundConfiguration> EndpointOutboundConfigurations { get; set; } = new();
 
@@ -16,16 +16,16 @@
         {
         }
 
-        public NtTunnelInboundConfiguration(Guid tunnelId, string name, int dataPort)
+        public NtTunnelInboundConfiguration(Guid tunnelId, string name)
         {
             TunnelId = tunnelId;
             Name = name;
-            DataPort = dataPort;
+
         }
 
         public NtTunnelInboundConfiguration Clone()
         {
-            return new NtTunnelInboundConfiguration(TunnelId, Name, DataPort);
+            return new NtTunnelInboundConfiguration(TunnelId, Name);
         }
     }
 }

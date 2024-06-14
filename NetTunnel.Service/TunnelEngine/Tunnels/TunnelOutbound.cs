@@ -4,7 +4,7 @@ using NetTunnel.Service.ReliableMessages;
 using NetTunnel.Service.ReliableMessages.Notification;
 using NetTunnel.Service.ReliableMessages.Query;
 using NetTunnel.Service.TunnelEngine.Endpoints;
-using NetTunnel.Service.TunnelEngine.Tunnels.MessageHandlers;
+using NetTunnel.Service.TunnelEngine.MessageHandlers;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
 using System.Net.Sockets;

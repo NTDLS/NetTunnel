@@ -1,7 +1,8 @@
-﻿using NTDLS.NullExtensions;
+﻿using NetTunnel.Service.TunnelEngine.Tunnels;
+using NTDLS.NullExtensions;
 using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Service.TunnelEngine.Tunnels.MessageHandlers
+namespace NetTunnel.Service.TunnelEngine.MessageHandlers
 {
     internal class TunnelMessageHandlerBase
     {
