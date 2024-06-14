@@ -45,24 +45,24 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
             return new QueryLoginReply(false);
         }
 
-        public GetOutboundTunnelsReply OnGetOutboundTunnels(RmContext context, QueryGetTunnels query)
+        public QueryGetTunnelsReply OnGetTunnels(RmContext context, QueryGetTunnels query)
         {
             var inboundTunnelContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
-            return new GetOutboundTunnelsReply
+            return new QueryGetTunnelsReply
             {
-                Collection = Singletons.Core.OutboundTunnels.CloneConfigurations(),
+                Collection = Singletons.Core.Tunnels.CloneConfigurations(),
             };
         }
 
-        public QueryCreateOutboundTunnelReply OnQueryCreateOutboundTunnel(RmContext context, QueryCreateTunnel query)
+        public QueryCreateTunnelReply OnQueryCreateTunnel(RmContext context, QueryCreateTunnel query)
         {
             var inboundTunnelContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
-            Singletons.Core.OutboundTunnels.Add(query.Configuration);
-            Singletons.Core.OutboundTunnels.SaveToDisk();
+            Singletons.Core.Tunnels.Add(query.Configuration);
+            Singletons.Core.Tunnels.SaveToDisk();
 
-            return new QueryCreateOutboundTunnelReply();
+            return new QueryCreateTunnelReply();
         }
     }
 }

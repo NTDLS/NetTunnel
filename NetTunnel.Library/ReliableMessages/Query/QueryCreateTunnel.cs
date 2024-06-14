@@ -3,7 +3,7 @@ using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Library.ReliableMessages.Query
 {
-    public class QueryCreateTunnel : IRmQuery<QueryCreateOutboundTunnelReply>
+    public class QueryCreateTunnel : IRmQuery<QueryCreateTunnelReply>
     {
         public NtTunnelConfiguration Configuration { get; set; }
 
@@ -14,9 +14,9 @@ namespace NetTunnel.Library.ReliableMessages.Query
 
     }
 
-    public class QueryCreateOutboundTunnelReply : IRmQueryReply
+    public class QueryCreateTunnelReply : IRmQueryReply
     {
-        public QueryCreateOutboundTunnelReply()
+        public QueryCreateTunnelReply()
         {
         }
     }

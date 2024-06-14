@@ -180,7 +180,6 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
             Text = "NetTunnel : Connect Tunnel";
-            Load += FormConnectTunnel_Load;
             groupBoxRemoteService.ResumeLayout(false);
             groupBoxRemoteService.PerformLayout();
             ResumeLayout(false);

@@ -314,7 +314,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             var endpoint = new EndpointInbound(Core, this, configuration);
             Endpoints.Add(endpoint);
-            Core.OutboundTunnels.SaveToDisk();
+            Core.Tunnels.SaveToDisk();
             return endpoint;
         }
 
@@ -328,7 +328,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             var endpoint = new EndpointOutbound(Core, this, configuration);
             Endpoints.Add(endpoint);
-            Core.OutboundTunnels.SaveToDisk();
+            Core.Tunnels.SaveToDisk();
             return endpoint;
         }
 
@@ -339,7 +339,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             {
                 endpoint.Stop();
                 Endpoints.Remove(endpoint);
-                Core.OutboundTunnels.SaveToDisk();
+                Core.Tunnels.SaveToDisk();
             }
         }
 

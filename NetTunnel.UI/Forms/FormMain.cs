@@ -643,17 +643,17 @@ namespace NetTunnel.UI.Forms
             listViewEndpoints.Items.Clear();
 
 
-            _client.GetOutboundTunnels().ContinueWith(t =>
+            _client.GetTunnels().ContinueWith(t =>
             {
-                t.Result.Collection.ForEach(t => AddOutboundTunnelToGrid(t));
+                t.Result.Collection.ForEach(t => AddTunnelToGrid(t));
             });
 
 
-            void AddOutboundTunnelToGrid(NtTunnelConfiguration tunnel)
+            void AddTunnelToGrid(NtTunnelConfiguration tunnel)
             {
                 if (listViewTunnels.InvokeRequired)
                 {
-                    listViewTunnels.Invoke(AddOutboundTunnelToGrid, tunnel);
+                    listViewTunnels.Invoke(AddTunnelToGrid, tunnel);
                 }
                 else
                 {

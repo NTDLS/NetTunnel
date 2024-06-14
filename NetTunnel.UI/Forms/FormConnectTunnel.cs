@@ -59,70 +59,11 @@ namespace NetTunnel.UI.Forms
 #endif
         }
 
-        private void FormConnectTunnel_Load(object sender, EventArgs e)
-        {
-        }
-
-        private void buttonAdd_Click(object sender, EventArgs e)
-        {
-            _client.EnsureNotNull();
-
-            try
-            {
-                textBoxName.GetAndValidateText("You must specify a name. This is for your identification only.");
-                textBoxRemoteAddress.GetAndValidateText("You must specify a remote tunnel address.");
-                textBoxManagementPort.GetAndValidateNumeric(1, 65535, "You must specify a valid remote tunnel management port between [min] and [max].");
-                textBoxRemoteUsername.GetAndValidateText("You must specify a remote tunnel username.");
-                textBoxRemotePassword.GetAndValidateText("You must specify a valid remote tunnel password.");
-
-                var tunnelId = Guid.NewGuid(); //The TunnelId is the same on both services.
-
-                var outboundTunnel = new NtTunnelConfiguration(tunnelId, textBoxName.Text,
-                    textBoxRemoteAddress.Text, textBoxManagementPort.ValueAs<int>(),
-                    textBoxRemoteUsername.Text, Utility.ComputeSha256Hash(textBoxRemotePassword.Text));
-
-                buttonConnect.InvokeEnableControl(false);
-                buttonCancel.InvokeEnableControl(false);
-
-                try
-                {
-                    var remoteClient = NtServiceClient.CreateAndLogin(outboundTunnel.Address,
-                        outboundTunnel.ManagementPort, outboundTunnel.Username, outboundTunnel.PasswordHash).ContinueWith(x =>
-                        {
-                            if (!x.IsCompletedSuccessfully)
-                            {
-                                this.InvokeMessageBox(x.Exception?.Message ?? "An unknown exception occurred.",
-                                    Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-
-                                buttonConnect.InvokeEnableControl(true);
-                                buttonCancel.InvokeEnableControl(true);
-                                return;
-                            }
-
-                            this.InvokeClose(DialogResult.OK);
-                        });
-
-                    //ConfigureTunnelPair(remoteClient, outboundTunnel, inboundTunnel);
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception($"Failed to login to the remote tunnel: {ex.Message}.");
-                }
-            }
-            catch (Exception ex)
-            {
-                buttonConnect.InvokeEnableControl(true);
-                buttonCancel.InvokeEnableControl(true);
-
-                MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK);
-            }
-        }
-
-        public void ConfigureTunnelPair(NtClient remoteClient, NtTunnelConfiguration outboundTunnel)
+        public void ConfigureTunnelPair(NtClient remoteClient, NtTunnelConfiguration tunnel)
         {
             /*
             //Add the outbound tunnel config to the local tunnel instance.
-            _client.EnsureNotNull().TunnelOutbound.Add(outboundTunnel).ContinueWith(t =>
+            _client.EnsureNotNull().TunnelOutbound.Add(tunnel).ContinueWith(t =>
             {
                 if (!t.IsCompletedSuccessfully)
                 {
@@ -137,7 +78,7 @@ namespace NetTunnel.UI.Forms
                     if (!t.IsCompletedSuccessfully)
                     {
                         //If we failed to create the remote tunnel config, remove the local config.
-                        _client.TunnelOutbound.Delete(outboundTunnel.TunnelId).ContinueWith(t =>
+                        _client.TunnelOutbound.Delete(tunnel.TunnelId).ContinueWith(t =>
                         {
                             buttonAdd.InvokeEnableControl(true);
                             this.InvokeMessageBox("Failed to create remote inbound tunnel.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
@@ -149,7 +90,7 @@ namespace NetTunnel.UI.Forms
                     remoteClient.TunnelInbound.Start(inboundTunnel.TunnelId).Wait();
 
                     //Start the outbound-connecting tunnel:
-                    _client.TunnelOutbound.Start(outboundTunnel.TunnelId).Wait();
+                    _client.TunnelOutbound.Start(tunnel.TunnelId).Wait();
 
                     this.InvokeClose(DialogResult.OK);
                 });
@@ -159,7 +100,57 @@ namespace NetTunnel.UI.Forms
 
         private void buttonConnect_Click(object sender, EventArgs e)
         {
+            _client.EnsureNotNull();
 
+            try
+            {
+                textBoxName.GetAndValidateText("You must specify a name. This is for your identification only.");
+                textBoxRemoteAddress.GetAndValidateText("You must specify a remote tunnel address.");
+                textBoxManagementPort.GetAndValidateNumeric(1, 65535, "You must specify a valid remote tunnel management port between [min] and [max].");
+                textBoxRemoteUsername.GetAndValidateText("You must specify a remote tunnel username.");
+                textBoxRemotePassword.GetAndValidateText("You must specify a valid remote tunnel password.");
+
+                var tunnelId = Guid.NewGuid(); //The TunnelId is the same on both services.
+
+                var tunnel = new NtTunnelConfiguration(tunnelId, textBoxName.Text,
+                    textBoxRemoteAddress.Text, textBoxManagementPort.ValueAs<int>(),
+                    textBoxRemoteUsername.Text, Utility.ComputeSha256Hash(textBoxRemotePassword.Text));
+
+                buttonConnect.InvokeEnableControl(false);
+                buttonCancel.InvokeEnableControl(false);
+
+                try
+                {
+                    var remoteClient = NtServiceClient.CreateAndLogin(tunnel.Address,
+                        tunnel.ManagementPort, tunnel.Username, tunnel.PasswordHash).ContinueWith(x =>
+                        {
+                            if (!x.IsCompletedSuccessfully)
+                            {
+                                this.InvokeMessageBox(x.Exception?.Message ?? "An unknown exception occurred.",
+                                    Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+
+                                buttonConnect.InvokeEnableControl(true);
+                                buttonCancel.InvokeEnableControl(true);
+                                return;
+                            }
+
+                            this.InvokeClose(DialogResult.OK);
+                        });
+
+                    //ConfigureTunnelPair(remoteClient, tunnel, inboundTunnel);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Failed to login to the remote tunnel: {ex.Message}.");
+                }
+            }
+            catch (Exception ex)
+            {
+                buttonConnect.InvokeEnableControl(true);
+                buttonCancel.InvokeEnableControl(true);
+
+                MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK);
+            }
         }
     }
 }

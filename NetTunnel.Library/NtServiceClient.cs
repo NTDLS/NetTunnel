@@ -49,8 +49,8 @@ namespace NetTunnel.Library
             //We received a reply to the secure key exchange, apply it.
             compoundNegotiator.ApplyNegotiationResponseToken(queryRequestKeyExchangeReply.NegotiationToken);
 
-            var outboundTunnelConnection = new ClientConnectionContext(queryRequestKeyExchangeReply.ConnectionId);
-            client.Parameter = outboundTunnelConnection;
+            var tunnelConnection = new ClientConnectionContext(queryRequestKeyExchangeReply.ConnectionId);
+            client.Parameter = tunnelConnection;
 
             //Prop up encryption.
             var cryptographyProvider = new ClientCryptographyProvider(compoundNegotiator.SharedSecret);
@@ -71,7 +71,7 @@ namespace NetTunnel.Library
 
         #endregion
 
-        public async Task<GetOutboundTunnelsReply> GetOutboundTunnels()
+        public async Task<QueryGetTunnelsReply> GetTunnels()
         {
             return await Client.Query(new QueryGetTunnels());
         }
