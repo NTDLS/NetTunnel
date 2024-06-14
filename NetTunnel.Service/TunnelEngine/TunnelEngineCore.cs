@@ -1,9 +1,11 @@
 ﻿using NetTunnel.Service.TunnelEngine.Managers;
+using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Service.TunnelEngine
 {
     internal class TunnelEngineCore
     {
+        public RmServer CoreServer { get; private set; }
         public Logger Logging { get; set; }
         public UserSessionManager Sessions { get; set; }
         public TunnelOutboundManager OutboundTunnels { get; set; }
@@ -12,6 +14,8 @@ namespace NetTunnel.Service.TunnelEngine
 
         public TunnelEngineCore()
         {
+            CoreServer = new RmServer();
+
             Logging = new(this);
             Sessions = new(this);
             OutboundTunnels = new(this);
@@ -21,6 +25,8 @@ namespace NetTunnel.Service.TunnelEngine
 
         public void Start()
         {
+            CoreServer.Start(Singletons.Configuration.ManagementPort);
+
             InboundTunnels.StartAll();
             OutboundTunnels.StartAll();
         }
@@ -29,6 +35,8 @@ namespace NetTunnel.Service.TunnelEngine
         {
             InboundTunnels.StopAll();
             OutboundTunnels.StopAll();
+
+            CoreServer.Stop();
         }
     }
 }
