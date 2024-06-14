@@ -8,8 +8,7 @@
         public int ManagementPort { get; set; }
         public string Username { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
-        public List<NtEndpointOutboundConfiguration> EndpointOutboundConfigurations { get; set; } = new();
-        public List<NtEndpointInboundConfiguration> EndpointInboundConfigurations { get; set; } = new();
+        public List<NtEndpointConfiguration> EndpointConfigurations { get; set; } = new();
 
         public NtTunnelOutboundConfiguration()
         {

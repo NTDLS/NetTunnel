@@ -4,7 +4,6 @@
     {
         public Guid TunnelId { get; }
         public string Name { get; }
-        public List<NtEndpointOutboundConfiguration> EndpointOutboundConfigurations { get; }
-        public List<NtEndpointInboundConfiguration> EndpointInboundConfigurations { get; }
+        public List<NtEndpointConfiguration> EndpointConfigurations { get; }
     }
 }

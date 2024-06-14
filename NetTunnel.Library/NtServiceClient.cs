@@ -2,8 +2,6 @@
 using NetTunnel.Library.ReliableMessages.Query;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.ReliableMessages;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
 

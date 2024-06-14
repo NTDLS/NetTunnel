@@ -6,9 +6,9 @@
 
         public string Name { get; set; } = string.Empty;
 
-        public List<NtEndpointOutboundConfiguration> EndpointOutboundConfigurations { get; set; } = new();
+        public List<NtEndpointConfiguration> EndpointOutboundConfigurations { get; set; } = new();
 
-        public List<NtEndpointInboundConfiguration> EndpointInboundConfigurations { get; set; } = new();
+        public List<NtEndpointConfiguration> EndpointConfigurations { get; set; } = new();
 
         public NtTunnelInboundConfiguration()
         {

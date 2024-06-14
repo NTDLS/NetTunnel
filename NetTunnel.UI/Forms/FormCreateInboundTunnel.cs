@@ -1,9 +1,7 @@
 ﻿using NetTunnel.Library;
-using NetTunnel.Library.ReliableMessages.Query;
 using NetTunnel.Library.Types;
 using NTDLS.NullExtensions;
 using NTDLS.WinFormsHelpers;
-using System.Configuration;
 
 namespace NetTunnel.UI.Forms
 {

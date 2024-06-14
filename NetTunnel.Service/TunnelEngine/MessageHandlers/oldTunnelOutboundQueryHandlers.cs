@@ -1,7 +1,4 @@
-﻿using NetTunnel.Service.ReliableMessages.Query;
-using NetTunnel.Service.ReliableMessages.Query.Reply;
-using NetTunnel.Service.TunnelEngine.Tunnels;
-using NTDLS.ReliableMessaging;
+﻿using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Service.TunnelEngine.MessageHandlers
 {

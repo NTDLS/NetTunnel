@@ -7,6 +7,7 @@ namespace NetTunnel.Library.Types
     {
         public Guid EndpointId { get; }
         public Guid TunnelId { get; }
+        public NtDirection Direction { get; }
         public string Name { get; }
         public string OutboundAddress { get; }
         public int InboundPort { get; }

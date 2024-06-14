@@ -1,9 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NetTunnel.Service.ReliableMessages;
 using NetTunnel.Service.TunnelEngine.Endpoints;
-using NTDLS.NullExtensions;
-using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels
@@ -51,7 +48,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             TunnelId = configuration.TunnelId;
             Name = configuration.Name;
 
-            configuration.EndpointInboundConfigurations.ForEach(o => Endpoints.Add(new EndpointInbound(Core, this, o)));
+            configuration.EndpointConfigurations.ForEach(o => Endpoints.Add(new EndpointInbound(Core, this, o)));
             configuration.EndpointOutboundConfigurations.ForEach(o => Endpoints.Add(new EndpointOutbound(Core, this, o)));
 
             _heartbeatThread = new Thread(HeartbeatThreadProc);
@@ -92,17 +89,17 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             {
                 if (endpoint is EndpointInbound ibe)
                 {
-                    var endpointConfiguration = new NtEndpointInboundConfiguration(TunnelId,
-                        ibe.EndpointId, ibe.Configuration.Name, ibe.Configuration.OutboundAddress,
+                    var endpointConfiguration = new NtEndpointConfiguration(TunnelId,
+                        ibe.EndpointId, NtDirection.Inbound, ibe.Configuration.Name, ibe.Configuration.OutboundAddress,
                         ibe.Configuration.InboundPort, ibe.Configuration.OutboundPort,
                         ibe.Configuration.HttpHeaderRules, ibe.Configuration.TrafficType);
 
-                    tunnelConfiguration.EndpointInboundConfigurations.Add(endpointConfiguration);
+                    tunnelConfiguration.EndpointConfigurations.Add(endpointConfiguration);
                 }
                 else if (endpoint is EndpointOutbound obe)
                 {
-                    var endpointConfiguration = new NtEndpointOutboundConfiguration(TunnelId,
-                        obe.EndpointId, obe.Configuration.Name, obe.Configuration.OutboundAddress,
+                    var endpointConfiguration = new NtEndpointConfiguration(TunnelId,
+                        obe.EndpointId, NtDirection.Outbound, obe.Configuration.Name, obe.Configuration.OutboundAddress,
                         obe.Configuration.InboundPort, obe.Configuration.OutboundPort,
                         obe.Configuration.HttpHeaderRules, obe.Configuration.TrafficType);
 

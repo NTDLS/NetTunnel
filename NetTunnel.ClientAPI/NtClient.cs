@@ -1,11 +1,8 @@
-﻿using NetTunnel.Library;
-using NetTunnel.Library.Exceptions;
-using NTDLS.NullExtensions;
-
-namespace NetTunnel.ClientAPI
+﻿namespace NetTunnel.ClientAPI
 {
-    public class NtClient : IDisposable
+    public class NtClient
     {
+        /*
         public bool AutoAcceptSSLCertificate { get; set; } = true;
         public bool IsConnected => _connection != null;
         public string Address { get; private set; }
@@ -154,5 +151,6 @@ namespace NetTunnel.ClientAPI
         }
 
         #endregion
+        */
     }
 }

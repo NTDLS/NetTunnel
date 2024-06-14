@@ -1,7 +1,4 @@
-﻿using NetTunnel.Library.Types;
-using NetTunnel.Service.TunnelEngine;
-
-namespace NetTunnel.Service.Controllers
+﻿namespace NetTunnel.Service.Controllers
 {
     public class ControllerBase
     {

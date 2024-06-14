@@ -8,14 +8,14 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormCreateOutboundTunnel : Form
     {
-        private readonly Library.NtServiceClient? _client;
+        private readonly NtServiceClient? _client;
 
         public FormCreateOutboundTunnel()
         {
             InitializeComponent();
         }
 
-        public FormCreateOutboundTunnel(Library.NtServiceClient client)
+        public FormCreateOutboundTunnel(NtServiceClient client)
         {
             InitializeComponent();
 
@@ -83,38 +83,13 @@ namespace NetTunnel.UI.Forms
                 buttonAdd.InvokeEnableControl(false);
                 buttonCancel.InvokeEnableControl(false);
 
-                NtClient remoteClient;
-
                 try
                 {
-                    remoteClient = new NtClient($"https://{outboundTunnel.Address}:{outboundTunnel.ManagementPort}/");
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception($"Failed to connect to the remote tunnel: {ex.Message}.");
-                }
+                    var remoteClient = NtServiceClient.CreateAndLogin(outboundTunnel.Address,
+                        outboundTunnel.ManagementPort, outboundTunnel.Username, outboundTunnel.PasswordHash);
 
-                try
-                {
-                    //Log into the remote tunnel.
-                    remoteClient.Security.Login(outboundTunnel.Username, outboundTunnel.PasswordHash).ContinueWith(o =>
-                    {
-                        if (!o.IsCompletedSuccessfully)
-                        {
-                            remoteClient.Dispose();
-                            this.InvokeMessageBox($"Login failed: {o.Exception?.Message}.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 
-                            buttonAdd.InvokeEnableControl(true);
-                            buttonCancel.InvokeEnableControl(true);
-
-                            return;
-                        }
-
-                        ConfigureTunnelPair(remoteClient, outboundTunnel, inboundTunnel);
-
-                        this.InvokeClose(DialogResult.OK);
-                    });
-
+                    //ConfigureTunnelPair(remoteClient, outboundTunnel, inboundTunnel);
                 }
                 catch (Exception ex)
                 {

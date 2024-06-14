@@ -1,5 +1,4 @@
 ﻿using NetTunnel.Service.TunnelEngine.Endpoints;
-using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Tunnels

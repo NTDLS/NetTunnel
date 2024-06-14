@@ -1,10 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NetTunnel.ClientAPI.Payload;
-using NetTunnel.Library.Types;
-using NetTunnel.Service.ReliableMessages.Query.Reply;
-using NetTunnel.Service.TunnelEngine;
-using Newtonsoft.Json;
-using NTDLS.NullExtensions;
 
 namespace NetTunnel.Service.Controllers
 {
@@ -13,223 +7,223 @@ namespace NetTunnel.Service.Controllers
     public class TunnelOutboundController(IHttpContextAccessor httpContextAccessor)
         : ControllerBase(httpContextAccessor)
     {
-/*
-        [HttpGet]
-        [Route("{sessionId}/List")]
-        public NtActionResponseTunnelsOutbound List(Guid sessionId)
-        {
-            try
-            {
-                ValidateAndEnforceLoginSession(sessionId);
-
-                return new NtActionResponseTunnelsOutbound
+        /*
+                [HttpGet]
+                [Route("{sessionId}/List")]
+                public NtActionResponseTunnelsOutbound List(Guid sessionId)
                 {
-                    Collection = Singletons.Core.OutboundTunnels.CloneConfigurations(),
-                    Success = true
-                };
-            }
-            catch (Exception ex)
-            {
-                return new NtActionResponseTunnelsOutbound(ex);
-            }
-        }
+                    try
+                    {
+                        ValidateAndEnforceLoginSession(sessionId);
 
-        [HttpGet]
-        [Route("{sessionId}/Delete/{tunnelId}")]
-        public NtActionResponse Delete(Guid sessionId, Guid tunnelId)
-        {
-            try
-            {
-                ValidateAndEnforceLoginSession(sessionId);
+                        return new NtActionResponseTunnelsOutbound
+                        {
+                            Collection = Singletons.Core.OutboundTunnels.CloneConfigurations(),
+                            Success = true
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        return new NtActionResponseTunnelsOutbound(ex);
+                    }
+                }
 
-                Singletons.Core.OutboundTunnels.Delete(tunnelId);
-                Singletons.Core.OutboundTunnels.SaveToDisk();
+                [HttpGet]
+                [Route("{sessionId}/Delete/{tunnelId}")]
+                public NtActionResponse Delete(Guid sessionId, Guid tunnelId)
+                {
+                    try
+                    {
+                        ValidateAndEnforceLoginSession(sessionId);
 
-                return new NtActionResponse { Success = true };
-            }
-            catch (Exception ex)
-            {
-                return new NtActionResponseTunnelsInbound(ex);
-            }
-        }
+                        Singletons.Core.OutboundTunnels.Delete(tunnelId);
+                        Singletons.Core.OutboundTunnels.SaveToDisk();
 
-        [HttpGet]
-        [Route("{sessionId}/DeletePair/{tunnelId}")]
-        public NtActionResponse DeletePair(Guid sessionId, Guid tunnelId)
-        {
-            try
-            {
-                ValidateAndEnforceLoginSession(sessionId);
+                        return new NtActionResponse { Success = true };
+                    }
+                    catch (Exception ex)
+                    {
+                        return new NtActionResponseTunnelsInbound(ex);
+                    }
+                }
 
-                Singletons.Core.OutboundTunnels.DeletePair(tunnelId);
-                Singletons.Core.OutboundTunnels.SaveToDisk();
+                [HttpGet]
+                [Route("{sessionId}/DeletePair/{tunnelId}")]
+                public NtActionResponse DeletePair(Guid sessionId, Guid tunnelId)
+                {
+                    try
+                    {
+                        ValidateAndEnforceLoginSession(sessionId);
 
-                return new NtActionResponse { Success = true };
-            }
-            catch (Exception ex)
-            {
-                return new NtActionResponseTunnelsInbound(ex);
-            }
-        }
+                        Singletons.Core.OutboundTunnels.DeletePair(tunnelId);
+                        Singletons.Core.OutboundTunnels.SaveToDisk();
 
-        [HttpGet]
-        [Route("{sessionId}/Start/{tunnelId}")]
-        public NtActionResponse Start(Guid sessionId, Guid tunnelId)
-        {
-            try
-            {
-                ValidateAndEnforceLoginSession(sessionId);
+                        return new NtActionResponse { Success = true };
+                    }
+                    catch (Exception ex)
+                    {
+                        return new NtActionResponseTunnelsInbound(ex);
+                    }
+                }
 
-                Singletons.Core.OutboundTunnels.Start(tunnelId);
+                [HttpGet]
+                [Route("{sessionId}/Start/{tunnelId}")]
+                public NtActionResponse Start(Guid sessionId, Guid tunnelId)
+                {
+                    try
+                    {
+                        ValidateAndEnforceLoginSession(sessionId);
 
-                return new NtActionResponse { Success = true };
-            }
-            catch (Exception ex)
-            {
-                return new NtActionResponseTunnelsInbound(ex);
-            }
-        }
+                        Singletons.Core.OutboundTunnels.Start(tunnelId);
 
-        [HttpGet]
-        [Route("{sessionId}/Stop/{tunnelId}")]
-        public NtActionResponse Stop(Guid sessionId, Guid tunnelId)
-        {
-            try
-            {
-                ValidateAndEnforceLoginSession(sessionId);
+                        return new NtActionResponse { Success = true };
+                    }
+                    catch (Exception ex)
+                    {
+                        return new NtActionResponseTunnelsInbound(ex);
+                    }
+                }
 
-                Singletons.Core.OutboundTunnels.Stop(tunnelId);
+                [HttpGet]
+                [Route("{sessionId}/Stop/{tunnelId}")]
+                public NtActionResponse Stop(Guid sessionId, Guid tunnelId)
+                {
+                    try
+                    {
+                        ValidateAndEnforceLoginSession(sessionId);
 
-                return new NtActionResponse { Success = true };
-            }
-            catch (Exception ex)
-            {
-                return new NtActionResponseTunnelsInbound(ex);
-            }
-        }
+                        Singletons.Core.OutboundTunnels.Stop(tunnelId);
 
-        /// <summary>
-        /// This is called locally to add a local listening tunnel. This is the tunnel that may be behind a firewall.
-        /// </summary>
-        /// <param name="sessionId"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("{sessionId}/Add")]
-        public NtActionResponse Add(Guid sessionId, [FromBody] string value)
-        {
-            try
-            {
-                ValidateAndEnforceLoginSession(sessionId);
+                        return new NtActionResponse { Success = true };
+                    }
+                    catch (Exception ex)
+                    {
+                        return new NtActionResponseTunnelsInbound(ex);
+                    }
+                }
 
-                var tunnel = JsonConvert.DeserializeObject<NtTunnelOutboundConfiguration>(value).EnsureNotNull();
+                /// <summary>
+                /// This is called locally to add a local listening tunnel. This is the tunnel that may be behind a firewall.
+                /// </summary>
+                /// <param name="sessionId"></param>
+                /// <param name="value"></param>
+                /// <returns></returns>
+                [HttpPost]
+                [Route("{sessionId}/Add")]
+                public NtActionResponse Add(Guid sessionId, [FromBody] string value)
+                {
+                    try
+                    {
+                        ValidateAndEnforceLoginSession(sessionId);
 
-                Singletons.Core.OutboundTunnels.Add(tunnel);
-                Singletons.Core.OutboundTunnels.SaveToDisk();
+                        var tunnel = JsonConvert.DeserializeObject<NtTunnelOutboundConfiguration>(value).EnsureNotNull();
 
-                return new NtActionResponse { Success = true };
-            }
-            catch (Exception ex)
-            {
-                return new NtActionResponse(ex);
-            }
-        }
+                        Singletons.Core.OutboundTunnels.Add(tunnel);
+                        Singletons.Core.OutboundTunnels.SaveToDisk();
 
-        [HttpPost]
-        [Route("{sessionId}/UpsertEndpointInboundPair/{tunnelId}")]
-        public async Task<NtActionResponse> UpsertEndpointInboundPair(Guid sessionId, Guid tunnelId, [FromBody] string value)
-        {
-            try
-            {
-                ValidateAndEnforceLoginSession(sessionId);
+                        return new NtActionResponse { Success = true };
+                    }
+                    catch (Exception ex)
+                    {
+                        return new NtActionResponse(ex);
+                    }
+                }
 
-                var endpoint = JsonConvert.DeserializeObject<NtEndpointPairConfiguration>(value).EnsureNotNull();
+                [HttpPost]
+                [Route("{sessionId}/UpsertEndpointInboundPair/{tunnelId}")]
+                public async Task<NtActionResponse> UpsertEndpointInboundPair(Guid sessionId, Guid tunnelId, [FromBody] string value)
+                {
+                    try
+                    {
+                        ValidateAndEnforceLoginSession(sessionId);
 
-                //Add the inbound endpoint to the local tunnel.
-                Singletons.Core.OutboundTunnels.UpsertEndpointInbound(tunnelId, endpoint.Inbound);
-                Singletons.Core.OutboundTunnels.SaveToDisk();
+                        var endpoint = JsonConvert.DeserializeObject<NtEndpointPairConfiguration>(value).EnsureNotNull();
 
-                //Since we have a tunnel, we will communicate the alteration of endpoints though the tunnel.
-                var result = await Singletons.Core.OutboundTunnels
-                    .DispatchUpsertEndpointOutboundToAssociatedTunnelService<oldQueryReplyPayloadBoolean>(tunnelId, endpoint.Outbound);
+                        //Add the inbound endpoint to the local tunnel.
+                        Singletons.Core.OutboundTunnels.UpsertEndpointInbound(tunnelId, endpoint.Inbound);
+                        Singletons.Core.OutboundTunnels.SaveToDisk();
 
-                return new NtActionResponse { Success = result?.Value ?? false };
-            }
-            catch (Exception ex)
-            {
-                return new NtActionResponse(ex);
-            }
-        }
+                        //Since we have a tunnel, we will communicate the alteration of endpoints though the tunnel.
+                        var result = await Singletons.Core.OutboundTunnels
+                            .DispatchUpsertEndpointOutboundToAssociatedTunnelService<oldQueryReplyPayloadBoolean>(tunnelId, endpoint.Outbound);
 
-        [HttpPost]
-        [Route("{sessionId}/UpsertEndpointOutboundPair/{tunnelId}")]
-        public async Task<NtActionResponse> UpsertEndpointOutboundPair(Guid sessionId, Guid tunnelId, [FromBody] string value)
-        {
-            try
-            {
-                ValidateAndEnforceLoginSession(sessionId);
+                        return new NtActionResponse { Success = result?.Value ?? false };
+                    }
+                    catch (Exception ex)
+                    {
+                        return new NtActionResponse(ex);
+                    }
+                }
 
-                var endpoint = JsonConvert.DeserializeObject<NtEndpointPairConfiguration>(value).EnsureNotNull();
+                [HttpPost]
+                [Route("{sessionId}/UpsertEndpointOutboundPair/{tunnelId}")]
+                public async Task<NtActionResponse> UpsertEndpointOutboundPair(Guid sessionId, Guid tunnelId, [FromBody] string value)
+                {
+                    try
+                    {
+                        ValidateAndEnforceLoginSession(sessionId);
 
-                //Add the Outbound endpoint to the local tunnel.
-                Singletons.Core.OutboundTunnels.UpsertEndpointOutbound(tunnelId, endpoint.Outbound);
-                Singletons.Core.OutboundTunnels.SaveToDisk();
+                        var endpoint = JsonConvert.DeserializeObject<NtEndpointPairConfiguration>(value).EnsureNotNull();
 
-                //Since we have a tunnel, we will communicate the alteration of endpoints though the tunnel.
-                var result = await Singletons.Core.OutboundTunnels
-                    .DispatchUpsertEndpointInboundToAssociatedTunnelService<oldQueryReplyPayloadBoolean>(tunnelId, endpoint.Inbound);
+                        //Add the Outbound endpoint to the local tunnel.
+                        Singletons.Core.OutboundTunnels.UpsertEndpointOutbound(tunnelId, endpoint.Outbound);
+                        Singletons.Core.OutboundTunnels.SaveToDisk();
 
-                return new NtActionResponse { Success = result?.Value ?? false };
-            }
-            catch (Exception ex)
-            {
-                return new NtActionResponse(ex);
-            }
-        }
+                        //Since we have a tunnel, we will communicate the alteration of endpoints though the tunnel.
+                        var result = await Singletons.Core.OutboundTunnels
+                            .DispatchUpsertEndpointInboundToAssociatedTunnelService<oldQueryReplyPayloadBoolean>(tunnelId, endpoint.Inbound);
 
-        [HttpGet]
-        [Route("{sessionId}/DeleteEndpointPair/{tunnelId}/{endpointId}")]
-        public async Task<NtActionResponse> DeleteEndpointPair(Guid sessionId, Guid tunnelId, Guid endpointId)
-        {
-            try
-            {
-                ValidateAndEnforceLoginSession(sessionId);
+                        return new NtActionResponse { Success = result?.Value ?? false };
+                    }
+                    catch (Exception ex)
+                    {
+                        return new NtActionResponse(ex);
+                    }
+                }
 
-                //Remove the the endpoint to the local tunnel.
-                Singletons.Core.OutboundTunnels.DeleteEndpoint(tunnelId, endpointId);
-                Singletons.Core.OutboundTunnels.SaveToDisk();
+                [HttpGet]
+                [Route("{sessionId}/DeleteEndpointPair/{tunnelId}/{endpointId}")]
+                public async Task<NtActionResponse> DeleteEndpointPair(Guid sessionId, Guid tunnelId, Guid endpointId)
+                {
+                    try
+                    {
+                        ValidateAndEnforceLoginSession(sessionId);
 
-                //Since we have a tunnel, we will communicate the alteration of endpoints though the tunnel.
-                var result = await Singletons.Core.OutboundTunnels
-                    .DispatchDeleteEndpointToAssociatedTunnelService<oldQueryReplyPayloadBoolean>(tunnelId, endpointId);
+                        //Remove the the endpoint to the local tunnel.
+                        Singletons.Core.OutboundTunnels.DeleteEndpoint(tunnelId, endpointId);
+                        Singletons.Core.OutboundTunnels.SaveToDisk();
 
-                return new NtActionResponse { Success = result?.Value ?? false };
-            }
-            catch (Exception ex)
-            {
-                return new NtActionResponse(ex);
-            }
-        }
+                        //Since we have a tunnel, we will communicate the alteration of endpoints though the tunnel.
+                        var result = await Singletons.Core.OutboundTunnels
+                            .DispatchDeleteEndpointToAssociatedTunnelService<oldQueryReplyPayloadBoolean>(tunnelId, endpointId);
 
-        [HttpGet]
-        [Route("{sessionId}/DeleteEndpoint/{tunnelId}/{endpointId}")]
-        public NtActionResponse DeleteEndpoint(Guid sessionId, Guid tunnelId, Guid endpointId)
-        {
-            try
-            {
-                ValidateAndEnforceLoginSession(sessionId);
+                        return new NtActionResponse { Success = result?.Value ?? false };
+                    }
+                    catch (Exception ex)
+                    {
+                        return new NtActionResponse(ex);
+                    }
+                }
 
-                //Remove the the endpoint to the local tunnel.
-                Singletons.Core.OutboundTunnels.DeleteEndpoint(tunnelId, endpointId);
-                Singletons.Core.OutboundTunnels.SaveToDisk();
+                [HttpGet]
+                [Route("{sessionId}/DeleteEndpoint/{tunnelId}/{endpointId}")]
+                public NtActionResponse DeleteEndpoint(Guid sessionId, Guid tunnelId, Guid endpointId)
+                {
+                    try
+                    {
+                        ValidateAndEnforceLoginSession(sessionId);
 
-                return new NtActionResponse { Success = true };
-            }
-            catch (Exception ex)
-            {
-                return new NtActionResponse(ex);
-            }
-        }
-*/
+                        //Remove the the endpoint to the local tunnel.
+                        Singletons.Core.OutboundTunnels.DeleteEndpoint(tunnelId, endpointId);
+                        Singletons.Core.OutboundTunnels.SaveToDisk();
+
+                        return new NtActionResponse { Success = true };
+                    }
+                    catch (Exception ex)
+                    {
+                        return new NtActionResponse(ex);
+                    }
+                }
+        */
     }
 }

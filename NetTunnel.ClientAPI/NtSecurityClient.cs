@@ -1,13 +1,8 @@
-﻿using NetTunnel.ClientAPI.Payload;
-using NetTunnel.Library.Exceptions;
-using NetTunnel.Service;
-using Newtonsoft.Json;
-using System.Text;
-
-namespace NetTunnel.ClientAPI
+﻿namespace NetTunnel.ClientAPI
 {
     public class NtSecurityClient
     {
+        /*
         private readonly NtClient _client;
 
         public NtSecurityClient(NtClient client)
@@ -102,6 +97,7 @@ namespace NetTunnel.ClientAPI
                 throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
             }
         }
+        */
     }
 }
 

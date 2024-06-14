@@ -1,5 +1,4 @@
-﻿using NetTunnel.ClientAPI;
-using NetTunnel.Library;
+﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NTDLS.NullExtensions;
 using NTDLS.WinFormsHelpers;
@@ -26,19 +25,7 @@ namespace NetTunnel.UI.Forms
             _client = client;
             _tunnel = tunnel;
             _existingEndpoint = existingEndpoint;
-
-            if (existingEndpoint is NtEndpointInboundConfiguration)
-            {
-                _direction = NtDirection.Inbound;
-            }
-            else if (existingEndpoint is NtEndpointOutboundConfiguration)
-            {
-                _direction = NtDirection.Outbound;
-            }
-            else
-            {
-                throw new Exception("Unknown endpoint type.");
-            }
+            _direction = existingEndpoint.Direction;
 
             PopulateForm();
         }
@@ -152,18 +139,17 @@ namespace NetTunnel.UI.Forms
 
                 buttonSave.InvokeEnableControl(false);
 
-                /*
                 var endpointId = _existingEndpoint?.EndpointId ?? Guid.NewGuid(); //The endpointId is the same on both services.
 
-                var endpointInbound = new NtEndpointInboundConfiguration(_tunnel.TunnelId, endpointId,
+                var inboundEndpoint = new NtEndpointConfiguration(_tunnel.TunnelId, endpointId, NtDirection.Inbound,
                     textBoxName.Text, textBoxOutboundAddress.Text, textBoxInboundPort.ValueAs<int>(),
                     textBoxOutboundPort.ValueAs<int>(), endpointHttpHeaderRules, Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"));
 
-                var endpointOutbound = new NtEndpointOutboundConfiguration(_tunnel.TunnelId, endpointId,
+                var outboundEndpoint = new NtEndpointConfiguration(_tunnel.TunnelId, endpointId, NtDirection.Outbound,
                     textBoxName.Text, textBoxOutboundAddress.Text, textBoxInboundPort.ValueAs<int>(),
                     textBoxOutboundPort.ValueAs<int>(), endpointHttpHeaderRules, Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"));
 
-
+                /*
                 if (_tunnel is NtTunnelInboundConfiguration)
                 {
                     if (_direction == NtDirection.Inbound)

@@ -13,7 +13,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         public override int GetHashCode()
             => Configuration.GetHashCode();
 
-        public EndpointOutbound(TunnelEngineCore core, ITunnel tunnel, NtEndpointOutboundConfiguration configuration)
+        public EndpointOutbound(TunnelEngineCore core, ITunnel tunnel, NtEndpointConfiguration configuration)
             : base(core, tunnel, configuration.EndpointId, configuration)
         {
         }

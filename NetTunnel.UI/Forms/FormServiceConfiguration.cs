@@ -1,7 +1,5 @@
-﻿using NetTunnel.ClientAPI;
-using NetTunnel.Library;
+﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NTDLS.NullExtensions;
 using NTDLS.WinFormsHelpers;
 
 namespace NetTunnel.UI.Forms

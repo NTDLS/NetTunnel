@@ -1,10 +1,7 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NetTunnel.Service.ReliableMessages.Query;
 using NetTunnel.Service.TunnelEngine.Tunnels;
-using NTDLS.NullExtensions;
 using NTDLS.Persistence;
-using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Service.TunnelEngine.Managers
 {

@@ -1,5 +1,4 @@
-﻿using NetTunnel.ClientAPI;
-using NetTunnel.Library.Types;
+﻿using NetTunnel.Library.Types;
 using NetTunnel.UI.Helpers;
 using NTDLS.NullExtensions;
 using NTDLS.WinFormsHelpers;
@@ -162,7 +161,7 @@ namespace NetTunnel.UI.Forms
                         {
                             var endpoint = ((INtEndpointConfiguration?)item.Tag).EnsureNotNull();
 
-                            var direction = (endpoint is NtEndpointInboundConfiguration) ? NtDirection.Inbound : NtDirection.Outbound;
+                            var direction = (endpoint is NtEndpointConfiguration) ? NtDirection.Inbound : NtDirection.Outbound;
 
                             var tunnelStats = statistics.Where(o => o.TunnelId == endpoint.TunnelId).ToList();
                             if (tunnelStats != null)
@@ -676,14 +675,11 @@ namespace NetTunnel.UI.Forms
                 }
                 else
                 {
-                    int endpointCount = tunnel.EndpointOutboundConfigurations.Count
-                        + tunnel.EndpointInboundConfigurations.Count;
-
                     var item = new ListViewItem(tunnel.Name);
                     item.Tag = tunnel;
                     item.SubItems.Add("Inbound");
                     item.SubItems.Add($"*");
-                    item.SubItems.Add($"{endpointCount:n0}");
+                    item.SubItems.Add($"{tunnel.EndpointConfigurations.Count:n0}");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
@@ -699,14 +695,11 @@ namespace NetTunnel.UI.Forms
                 }
                 else
                 {
-                    int endpointCount = tunnel.EndpointOutboundConfigurations.Count
-                        + tunnel.EndpointInboundConfigurations.Count;
-
                     var item = new ListViewItem(tunnel.Name);
                     item.Tag = tunnel;
                     item.SubItems.Add("Outbound");
                     item.SubItems.Add($"{tunnel.Address}");
-                    item.SubItems.Add($"{endpointCount:n0}");
+                    item.SubItems.Add($"{tunnel.EndpointConfigurations.Count:n0}");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
@@ -738,10 +731,13 @@ namespace NetTunnel.UI.Forms
         {
             listViewEndpoints.Items.Clear();
 
-            tunnelInbound.EndpointInboundConfigurations.ForEach(x => AddEndpointInboundToGrid(x));
-            tunnelInbound.EndpointOutboundConfigurations.ForEach(x => AddEndpointOutboundToGrid(x));
+            tunnelInbound.EndpointConfigurations.Where(o => o.Direction == NtDirection.Inbound)
+                .ToList().ForEach(x => AddEndpointInboundToGrid(x));
 
-            void AddEndpointInboundToGrid(NtEndpointInboundConfiguration endpoint)
+            tunnelInbound.EndpointConfigurations.Where(o => o.Direction == NtDirection.Outbound)
+                .ToList().ForEach(x => AddEndpointOutboundToGrid(x));
+
+            void AddEndpointInboundToGrid(NtEndpointConfiguration endpoint)
             {
                 if (listViewEndpoints.InvokeRequired)
                 {
@@ -762,7 +758,7 @@ namespace NetTunnel.UI.Forms
                 }
             }
 
-            void AddEndpointOutboundToGrid(NtEndpointOutboundConfiguration endpoint)
+            void AddEndpointOutboundToGrid(NtEndpointConfiguration endpoint)
             {
                 if (listViewEndpoints.InvokeRequired)
                 {

@@ -1,8 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.ReliableMessages;
-using NetTunnel.Service.ReliableMessages.Notification;
-using NetTunnel.Service.ReliableMessages.Query;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NetTunnel.Service.TunnelEngine.MessageHandlers;
 using NTDLS.ReliableMessaging;
@@ -66,8 +64,11 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             TunnelId = configuration.TunnelId;
             Name = configuration.Name;
 
-            configuration.EndpointInboundConfigurations.ForEach(o => Endpoints.Add(new EndpointInbound(Core, this, o)));
-            configuration.EndpointOutboundConfigurations.ForEach(o => Endpoints.Add(new EndpointOutbound(Core, this, o)));
+            configuration.EndpointConfigurations.Where(o => o.Direction == NtDirection.Inbound)
+                .ToList().ForEach(o => Endpoints.Add(new EndpointInbound(Core, this, o)));
+
+            configuration.EndpointConfigurations.Where(o => o.Direction == NtDirection.Outbound)
+                .ToList().ForEach(o => Endpoints.Add(new EndpointOutbound(Core, this, o)));
 
             _heartbeatThread = new Thread(HeartbeatThreadProc);
             _heartbeatThread.Start();
@@ -132,21 +133,21 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             {
                 if (endpoint is EndpointInbound ibe)
                 {
-                    var endpointConfiguration = new NtEndpointInboundConfiguration(TunnelId,
-                        ibe.EndpointId, ibe.Configuration.Name, ibe.Configuration.OutboundAddress,
+                    var endpointConfiguration = new NtEndpointConfiguration(TunnelId,
+                        ibe.EndpointId, NtDirection.Inbound, ibe.Configuration.Name, ibe.Configuration.OutboundAddress,
                         ibe.Configuration.InboundPort, ibe.Configuration.OutboundPort,
                         ibe.Configuration.HttpHeaderRules, ibe.Configuration.TrafficType);
 
-                    tunnelConfiguration.EndpointInboundConfigurations.Add(endpointConfiguration);
+                    tunnelConfiguration.EndpointConfigurations.Add(endpointConfiguration);
                 }
                 else if (endpoint is EndpointOutbound obe)
                 {
-                    var endpointConfiguration = new NtEndpointOutboundConfiguration(TunnelId,
-                        obe.EndpointId, obe.Configuration.Name, obe.Configuration.OutboundAddress,
+                    var endpointConfiguration = new NtEndpointConfiguration(TunnelId,
+                        obe.EndpointId, NtDirection.Outbound, obe.Configuration.Name, obe.Configuration.OutboundAddress,
                         obe.Configuration.InboundPort, obe.Configuration.OutboundPort,
                         obe.Configuration.HttpHeaderRules, obe.Configuration.TrafficType);
 
-                    tunnelConfiguration.EndpointOutboundConfigurations.Add(endpointConfiguration);
+                    tunnelConfiguration.EndpointConfigurations.Add(endpointConfiguration);
                 }
             }
 
@@ -231,7 +232,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                         //The first thing we do when we get a connection is start a new key exchange process.
                         var compoundNegotiator = new CompoundNegotiator();
                         var negotiationToken = compoundNegotiator.GenerateNegotiationToken(Singletons.Configuration.TunnelCryptographyKeySize);
-
+                        /*
                         var query = new oldQueryRequestKeyExchange(negotiationToken);
                         _client.Query(query, Singletons.Configuration.MessageQueryTimeoutMs).ContinueWith(t =>
                         {
@@ -246,7 +247,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                                 ApplyCryptographyProvider();
                             }
                         });
-
+                        */
                         CurrentConnections++;
                         TotalConnections++;
                     }
@@ -304,7 +305,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         #region Endpoint CRUD helpers.
 
-        public EndpointInbound UpsertInboundEndpoint(NtEndpointInboundConfiguration configuration)
+        public EndpointInbound UpsertInboundEndpoint(NtEndpointConfiguration configuration)
         {
             var existingEndpoint = GetEndpointById(configuration.EndpointId);
             if (existingEndpoint != null)
@@ -318,7 +319,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             return endpoint;
         }
 
-        public EndpointOutbound UpsertOutboundEndpoint(NtEndpointOutboundConfiguration configuration)
+        public EndpointOutbound UpsertOutboundEndpoint(NtEndpointConfiguration configuration)
         {
             var existingEndpoint = GetEndpointById(configuration.EndpointId);
             if (existingEndpoint != null)

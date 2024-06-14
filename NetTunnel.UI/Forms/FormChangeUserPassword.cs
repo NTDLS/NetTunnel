@@ -46,7 +46,7 @@ namespace NetTunnel.UI.Forms
                 var user = new NtUser(textBoxUsername.Text, Utility.ComputeSha256Hash(textBoxPassword.Text));
 
                 buttonSave.InvokeEnableControl(false);
-
+                /*
                 _client.Security.ChangeUserPassword(user).ContinueWith(t =>
                  {
                      if (!t.IsCompletedSuccessfully)
@@ -60,6 +60,7 @@ namespace NetTunnel.UI.Forms
 
                      this.InvokeClose(DialogResult.OK);
                  });
+                */
             }
             catch (Exception ex)
             {

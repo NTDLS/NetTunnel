@@ -1,13 +1,8 @@
-﻿using NetTunnel.ClientAPI.Payload;
-using NetTunnel.Library.Exceptions;
-using NetTunnel.Library.Types;
-using Newtonsoft.Json;
-using System.Text;
-
-namespace NetTunnel.ClientAPI
+﻿namespace NetTunnel.ClientAPI
 {
     public class NtTunnelOutboundClient
     {
+        /*
         private readonly NtClient _client;
 
         public NtTunnelOutboundClient(NtClient client)
@@ -110,7 +105,7 @@ namespace NetTunnel.ClientAPI
         /// <param name="tunnel"></param>
         /// <returns></returns>
         /// <exception cref="NtAPIResponseException"></exception>
-        public async Task UpsertEndpointInboundPair(Guid tunnelId, NtEndpointInboundConfiguration inboundEndpoint, NtEndpointOutboundConfiguration outboundEndpoint)
+        public async Task UpsertEndpointInboundPair(Guid tunnelId, NtEndpointConfiguration inboundEndpoint, NtEndpointOutboundConfiguration outboundEndpoint)
         {
             string url = $"api/TunnelOutbound/{_client.SessionId}/UpsertEndpointInboundPair/{tunnelId}";
 
@@ -133,7 +128,7 @@ namespace NetTunnel.ClientAPI
         /// <param name="tunnel"></param>
         /// <returns></returns>
         /// <exception cref="NtAPIResponseException"></exception>
-        public async Task UpsertEndpointOutboundPair(Guid tunnelId, NtEndpointInboundConfiguration inboundEndpoint, NtEndpointOutboundConfiguration outboundEndpoint)
+        public async Task UpsertEndpointOutboundPair(Guid tunnelId, NtEndpointConfiguration inboundEndpoint, NtEndpointOutboundConfiguration outboundEndpoint)
         {
             string url = $"api/TunnelOutbound/{_client.SessionId}/UpsertEndpointOutboundPair/{tunnelId}";
 
@@ -188,5 +183,6 @@ namespace NetTunnel.ClientAPI
                 throw new NtAPIResponseException(result == null ? "Invalid response" : result.ExceptionText);
             }
         }
+        */
     }
 }
