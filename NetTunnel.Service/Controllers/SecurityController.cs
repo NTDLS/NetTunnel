@@ -11,6 +11,7 @@ namespace NetTunnel.Service.Controllers
     public class SecurityController(IHttpContextAccessor httpContextAccessor)
         : ControllerBase(httpContextAccessor)
     {
+        /*
         [HttpGet]
         [Route("{sessionId}/ListUsers")]
         public NtActionResponseUsers ListUsers(Guid sessionId)
@@ -102,5 +103,6 @@ namespace NetTunnel.Service.Controllers
                 return new NtActionResponse(ex);
             }
         }
+        */
     }
 }

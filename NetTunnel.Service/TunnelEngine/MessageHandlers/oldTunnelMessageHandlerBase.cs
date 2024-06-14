@@ -6,6 +6,7 @@ namespace NetTunnel.Service.TunnelEngine.MessageHandlers
 {
     internal class oldTunnelMessageHandlerBase
     {
+        /*
         /// <summary>
         /// Enforces that cryptography has been fully initialized and established then returns the Tunnel from the RmContext parameter.
         /// </summary>
@@ -25,5 +26,6 @@ namespace NetTunnel.Service.TunnelEngine.MessageHandlers
         /// </summary>
         public T GetTunnel<T>(RmContext context) where T : class, ITunnel
             => (context.Endpoint.Parameter as T).EnsureNotNull();
+        */
     }
 }

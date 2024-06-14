@@ -16,6 +16,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             LoadFromDisk();
         }
 
+        /*
+
         /// <summary>
         /// Tell the remote tunnel service to delete the specified endpoint.
         /// </summary>
@@ -98,6 +100,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 endpoint.Start();
             });
         }
+
+        */
 
         public List<NtTunnelOutboundConfiguration> CloneConfigurations()
         {

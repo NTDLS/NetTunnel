@@ -28,12 +28,6 @@ namespace NetTunnel.UI.Forms
             InitializeComponent();
         }
 
-        public new void Dispose()
-        {
-            OLDDELETEMECLIENT_client?.Dispose();
-            base.Dispose();
-        }
-
         #endregion
 
         private void FormMain_Load(object sender, EventArgs e)

@@ -9,6 +9,7 @@ namespace NetTunnel.Service.TunnelEngine.MessageHandlers
 {
     internal class oldTunnelOutboundMessageHandlers : oldTunnelMessageHandlerBase, IRmMessageHandler
     {
+        /*
         /// <summary>
         /// The remote service is asking us to delete an outbound tunnel based on its id.
         /// </summary>
@@ -72,5 +73,6 @@ namespace NetTunnel.Service.TunnelEngine.MessageHandlers
 
             endpoint.SendEndpointData(notification.StreamId, notification.Bytes);
         }
+        */
     }
 }

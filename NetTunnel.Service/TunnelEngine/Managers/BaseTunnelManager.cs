@@ -33,6 +33,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
+        /*
+
         public void Delete(Guid tunnelId)
         {
             Collection.Use((o) =>
@@ -62,6 +64,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 o.Remove(tunnel);
             });
         }
+
+        */
 
         public List<NtTunnelStatistics> GetStatistics()
         {

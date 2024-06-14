@@ -9,6 +9,7 @@ namespace NetTunnel.Service.TunnelEngine.MessageHandlers
 {
     internal class oldTunnelInboundMessageHandlers : oldTunnelMessageHandlerBase, IRmMessageHandler
     {
+        /*
         /// <summary>
         /// The remote service is letting us know that they are about to start using the cryptography provider,
         /// so we need to apply the one that we have ready on this end.
@@ -85,5 +86,6 @@ namespace NetTunnel.Service.TunnelEngine.MessageHandlers
 
             endpoint.SendEndpointData(notification.StreamId, notification.Bytes);
         }
+        */
     }
 }

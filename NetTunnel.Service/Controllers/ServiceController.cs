@@ -12,6 +12,7 @@ namespace NetTunnel.Service.Controllers
     public class ServiceController(IHttpContextAccessor httpContextAccessor)
         : ControllerBase(httpContextAccessor)
     {
+        /*
         [HttpGet]
         [Route("{sessionId}/GetStatistics")]
         public NtActionResponseStatistics GetStatistics(Guid sessionId)
@@ -71,5 +72,6 @@ namespace NetTunnel.Service.Controllers
                 return new NtActionResponse(ex);
             }
         }
+        */
     }
 }

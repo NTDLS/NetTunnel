@@ -8,6 +8,7 @@ namespace NetTunnel.Service.TunnelEngine.MessageHandlers
 {
     internal class oldTunnelInboundQueryHandlers : oldTunnelMessageHandlerBase, IRmMessageHandler
     {
+        /*
         /// <summary>
         /// The remote service has made an outgoing tunnel connection and has started the process of exchanging a key.
         /// Here we need to apply the diffie–hellman negation token and reply with the diffie–hellman reply token
@@ -74,5 +75,6 @@ namespace NetTunnel.Service.TunnelEngine.MessageHandlers
             tunnel.DeleteEndpoint(query.EndpointId);
             return new oldQueryReplyPayloadBoolean(true);
         }
+        */
     }
 }

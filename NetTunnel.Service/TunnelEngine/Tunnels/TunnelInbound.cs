@@ -13,8 +13,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
     /// </summary>
     internal class TunnelInbound : ITunnel
     {
-        private readonly RmServer _server;
-
         public override int GetHashCode()
         {
             return TunnelId.GetHashCode()
@@ -46,7 +44,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         public List<IEndpoint> Endpoints { get; private set; } = new();
 
         private readonly Thread _heartbeatThread;
-        private ClientCryptographyProvider? _cryptographyProvider;
 
         #endregion
 
@@ -91,60 +88,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         public IEndpoint? GetEndpointById(Guid pairId)
             => Endpoints.Where(o => o.EndpointId == pairId).SingleOrDefault();
-
-        private void _server_OnConnected(RmContext context)
-        {
-            if (_peerRmClientConnectionId != null)
-            {
-                Core.Logging.Write(NtLogSeverity.Verbose, $"The tunnel '{Name}' on port {DataPort} cannot accept more than one connection.");
-                context.Disconnect();
-                return;
-            }
-
-            SecureKeyExchangeIsComplete = false;
-            _cryptographyProvider = null;
-            _server.ClearCryptographyProvider();
-
-            Core.Logging.Write(NtLogSeverity.Verbose, $"Accepted connection for inbound tunnel '{Name}' on port {DataPort}.");
-            Status = NtTunnelStatus.Established;
-
-            TotalConnections++;
-            CurrentConnections++;
-
-            _peerRmClientConnectionId = context.ConnectionId;
-        }
-
-        private void _server_OnDisconnected(RmContext context)
-        {
-            Status = NtTunnelStatus.Disconnected;
-
-            SecureKeyExchangeIsComplete = false;
-            _cryptographyProvider = null;
-            //_server.ClearCryptographyProvider(); //This can cause blocking.
-
-            CurrentConnections--;
-
-            Core.Logging.Write(NtLogSeverity.Verbose, $"Disconnected inbound tunnel '{Name}' on port {DataPort}");
-
-            _peerRmClientConnectionId = null;
-        }
-
-        public void InitializeCryptographyProvider(byte[] sharedSecret)
-        {
-            _cryptographyProvider = new ClientCryptographyProvider(sharedSecret);
-
-            Core.Logging.Write(NtLogSeverity.Verbose,
-                $"Cryptography Key generated, hash: {Utility.ComputeSha256Hash(sharedSecret)}");
-        }
-
-        public void ApplyCryptographyProvider()
-        {
-            SecureKeyExchangeIsComplete = true;
-            _server.SetCryptographyProvider(_cryptographyProvider);
-
-            Core.Logging.Write(NtLogSeverity.Verbose,
-                $"End-to-end encryption has been established for '{Name}'.");
-        }
 
         public NtTunnelInboundConfiguration CloneConfiguration()
         {
@@ -211,7 +154,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             KeepRunning = false;
             _heartbeatThread.Join();
-            Utility.TryAndIgnore(_server.Stop);
 
             Status = NtTunnelStatus.Stopped;
 
@@ -220,6 +162,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         #region Reliable Messaging Passthrough.
 
+        /*
         public Task<T> Query<T>(IRmQuery<T> query) where T : class, IRmQueryReply
         {
             if (_peerRmClientConnectionId == null)
@@ -254,11 +197,13 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             _server.Notify(connectionId, notification);
         }
+        */
 
         #endregion
 
         #region Endpoint CRUD helpers.
 
+        /*
         public EndpointInbound UpsertInboundEndpoint(NtEndpointInboundConfiguration configuration)
         {
             var existingEndpoint = GetEndpointById(configuration.EndpointId);
@@ -297,6 +242,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 Core.InboundTunnels.SaveToDisk();
             }
         }
+        */
 
         #endregion
 

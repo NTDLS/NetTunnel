@@ -13,6 +13,7 @@ namespace NetTunnel.Service.Controllers
     public class TunnelInboundController(IHttpContextAccessor httpContextAccessor)
         : ControllerBase(httpContextAccessor)
     {
+        /*
         [HttpGet]
         [Route("{sessionId}/List")]
         public NtActionResponseTunnelsInbound List(Guid sessionId)
@@ -229,5 +230,6 @@ namespace NetTunnel.Service.Controllers
                 return new NtActionResponse(ex);
             }
         }
+        */
     }
 }

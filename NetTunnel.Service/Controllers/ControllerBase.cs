@@ -12,6 +12,7 @@ namespace NetTunnel.Service.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
+        /*
         /// <summary>
         /// Validates and enforces a login session by throwing an exception if the passed
         /// session id does not exist or does not match the IP address of the peer.
@@ -23,5 +24,6 @@ namespace NetTunnel.Service.Controllers
 
         public string GetPeerIpAddress()
             => _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? string.Empty;
+        */
     }
 }

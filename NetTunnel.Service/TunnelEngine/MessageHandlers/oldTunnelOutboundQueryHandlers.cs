@@ -7,6 +7,7 @@ namespace NetTunnel.Service.TunnelEngine.MessageHandlers
 {
     internal class oldTunnelOutboundQueryHandlers : oldTunnelMessageHandlerBase, IRmMessageHandler
     {
+        /*
         /// <summary>
         /// The remote service is asking us to add an inbound endpoint to this tunnel.
         /// </summary>
@@ -50,5 +51,6 @@ namespace NetTunnel.Service.TunnelEngine.MessageHandlers
             tunnel.DeleteEndpoint(query.EndpointId);
             return new oldQueryReplyPayloadBoolean(true);
         }
+        */
     }
 }
