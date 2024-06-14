@@ -5,7 +5,7 @@ namespace NetTunnel.Service.ReliableMessages.Notification
 {
     [Serializable]
     [ProtoContract]
-    public class NotificationApplyCryptography : IRmNotification
+    public class oldNotificationApplyCryptography : IRmNotification
     {
     }
 }

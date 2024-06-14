@@ -102,53 +102,5 @@ namespace NetTunnel.Service.Controllers
                 return new NtActionResponse(ex);
             }
         }
-
-        [HttpGet]
-        [Route("{username}/{passwordHash}/Login")]
-        public NtActionResponse Login(string username, string passwordHash)
-        {
-            try
-            {
-                var userSession = Singletons.Core.Sessions.Login(username, passwordHash, GetPeerIpAddress());
-
-                if (userSession != null)
-                {
-                    return new NtActionResponseLogin()
-                    {
-                        SessionId = userSession.SessionId,
-                        Success = true
-                    };
-                }
-                else
-                {
-                    throw new Exception("Login failed.");
-                }
-            }
-            catch (Exception ex)
-            {
-                return new NtActionResponseLogin(ex);
-            }
-        }
-
-        [HttpGet]
-        [Route("{sessionId}/Logout")]
-        public NtActionResponse Logout(Guid sessionId)
-        {
-            try
-            {
-                var userSession = ValidateAndEnforceLoginSession(sessionId);
-
-                Singletons.Core.Sessions.Logout(userSession);
-
-                return new NtActionResponse
-                {
-                    Success = true
-                };
-            }
-            catch (Exception ex)
-            {
-                return new NtActionResponse(ex);
-            }
-        }
     }
 }

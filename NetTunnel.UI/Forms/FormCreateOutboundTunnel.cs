@@ -8,14 +8,14 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormCreateOutboundTunnel : Form
     {
-        private readonly NtClient? _client;
+        private readonly ClientWrapper? _client;
 
         public FormCreateOutboundTunnel()
         {
             InitializeComponent();
         }
 
-        public FormCreateOutboundTunnel(NtClient client)
+        public FormCreateOutboundTunnel(ClientWrapper client)
         {
             InitializeComponent();
 
@@ -48,7 +48,7 @@ namespace NetTunnel.UI.Forms
             AcceptButton = buttonAdd;
             CancelButton = buttonCancel;
 
-            textBoxManagementPort.Text = $"{client?.BaseAddress?.Port}"; //The port that is used to manage the remote tunnel.
+            textBoxManagementPort.Text = ""; // $"{client?.BasePort}"; //The port that is used to manage the remote tunnel.
 
 #if DEBUG
             textBoxName.Text = "My First Tunnel";
@@ -136,6 +136,7 @@ namespace NetTunnel.UI.Forms
 
         public void ConfigureTunnelPair(NtClient remoteClient, NtTunnelOutboundConfiguration outboundTunnel, NtTunnelInboundConfiguration inboundTunnel)
         {
+            /*
             //Add the outbound tunnel config to the local tunnel instance.
             _client.EnsureNotNull().TunnelOutbound.Add(outboundTunnel).ContinueWith(t =>
             {
@@ -169,6 +170,7 @@ namespace NetTunnel.UI.Forms
                     this.InvokeClose(DialogResult.OK);
                 });
             });
+            */
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)

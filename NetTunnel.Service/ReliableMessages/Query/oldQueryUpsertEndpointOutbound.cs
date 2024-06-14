@@ -7,16 +7,16 @@ namespace NetTunnel.Service.ReliableMessages.Query
 {
     [Serializable]
     [ProtoContract]
-    public class QueryUpsertEndpointOutbound : IRmQuery<QueryReplyPayloadBoolean>
+    public class oldQueryUpsertEndpointOutbound : IRmQuery<oldQueryReplyPayloadBoolean>
     {
         [ProtoMember(1)]
         public string Label { get; set; } = string.Empty;
         [ProtoMember(2)]
         public NtEndpointOutboundConfiguration Configuration { get; set; } = new();
 
-        public QueryUpsertEndpointOutbound() { }
+        public oldQueryUpsertEndpointOutbound() { }
 
-        public QueryUpsertEndpointOutbound(NtEndpointOutboundConfiguration configuration)
+        public oldQueryUpsertEndpointOutbound(NtEndpointOutboundConfiguration configuration)
         {
             Configuration = configuration;
         }

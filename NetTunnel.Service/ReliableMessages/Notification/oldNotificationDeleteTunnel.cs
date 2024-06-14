@@ -5,14 +5,14 @@ namespace NetTunnel.Service.ReliableMessages.Notification
 {
     [Serializable]
     [ProtoContract]
-    public class NotificationDeleteTunnel : IRmNotification
+    public class oldNotificationDeleteTunnel : IRmNotification
     {
         [ProtoMember(1)]
         public Guid TunnelId { get; set; }
 
-        public NotificationDeleteTunnel() { }
+        public oldNotificationDeleteTunnel() { }
 
-        public NotificationDeleteTunnel(Guid tunnelId)
+        public oldNotificationDeleteTunnel(Guid tunnelId)
         {
             TunnelId = tunnelId;
         }

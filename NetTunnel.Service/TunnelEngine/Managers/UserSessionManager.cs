@@ -14,20 +14,19 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             _core = core;
         }
 
-        public NtUserSession? Login(string username, string passwordHash, string? clientIpAddress)
+        public bool Login(Guid connectionId, string username, string passwordHash, string? clientIpAddress)
         {
             if (_core.Users.ValidateLogin(username, passwordHash))
             {
-                var session = new NtUserSession(username, clientIpAddress);
-                _collection.Use((o) => o.Add(session));
-                return session;
+                _collection.Use((o) => o.Add(new NtUserSession(connectionId, username, clientIpAddress)));
+                return true;
             }
-            return null;
+            return false;
         }
 
         public NtUserSession Validate(Guid sessionId, string? clientIpAddress)
         {
-            var session = _collection.Use((o) => o.Where(o => o.SessionId == sessionId).FirstOrDefault())
+            var session = _collection.Use((o) => o.Where(o => o.ConnectionId == sessionId).FirstOrDefault())
                 ?? throw new Exception("Session was not found.");
 
             if (session.ClientIpAddress != clientIpAddress)
@@ -38,6 +37,13 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             return session;
         }
 
-        public void Logout(NtUserSession session) => _collection.Use((o) => { o.Remove(session); });
+        public void Logout(Guid connectionId)
+        {
+            _collection.Use((o) =>
+            {
+                o.RemoveAll(o => o.ConnectionId == connectionId);
+            });
+        }
+
     }
 }

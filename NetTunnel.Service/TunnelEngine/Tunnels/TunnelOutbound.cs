@@ -56,7 +56,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         public List<IEndpoint> Endpoints { get; private set; } = new();
 
         private readonly Thread _heartbeatThread;
-        private CryptographyProvider? _cryptographyProvider;
+        private ClientCryptographyProvider? _cryptographyProvider;
 
         #endregion
 
@@ -88,8 +88,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 ReceiveBufferGrowthRate = Singletons.Configuration.ReceiveBufferGrowthRate,
             });
 
-            _client.AddHandler(new TunnelOutboundMessageHandlers());
-            _client.AddHandler(new TunnelOutboundQueryHandlers());
+            _client.AddHandler(new oldTunnelOutboundMessageHandlers());
+            _client.AddHandler(new oldTunnelOutboundQueryHandlers());
 
             _client.OnConnected += _client_OnConnected;
             _client.OnDisconnected += _client_OnDisconnected;
@@ -194,7 +194,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         public void InitializeCryptographyProvider(byte[] sharedSecret)
         {
-            _cryptographyProvider = new CryptographyProvider(sharedSecret);
+            _cryptographyProvider = new ClientCryptographyProvider(sharedSecret);
 
             Core.Logging.Write(NtLogSeverity.Verbose,
                 $"Cryptography Key generated, hash: {Utility.ComputeSha256Hash(sharedSecret)}");
@@ -234,7 +234,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                         var compoundNegotiator = new CompoundNegotiator();
                         var negotiationToken = compoundNegotiator.GenerateNegotiationToken(Singletons.Configuration.TunnelCryptographyKeySize);
 
-                        var query = new QueryRequestKeyExchange(negotiationToken);
+                        var query = new oldQueryRequestKeyExchange(negotiationToken);
                         _client.Query(query, Singletons.Configuration.MessageQueryTimeoutMs).ContinueWith(t =>
                         {
                             if (t.IsCompletedSuccessfully && t.Result != null)
@@ -243,7 +243,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
                                 InitializeCryptographyProvider(compoundNegotiator.SharedSecret);
 
-                                _client.Notify(new NotificationApplyCryptography());
+                                _client.Notify(new oldNotificationApplyCryptography());
 
                                 ApplyCryptographyProvider();
                             }

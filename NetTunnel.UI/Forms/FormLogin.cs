@@ -1,5 +1,4 @@
 ﻿using NetTunnel.Library;
-using NetTunnel.Library.Types;
 using NTDLS.Persistence;
 using NTDLS.WinFormsHelpers;
 
@@ -7,10 +6,7 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormLogin : Form
     {
-        public string Address { get; private set; } = string.Empty;
-        public string ServerURL { get; private set; } = string.Empty;
-        public string Username { get; private set; } = string.Empty;
-        public string PasswordHash { get; private set; } = string.Empty;
+        public ClientWrapper? ResultingClient { get; private set; } = null;
 
         public FormLogin()
         {
@@ -39,11 +35,11 @@ namespace NetTunnel.UI.Forms
             try
             {
                 int port = textBoxPort.GetAndValidateNumeric(1, 65535, "A port number between [min] and [max] is required.");
-                Username = textBoxUsername.GetAndValidateText("A username is required.");
-                PasswordHash = Utility.ComputeSha256Hash(textBoxPassword.Text);
-                Address = textBoxAddress.GetAndValidateText("A hostname or IP address is required.");
+                string username = textBoxUsername.GetAndValidateText("A username is required.");
+                string passwordHash = Utility.ComputeSha256Hash(textBoxPassword.Text);
+                string address = textBoxAddress.GetAndValidateText("A hostname or IP address is required.");
 
-                var client = ClientFactory.Establish(new NtServiceConfiguration(), Address, port, Username, PasswordHash);
+                var client = ClientWrapper.CreateAndLogin(address, port, username, passwordHash);
 
                 var preferences = new UILoginPreferences()
                 {
@@ -53,6 +49,9 @@ namespace NetTunnel.UI.Forms
                 };
 
                 LocalUserApplicationData.SaveToDisk(Constants.FriendlyName, preferences);
+
+                ResultingClient = client;
+
                 this.InvokeClose(DialogResult.OK);
             }
             catch (Exception ex)

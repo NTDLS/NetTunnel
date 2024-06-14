@@ -5,7 +5,7 @@ namespace NetTunnel.Service.ReliableMessages.Notification
 {
     [Serializable]
     [ProtoContract]
-    public class NotificationEndpointDisconnect : IRmNotification
+    public class oldNotificationEndpointDisconnect : IRmNotification
     {
         [ProtoMember(1)]
         public Guid StreamId { get; set; }
@@ -17,14 +17,14 @@ namespace NetTunnel.Service.ReliableMessages.Notification
         public Guid EndpointId { get; set; }
 
 
-        public NotificationEndpointDisconnect(Guid tunnelId, Guid endpointId, Guid streamId)
+        public oldNotificationEndpointDisconnect(Guid tunnelId, Guid endpointId, Guid streamId)
         {
             StreamId = streamId;
             TunnelId = tunnelId;
             EndpointId = endpointId;
         }
 
-        public NotificationEndpointDisconnect()
+        public oldNotificationEndpointDisconnect()
         {
         }
     }

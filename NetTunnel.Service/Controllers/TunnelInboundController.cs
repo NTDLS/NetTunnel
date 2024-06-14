@@ -150,7 +150,7 @@ namespace NetTunnel.Service.Controllers
 
                 //Since we have a tunnel, we will communicate the alteration of endpoints though the tunnel.
                 var result = await Singletons.Core.InboundTunnels
-                    .DispatchUpsertEndpointOutboundToAssociatedTunnelService<QueryReplyPayloadBoolean>(tunnelId, endpoint.Outbound);
+                    .DispatchUpsertEndpointOutboundToAssociatedTunnelService<oldQueryReplyPayloadBoolean>(tunnelId, endpoint.Outbound);
 
                 return new NtActionResponse { Success = result?.Value ?? false };
             }
@@ -176,7 +176,7 @@ namespace NetTunnel.Service.Controllers
 
                 //Since we have a tunnel, we will communicate the alteration of endpoints though the tunnel.
                 var result = await Singletons.Core.InboundTunnels
-                    .DispatchUpsertEndpointInboundToAssociatedTunnelService<QueryReplyPayloadBoolean>(tunnelId, endpoint.Inbound);
+                    .DispatchUpsertEndpointInboundToAssociatedTunnelService<oldQueryReplyPayloadBoolean>(tunnelId, endpoint.Inbound);
 
                 return new NtActionResponse { Success = result?.Value ?? false };
             }
@@ -200,7 +200,7 @@ namespace NetTunnel.Service.Controllers
 
                 //Since we have a tunnel, we will communicate the alteration of endpoints though the tunnel.
                 var result = await Singletons.Core.InboundTunnels
-                    .DispatchDeleteEndpointToAssociatedTunnelService<QueryReplyPayloadBoolean>(tunnelId, endpointId);
+                    .DispatchDeleteEndpointToAssociatedTunnelService<oldQueryReplyPayloadBoolean>(tunnelId, endpointId);
 
                 return new NtActionResponse { Success = result?.Value ?? false };
             }

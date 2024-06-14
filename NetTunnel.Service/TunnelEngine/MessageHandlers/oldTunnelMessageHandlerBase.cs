@@ -4,7 +4,7 @@ using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Service.TunnelEngine.MessageHandlers
 {
-    internal class TunnelMessageHandlerBase
+    internal class oldTunnelMessageHandlerBase
     {
         /// <summary>
         /// Enforces that cryptography has been fully initialized and established then returns the Tunnel from the RmContext parameter.

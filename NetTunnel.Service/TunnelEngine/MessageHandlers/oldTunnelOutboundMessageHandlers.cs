@@ -7,32 +7,19 @@ using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.MessageHandlers
 {
-    internal class TunnelInboundMessageHandlers : TunnelMessageHandlerBase, IRmMessageHandler
+    internal class oldTunnelOutboundMessageHandlers : oldTunnelMessageHandlerBase, IRmMessageHandler
     {
         /// <summary>
-        /// The remote service is letting us know that they are about to start using the cryptography provider,
-        /// so we need to apply the one that we have ready on this end.
+        /// The remote service is asking us to delete an outbound tunnel based on its id.
         /// </summary>
         /// <param name="context"></param>
         /// <param name="notification"></param>
-        public void OnNotificationApplyCryptography(RmContext context, NotificationApplyCryptography notification)
+        public void OnNotificationDeleteTunnel(RmContext context, oldNotificationDeleteTunnel notification)
         {
-            var tunnel = GetTunnel<TunnelInbound>(context);
+            var tunnel = EnforceCryptographyAndGetTunnel<TunnelOutbound>(context);
 
-            tunnel.ApplyCryptographyProvider();
-        }
-
-        /// <summary>
-        /// The remote service is asking us to delete an inbound tunnel based on its id.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="notification"></param>
-        public void OnNotificationDeleteTunnel(RmContext context, NotificationDeleteTunnel notification)
-        {
-            var tunnel = EnforceCryptographyAndGetTunnel<TunnelInbound>(context);
-
-            tunnel.Core.InboundTunnels.Delete(notification.TunnelId);
-            tunnel.Core.InboundTunnels.SaveToDisk();
+            tunnel.Core.OutboundTunnels.Delete(notification.TunnelId);
+            tunnel.Core.OutboundTunnels.SaveToDisk();
         }
 
         /// <summary>
@@ -41,9 +28,9 @@ namespace NetTunnel.Service.TunnelEngine.MessageHandlers
         /// </summary>
         /// <param name="context"></param>
         /// <param name="notification"></param>
-        public void OnNotificationEndpointConnect(RmContext context, NotificationEndpointConnect notification)
+        public void OnNotificationEndpointConnect(RmContext context, oldNotificationEndpointConnect notification)
         {
-            var tunnel = EnforceCryptographyAndGetTunnel<TunnelInbound>(context);
+            var tunnel = EnforceCryptographyAndGetTunnel<TunnelOutbound>(context);
 
             tunnel.Core.Logging.Write(NtLogSeverity.Debug,
                 $"Received endpoint connection notification.");
@@ -59,9 +46,9 @@ namespace NetTunnel.Service.TunnelEngine.MessageHandlers
         /// </summary>
         /// <param name="context"></param>
         /// <param name="notification"></param>
-        public void OnNotificationEndpointDisconnect(RmContext context, NotificationEndpointDisconnect notification)
+        public void OnNotificationEndpointDisconnect(RmContext context, oldNotificationEndpointDisconnect notification)
         {
-            var tunnel = EnforceCryptographyAndGetTunnel<TunnelInbound>(context);
+            var tunnel = EnforceCryptographyAndGetTunnel<TunnelOutbound>(context);
 
             tunnel.Core.Logging.Write(NtLogSeverity.Debug,
                 $"Received endpoint disconnection notification.");
@@ -76,9 +63,9 @@ namespace NetTunnel.Service.TunnelEngine.MessageHandlers
         /// </summary>
         /// <param name="context"></param>
         /// <param name="notification"></param>
-        public void OnNotificationEndpointExchange(RmContext context, NotificationEndpointExchange notification)
+        public void OnNotificationEndpointExchange(RmContext context, oldNotificationEndpointExchange notification)
         {
-            var tunnel = EnforceCryptographyAndGetTunnel<TunnelInbound>(context);
+            var tunnel = EnforceCryptographyAndGetTunnel<TunnelOutbound>(context);
 
             var endpoint = tunnel.GetEndpointById(notification.EndpointId)
                 .EnsureNotNull($"The outbound tunnel endpoint could not be found: '{notification.EndpointId}'.");

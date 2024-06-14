@@ -2,14 +2,15 @@
 {
     public class NtUserSession
     {
-        public Guid SessionId { get; set; } = Guid.NewGuid();
+        public Guid ConnectionId { get; set; }
         public DateTime LoginTime { get; private set; } = DateTime.UtcNow;
         public string Username { get; set; }
         public string? ClientIpAddress { get; set; }
 
-        public NtUserSession(string username, string? clientIpAddress)
+        public NtUserSession(Guid connectionId, string username, string? clientIpAddress)
         {
-            Username = username;
+            ConnectionId = connectionId;
+            Username = username.ToLower();
             ClientIpAddress = clientIpAddress;
         }
     }

@@ -1,5 +1,5 @@
-﻿using NetTunnel.Service.TunnelEngine.Managers;
-using NetTunnel.Service.TunnelEngine.MessageHandlers;
+﻿using NetTunnel.Service.ReliableMessages.Handlers;
+using NetTunnel.Service.TunnelEngine.Managers;
 using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 
@@ -7,7 +7,7 @@ namespace NetTunnel.Service.TunnelEngine
 {
     internal class TunnelEngineCore
     {
-        public Dictionary<Guid, InboundTunnelConnection> InboundTunnelConnections { get; private set; } = new();
+        public Dictionary<Guid, ServiceConnectionContext> InboundTunnelConnections { get; private set; } = new();
         public RmServer CoreServer { get; private set; }
         public Logger Logging { get; set; }
         public UserSessionManager Sessions { get; set; }
@@ -34,8 +34,8 @@ namespace NetTunnel.Service.TunnelEngine
                 ReceiveBufferGrowthRate = Singletons.Configuration.ReceiveBufferGrowthRate,
             });
 
-            CoreServer.AddHandler(new NewTunnelInboundMessageHandlers());
-            CoreServer.AddHandler(new NewTunnelInboundQueryHandlers());
+            CoreServer.AddHandler(new ServiceNotificationHandlers());
+            CoreServer.AddHandler(new ServiceQueryHandlers());
 
             CoreServer.OnConnected += CoreServer_OnConnected;
             CoreServer.OnDisconnected += CoreServer_OnDisconnected;
@@ -49,16 +49,20 @@ namespace NetTunnel.Service.TunnelEngine
 
         private void CoreServer_OnConnected(RmContext context)
         {
-            InboundTunnelConnections.Add(context.ConnectionId, new InboundTunnelConnection(context.ConnectionId));
+            InboundTunnelConnections.Add(context.ConnectionId,
+                new ServiceConnectionContext(context.ConnectionId));
         }
 
         private void CoreServer_OnDisconnected(RmContext context)
         {
+            Sessions.Logout(context.ConnectionId);
             InboundTunnelConnections.Remove(context.ConnectionId);
         }
 
         public void Start()
         {
+            CoreServer.SetCryptographyProvider(new ServiceCryptographyProvider(this));
+
             CoreServer.Start(Singletons.Configuration.ManagementPort);
 
             InboundTunnels.StartAll();

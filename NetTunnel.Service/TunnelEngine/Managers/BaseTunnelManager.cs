@@ -48,7 +48,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                tunnel.Notify(new NotificationDeleteTunnel(tunnelId));
+                tunnel.Notify(new oldNotificationDeleteTunnel(tunnelId));
             });
         }
 

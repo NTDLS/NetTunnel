@@ -153,7 +153,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     endpointConfig = endpointInbound.Configuration;
                     //If this is an inbound endpoint, then let the remote service know that we just received a
                     //  connection so that it came make the associated outbound connection.
-                    _tunnel.Notify(new NotificationEndpointConnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId));
+                    _tunnel.Notify(new oldNotificationEndpointConnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId));
                 }
                 else if (this is EndpointOutbound endpointOutbound)
                 {
@@ -204,7 +204,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                                 var httpHeaderBytes = Encoding.UTF8.GetBytes(httpHeaderBuilder.ToString());
 
-                                _tunnel.Notify(new NotificationEndpointExchange
+                                _tunnel.Notify(new oldNotificationEndpointExchange
                                     (_tunnel.TunnelId, EndpointId, activeConnection.StreamId, httpHeaderBytes, httpHeaderBytes.Length));
 
                                 httpHeaderBuilder.Clear();
@@ -217,7 +217,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                     #endregion
 
-                    _tunnel.Notify(new NotificationEndpointExchange
+                    _tunnel.Notify(new oldNotificationEndpointExchange
                         (_tunnel.TunnelId, EndpointId, activeConnection.StreamId, buffer.Bytes, buffer.Length));
 
                     buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);
@@ -262,7 +262,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             }
 
             Utility.TryAndIgnore(() =>
-                _tunnel.Notify(new NotificationEndpointDisconnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId)));
+                _tunnel.Notify(new oldNotificationEndpointDisconnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId)));
         }
     }
 }

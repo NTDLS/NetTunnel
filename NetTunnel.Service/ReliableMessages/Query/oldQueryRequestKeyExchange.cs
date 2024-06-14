@@ -6,17 +6,17 @@ namespace NetTunnel.Service.ReliableMessages.Query
 {
     [Serializable]
     [ProtoContract]
-    public class QueryRequestKeyExchange : IRmQuery<QueryReplyKeyExchangeReply>
+    public class oldQueryRequestKeyExchange : IRmQuery<oldQueryReplyKeyExchangeReply>
     {
         [ProtoMember(1)]
         public byte[] NegotiationToken { get; set; }
 
-        public QueryRequestKeyExchange()
+        public oldQueryRequestKeyExchange()
         {
             NegotiationToken = new byte[0];
         }
 
-        public QueryRequestKeyExchange(byte[] negotiationToken)
+        public oldQueryRequestKeyExchange(byte[] negotiationToken)
         {
             NegotiationToken = negotiationToken;
         }

@@ -5,7 +5,7 @@ namespace NetTunnel.Service.ReliableMessages.Query.Reply
 {
     [Serializable]
     [ProtoContract]
-    public class QueryReplyPayloadBoolean : IRmQueryReply
+    public class oldQueryReplyPayloadBoolean : IRmQueryReply
     {
         [ProtoMember(1)]
         public bool Value { get; set; }
@@ -13,16 +13,16 @@ namespace NetTunnel.Service.ReliableMessages.Query.Reply
         [ProtoMember(2)]
         public string Message { get; set; } = string.Empty;
 
-        public QueryReplyPayloadBoolean()
+        public oldQueryReplyPayloadBoolean()
         {
         }
 
-        public QueryReplyPayloadBoolean(bool value)
+        public oldQueryReplyPayloadBoolean(bool value)
         {
             Value = value;
         }
 
-        public QueryReplyPayloadBoolean(Exception exception)
+        public oldQueryReplyPayloadBoolean(Exception exception)
         {
             Value = false;
             Message = exception.Message;

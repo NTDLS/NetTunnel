@@ -2,7 +2,6 @@
 using NetTunnel.Library.Types;
 using NetTunnel.Service.ReliableMessages;
 using NetTunnel.Service.TunnelEngine.Endpoints;
-using NetTunnel.Service.TunnelEngine.MessageHandlers;
 using NTDLS.NullExtensions;
 using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
@@ -49,7 +48,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         public List<IEndpoint> Endpoints { get; private set; } = new();
 
         private readonly Thread _heartbeatThread;
-        private CryptographyProvider? _cryptographyProvider;
+        private ClientCryptographyProvider? _cryptographyProvider;
 
         #endregion
 
@@ -134,7 +133,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         public void InitializeCryptographyProvider(byte[] sharedSecret)
         {
-            _cryptographyProvider = new CryptographyProvider(sharedSecret);
+            _cryptographyProvider = new ClientCryptographyProvider(sharedSecret);
 
             Core.Logging.Write(NtLogSeverity.Verbose,
                 $"Cryptography Key generated, hash: {Utility.ComputeSha256Hash(sharedSecret)}");

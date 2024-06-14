@@ -28,7 +28,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             return (await Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                return tunnel.Query(new QueryDeleteEndpoint(endpointId));
+                return tunnel.Query(new oldQueryDeleteEndpoint(endpointId));
             }) as T).EnsureNotNull();
         }
 
@@ -45,7 +45,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             return (await Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                return tunnel.Query(new QueryUpsertEndpointInbound(endpoint));
+                return tunnel.Query(new oldQueryUpsertEndpointInbound(endpoint));
             }) as T).EnsureNotNull();
         }
 
@@ -61,7 +61,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             return (await Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                return tunnel.Query(new QueryUpsertEndpointOutbound(endpoint));
+                return tunnel.Query(new oldQueryUpsertEndpointOutbound(endpoint));
             }) as T).EnsureNotNull();
         }
 

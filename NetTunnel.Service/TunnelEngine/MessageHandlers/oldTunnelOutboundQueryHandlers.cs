@@ -5,7 +5,7 @@ using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Service.TunnelEngine.MessageHandlers
 {
-    internal class TunnelOutboundQueryHandlers : TunnelMessageHandlerBase, IRmMessageHandler
+    internal class oldTunnelOutboundQueryHandlers : oldTunnelMessageHandlerBase, IRmMessageHandler
     {
         /// <summary>
         /// The remote service is asking us to add an inbound endpoint to this tunnel.
@@ -13,13 +13,13 @@ namespace NetTunnel.Service.TunnelEngine.MessageHandlers
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public QueryReplyPayloadBoolean OnQueryUpsertEndpointInbound(RmContext context, QueryUpsertEndpointInbound query)
+        public oldQueryReplyPayloadBoolean OnQueryUpsertEndpointInbound(RmContext context, oldQueryUpsertEndpointInbound query)
         {
             var tunnel = EnforceCryptographyAndGetTunnel<TunnelOutbound>(context);
 
             var endpoint = tunnel.UpsertInboundEndpoint(query.Configuration);
             endpoint.Start();
-            return new QueryReplyPayloadBoolean(true);
+            return new oldQueryReplyPayloadBoolean(true);
         }
 
         /// <summary>
@@ -28,13 +28,13 @@ namespace NetTunnel.Service.TunnelEngine.MessageHandlers
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public QueryReplyPayloadBoolean OnQueryUpsertEndpointOutbound(RmContext context, QueryUpsertEndpointOutbound query)
+        public oldQueryReplyPayloadBoolean OnQueryUpsertEndpointOutbound(RmContext context, oldQueryUpsertEndpointOutbound query)
         {
             var tunnel = EnforceCryptographyAndGetTunnel<TunnelOutbound>(context);
 
             var endpoint = tunnel.UpsertOutboundEndpoint(query.Configuration);
             endpoint.Start();
-            return new QueryReplyPayloadBoolean(true);
+            return new oldQueryReplyPayloadBoolean(true);
         }
 
         /// <summary>
@@ -43,12 +43,12 @@ namespace NetTunnel.Service.TunnelEngine.MessageHandlers
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public QueryReplyPayloadBoolean OnQueryDeleteEndpoint(RmContext context, QueryDeleteEndpoint query)
+        public oldQueryReplyPayloadBoolean OnQueryDeleteEndpoint(RmContext context, oldQueryDeleteEndpoint query)
         {
             var tunnel = EnforceCryptographyAndGetTunnel<TunnelOutbound>(context);
 
             tunnel.DeleteEndpoint(query.EndpointId);
-            return new QueryReplyPayloadBoolean(true);
+            return new oldQueryReplyPayloadBoolean(true);
         }
     }
 }

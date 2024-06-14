@@ -1,7 +1,6 @@
 ﻿using NTDLS.ReliableMessaging;
-using ProtoBuf;
 
-namespace NetTunnel.Library.ReliableMessages
+namespace NetTunnel.Library.ReliableMessages.Notification
 {
     public class NotificationApplyCryptography : IRmNotification
     {

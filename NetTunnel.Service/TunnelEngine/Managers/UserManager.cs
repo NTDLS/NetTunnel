@@ -17,9 +17,14 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             LoadFromDisk();
         }
 
-        public void Add(string username, string passwordHash) => Add(new NtUser(username, passwordHash));
-        public void Add(NtUser user) => _collection.Use((o) => o.Add(user));
-        public void Delete(NtUser user) => _collection.Use((o) => o.RemoveAll(t => t.Username == user.Username));
+        public void Add(string username, string passwordHash)
+            => Add(new NtUser(username, passwordHash));
+
+        public void Add(NtUser user) => _collection.Use((o)
+            => o.Add(user));
+
+        public void Delete(NtUser user) => _collection.Use((o)
+            => o.RemoveAll(t => t.Username == user.Username));
 
         public void ChangePassword(NtUser user)
         {
@@ -32,11 +37,9 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         public bool ValidateLogin(string username, string passwordHash)
         {
-            username = username.ToLower();
-            passwordHash = passwordHash.ToLower();
-
             return _collection.Use((o) =>
-                o.Where(u => u.Username == username && u.PasswordHash == passwordHash).Any());
+                o.Where(u => u.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase)
+                && u.PasswordHash.Equals(passwordHash, StringComparison.CurrentCultureIgnoreCase)).Any());
         }
 
         public List<NtUser> Clone()

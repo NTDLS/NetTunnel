@@ -5,7 +5,7 @@ namespace NetTunnel.Service.ReliableMessages.Notification
 {
     [Serializable]
     [ProtoContract]
-    public class NotificationEndpointExchange : IRmNotification
+    public class oldNotificationEndpointExchange : IRmNotification
     {
         [ProtoMember(1)]
         public Guid StreamId { get; set; }
@@ -19,7 +19,7 @@ namespace NetTunnel.Service.ReliableMessages.Notification
         [ProtoMember(4)]
         public byte[] Bytes { get; set; }
 
-        public NotificationEndpointExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
+        public oldNotificationEndpointExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
         {
             StreamId = streamId;
             TunnelId = tunnelId;
@@ -29,7 +29,7 @@ namespace NetTunnel.Service.ReliableMessages.Notification
             Array.Copy(bytes, Bytes, length);
         }
 
-        public NotificationEndpointExchange()
+        public oldNotificationEndpointExchange()
         {
             Bytes = Array.Empty<byte>();
         }

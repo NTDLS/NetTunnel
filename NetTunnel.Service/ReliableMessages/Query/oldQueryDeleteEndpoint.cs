@@ -6,16 +6,16 @@ namespace NetTunnel.Service.ReliableMessages.Query
 {
     [Serializable]
     [ProtoContract]
-    public class QueryDeleteEndpoint : IRmQuery<QueryReplyPayloadBoolean>
+    public class oldQueryDeleteEndpoint : IRmQuery<oldQueryReplyPayloadBoolean>
     {
         [ProtoMember(1)]
         public string Label { get; set; } = string.Empty;
         [ProtoMember(2)]
         public Guid EndpointId { get; set; } = new();
 
-        public QueryDeleteEndpoint() { }
+        public oldQueryDeleteEndpoint() { }
 
-        public QueryDeleteEndpoint(Guid endpointId)
+        public oldQueryDeleteEndpoint(Guid endpointId)
         {
             EndpointId = endpointId;
         }

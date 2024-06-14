@@ -9,6 +9,8 @@ namespace NetTunnel.Library.ReliableMessages.Query
 
         public QueryLogin(string username, string passwordHash)
         {
+            UserName = username;
+            PasswordHash = passwordHash;
         }
     }
 

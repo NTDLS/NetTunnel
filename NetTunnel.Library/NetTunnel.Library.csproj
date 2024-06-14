@@ -20,8 +20,11 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NTDLS.NASCCL" Version="1.1.1" />
     <PackageReference Include="NTDLS.NullHelpers" Version="1.0.0" />
-    <PackageReference Include="NTDLS.ReliableMessaging" Version="1.8.2" />
     <PackageReference Include="NTDLS.SecureKeyExchange" Version="2.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\NTDLS.ReliableMessaging\NTDLS.ReliableMessaging\NTDLS.ReliableMessaging.csproj" />
   </ItemGroup>
 
 </Project>

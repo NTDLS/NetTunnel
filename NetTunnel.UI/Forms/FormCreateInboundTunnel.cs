@@ -1,4 +1,4 @@
-﻿using NetTunnel.ClientAPI;
+﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NTDLS.NullExtensions;
 using NTDLS.WinFormsHelpers;
@@ -7,14 +7,14 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormCreateInboundTunnel : Form
     {
-        private readonly NtClient? _client;
+        private readonly ClientWrapper? _client;
 
         public FormCreateInboundTunnel()
         {
             InitializeComponent();
         }
 
-        public FormCreateInboundTunnel(NtClient client)
+        public FormCreateInboundTunnel(ClientWrapper client)
         {
             InitializeComponent();
 
@@ -53,9 +53,6 @@ namespace NetTunnel.UI.Forms
 
                 buttonAdd.InvokeEnableControl(false);
                 buttonCancel.InvokeEnableControl(false);
-
-                NtClient remoteClient;
-
 
                 try
                 {
