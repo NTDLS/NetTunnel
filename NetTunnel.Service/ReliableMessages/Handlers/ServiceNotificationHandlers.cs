@@ -14,9 +14,9 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
         /// <param name="notification"></param>
         public void OnNotificationApplyCryptography(RmContext context, NotificationApplyCryptography notification)
         {
-            var inboundTunnelContext = GetServiceConnectionContext(context);
+            var tunnelContext = GetServiceConnectionContext(context);
 
-            inboundTunnelContext.ApplyCryptographyProvider();
+            tunnelContext.ApplyCryptographyProvider();
         }
     }
 }
