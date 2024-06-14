@@ -48,8 +48,11 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             TunnelId = configuration.TunnelId;
             Name = configuration.Name;
 
-            configuration.EndpointConfigurations.ForEach(o => Endpoints.Add(new EndpointInbound(Core, this, o)));
-            configuration.EndpointOutboundConfigurations.ForEach(o => Endpoints.Add(new EndpointOutbound(Core, this, o)));
+            configuration.EndpointConfigurations.Where(o=>o.Direction == NtDirection.Inbound)
+                .ToList().ForEach(o => Endpoints.Add(new EndpointInbound(Core, this, o)));
+
+            configuration.EndpointConfigurations.Where(o => o.Direction == NtDirection.Outbound)
+                .ToList().ForEach(o => Endpoints.Add(new EndpointOutbound(Core, this, o)));
 
             _heartbeatThread = new Thread(HeartbeatThreadProc);
             _heartbeatThread.Start();
@@ -103,7 +106,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                         obe.Configuration.InboundPort, obe.Configuration.OutboundPort,
                         obe.Configuration.HttpHeaderRules, obe.Configuration.TrafficType);
 
-                    tunnelConfiguration.EndpointOutboundConfigurations.Add(endpointConfiguration);
+                    tunnelConfiguration.EndpointConfigurations.Add(endpointConfiguration);
                 }
             }
 
