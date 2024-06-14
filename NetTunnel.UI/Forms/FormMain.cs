@@ -682,6 +682,7 @@ namespace NetTunnel.UI.Forms
                     var item = new ListViewItem(tunnel.Name);
                     item.Tag = tunnel;
                     item.SubItems.Add("Inbound");
+                    item.SubItems.Add($"*");
                     item.SubItems.Add($"{endpointCount:n0}");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
