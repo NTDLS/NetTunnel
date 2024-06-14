@@ -1,5 +1,4 @@
 ﻿using NetTunnel.ClientAPI;
-using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.UI.Helpers;
 using NTDLS.NullExtensions;
@@ -14,7 +13,7 @@ namespace NetTunnel.UI.Forms
         private bool _needToRepopulateTunnels = false;
         private NtClient? OLDDELETEMECLIENT_client;
 
-        private ClientWrapper? _client;
+        private Library.NtServiceClient? _client;
 
         private bool _inTimerTick = false;
         private volatile int _gridPopulationScope = 0;

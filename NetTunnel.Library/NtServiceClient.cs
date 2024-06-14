@@ -7,23 +7,26 @@ using NTDLS.SecureKeyExchange;
 
 namespace NetTunnel.Library
 {
-    public class ClientWrapper
+    /// <summary>
+    /// Used by both the UI to connect to a service and the service to connect to other services.
+    /// </summary>
+    public class NtServiceClient
     {
         public RmClient Client { get; private set; }
 
-        public ClientWrapper(RmClient client)
+        public NtServiceClient(RmClient client)
         {
             Client = client;
         }
 
         #region Factory.
 
-        public static ClientWrapper CreateAndLogin(string address, int port, string username, string passwordHash)
+        public static NtServiceClient CreateAndLogin(string address, int port, string username, string passwordHash)
         {
             return CreateAndLogin(new NtServiceConfiguration(), address, port, username, passwordHash);
         }
 
-        public static ClientWrapper CreateAndLogin(NtServiceConfiguration configuration,
+        public static NtServiceClient CreateAndLogin(NtServiceConfiguration configuration,
              string address, int port, string username, string passwordHash)
         {
             var client = new RmClient(new RmConfiguration()
@@ -60,7 +63,7 @@ namespace NetTunnel.Library
             var login = client.Query(new QueryLogin(username, passwordHash)).Result;
             if (login.Successful)
             {
-                return new ClientWrapper(client);
+                return new NtServiceClient(client);
             }
 
             throw new Exception("Login failed.");

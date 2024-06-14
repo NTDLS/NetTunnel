@@ -8,14 +8,14 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormCreateOutboundTunnel : Form
     {
-        private readonly ClientWrapper? _client;
+        private readonly Library.NtServiceClient? _client;
 
         public FormCreateOutboundTunnel()
         {
             InitializeComponent();
         }
 
-        public FormCreateOutboundTunnel(ClientWrapper client)
+        public FormCreateOutboundTunnel(Library.NtServiceClient client)
         {
             InitializeComponent();
 

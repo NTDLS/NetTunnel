@@ -6,7 +6,7 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormLogin : Form
     {
-        public ClientWrapper? ResultingClient { get; private set; } = null;
+        public NtServiceClient? ResultingClient { get; private set; } = null;
 
         public FormLogin()
         {
@@ -39,7 +39,7 @@ namespace NetTunnel.UI.Forms
                 string passwordHash = Utility.ComputeSha256Hash(textBoxPassword.Text);
                 string address = textBoxAddress.GetAndValidateText("A hostname or IP address is required.");
 
-                var client = ClientWrapper.CreateAndLogin(address, port, username, passwordHash);
+                var client = NtServiceClient.CreateAndLogin(address, port, username, passwordHash);
 
                 var preferences = new UILoginPreferences()
                 {
