@@ -9,6 +9,8 @@ namespace NetTunnel.UI.Forms
     public partial class FormCreateOutboundTunnel : Form
     {
         private readonly NtServiceClient? _client;
+        private bool _allowTabChange = false;
+        private int _lastSelectedTabIndex = 0;
 
         public FormCreateOutboundTunnel()
         {
@@ -20,6 +22,8 @@ namespace NetTunnel.UI.Forms
             InitializeComponent();
 
             _client = client;
+
+            tabControlBody.SelectedIndexChanged += TabControlBody_SelectedIndexChanged;
 
             #region Set Tool-tips.
 
@@ -34,7 +38,7 @@ namespace NetTunnel.UI.Forms
             toolTips.AddControls([labelRemotePassword, textBoxRemotePassword],
                     "The password for the specified user name. This user and password need to exist at the remote TunnelService instance.");
 
-            toolTips.AddControls([labelManagementPort, textBoxManagementPort],
+            toolTips.AddControls([labelPort, textBoxManagementPort],
                     "The management port of the remote TunnelService. This is used so that this instance can reach out to the remote TunnelService instance and configure an inbound tunnel for this outbound tunnel.");
 
             toolTips.AddControls([labelName, textBoxName],
@@ -46,7 +50,7 @@ namespace NetTunnel.UI.Forms
             AcceptButton = buttonAdd;
             CancelButton = buttonCancel;
 
-            textBoxManagementPort.Text = ""; // $"{client?.BasePort}"; //The port that is used to manage the remote tunnel.
+            textBoxManagementPort.Text = "52845"; //TODO: This should be stored in preferences.
 
 #if DEBUG
             textBoxName.Text = "My First Tunnel";
@@ -56,6 +60,22 @@ namespace NetTunnel.UI.Forms
             textBoxRemoteUsername.Text = "debug";
             textBoxRemotePassword.Text = "123456789";
 #endif
+        }
+
+        private void TabControlBody_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            if (!_allowTabChange && tabControlBody.SelectedIndex != _lastSelectedTabIndex)
+            {
+                tabControlBody.SelectedIndex = _lastSelectedTabIndex;
+            }
+        }
+
+        private void ChangeTabIndex(int index)
+        {
+            _allowTabChange = true;
+            tabControlBody.SelectedIndex = index;
+            _lastSelectedTabIndex = index;
+            _allowTabChange = false;
         }
 
         private void FormCreateOutboundTunnel_Load(object sender, EventArgs e) { }
@@ -144,10 +164,90 @@ namespace NetTunnel.UI.Forms
             */
         }
 
+        private void PopulateSelectedTab()
+        {
+            if (tabControlBody.SelectedTab == tabPageBasics)
+            {
+            }
+            else if (tabControlBody.SelectedTab == tabPageRemoteService)
+            {
+            }
+            else if (tabControlBody.SelectedTab == tabPageTunnel)
+            {
+            }
+        }
+
+        /// <summary>
+        /// We are moving away from the tab, so validate the user input. Return false to prevent the tab change.
+        /// </summary>
+        private bool ExecuteSelectedTab()
+        {
+            if (tabControlBody.SelectedTab == tabPageBasics)
+            {
+            }
+            else if (tabControlBody.SelectedTab == tabPageRemoteService)
+            {
+                textBoxRemoteAddress.GetAndValidateText("You must specify a remote tunnel address.");
+                textBoxManagementPort.GetAndValidateNumeric(1, 65535, "You must specify a valid remote tunnel management port between [min] and [max].");
+                textBoxRemoteUsername.GetAndValidateText("You must specify a remote tunnel username.");
+                textBoxRemotePassword.GetAndValidateText("You must specify a valid remote tunnel password.");
+
+                var remoteService = NtServiceClient.CreateAndLogin(
+                    textBoxRemoteAddress.Text, textBoxManagementPort.ValueAs<int>(),
+                    textBoxRemoteUsername.Text, Utility.ComputeSha256Hash(textBoxRemotePassword.Text));
+
+
+                var fff = remoteService.GetInboundTunnels();
+
+            }
+            else if (tabControlBody.SelectedTab == tabPageTunnel)
+            {
+            }
+
+            return true;
+        }
+
         private void buttonCancel_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
             Close();
+        }
+
+        private void buttonNext_Click(object sender, EventArgs e)
+        {
+            if (ExecuteSelectedTab() == false)
+            {
+                return;
+            }
+
+            if (buttonNext.Text == "Save")
+            {
+            }
+            else if (buttonNext.Text == "Next >")
+            {
+                if (tabControlBody.SelectedIndex < tabControlBody.TabCount)
+                {
+                    ChangeTabIndex(tabControlBody.SelectedIndex + 1);
+                }
+                if (tabControlBody.SelectedIndex == tabControlBody.TabCount - 1)
+                {
+                    buttonNext.Text = "Save";
+                }
+                else
+                {
+                    buttonNext.Text = "Next >";
+                }
+
+                PopulateSelectedTab();
+            }
+        }
+
+        private void buttonPrevious_Click(object sender, EventArgs e)
+        {
+            if (tabControlBody.SelectedIndex > 0)
+            {
+                ChangeTabIndex(tabControlBody.SelectedIndex - 1);
+            }
         }
     }
 }

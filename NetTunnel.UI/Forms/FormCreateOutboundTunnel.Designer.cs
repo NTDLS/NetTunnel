@@ -36,20 +36,25 @@
             textBoxRemoteUsername = new TextBox();
             textBoxRemotePassword = new TextBox();
             textBoxManagementPort = new TextBox();
-            labelManagementPort = new Label();
-            buttonAdd = new Button();
+            labelPort = new Label();
             buttonCancel = new Button();
             textBoxName = new TextBox();
             labelName = new Label();
-            labelTunnelDataPort = new Label();
-            groupBoxLoginInfo = new GroupBox();
-            groupBoxLoginInfo.SuspendLayout();
+            tabControlBody = new TabControl();
+            tabPageBasics = new TabPage();
+            tabPageRemoteService = new TabPage();
+            tabPageTunnel = new TabPage();
+            buttonNext = new Button();
+            buttonPrevious = new Button();
+            tabControlBody.SuspendLayout();
+            tabPageBasics.SuspendLayout();
+            tabPageRemoteService.SuspendLayout();
             SuspendLayout();
             // 
             // labelRemoteAddress
             // 
             labelRemoteAddress.AutoSize = true;
-            labelRemoteAddress.Location = new Point(17, 22);
+            labelRemoteAddress.Location = new Point(13, 21);
             labelRemoteAddress.Name = "labelRemoteAddress";
             labelRemoteAddress.Size = new Size(86, 15);
             labelRemoteAddress.TabIndex = 0;
@@ -58,7 +63,7 @@
             // labelRemoteUsername
             // 
             labelRemoteUsername.AutoSize = true;
-            labelRemoteUsername.Location = new Point(18, 76);
+            labelRemoteUsername.Location = new Point(14, 75);
             labelRemoteUsername.Name = "labelRemoteUsername";
             labelRemoteUsername.Size = new Size(63, 15);
             labelRemoteUsername.TabIndex = 1;
@@ -67,7 +72,7 @@
             // labelRemotePassword
             // 
             labelRemotePassword.AutoSize = true;
-            labelRemotePassword.Location = new Point(17, 125);
+            labelRemotePassword.Location = new Point(13, 124);
             labelRemotePassword.Name = "labelRemotePassword";
             labelRemotePassword.Size = new Size(57, 15);
             labelRemotePassword.TabIndex = 2;
@@ -75,21 +80,21 @@
             // 
             // textBoxRemoteAddress
             // 
-            textBoxRemoteAddress.Location = new Point(18, 40);
+            textBoxRemoteAddress.Location = new Point(14, 39);
             textBoxRemoteAddress.Name = "textBoxRemoteAddress";
             textBoxRemoteAddress.Size = new Size(156, 23);
             textBoxRemoteAddress.TabIndex = 2;
             // 
             // textBoxRemoteUsername
             // 
-            textBoxRemoteUsername.Location = new Point(18, 94);
+            textBoxRemoteUsername.Location = new Point(14, 93);
             textBoxRemoteUsername.Name = "textBoxRemoteUsername";
             textBoxRemoteUsername.Size = new Size(239, 23);
             textBoxRemoteUsername.TabIndex = 4;
             // 
             // textBoxRemotePassword
             // 
-            textBoxRemotePassword.Location = new Point(18, 143);
+            textBoxRemotePassword.Location = new Point(14, 142);
             textBoxRemotePassword.Name = "textBoxRemotePassword";
             textBoxRemotePassword.PasswordChar = '*';
             textBoxRemotePassword.Size = new Size(239, 23);
@@ -97,33 +102,23 @@
             // 
             // textBoxManagementPort
             // 
-            textBoxManagementPort.Location = new Point(180, 40);
+            textBoxManagementPort.Location = new Point(176, 39);
             textBoxManagementPort.Name = "textBoxManagementPort";
             textBoxManagementPort.Size = new Size(77, 23);
             textBoxManagementPort.TabIndex = 3;
             // 
-            // labelManagementPort
+            // labelPort
             // 
-            labelManagementPort.AutoSize = true;
-            labelManagementPort.Location = new Point(180, 22);
-            labelManagementPort.Name = "labelManagementPort";
-            labelManagementPort.Size = new Size(68, 15);
-            labelManagementPort.TabIndex = 4;
-            labelManagementPort.Text = "Mgmt. Port";
-            // 
-            // buttonAdd
-            // 
-            buttonAdd.Location = new Point(220, 304);
-            buttonAdd.Name = "buttonAdd";
-            buttonAdd.Size = new Size(75, 23);
-            buttonAdd.TabIndex = 6;
-            buttonAdd.Text = "Add";
-            buttonAdd.UseVisualStyleBackColor = true;
-            buttonAdd.Click += buttonAdd_Click;
+            labelPort.AutoSize = true;
+            labelPort.Location = new Point(176, 21);
+            labelPort.Name = "labelPort";
+            labelPort.Size = new Size(29, 15);
+            labelPort.TabIndex = 4;
+            labelPort.Text = "Port";
             // 
             // buttonCancel
             // 
-            buttonCancel.Location = new Point(139, 304);
+            buttonCancel.Location = new Point(12, 295);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(75, 23);
             buttonCancel.TabIndex = 7;
@@ -133,57 +128,99 @@
             // 
             // textBoxName
             // 
-            textBoxName.Location = new Point(17, 32);
+            textBoxName.Location = new Point(14, 39);
             textBoxName.Name = "textBoxName";
-            textBoxName.Size = new Size(278, 23);
+            textBoxName.Size = new Size(307, 23);
             textBoxName.TabIndex = 0;
             // 
             // labelName
             // 
             labelName.AutoSize = true;
-            labelName.Location = new Point(17, 14);
+            labelName.Location = new Point(14, 21);
             labelName.Name = "labelName";
             labelName.Size = new Size(115, 15);
             labelName.TabIndex = 6;
             labelName.Text = "Name or description";
             // 
-            // labelTunnelDataPort
+            // tabControlBody
             // 
-            labelTunnelDataPort.AutoSize = true;
-            labelTunnelDataPort.Location = new Point(17, 61);
-            labelTunnelDataPort.Name = "labelTunnelDataPort";
-            labelTunnelDataPort.Size = new Size(100, 15);
-            labelTunnelDataPort.TabIndex = 8;
-            labelTunnelDataPort.Text = "Transmission port";
+            tabControlBody.Controls.Add(tabPageBasics);
+            tabControlBody.Controls.Add(tabPageRemoteService);
+            tabControlBody.Controls.Add(tabPageTunnel);
+            tabControlBody.Location = new Point(12, 12);
+            tabControlBody.Name = "tabControlBody";
+            tabControlBody.SelectedIndex = 0;
+            tabControlBody.Size = new Size(345, 281);
+            tabControlBody.TabIndex = 29;
             // 
-            // groupBoxLoginInfo
+            // tabPageBasics
             // 
-            groupBoxLoginInfo.Controls.Add(labelRemoteAddress);
-            groupBoxLoginInfo.Controls.Add(labelRemoteUsername);
-            groupBoxLoginInfo.Controls.Add(labelRemotePassword);
-            groupBoxLoginInfo.Controls.Add(textBoxRemoteAddress);
-            groupBoxLoginInfo.Controls.Add(textBoxRemoteUsername);
-            groupBoxLoginInfo.Controls.Add(textBoxRemotePassword);
-            groupBoxLoginInfo.Controls.Add(textBoxManagementPort);
-            groupBoxLoginInfo.Controls.Add(labelManagementPort);
-            groupBoxLoginInfo.Location = new Point(17, 117);
-            groupBoxLoginInfo.Name = "groupBoxLoginInfo";
-            groupBoxLoginInfo.Size = new Size(278, 179);
-            groupBoxLoginInfo.TabIndex = 9;
-            groupBoxLoginInfo.TabStop = false;
-            groupBoxLoginInfo.Text = "Remote Service Login";
+            tabPageBasics.Controls.Add(labelName);
+            tabPageBasics.Controls.Add(textBoxName);
+            tabPageBasics.Location = new Point(4, 24);
+            tabPageBasics.Name = "tabPageBasics";
+            tabPageBasics.Size = new Size(337, 253);
+            tabPageBasics.TabIndex = 2;
+            tabPageBasics.Text = "Basics";
+            tabPageBasics.UseVisualStyleBackColor = true;
+            // 
+            // tabPageRemoteService
+            // 
+            tabPageRemoteService.Controls.Add(labelRemoteAddress);
+            tabPageRemoteService.Controls.Add(labelRemoteUsername);
+            tabPageRemoteService.Controls.Add(labelRemotePassword);
+            tabPageRemoteService.Controls.Add(labelPort);
+            tabPageRemoteService.Controls.Add(textBoxRemoteAddress);
+            tabPageRemoteService.Controls.Add(textBoxManagementPort);
+            tabPageRemoteService.Controls.Add(textBoxRemoteUsername);
+            tabPageRemoteService.Controls.Add(textBoxRemotePassword);
+            tabPageRemoteService.Location = new Point(4, 24);
+            tabPageRemoteService.Name = "tabPageRemoteService";
+            tabPageRemoteService.Padding = new Padding(3);
+            tabPageRemoteService.Size = new Size(337, 253);
+            tabPageRemoteService.TabIndex = 0;
+            tabPageRemoteService.Text = "Remote Service";
+            tabPageRemoteService.UseVisualStyleBackColor = true;
+            // 
+            // tabPageTunnel
+            // 
+            tabPageTunnel.Location = new Point(4, 24);
+            tabPageTunnel.Name = "tabPageTunnel";
+            tabPageTunnel.Padding = new Padding(3);
+            tabPageTunnel.Size = new Size(337, 253);
+            tabPageTunnel.TabIndex = 1;
+            tabPageTunnel.Text = "Tunnel";
+            tabPageTunnel.UseVisualStyleBackColor = true;
+            // 
+            // buttonNext
+            // 
+            buttonNext.Location = new Point(270, 295);
+            buttonNext.Name = "buttonNext";
+            buttonNext.Size = new Size(83, 23);
+            buttonNext.TabIndex = 30;
+            buttonNext.Text = "Next >";
+            buttonNext.UseVisualStyleBackColor = true;
+            buttonNext.Click += buttonNext_Click;
+            // 
+            // buttonPrevious
+            // 
+            buttonPrevious.Location = new Point(181, 295);
+            buttonPrevious.Name = "buttonPrevious";
+            buttonPrevious.Size = new Size(83, 23);
+            buttonPrevious.TabIndex = 31;
+            buttonPrevious.Text = "< Previous";
+            buttonPrevious.UseVisualStyleBackColor = true;
+            buttonPrevious.Click += buttonPrevious_Click;
             // 
             // FormCreateOutboundTunnel
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(312, 339);
-            Controls.Add(groupBoxLoginInfo);
-            Controls.Add(labelTunnelDataPort);
-            Controls.Add(textBoxName);
-            Controls.Add(labelName);
+            ClientSize = new Size(366, 330);
+            Controls.Add(buttonPrevious);
+            Controls.Add(buttonNext);
+            Controls.Add(tabControlBody);
             Controls.Add(buttonCancel);
-            Controls.Add(buttonAdd);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
@@ -193,10 +230,12 @@
             StartPosition = FormStartPosition.CenterParent;
             Text = "NetTunnel : Create Outbound Tunnel";
             Load += FormCreateOutboundTunnel_Load;
-            groupBoxLoginInfo.ResumeLayout(false);
-            groupBoxLoginInfo.PerformLayout();
+            tabControlBody.ResumeLayout(false);
+            tabPageBasics.ResumeLayout(false);
+            tabPageBasics.PerformLayout();
+            tabPageRemoteService.ResumeLayout(false);
+            tabPageRemoteService.PerformLayout();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
@@ -208,12 +247,17 @@
         private TextBox textBoxRemoteUsername;
         private TextBox textBoxRemotePassword;
         private TextBox textBoxManagementPort;
-        private Label labelManagementPort;
+        private Label labelPort;
         private Button buttonAdd;
         private Button buttonCancel;
         private TextBox textBoxName;
         private Label labelName;
         private Label labelTunnelDataPort;
-        private GroupBox groupBoxLoginInfo;
+        private TabControl tabControlBody;
+        private TabPage tabPageRemoteService;
+        private TabPage tabPageTunnel;
+        private TabPage tabPageBasics;
+        private Button buttonNext;
+        private Button buttonPrevious;
     }
 }
