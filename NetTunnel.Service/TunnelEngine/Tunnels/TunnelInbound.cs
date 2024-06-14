@@ -17,7 +17,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         {
             return TunnelId.GetHashCode()
                 + Name.GetHashCode()
-                + DataPort.GetHashCode()
                 + Endpoints.Sum(o => o.GetHashCode());
         }
 
@@ -25,8 +24,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             => GetHashCode();
 
         #region Configuration Properties.
-
-        public int DataPort { get; private set; }
 
         #endregion
 
@@ -59,8 +56,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             _heartbeatThread = new Thread(HeartbeatThreadProc);
             _heartbeatThread.Start();
-
-            DataPort = configuration.DataPort;
 
             /*
             _server = new RmServer(new RmConfiguration()
@@ -126,14 +121,14 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 {
                     return;
                 }
-                Core.Logging.Write(NtLogSeverity.Verbose, $"Starting inbound tunnel '{Name}' on port {DataPort}.");
+                Core.Logging.Write(NtLogSeverity.Verbose, $"Starting inbound tunnel '{Name}'.");
 
                 KeepRunning = true;
 
                 Status = NtTunnelStatus.Disconnected;
 
                 //_server.Start(DataPort);
-                Core.Logging.Write(NtLogSeverity.Verbose, $"Started listening for inbound tunnel '{Name}' on port {DataPort}.");
+                Core.Logging.Write(NtLogSeverity.Verbose, $"Started listening for inbound tunnel '{Name}'.");
 
                 Core.Logging.Write(NtLogSeverity.Verbose, $"Starting endpoints for inbound tunnel '{Name}'.");
                 Endpoints.ForEach(x => x.Start());
@@ -148,7 +143,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         public void Stop()
         {
-            Core.Logging.Write(NtLogSeverity.Verbose, $"Stopping inbound tunnel '{Name}' on port {DataPort}.");
+            Core.Logging.Write(NtLogSeverity.Verbose, $"Stopping inbound tunnel '{Name}'.");
 
             Endpoints.ForEach(o => o.Stop());
 

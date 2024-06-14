@@ -41,7 +41,6 @@
             buttonCancel = new Button();
             textBoxName = new TextBox();
             labelName = new Label();
-            textBoxTunnelDataPort = new TextBox();
             labelTunnelDataPort = new Label();
             groupBoxLoginInfo = new GroupBox();
             groupBoxLoginInfo.SuspendLayout();
@@ -148,13 +147,6 @@
             labelName.TabIndex = 6;
             labelName.Text = "Name or description";
             // 
-            // textBoxTunnelDataPort
-            // 
-            textBoxTunnelDataPort.Location = new Point(17, 79);
-            textBoxTunnelDataPort.Name = "textBoxTunnelDataPort";
-            textBoxTunnelDataPort.Size = new Size(103, 23);
-            textBoxTunnelDataPort.TabIndex = 1;
-            // 
             // labelTunnelDataPort
             // 
             labelTunnelDataPort.AutoSize = true;
@@ -188,7 +180,6 @@
             ClientSize = new Size(312, 339);
             Controls.Add(groupBoxLoginInfo);
             Controls.Add(labelTunnelDataPort);
-            Controls.Add(textBoxTunnelDataPort);
             Controls.Add(textBoxName);
             Controls.Add(labelName);
             Controls.Add(buttonCancel);
@@ -222,7 +213,6 @@
         private Button buttonCancel;
         private TextBox textBoxName;
         private Label labelName;
-        private TextBox textBoxTunnelDataPort;
         private Label labelTunnelDataPort;
         private GroupBox groupBoxLoginInfo;
     }

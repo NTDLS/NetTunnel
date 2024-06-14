@@ -24,18 +24,17 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         {
             return TunnelId.GetHashCode()
                 + Name.GetHashCode()
-                + DataPort.GetHashCode()
                 + Endpoints.Sum(o => o.GetHashCode());
         }
 
         public int ChangeHash
-            => TunnelId.GetHashCode() + Name.GetHashCode() + DataPort.GetHashCode();
+            => TunnelId.GetHashCode()
+            + Name.GetHashCode();
 
         #region Configuration Properties.
 
         public string Address { get; set; }
         public int ManagementPort { get; set; }
-        public int DataPort { get; set; }
         public string Username { get; set; }
         public string PasswordHash { get; set; }
 
@@ -75,7 +74,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
             Address = configuration.Address;
             ManagementPort = configuration.ManagementPort;
-            DataPort = configuration.DataPort;
             Username = configuration.Username;
             PasswordHash = configuration.PasswordHash;
 
@@ -128,7 +126,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         public NtTunnelOutboundConfiguration CloneConfiguration()
         {
-            var tunnelConfiguration = new NtTunnelOutboundConfiguration(TunnelId, Name, Address, ManagementPort, DataPort, Username, PasswordHash);
+            var tunnelConfiguration = new NtTunnelOutboundConfiguration(TunnelId, Name, Address, ManagementPort, Username, PasswordHash);
 
             foreach (var endpoint in Endpoints)
             {
@@ -225,10 +223,10 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                         SecureKeyExchangeIsComplete = false;
                         _client.ClearCryptographyProvider();
 
-                        Core.Logging.Write(NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' connecting to remote at {Address}:{DataPort}.");
+                        Core.Logging.Write(NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' connecting to remote at {Address}:{ManagementPort}.");
 
                         //Make the outbound connection to the remote tunnel service.
-                        _client.Connect(Address, DataPort);
+                        _client.Connect(Address, ManagementPort);
 
                         //The first thing we do when we get a connection is start a new key exchange process.
                         var compoundNegotiator = new CompoundNegotiator();

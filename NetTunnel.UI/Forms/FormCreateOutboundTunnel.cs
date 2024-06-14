@@ -40,8 +40,6 @@ namespace NetTunnel.UI.Forms
             toolTips.AddControls([labelName, textBoxName],
                     "The user friendly name of this tunnel.");
 
-            toolTips.AddControls([labelTunnelDataPort, textBoxTunnelDataPort],
-                    "The port which the tunnel will use to listen and transmit data. This outbound tunnel will reach out to the specified remote TunnelService on the specified 'Management Port' and ask it to create a corresponding inbound tunnel for this outbound tunnel. The remote inbound tunnel will be configured to listen on this port and this outbound tunnel will make the outbound connection to it.");
 
             #endregion
 
@@ -54,7 +52,6 @@ namespace NetTunnel.UI.Forms
             textBoxName.Text = "My First Tunnel";
 
             textBoxRemoteAddress.Text = "10.20.1.120";
-            textBoxTunnelDataPort.Text = "52846"; //This is the port that is used to move tunnel data between tunnels
 
             textBoxRemoteUsername.Text = "debug";
             textBoxRemotePassword.Text = "123456789";
@@ -74,12 +71,11 @@ namespace NetTunnel.UI.Forms
                 textBoxManagementPort.GetAndValidateNumeric(1, 65535, "You must specify a valid remote tunnel management port between [min] and [max].");
                 textBoxRemoteUsername.GetAndValidateText("You must specify a remote tunnel username.");
                 textBoxRemotePassword.GetAndValidateText("You must specify a valid remote tunnel password.");
-                textBoxTunnelDataPort.GetAndValidateNumeric(1, 65535, "You must specify a tunnel data port between [min] and [max].");
 
                 var tunnelId = Guid.NewGuid(); //The TunnelId is the same on both services.
 
                 var outboundTunnel = new NtTunnelOutboundConfiguration(tunnelId, textBoxName.Text,
-                    textBoxRemoteAddress.Text, textBoxManagementPort.ValueAs<int>(), textBoxTunnelDataPort.ValueAs<int>(),
+                    textBoxRemoteAddress.Text, textBoxManagementPort.ValueAs<int>(),
                     textBoxRemoteUsername.Text, Utility.ComputeSha256Hash(textBoxRemotePassword.Text));
 
                 var inboundTunnel = new NtTunnelInboundConfiguration(tunnelId, textBoxName.Text);

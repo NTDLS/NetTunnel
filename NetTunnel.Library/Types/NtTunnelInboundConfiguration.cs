@@ -6,8 +6,6 @@
 
         public string Name { get; set; } = string.Empty;
 
-        public int DataPort { get; set; } //DELETEME
-
         public List<NtEndpointOutboundConfiguration> EndpointOutboundConfigurations { get; set; } = new();
 
         public List<NtEndpointInboundConfiguration> EndpointInboundConfigurations { get; set; } = new();
