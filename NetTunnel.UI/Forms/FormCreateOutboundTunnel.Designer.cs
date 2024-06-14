@@ -44,11 +44,15 @@
             tabPageBasics = new TabPage();
             tabPageRemoteService = new TabPage();
             tabPageTunnel = new TabPage();
+            labelSelectATunnel = new Label();
+            listViewTunnels = new ListView();
+            columnHeaderTunnelName = new ColumnHeader();
             buttonNext = new Button();
             buttonPrevious = new Button();
             tabControlBody.SuspendLayout();
             tabPageBasics.SuspendLayout();
             tabPageRemoteService.SuspendLayout();
+            tabPageTunnel.SuspendLayout();
             SuspendLayout();
             // 
             // labelRemoteAddress
@@ -184,6 +188,8 @@
             // 
             // tabPageTunnel
             // 
+            tabPageTunnel.Controls.Add(labelSelectATunnel);
+            tabPageTunnel.Controls.Add(listViewTunnels);
             tabPageTunnel.Location = new Point(4, 24);
             tabPageTunnel.Name = "tabPageTunnel";
             tabPageTunnel.Padding = new Padding(3);
@@ -191,6 +197,33 @@
             tabPageTunnel.TabIndex = 1;
             tabPageTunnel.Text = "Tunnel";
             tabPageTunnel.UseVisualStyleBackColor = true;
+            // 
+            // labelSelectATunnel
+            // 
+            labelSelectATunnel.AutoSize = true;
+            labelSelectATunnel.Location = new Point(3, 3);
+            labelSelectATunnel.Name = "labelSelectATunnel";
+            labelSelectATunnel.Size = new Size(202, 15);
+            labelSelectATunnel.TabIndex = 1;
+            labelSelectATunnel.Text = "Select a remote tunnel to connect to:";
+            // 
+            // listViewTunnels
+            // 
+            listViewTunnels.Columns.AddRange(new ColumnHeader[] { columnHeaderTunnelName });
+            listViewTunnels.FullRowSelect = true;
+            listViewTunnels.GridLines = true;
+            listViewTunnels.HeaderStyle = ColumnHeaderStyle.None;
+            listViewTunnels.Location = new Point(3, 21);
+            listViewTunnels.Name = "listViewTunnels";
+            listViewTunnels.Size = new Size(328, 226);
+            listViewTunnels.TabIndex = 0;
+            listViewTunnels.UseCompatibleStateImageBehavior = false;
+            listViewTunnels.View = View.Details;
+            // 
+            // columnHeaderTunnelName
+            // 
+            columnHeaderTunnelName.Text = "Name";
+            columnHeaderTunnelName.Width = 300;
             // 
             // buttonNext
             // 
@@ -235,6 +268,8 @@
             tabPageBasics.PerformLayout();
             tabPageRemoteService.ResumeLayout(false);
             tabPageRemoteService.PerformLayout();
+            tabPageTunnel.ResumeLayout(false);
+            tabPageTunnel.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -259,5 +294,8 @@
         private TabPage tabPageBasics;
         private Button buttonNext;
         private Button buttonPrevious;
+        private Label labelSelectATunnel;
+        private ListView listViewTunnels;
+        private ColumnHeader columnHeaderTunnelName;
     }
 }

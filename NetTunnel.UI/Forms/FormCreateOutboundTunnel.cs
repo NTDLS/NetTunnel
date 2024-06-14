@@ -196,15 +196,24 @@ namespace NetTunnel.UI.Forms
                     textBoxRemoteAddress.Text, textBoxManagementPort.ValueAs<int>(),
                     textBoxRemoteUsername.Text, Utility.ComputeSha256Hash(textBoxRemotePassword.Text));
 
-
-                var fff = remoteService.GetInboundTunnels();
-
+                remoteService.GetInboundTunnels().ContinueWith(t =>
+                {
+                    Invoke(PopulateTunnels, t.Result.Collection);
+                });
             }
             else if (tabControlBody.SelectedTab == tabPageTunnel)
             {
             }
 
             return true;
+        }
+
+        void PopulateTunnels(List<NtTunnelInboundConfiguration> tunnels)
+        {
+            foreach (var tunnel in tunnels)
+            {
+                listViewTunnels.Items.Add(tunnel.Name);
+            }
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)

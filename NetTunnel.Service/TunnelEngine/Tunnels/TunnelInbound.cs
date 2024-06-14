@@ -48,7 +48,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             TunnelId = configuration.TunnelId;
             Name = configuration.Name;
 
-            configuration.EndpointConfigurations.Where(o=>o.Direction == NtDirection.Inbound)
+            configuration.EndpointConfigurations.Where(o => o.Direction == NtDirection.Inbound)
                 .ToList().ForEach(o => Endpoints.Add(new EndpointInbound(Core, this, o)));
 
             configuration.EndpointConfigurations.Where(o => o.Direction == NtDirection.Outbound)
