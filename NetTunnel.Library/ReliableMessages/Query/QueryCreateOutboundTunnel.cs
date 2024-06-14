@@ -5,9 +5,9 @@ namespace NetTunnel.Library.ReliableMessages.Query
 {
     public class QueryCreateOutboundTunnel : IRmQuery<QueryCreateOutboundTunnelReply>
     {
-        public NtTunnelOutboundConfiguration Configuration { get; set; }
+        public NtTunnelConfiguration Configuration { get; set; }
 
-        public QueryCreateOutboundTunnel(NtTunnelOutboundConfiguration configuration)
+        public QueryCreateOutboundTunnel(NtTunnelConfiguration configuration)
         {
             Configuration = configuration;
         }

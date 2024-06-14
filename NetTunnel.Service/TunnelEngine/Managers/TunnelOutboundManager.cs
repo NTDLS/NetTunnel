@@ -1,11 +1,10 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NetTunnel.Service.TunnelEngine.Tunnels;
 using NTDLS.Persistence;
 
 namespace NetTunnel.Service.TunnelEngine.Managers
 {
-    internal class TunnelOutboundManager : BaseTunnelManager<TunnelOutbound, NtTunnelOutboundConfiguration>
+    internal class TunnelOutboundManager : BaseTunnelManager
     {
         public TunnelOutboundManager(TunnelEngineCore core)
             : base(core)
@@ -14,7 +13,6 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         }
 
         /*
-
         /// <summary>
         /// Tell the remote tunnel service to delete the specified endpoint.
         /// </summary>
@@ -100,11 +98,11 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         */
 
-        public List<NtTunnelOutboundConfiguration> CloneConfigurations()
+        public List<NtTunnelConfiguration> CloneConfigurations()
         {
             return Collection.Use((o) =>
             {
-                List<NtTunnelOutboundConfiguration> clones = new();
+                List<NtTunnelConfiguration> clones = new();
                 foreach (var tunnel in o)
                 {
                     clones.Add(tunnel.CloneConfiguration());
@@ -120,7 +118,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             Collection.Use((o) =>
             {
                 if (o.Count != 0) throw new Exception("Can not load configuration on top of existing collection.");
-                CommonApplicationData.LoadFromDisk<List<NtTunnelOutboundConfiguration>>(Constants.FriendlyName)?.ForEach(o => Add(o));
+                CommonApplicationData.LoadFromDisk<List<NtTunnelConfiguration>>(Constants.FriendlyName)?.ForEach(o => Add(o));
             });
         }
     }

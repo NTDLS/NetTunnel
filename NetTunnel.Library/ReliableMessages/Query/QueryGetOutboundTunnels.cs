@@ -9,7 +9,7 @@ namespace NetTunnel.Library.ReliableMessages.Query
 
     public class GetOutboundTunnelsReply : IRmQueryReply
     {
-        public List<NtTunnelOutboundConfiguration> Collection { get; set; } = new();
+        public List<NtTunnelConfiguration> Collection { get; set; } = new();
 
         public GetOutboundTunnelsReply()
         {

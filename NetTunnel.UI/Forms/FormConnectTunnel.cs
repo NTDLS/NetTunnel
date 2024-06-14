@@ -77,7 +77,7 @@ namespace NetTunnel.UI.Forms
 
                 var tunnelId = Guid.NewGuid(); //The TunnelId is the same on both services.
 
-                var outboundTunnel = new NtTunnelOutboundConfiguration(tunnelId, textBoxName.Text,
+                var outboundTunnel = new NtTunnelConfiguration(tunnelId, textBoxName.Text,
                     textBoxRemoteAddress.Text, textBoxManagementPort.ValueAs<int>(),
                     textBoxRemoteUsername.Text, Utility.ComputeSha256Hash(textBoxRemotePassword.Text));
 
@@ -106,7 +106,7 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-        public void ConfigureTunnelPair(NtClient remoteClient, NtTunnelOutboundConfiguration outboundTunnel)
+        public void ConfigureTunnelPair(NtClient remoteClient, NtTunnelConfiguration outboundTunnel)
         {
             /*
             //Add the outbound tunnel config to the local tunnel instance.

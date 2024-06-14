@@ -7,11 +7,11 @@ using NTDLS.Semaphore;
 
 namespace NetTunnel.Service.TunnelEngine.Managers
 {
-    internal class BaseTunnelManager<T, C> where T : ITunnel where C : INtTunnelConfiguration
+    internal class BaseTunnelManager
     {
         public TunnelEngineCore Core { get; private set; }
 
-        protected readonly PessimisticCriticalResource<List<T>> Collection = new();
+        protected readonly PessimisticCriticalResource<List<Tunnel>> Collection = new();
 
         public void Start(Guid tunnelId) => Collection.Use((o) => o.Where(o => o.TunnelId == tunnelId).Single().Start());
         public void Stop(Guid tunnelId) => Collection.Use((o) => o.Where(o => o.TunnelId == tunnelId).Single().Stop());
@@ -23,11 +23,11 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             Core = core;
         }
 
-        public void Add(C config)
+        public void Add(NtTunnelConfiguration config)
         {
             Collection.Use((o) =>
             {
-                var tunnel = (T?)Activator.CreateInstance(typeof(T), Core, config);
+                var tunnel = new Tunnel(Core, config);
                 o.Add(tunnel.EnsureNotNull());
             });
         }
