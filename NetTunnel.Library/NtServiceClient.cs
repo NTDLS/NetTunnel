@@ -21,12 +21,12 @@ namespace NetTunnel.Library
 
         #region Factory.
 
-        public static NtServiceClient CreateAndLogin(string address, int port, string username, string passwordHash)
+        public static async Task<NtServiceClient> CreateAndLogin(string address, int port, string username, string passwordHash)
         {
-            return CreateAndLogin(new NtServiceConfiguration(), address, port, username, passwordHash);
+            return await CreateAndLogin(new NtServiceConfiguration(), address, port, username, passwordHash);
         }
 
-        public static NtServiceClient CreateAndLogin(NtServiceConfiguration configuration,
+        public static async Task<NtServiceClient> CreateAndLogin(NtServiceConfiguration configuration,
              string address, int port, string username, string passwordHash)
         {
             var client = new RmClient(new RmConfiguration()
@@ -43,8 +43,8 @@ namespace NetTunnel.Library
             var negotiationToken = compoundNegotiator.GenerateNegotiationToken(configuration.TunnelCryptographyKeySize);
 
             //The first thing we do when we get a connection is start a new key exchange process.
-            var queryRequestKeyExchangeReply = client.Query(
-                new QueryRequestKeyExchange(negotiationToken), configuration.MessageQueryTimeoutMs).Result;
+            var queryRequestKeyExchangeReply = await client.Query(
+                new QueryRequestKeyExchange(negotiationToken), configuration.MessageQueryTimeoutMs);
 
             //We received a reply to the secure key exchange, apply it.
             compoundNegotiator.ApplyNegotiationResponseToken(queryRequestKeyExchangeReply.NegotiationToken);
@@ -59,8 +59,8 @@ namespace NetTunnel.Library
             client.Notify(new NotificationApplyCryptography());
             client.SetCryptographyProvider(cryptographyProvider);
 
-            //Login
-            var login = client.Query(new QueryLogin(username, passwordHash)).Result;
+            //Login.
+            var login = await client.Query(new QueryLogin(username, passwordHash));
             if (login.Successful)
             {
                 return new NtServiceClient(client);

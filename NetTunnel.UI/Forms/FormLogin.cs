@@ -39,20 +39,31 @@ namespace NetTunnel.UI.Forms
                 string passwordHash = Utility.ComputeSha256Hash(textBoxPassword.Text);
                 string address = textBoxAddress.GetAndValidateText("A hostname or IP address is required.");
 
-                var client = NtServiceClient.CreateAndLogin(address, port, username, passwordHash);
-
-                var preferences = new UILoginPreferences()
+                NtServiceClient.CreateAndLogin(address, port, username, passwordHash).ContinueWith(x =>
                 {
-                    Address = textBoxAddress.Text,
-                    Port = textBoxPort.Text,
-                    Username = textBoxUsername.Text,
-                };
+                    if (!x.IsCompletedSuccessfully)
+                    {
+                        this.InvokeMessageBox(x.Exception?.Message ?? "An unknown exception occurred.",
+                            Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 
-                LocalUserApplicationData.SaveToDisk(Constants.FriendlyName, preferences);
+                        buttonLogin.InvokeEnableControl(true);
+                        buttonCancel.InvokeEnableControl(true);
+                        return;
+                    }
 
-                ResultingClient = client;
+                    var preferences = new UILoginPreferences()
+                    {
+                        Address = textBoxAddress.Text,
+                        Port = textBoxPort.Text,
+                        Username = textBoxUsername.Text,
+                    };
 
-                this.InvokeClose(DialogResult.OK);
+                    LocalUserApplicationData.SaveToDisk(Constants.FriendlyName, preferences);
+
+                    ResultingClient = x.Result;
+
+                    this.InvokeClose(DialogResult.OK);
+                });
             }
             catch (Exception ex)
             {

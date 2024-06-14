@@ -87,8 +87,20 @@ namespace NetTunnel.UI.Forms
                 try
                 {
                     var remoteClient = NtServiceClient.CreateAndLogin(outboundTunnel.Address,
-                        outboundTunnel.ManagementPort, outboundTunnel.Username, outboundTunnel.PasswordHash);
+                        outboundTunnel.ManagementPort, outboundTunnel.Username, outboundTunnel.PasswordHash).ContinueWith(x =>
+                        {
+                            if (!x.IsCompletedSuccessfully)
+                            {
+                                this.InvokeMessageBox(x.Exception?.Message ?? "An unknown exception occurred.",
+                                    Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 
+                                buttonConnect.InvokeEnableControl(true);
+                                buttonCancel.InvokeEnableControl(true);
+                                return;
+                            }
+
+                            this.InvokeClose(DialogResult.OK);
+                        });
 
                     //ConfigureTunnelPair(remoteClient, outboundTunnel, inboundTunnel);
                 }
@@ -143,6 +155,11 @@ namespace NetTunnel.UI.Forms
                 });
             });
             */
+        }
+
+        private void buttonConnect_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
