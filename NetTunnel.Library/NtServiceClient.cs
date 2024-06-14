@@ -73,7 +73,7 @@ namespace NetTunnel.Library
 
         public async Task<GetOutboundTunnelsReply> GetOutboundTunnels()
         {
-            return await Client.Query(new QueryGetOutboundTunnels());
+            return await Client.Query(new QueryGetTunnels());
         }
 
         /*

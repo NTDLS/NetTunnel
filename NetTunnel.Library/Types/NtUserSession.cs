@@ -1,5 +1,8 @@
 ﻿namespace NetTunnel.Library.Types
 {
+    /// <summary>
+    /// Used to record a logged in connection.
+    /// </summary>
     public class NtUserSession
     {
         public Guid ConnectionId { get; set; }

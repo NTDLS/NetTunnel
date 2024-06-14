@@ -11,7 +11,7 @@ namespace NetTunnel.Service.TunnelEngine
         public RmServer CoreServer { get; private set; }
         public Logger Logging { get; set; }
         public UserSessionManager Sessions { get; set; }
-        public TunnelOutboundManager OutboundTunnels { get; set; }
+        public TunnelManager OutboundTunnels { get; set; }
         public UserManager Users { get; set; }
 
         public TunnelEngineCore()

@@ -45,7 +45,7 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
             return new QueryLoginReply(false);
         }
 
-        public GetOutboundTunnelsReply OnGetOutboundTunnels(RmContext context, QueryGetOutboundTunnels query)
+        public GetOutboundTunnelsReply OnGetOutboundTunnels(RmContext context, QueryGetTunnels query)
         {
             var inboundTunnelContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
@@ -55,7 +55,7 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
             };
         }
 
-        public QueryCreateOutboundTunnelReply OnQueryCreateOutboundTunnel(RmContext context, QueryCreateOutboundTunnel query)
+        public QueryCreateOutboundTunnelReply OnQueryCreateOutboundTunnel(RmContext context, QueryCreateTunnel query)
         {
             var inboundTunnelContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 

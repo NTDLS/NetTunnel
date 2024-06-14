@@ -2,7 +2,6 @@
 using NetTunnel.Library.Types;
 using NetTunnel.Service.ReliableMessages;
 using NetTunnel.Service.TunnelEngine.Endpoints;
-using NetTunnel.Service.TunnelEngine.MessageHandlers;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
 using System.Net.Sockets;
@@ -87,8 +86,8 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 ReceiveBufferGrowthRate = Singletons.Configuration.ReceiveBufferGrowthRate,
             });
 
-            _client.AddHandler(new oldTunnelOutboundMessageHandlers());
-            _client.AddHandler(new oldTunnelOutboundQueryHandlers());
+            //_client.AddHandler(new oldTunnelOutboundMessageHandlers());
+            //_client.AddHandler(new oldTunnelOutboundQueryHandlers());
 
             _client.OnConnected += _client_OnConnected;
             _client.OnDisconnected += _client_OnDisconnected;

@@ -3,11 +3,11 @@ using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Library.ReliableMessages.Query
 {
-    public class QueryCreateOutboundTunnel : IRmQuery<QueryCreateOutboundTunnelReply>
+    public class QueryCreateTunnel : IRmQuery<QueryCreateOutboundTunnelReply>
     {
         public NtTunnelConfiguration Configuration { get; set; }
 
-        public QueryCreateOutboundTunnel(NtTunnelConfiguration configuration)
+        public QueryCreateTunnel(NtTunnelConfiguration configuration)
         {
             Configuration = configuration;
         }
