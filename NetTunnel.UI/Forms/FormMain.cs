@@ -70,7 +70,7 @@ namespace NetTunnel.UI.Forms
             var selectedEndpointRow = listViewEndpoints.GetItemAt(e.X, e.Y);
             if (selectedEndpointRow != null)
             {
-                var selectedEndpoint = (selectedEndpointRow.Tag as INtEndpointConfiguration).EnsureNotNull();
+                var selectedEndpoint = (selectedEndpointRow.Tag as NtEndpointConfiguration).EnsureNotNull();
 
                 using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), selectedTunnel, selectedEndpoint);
                 if (form.ShowDialog() == DialogResult.OK)
@@ -159,7 +159,7 @@ namespace NetTunnel.UI.Forms
 
                         foreach (ListViewItem item in listViewEndpoints.Items)
                         {
-                            var endpoint = ((INtEndpointConfiguration?)item.Tag).EnsureNotNull();
+                            var endpoint = ((NtEndpointConfiguration?)item.Tag).EnsureNotNull();
 
                             var direction = (endpoint is NtEndpointConfiguration) ? NtDirection.Inbound : NtDirection.Outbound;
 

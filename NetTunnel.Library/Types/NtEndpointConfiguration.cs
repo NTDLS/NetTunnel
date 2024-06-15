@@ -5,7 +5,7 @@ namespace NetTunnel.Library.Types
     /// <summary>
     /// The endpoint contains information that defines all we need to listen or connect to an endpoint.
     /// </summary>
-    public class NtEndpointConfiguration : INtEndpointConfiguration
+    public class NtEndpointConfiguration
     {
         public Guid EndpointId { get; set; }
         public Guid TunnelId { get; set; }

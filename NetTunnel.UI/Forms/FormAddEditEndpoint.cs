@@ -11,12 +11,12 @@ namespace NetTunnel.UI.Forms
         private readonly NtServiceClient? _client;
         private readonly NtTunnelConfiguration? _tunnel;
         private readonly NtDirection _direction;
-        private readonly INtEndpointConfiguration? _existingEndpoint;
+        private readonly NtEndpointConfiguration? _existingEndpoint;
 
         /// <summary>
         /// Creates a form for a editing an existing endpoint.
         /// </summary>
-        public FormAddEditEndpoint(NtServiceClient client, NtTunnelConfiguration tunnel, INtEndpointConfiguration existingEndpoint)
+        public FormAddEditEndpoint(NtServiceClient client, NtTunnelConfiguration tunnel, NtEndpointConfiguration existingEndpoint)
         {
             InitializeComponent();
 

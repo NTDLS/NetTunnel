@@ -26,10 +26,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         internal readonly PessimisticCriticalResource<Dictionary<Guid, ActiveEndpointConnection>> _activeConnections = new();
 
-        public INtEndpointConfiguration Configuration { get; private set; }
+        public NtEndpointConfiguration Configuration { get; private set; }
 
         public BaseEndpoint(TunnelEngineCore core, Tunnel tunnel,
-            Guid endpointId, INtEndpointConfiguration configuration)
+            Guid endpointId, NtEndpointConfiguration configuration)
         {
             Configuration = configuration;
 
@@ -144,7 +144,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
             try
             {
-                INtEndpointConfiguration? endpointConfig = null;
+                NtEndpointConfiguration? endpointConfig = null;
 
                 if (this is EndpointInbound endpointInbound)
                 {

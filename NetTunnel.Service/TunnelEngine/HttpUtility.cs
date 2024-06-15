@@ -21,7 +21,7 @@ namespace NetTunnel.Service
             NotPresent
         }
 
-        public static HTTPHeaderResult Process(ref StringBuilder httpHeaderBuilder, INtEndpointConfiguration endpointConfig, PumpBuffer buffer)
+        public static HTTPHeaderResult Process(ref StringBuilder httpHeaderBuilder, NtEndpointConfiguration endpointConfig, PumpBuffer buffer)
         {
             try
             {
@@ -119,7 +119,7 @@ namespace NetTunnel.Service
             return -1;
         }
 
-        public static string ApplyHttpHeaderRules(INtEndpointConfiguration endpointConfig,
+        public static string ApplyHttpHeaderRules(NtEndpointConfiguration endpointConfig,
             string httpHeader, NtHttpHeaderType headerType, string httpRequestVerb, string headerDelimiter)
         {
             try
