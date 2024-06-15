@@ -2,7 +2,6 @@
 using NetTunnel.Library.Types;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NTDLS.ReliableMessaging;
-using NTDLS.SecureKeyExchange;
 using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
 
@@ -75,7 +74,7 @@ namespace NetTunnel.Service.TunnelEngine
             PasswordHash = configuration.PasswordHash;
 
             _client = NtServiceClient.Create(Singletons.Configuration,
-                configuration.Address, configuration.ManagementPort, configuration.Name, configuration.PasswordHash, this);
+                configuration.Address, configuration.ManagementPort, configuration.Username, configuration.PasswordHash, this);
 
             //_client.AddHandler(new oldTunnelOutboundMessageHandlers());
             //_client.AddHandler(new oldTunnelOutboundQueryHandlers());
@@ -173,6 +172,9 @@ namespace NetTunnel.Service.TunnelEngine
             Core.Logging.Write(NtLogSeverity.Verbose, $"Stopped outbound tunnel '{Name}'.");
         }
 
+        /// <summary>
+        /// This thread is used to make sure we stay connected to the tunnel service.
+        /// </summary>
         private void EstablishConnectionThread()
         {
             Thread.CurrentThread.Name = $"EstablishConnectionThread:{Environment.CurrentManagedThreadId}";
@@ -190,25 +192,6 @@ namespace NetTunnel.Service.TunnelEngine
                         //Make the outbound connection to the remote tunnel service.
                         _client.ConnectAndLogin().Wait();
 
-                        //The first thing we do when we get a connection is start a new key exchange process.
-                        var compoundNegotiator = new CompoundNegotiator();
-                        var negotiationToken = compoundNegotiator.GenerateNegotiationToken(Singletons.Configuration.TunnelCryptographyKeySize);
-                        /*
-                        var query = new oldQueryRequestKeyExchange(negotiationToken);
-                        _client.Query(query, Singletons.Configuration.MessageQueryTimeoutMs).ContinueWith(t =>
-                        {
-                            if (t.IsCompletedSuccessfully && t.Result != null)
-                            {
-                                compoundNegotiator.ApplyNegotiationResponseToken(t.Result.NegotiationToken);
-
-                                InitializeCryptographyProvider(compoundNegotiator.SharedSecret);
-
-                                _client.Notify(new oldNotificationApplyCryptography());
-
-                                ApplyCryptographyProvider();
-                            }
-                        });
-                        */
                         CurrentConnections++;
                         TotalConnections++;
                     }
