@@ -4,6 +4,9 @@ namespace NetTunnel.Library.Types
 {
     /// <summary>
     /// The endpoint contains information that defines all we need to listen or connect to an endpoint.
+    /// They are OWNED by the tunnel configuration and at the server that created the tunnel.
+    /// These are sent to the tunnel service when the tunnel is connected, but once the connection
+    ///     is made - they can be altered at either end by the service UI.
     /// </summary>
     public class NtEndpointConfiguration
     {
