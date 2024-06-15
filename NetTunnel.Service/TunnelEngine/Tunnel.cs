@@ -8,7 +8,7 @@ using static NetTunnel.Library.Constants;
 namespace NetTunnel.Service.TunnelEngine
 {
     /// <summary>
-    /// This is the class that makes an outbound TCP/IP connection to a listening tunnel.
+    /// This is the class that makes an outbound TCP/IP connection to a listening tunnel service.
     /// </summary>
     internal class Tunnel
     {
@@ -35,7 +35,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         #endregion
 
-        #region Properties Common to Inbound and Outbound Tunnels.
+        #region Public Properties.
 
         public NtTunnelStatus Status { get; set; }
         public ulong BytesReceived { get; set; }
@@ -96,14 +96,14 @@ namespace NetTunnel.Service.TunnelEngine
         {
             Status = NtTunnelStatus.Disconnected;
 
-            Core.Logging.Write(NtLogSeverity.Warning, $"Outbound tunnel '{Name}' disconnected.");
+            Core.Logging.Write(NtLogSeverity.Warning, $"Tunnel '{Name}' disconnected.");
         }
 
         private void _client_OnConnected(RmContext context)
         {
             Status = NtTunnelStatus.Established;
 
-            Core.Logging.Write(NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' connection successful.");
+            Core.Logging.Write(NtLogSeverity.Verbose, $"Tunnel '{Name}' connection successful.");
         }
 
         public NtTunnelConfiguration CloneConfiguration()
@@ -141,20 +141,20 @@ namespace NetTunnel.Service.TunnelEngine
             {
                 return;
             }
-            Core.Logging.Write(NtLogSeverity.Verbose, $"Starting outbound tunnel '{Name}'.");
+            Core.Logging.Write(NtLogSeverity.Verbose, $"Starting tunnel '{Name}'.");
 
             KeepRunning = true;
 
             _establishConnectionThread = new Thread(EstablishConnectionThread);
             _establishConnectionThread.Start();
 
-            Core.Logging.Write(NtLogSeverity.Verbose, $"Starting endpoints for outbound tunnel '{Name}'.");
+            Core.Logging.Write(NtLogSeverity.Verbose, $"Starting endpoints for tunnel '{Name}'.");
             Endpoints.ForEach(x => x.Start());
         }
 
         public void Stop()
         {
-            Core.Logging.Write(NtLogSeverity.Verbose, $"Stopping outbound tunnel '{Name}'.");
+            Core.Logging.Write(NtLogSeverity.Verbose, $"Stopping tunnel '{Name}'.");
             Endpoints.ForEach(o => o.Stop());
 
             KeepRunning = false;
@@ -169,7 +169,7 @@ namespace NetTunnel.Service.TunnelEngine
 
             Status = NtTunnelStatus.Stopped;
 
-            Core.Logging.Write(NtLogSeverity.Verbose, $"Stopped outbound tunnel '{Name}'.");
+            Core.Logging.Write(NtLogSeverity.Verbose, $"Stopped tunnel '{Name}'.");
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace NetTunnel.Service.TunnelEngine
                     {
                         Status = NtTunnelStatus.Connecting;
 
-                        Core.Logging.Write(NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' connecting to remote at {Address}:{ManagementPort}.");
+                        Core.Logging.Write(NtLogSeverity.Verbose, $"Tunnel '{Name}' connecting to service at {Address}:{ManagementPort}.");
 
                         //Make the outbound connection to the remote tunnel service.
                         _client.ConnectAndLogin().Wait();
@@ -225,6 +225,8 @@ namespace NetTunnel.Service.TunnelEngine
 
         #region Endpoint CRUD helpers.
 
+        /*
+         * 
         public EndpointInbound UpsertInboundEndpoint(NtEndpointConfiguration configuration)
         {
             var existingEndpoint = GetEndpointById(configuration.EndpointId);
@@ -263,6 +265,7 @@ namespace NetTunnel.Service.TunnelEngine
                 Core.Tunnels.SaveToDisk();
             }
         }
+        */
 
         #endregion
 
@@ -277,6 +280,9 @@ namespace NetTunnel.Service.TunnelEngine
                 if ((DateTime.UtcNow - lastHeartBeat).TotalMilliseconds > Singletons.Configuration.TunnelAndEndpointHeartbeatDelayMs)
                 {
                     lastHeartBeat = DateTime.UtcNow;
+
+                    //TODO: Send a RM ping here and track the round-trip time.
+
                 }
 
                 Thread.Sleep(100);
