@@ -1,5 +1,6 @@
 ﻿namespace NetTunnel.Library
 {
+    /*
     public class ClientConnectionContext
     {
         public Guid ConnectionId { get; set; }
@@ -9,4 +10,5 @@
             ConnectionId = connectionId;
         }
     }
+    */
 }

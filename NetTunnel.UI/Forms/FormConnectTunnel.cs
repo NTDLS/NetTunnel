@@ -1,5 +1,4 @@
-﻿using NetTunnel.ClientAPI;
-using NetTunnel.Library;
+﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NTDLS.NullExtensions;
 using NTDLS.WinFormsHelpers;
@@ -20,7 +19,6 @@ namespace NetTunnel.UI.Forms
             InitializeComponent();
 
             _client = client;
-
 
             #region Set Tool-tips.
 
@@ -59,45 +57,6 @@ namespace NetTunnel.UI.Forms
 #endif
         }
 
-        public void ConfigureTunnelPair(NtClient remoteClient, NtTunnelConfiguration tunnel)
-        {
-            /*
-            //Add the outbound tunnel config to the local tunnel instance.
-            _client.EnsureNotNull().TunnelOutbound.Add(tunnel).ContinueWith(t =>
-            {
-                if (!t.IsCompletedSuccessfully)
-                {
-                    buttonAdd.InvokeEnableControl(true);
-                    this.InvokeMessageBox("Failed to create local outbound tunnel.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                    return;
-                }
-
-                //Add the inbound tunnel config to the remote tunnel instance.
-                remoteClient.TunnelInbound.Add(inboundTunnel).ContinueWith(t =>
-                {
-                    if (!t.IsCompletedSuccessfully)
-                    {
-                        //If we failed to create the remote tunnel config, remove the local config.
-                        _client.TunnelOutbound.Delete(tunnel.TunnelId).ContinueWith(t =>
-                        {
-                            buttonAdd.InvokeEnableControl(true);
-                            this.InvokeMessageBox("Failed to create remote inbound tunnel.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                            return;
-                        });
-                    }
-
-                    //Start the listening tunnel:
-                    remoteClient.TunnelInbound.Start(inboundTunnel.TunnelId).Wait();
-
-                    //Start the outbound-connecting tunnel:
-                    _client.TunnelOutbound.Start(tunnel.TunnelId).Wait();
-
-                    this.InvokeClose(DialogResult.OK);
-                });
-            });
-            */
-        }
-
         private void buttonConnect_Click(object sender, EventArgs e)
         {
             _client.EnsureNotNull();
@@ -121,8 +80,9 @@ namespace NetTunnel.UI.Forms
 
                 try
                 {
-                    var remoteClient = NtServiceClient.CreateAndLogin(tunnel.Address,
-                        tunnel.ManagementPort, tunnel.Username, tunnel.PasswordHash).ContinueWith(x =>
+                    //Just to test the login.
+                    var remoteClient = NtServiceClient.CreateConnectAndLogin(tunnel.Address,
+                        tunnel.ManagementPort, tunnel.Username, tunnel.PasswordHash).ContinueWith(async x =>
                         {
                             if (!x.IsCompletedSuccessfully)
                             {
@@ -133,6 +93,8 @@ namespace NetTunnel.UI.Forms
                                 buttonCancel.InvokeEnableControl(true);
                                 return;
                             }
+
+                            await _client.CreateTunnel(tunnel);
 
                             this.InvokeClose(DialogResult.OK);
                         });

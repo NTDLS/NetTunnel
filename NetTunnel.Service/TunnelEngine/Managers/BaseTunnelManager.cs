@@ -1,7 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.TunnelEngine.Endpoints;
-using NetTunnel.Service.TunnelEngine.Tunnels;
 using NTDLS.NullExtensions;
 using NTDLS.Semaphore;
 

@@ -39,7 +39,7 @@ namespace NetTunnel.UI.Forms
                 string passwordHash = Utility.ComputeSha256Hash(textBoxPassword.Text);
                 string address = textBoxAddress.GetAndValidateText("A hostname or IP address is required.");
 
-                NtServiceClient.CreateAndLogin(address, port, username, passwordHash).ContinueWith(x =>
+                NtServiceClient.CreateConnectAndLogin(address, port, username, passwordHash).ContinueWith(x =>
                 {
                     if (!x.IsCompletedSuccessfully)
                     {

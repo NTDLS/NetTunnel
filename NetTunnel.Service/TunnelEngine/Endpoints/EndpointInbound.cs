@@ -1,6 +1,5 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NetTunnel.Service.TunnelEngine.Tunnels;
 using NTDLS.NullExtensions;
 using System.Net;
 using System.Net.Sockets;

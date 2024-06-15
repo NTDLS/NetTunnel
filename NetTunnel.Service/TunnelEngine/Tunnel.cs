@@ -1,20 +1,19 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NetTunnel.Service.ReliableMessages;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
 using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
 
-namespace NetTunnel.Service.TunnelEngine.Tunnels
+namespace NetTunnel.Service.TunnelEngine
 {
     /// <summary>
     /// This is the class that makes an outbound TCP/IP connection to a listening tunnel.
     /// </summary>
     internal class Tunnel
     {
-        private readonly RmClient _client;
+        private readonly NtServiceClient _client;
         private Thread? _establishConnectionThread;
 
         public override int GetHashCode()
@@ -39,7 +38,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
 
         #region Properties Common to Inbound and Outbound Tunnels.
 
-        public bool SecureKeyExchangeIsComplete { get; private set; }
         public NtTunnelStatus Status { get; set; }
         public ulong BytesReceived { get; set; }
         public ulong BytesSent { get; set; }
@@ -52,7 +50,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         public List<IEndpoint> Endpoints { get; private set; } = new();
 
         private readonly Thread _heartbeatThread;
-        private ClientCryptographyProvider? _cryptographyProvider;
 
         #endregion
 
@@ -77,22 +74,16 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             Username = configuration.Username;
             PasswordHash = configuration.PasswordHash;
 
-            _client = new RmClient(new RmConfiguration()
-            {
-                Parameter = this,
-                //FrameDelimiter = Singletons.Configuration.FrameDelimiter,
-                InitialReceiveBufferSize = Singletons.Configuration.InitialReceiveBufferSize,
-                MaxReceiveBufferSize = Singletons.Configuration.MaxReceiveBufferSize,
-                ReceiveBufferGrowthRate = Singletons.Configuration.ReceiveBufferGrowthRate,
-            });
+            _client = NtServiceClient.Create(Singletons.Configuration,
+                configuration.Address, configuration.ManagementPort, configuration.Name, configuration.PasswordHash, this);
 
             //_client.AddHandler(new oldTunnelOutboundMessageHandlers());
             //_client.AddHandler(new oldTunnelOutboundQueryHandlers());
 
-            _client.OnConnected += _client_OnConnected;
-            _client.OnDisconnected += _client_OnDisconnected;
+            _client.Client.OnConnected += _client_OnConnected;
+            _client.Client.OnDisconnected += _client_OnDisconnected;
 
-            _client.OnException += (RmContext? context, Exception ex, IRmPayload? payload) =>
+            _client.Client.OnException += (context, ex, payload) =>
             {
                 Core.Logging.Write(NtLogSeverity.Exception, $"RPC client exception: '{ex.Message}'"
                     + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
@@ -106,20 +97,12 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
         {
             Status = NtTunnelStatus.Disconnected;
 
-            _cryptographyProvider = null;
-            SecureKeyExchangeIsComplete = false;
-            //_client.ClearCryptographyProvider() //This can cause blocking.
-
             Core.Logging.Write(NtLogSeverity.Warning, $"Outbound tunnel '{Name}' disconnected.");
         }
 
         private void _client_OnConnected(RmContext context)
         {
             Status = NtTunnelStatus.Established;
-
-            _cryptographyProvider = null;
-            SecureKeyExchangeIsComplete = false;
-            //_client.ClearCryptographyProvider() //This can cause blocking.
 
             Core.Logging.Write(NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' connection successful.");
         }
@@ -178,7 +161,7 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             KeepRunning = false;
             _heartbeatThread.Join();
 
-            Utility.TryAndIgnore(_client.Disconnect);
+            _client.Disconnect();
 
             if (Environment.CurrentManagedThreadId != _establishConnectionThread?.ManagedThreadId)
             {
@@ -188,23 +171,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
             Status = NtTunnelStatus.Stopped;
 
             Core.Logging.Write(NtLogSeverity.Verbose, $"Stopped outbound tunnel '{Name}'.");
-        }
-
-        public void InitializeCryptographyProvider(byte[] sharedSecret)
-        {
-            _cryptographyProvider = new ClientCryptographyProvider(sharedSecret);
-
-            Core.Logging.Write(NtLogSeverity.Verbose,
-                $"Cryptography Key generated, hash: {Utility.ComputeSha256Hash(sharedSecret)}");
-        }
-
-        public void ApplyCryptographyProvider()
-        {
-            SecureKeyExchangeIsComplete = true;
-            _client.SetCryptographyProvider(_cryptographyProvider);
-
-            Core.Logging.Write(NtLogSeverity.Verbose,
-                $"End-to-end encryption has been established for '{Name}'.");
         }
 
         private void EstablishConnectionThread()
@@ -219,14 +185,10 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                     {
                         Status = NtTunnelStatus.Connecting;
 
-                        _cryptographyProvider = null;
-                        SecureKeyExchangeIsComplete = false;
-                        _client.ClearCryptographyProvider();
-
                         Core.Logging.Write(NtLogSeverity.Verbose, $"Outbound tunnel '{Name}' connecting to remote at {Address}:{ManagementPort}.");
 
                         //Make the outbound connection to the remote tunnel service.
-                        _client.Connect(Address, ManagementPort);
+                        _client.ConnectAndLogin().Wait();
 
                         //The first thing we do when we get a connection is start a new key exchange process.
                         var compoundNegotiator = new CompoundNegotiator();
@@ -277,30 +239,6 @@ namespace NetTunnel.Service.TunnelEngine.Tunnels
                 Thread.Sleep(1000);
             }
         }
-
-        #region Reliable Messaging Passthrough.
-
-        public Task<T> Query<T>(IRmQuery<T> query) where T : class, IRmQueryReply
-        {
-            if (_client.IsConnected == false)
-            {
-                throw new Exception("The RPC client is not connected.");
-            }
-
-            return _client.Query(query, Singletons.Configuration.MessageQueryTimeoutMs);
-        }
-
-        public void Notify(IRmNotification notification)
-        {
-            if (_client.IsConnected == false)
-            {
-                throw new Exception("The RPC client is not connected.");
-            }
-
-            _client.Notify(notification);
-        }
-
-        #endregion
 
         #region Endpoint CRUD helpers.
 

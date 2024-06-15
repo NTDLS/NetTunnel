@@ -14,66 +14,98 @@ namespace NetTunnel.Library
     {
         public RmClient Client { get; private set; }
 
-        public NtServiceClient(RmClient client)
+        private readonly NtServiceConfiguration _configuration;
+        private readonly string _address;
+        private readonly int _port;
+        private readonly string _userName;
+        private readonly string _passwordHash;
+
+        public NtServiceClient(NtServiceConfiguration configuration, RmClient client, string address, int port, string userName, string passwordHash)
         {
+            _configuration = configuration;
             Client = client;
+            _address = address;
+            _port = port;
+            _userName = userName;
+            _passwordHash = passwordHash;
         }
 
         #region Factory.
 
-        public static async Task<NtServiceClient> CreateAndLogin(string address, int port, string username, string passwordHash)
+        public static async Task<NtServiceClient> CreateConnectAndLogin(string address, int port, string userName, string passwordHash, object? owner = null)
         {
-            return await CreateAndLogin(new NtServiceConfiguration(), address, port, username, passwordHash);
+            return await CreateConnectAndLogin(new NtServiceConfiguration(), address, port, userName, passwordHash, owner);
         }
 
-        public static async Task<NtServiceClient> CreateAndLogin(NtServiceConfiguration configuration,
-             string address, int port, string username, string passwordHash)
+        public static async Task<NtServiceClient> CreateConnectAndLogin(NtServiceConfiguration configuration,
+             string address, int port, string userName, string passwordHash, object? owner = null)
+        {
+            var serviceClient = Create(configuration, address, port, userName, passwordHash, owner);
+            await serviceClient.ConnectAndLogin();
+            return serviceClient;
+        }
+
+        public static NtServiceClient Create(NtServiceConfiguration configuration, string address, int port, string userName, string passwordHash, object? owner = null)
         {
             var client = new RmClient(new RmConfiguration()
             {
-                //Parameter = this,
+                Parameter = owner,
                 InitialReceiveBufferSize = configuration.InitialReceiveBufferSize,
                 MaxReceiveBufferSize = configuration.MaxReceiveBufferSize,
                 ReceiveBufferGrowthRate = configuration.ReceiveBufferGrowthRate,
             });
 
-            client.Connect(address, port);
+            return new NtServiceClient(configuration, client, address, port, userName, passwordHash);
+        }
+
+        #endregion
+
+        public bool IsConnected
+            => Client.IsConnected;
+
+        public void Disconnect()
+            => Utility.TryAndIgnore(Client.Disconnect);
+
+        public async Task ConnectAndLogin()
+        {
+            Client.Connect(_address, _port);
 
             var compoundNegotiator = new CompoundNegotiator();
-            var negotiationToken = compoundNegotiator.GenerateNegotiationToken(configuration.TunnelCryptographyKeySize);
+            var negotiationToken = compoundNegotiator.GenerateNegotiationToken(_configuration.TunnelCryptographyKeySize);
 
             //The first thing we do when we get a connection is start a new key exchange process.
-            var queryRequestKeyExchangeReply = await client.Query(
-                new QueryRequestKeyExchange(negotiationToken), configuration.MessageQueryTimeoutMs);
+            var queryRequestKeyExchangeReply = await Client.Query(
+                new QueryRequestKeyExchange(negotiationToken), _configuration.MessageQueryTimeoutMs);
 
             //We received a reply to the secure key exchange, apply it.
             compoundNegotiator.ApplyNegotiationResponseToken(queryRequestKeyExchangeReply.NegotiationToken);
 
-            var tunnelConnection = new ClientConnectionContext(queryRequestKeyExchangeReply.ConnectionId);
-            client.Parameter = tunnelConnection;
+            //var tunnelConnection = new ClientConnectionContext(queryRequestKeyExchangeReply.ConnectionId);
+            //Client.Parameter = tunnelConnection;
 
             //Prop up encryption.
             var cryptographyProvider = new ClientCryptographyProvider(compoundNegotiator.SharedSecret);
 
             //Tell the server we are switching to encryption.
-            client.Notify(new NotificationApplyCryptography());
-            client.SetCryptographyProvider(cryptographyProvider);
+            Client.Notify(new NotificationApplyCryptography());
+            Client.SetCryptographyProvider(cryptographyProvider);
 
             //Login.
-            var login = await client.Query(new QueryLogin(username, passwordHash));
-            if (login.Successful)
+            var login = await Client.Query(new QueryLogin(_userName, _passwordHash));
+            if (login.Successful == false)
             {
-                return new NtServiceClient(client);
+                throw new Exception("Login failed.");
             }
-
-            throw new Exception("Login failed.");
         }
-
-        #endregion
 
         public async Task<QueryGetTunnelsReply> GetTunnels()
         {
             return await Client.Query(new QueryGetTunnels());
+        }
+
+        public async Task<QueryCreateTunnelReply> CreateTunnel(NtTunnelConfiguration configuration)
+        {
+            return await Client.Query(new QueryCreateTunnel(configuration));
         }
 
         /*
