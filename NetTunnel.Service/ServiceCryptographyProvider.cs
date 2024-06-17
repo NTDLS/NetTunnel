@@ -5,16 +5,16 @@ namespace NetTunnel.Service
 {
     internal class ServiceCryptographyProvider : IRmCryptographyProvider
     {
-        private TunnelEngineCore _engineCore;
+        private readonly ServiceEngine _serviceEngine;
 
-        public ServiceCryptographyProvider(TunnelEngineCore engineCore)
+        public ServiceCryptographyProvider(ServiceEngine engineCore)
         {
-            _engineCore = engineCore;
+            _serviceEngine = engineCore;
         }
 
         public byte[] Decrypt(RmContext context, byte[] encryptedPayload)
         {
-            if (_engineCore.InboundTunnelConnections.TryGetValue(context.ConnectionId, out var connection))
+            if (_serviceEngine.ServiceConnectionStates.TryGetValue(context.ConnectionId, out var connection))
             {
                 if (connection.StreamCryptography != null && connection.SecureKeyExchangeIsComplete)
                 {
@@ -30,7 +30,7 @@ namespace NetTunnel.Service
 
         public byte[] Encrypt(RmContext context, byte[] payload)
         {
-            if (_engineCore.InboundTunnelConnections.TryGetValue(context.ConnectionId, out var connection))
+            if (_serviceEngine.ServiceConnectionStates.TryGetValue(context.ConnectionId, out var connection))
             {
                 if (connection.StreamCryptography != null && connection.SecureKeyExchangeIsComplete)
                 {

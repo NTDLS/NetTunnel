@@ -26,10 +26,6 @@ namespace NetTunnel.Service.TunnelEngine
             => Configuration.TunnelId.GetHashCode()
             + Configuration.Name.GetHashCode();
 
-        #region Configuration Properties.
-
-        #endregion
-
         #region Public Properties.
 
         public NtTunnelConfiguration Configuration { get; private set; }
@@ -39,7 +35,7 @@ namespace NetTunnel.Service.TunnelEngine
         public ulong BytesSent { get; set; }
         public ulong TotalConnections { get; private set; }
         public ulong CurrentConnections { get; private set; }
-        public TunnelEngineCore Core { get; private set; }
+        public ServiceEngine Core { get; private set; }
         public bool KeepRunning { get; private set; } = false;
         //public Guid TunnelId { get; private set; }
         //public string Name { get; private set; }
@@ -48,11 +44,10 @@ namespace NetTunnel.Service.TunnelEngine
 
         #endregion
 
-        public Tunnel(TunnelEngineCore core, NtTunnelConfiguration configuration)
+        public Tunnel(ServiceEngine core, NtTunnelConfiguration configuration)
         {
             Core = core;
-            Configuration = configuration;
-
+            Configuration = configuration.CloneConfiguration();
 
             Configuration.Endpoints.Where(o => o.Direction == NtDirection.Inbound)
                 .ToList().ForEach(o => Endpoints.Add(new EndpointInbound(Core, this, o)));
@@ -199,6 +194,7 @@ namespace NetTunnel.Service.TunnelEngine
             }
 
             var endpoint = new EndpointInbound(Core, this, configuration);
+            Configuration.Endpoints.Add(configuration);
             Endpoints.Add(endpoint);
             return endpoint;
         }
@@ -209,6 +205,7 @@ namespace NetTunnel.Service.TunnelEngine
             if (endpoint != null)
             {
                 endpoint.Stop();
+                Configuration.Endpoints.RemoveAll(o => o.EndpointId == endpointId);
                 Endpoints.Remove(endpoint);
             }
         }

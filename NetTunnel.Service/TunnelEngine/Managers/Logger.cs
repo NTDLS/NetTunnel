@@ -6,10 +6,10 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 {
     internal class Logger
     {
-        private readonly TunnelEngineCore _core;
+        private readonly ServiceEngine _core;
         private readonly object _lock = new();
 
-        public Logger(TunnelEngineCore core)
+        public Logger(ServiceEngine core)
         {
             _core = core;
         }

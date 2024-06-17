@@ -8,7 +8,7 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
         /// <summary>
         /// Enforces that cryptography has been fully initialized and established then returns the Tunnel from the RmContext parameter.
         /// </summary>
-        public ServiceConnectionContext EnforceLoginCryptographyAndGetServiceConnectionContext(RmContext context)
+        public ServiceConnectionState EnforceLoginCryptographyAndGetServiceConnectionContext(RmContext context)
         {
             var tunnelContext = GetServiceConnectionContext(context);
 
@@ -22,7 +22,7 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
         /// <summary>
         /// Enforces that cryptography has been fully initialized and established then returns the Tunnel from the RmContext parameter.
         /// </summary>
-        public ServiceConnectionContext EnforceCryptographyAndGetServiceConnectionContext(RmContext context)
+        public ServiceConnectionState EnforceCryptographyAndGetServiceConnectionContext(RmContext context)
         {
             var tunnelContext = GetServiceConnectionContext(context);
 
@@ -36,11 +36,14 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
         /// <summary>
         /// Returns the Tunnel from the RmContext parameter.
         /// </summary>
-        public ServiceConnectionContext GetServiceConnectionContext(RmContext context)
+        public ServiceConnectionState GetServiceConnectionContext(RmContext context)
         {
-            if (Singletons.Core.InboundTunnelConnections.TryGetValue(context.ConnectionId, out var connection))
+            if (Singletons.Core.ServiceConnectionStates.TryGetValue(context.ConnectionId, out var connection))
             {
-                return connection;
+                if (connection.Validate($"{context.TcpClient.Client.RemoteEndPoint}"))
+                {
+                    return connection;
+                }
             }
             throw new Exception("Connection not found.");
         }

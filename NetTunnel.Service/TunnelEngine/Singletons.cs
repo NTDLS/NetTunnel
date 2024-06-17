@@ -5,12 +5,12 @@ namespace NetTunnel.Service.TunnelEngine
 {
     internal static class Singletons
     {
-        private static TunnelEngineCore? _core = null;
-        public static TunnelEngineCore Core
+        private static ServiceEngine? _core = null;
+        public static ServiceEngine Core
         {
             get
             {
-                _core ??= new TunnelEngineCore();
+                _core ??= new ServiceEngine();
                 return _core;
             }
         }

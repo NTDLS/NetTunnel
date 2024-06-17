@@ -34,8 +34,7 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
         {
             var tunnelContext = EnforceCryptographyAndGetServiceConnectionContext(context);
 
-            if (Singletons.Core.Sessions.Login(context.ConnectionId,
-                query.UserName, query.PasswordHash, $"{context.TcpClient.Client.RemoteEndPoint}"))
+            if (Singletons.Core.Users.ValidatePassword(query.UserName, query.PasswordHash))
             {
                 tunnelContext.SetAuthenticated(query.UserName);
 
@@ -54,7 +53,7 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
 
             return new QueryGetTunnelsReply
             {
-                Collection = Singletons.Core.Tunnels.CloneConfigurations(),
+                Collection = Singletons.Core.Tunnels.Clone(),
             };
         }
 

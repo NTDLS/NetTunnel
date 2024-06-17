@@ -6,11 +6,11 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 {
     internal class UserManager
     {
-        private readonly TunnelEngineCore _core;
+        private readonly ServiceEngine _core;
 
         private readonly PessimisticCriticalResource<List<NtUser>> _collection = new();
 
-        public UserManager(TunnelEngineCore core)
+        public UserManager(ServiceEngine core)
         {
             _core = core;
 
@@ -42,20 +42,25 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 && u.PasswordHash.Equals(passwordHash, StringComparison.CurrentCultureIgnoreCase)).Any());
         }
 
-        public List<NtUser> Clone()
+        public bool ValidatePassword(string username, string passwordHash)
         {
-            return _collection.Use((o) => new List<NtUser>(o));
+            if (_core.Users.ValidateLogin(username, passwordHash))
+            {
+                return true;
+            }
+            return false;
         }
 
-        public void SaveToDisk() => CommonApplicationData.SaveToDisk(Constants.FriendlyName, Clone());
+        public void SaveToDisk()
+            => _collection.Use((o) => CommonApplicationData.SaveToDisk(Constants.FriendlyName, o));
 
         private void LoadFromDisk()
         {
             _collection.Use((o) =>
             {
-                if (o.Count != 0) throw new Exception("Can not load configuration on top of existing collection.");
+                o.Clear();
 
-                CommonApplicationData.LoadFromDisk<List<NtUser>>(Constants.FriendlyName)?.ForEach(o => Add(o));
+                CommonApplicationData.LoadFromDisk(Constants.FriendlyName, new List<NtUser>()).ForEach(o => Add(o));
 
                 if (o.Count == 0)
                 {

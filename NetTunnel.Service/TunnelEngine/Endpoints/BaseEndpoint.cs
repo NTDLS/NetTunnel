@@ -18,7 +18,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         public ulong CurrentConnections { get; internal set; }
         public Guid EndpointId { get; private set; }
 
-        internal readonly TunnelEngineCore _core;
+        internal readonly ServiceEngine _core;
         internal readonly Tunnel _tunnel;
         public bool KeepRunning { get; internal set; } = false;
 
@@ -28,7 +28,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         public NtEndpointConfiguration Configuration { get; private set; }
 
-        public BaseEndpoint(TunnelEngineCore core, Tunnel tunnel,
+        public BaseEndpoint(ServiceEngine core, Tunnel tunnel,
             Guid endpointId, NtEndpointConfiguration configuration)
         {
             Configuration = configuration;

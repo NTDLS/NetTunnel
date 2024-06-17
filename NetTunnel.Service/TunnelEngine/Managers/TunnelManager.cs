@@ -9,20 +9,32 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 {
     internal class TunnelManager
     {
-        private readonly TunnelEngineCore _Core;
+        private readonly ServiceEngine _Core;
 
         protected readonly PessimisticCriticalResource<List<Tunnel>> Collection = new();
 
-        public void Start(Guid tunnelId) => Collection.Use((o) => o.Where(o => o.Configuration.TunnelId == tunnelId).Single().Start());
-        public void Stop(Guid tunnelId) => Collection.Use((o) => o.Where(o => o.Configuration.TunnelId == tunnelId).Single().Stop());
-        public void StartAll() => Collection.Use((o) => o.ForEach((o) => o.Start()));
-        public void StopAll() => Collection.Use((o) => o.ForEach((o) => o.Stop()));
-
-        public TunnelManager(TunnelEngineCore core)
+        public TunnelManager(ServiceEngine core)
         {
             _Core = core;
             LoadFromDisk();
         }
+
+        #region Start / Stop.
+
+        public void Start(Guid tunnelId) => Collection.Use((o)
+            => o.Where(o => o.Configuration.TunnelId == tunnelId).Single().Start());
+        public void Stop(Guid tunnelId) => Collection.Use((o)
+            => o.Where(o => o.Configuration.TunnelId == tunnelId).Single().Stop());
+
+        public void StartAll()
+            => Collection.Use((o) => o.ForEach((o) => o.Start()));
+
+        public void StopAll()
+            => Collection.Use((o) => o.ForEach((o) => o.Stop()));
+
+        #endregion
+
+        #region Create / Delete.
 
         public void UpsertTunnel(NtTunnelConfiguration config)
         {
@@ -36,7 +48,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 }
 
                 var newTunnel = new Tunnel(_Core, config);
-                o.Add(existingTunnel.EnsureNotNull());
+                o.Add(newTunnel.EnsureNotNull());
 
                 SaveToDisk();
             });
@@ -65,7 +77,36 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-        public List<NtTunnelConfiguration> CloneConfigurations()
+        #endregion
+
+        #region Disk Save/Load.
+
+        /// <summary>
+        /// Saves locally owned tunnels to disk.
+        /// </summary>
+        private void SaveToDisk()
+        {
+            var clonedConfig = Clone()
+                .Where(o => o.ServiceId == Singletons.Configuration.ServiceId).ToList();
+
+            CommonApplicationData.SaveToDisk(Constants.FriendlyName, Clone());
+        }
+
+        private void LoadFromDisk()
+        {
+            Collection.Use((o) =>
+            {
+                o.Clear();
+
+                CommonApplicationData.LoadFromDisk<List<NtTunnelConfiguration>>(Constants.FriendlyName)?
+                    .Where(t => t.ServiceId == Singletons.Configuration.ServiceId).ToList()
+                    .ForEach(c => o.Add(new Tunnel(_Core, c)));
+            });
+        }
+
+        #endregion
+
+        public List<NtTunnelConfiguration> Clone()
         {
             return Collection.Use((o) =>
             {
@@ -77,33 +118,6 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 return clones;
             });
         }
-
-        #region Disk Save/Load.
-
-        /// <summary>
-        /// Saves locally owned tunnels to disk.
-        /// </summary>
-        private void SaveToDisk()
-        {
-            var clonedConfig = CloneConfigurations()
-                .Where(o => o.ServiceId == Singletons.Configuration.ServiceId).ToList();
-
-            CommonApplicationData.SaveToDisk(Constants.FriendlyName, CloneConfigurations());
-        }
-
-        private void LoadFromDisk()
-        {
-            Collection.Use((o) =>
-            {
-                if (o.Count != 0) throw new Exception("Can not load configuration on top of existing collection.");
-
-                CommonApplicationData.LoadFromDisk<List<NtTunnelConfiguration>>(Constants.FriendlyName)?
-                    .Where(t => t.ServiceId == Singletons.Configuration.ServiceId).ToList()
-                    .ForEach(c => o.Add(new Tunnel(_Core, c)));
-            });
-        }
-
-        #endregion
 
         public List<NtTunnelStatistics> GetStatistics()
         {
