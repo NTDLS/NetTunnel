@@ -33,7 +33,7 @@
         /// <summary>
         /// The delay in milliseconds between tunnel heartbeats.
         /// </summary>
-        public int TunnelAndEndpointHeartbeatDelayMs { get; set; } = 10000;
+        public int TunnelAndEndpointHeartbeatDelayMs { get; set; } = 5000;
 
         /// <summary>
         /// The number of 12-byte segments to generate for tunnel cryptography.

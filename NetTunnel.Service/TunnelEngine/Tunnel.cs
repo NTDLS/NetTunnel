@@ -47,8 +47,7 @@ namespace NetTunnel.Service.TunnelEngine
         public Guid TunnelId { get; private set; }
         public string Name { get; private set; }
         public List<IEndpoint> Endpoints { get; private set; } = new();
-
-        private readonly Thread _heartbeatThread;
+        private Thread? _heartbeatThread;
 
         #endregion
 
@@ -64,9 +63,6 @@ namespace NetTunnel.Service.TunnelEngine
 
             configuration.EndpointConfigurations.Where(o => o.Direction == NtDirection.Outbound)
                 .ToList().ForEach(o => Endpoints.Add(new EndpointOutbound(Core, this, o)));
-
-            _heartbeatThread = new Thread(HeartbeatThreadProc);
-            _heartbeatThread.Start();
 
             Address = configuration.Address;
             ManagementPort = configuration.ManagementPort;
@@ -112,24 +108,13 @@ namespace NetTunnel.Service.TunnelEngine
 
             foreach (var endpoint in Endpoints)
             {
-                if (endpoint is EndpointInbound ibe)
-                {
-                    var endpointConfiguration = new NtEndpointConfiguration(TunnelId,
-                        ibe.EndpointId, NtDirection.Inbound, ibe.Configuration.Name, ibe.Configuration.OutboundAddress,
-                        ibe.Configuration.InboundPort, ibe.Configuration.OutboundPort,
-                        ibe.Configuration.HttpHeaderRules, ibe.Configuration.TrafficType);
+                var endpointConfiguration = new NtEndpointConfiguration(TunnelId, endpoint.EndpointId,
+                    (endpoint is EndpointInbound) ? NtDirection.Inbound : NtDirection.Outbound,
+                    endpoint.Configuration.Name, endpoint.Configuration.OutboundAddress,
+                    endpoint.Configuration.InboundPort, endpoint.Configuration.OutboundPort,
+                    endpoint.Configuration.HttpHeaderRules, endpoint.Configuration.TrafficType);
 
-                    tunnelConfiguration.EndpointConfigurations.Add(endpointConfiguration);
-                }
-                else if (endpoint is EndpointOutbound obe)
-                {
-                    var endpointConfiguration = new NtEndpointConfiguration(TunnelId,
-                        obe.EndpointId, NtDirection.Outbound, obe.Configuration.Name, obe.Configuration.OutboundAddress,
-                        obe.Configuration.InboundPort, obe.Configuration.OutboundPort,
-                        obe.Configuration.HttpHeaderRules, obe.Configuration.TrafficType);
-
-                    tunnelConfiguration.EndpointConfigurations.Add(endpointConfiguration);
-                }
+                tunnelConfiguration.EndpointConfigurations.Add(endpointConfiguration);
             }
 
             return tunnelConfiguration;
@@ -148,6 +133,9 @@ namespace NetTunnel.Service.TunnelEngine
             _establishConnectionThread = new Thread(EstablishConnectionThread);
             _establishConnectionThread.Start();
 
+            _heartbeatThread = new Thread(HeartbeatThreadProc);
+            _heartbeatThread.Start();
+
             Core.Logging.Write(NtLogSeverity.Verbose, $"Starting endpoints for tunnel '{Name}'.");
             Endpoints.ForEach(x => x.Start());
         }
@@ -158,7 +146,7 @@ namespace NetTunnel.Service.TunnelEngine
             Endpoints.ForEach(o => o.Stop());
 
             KeepRunning = false;
-            _heartbeatThread.Join();
+            _heartbeatThread?.Join();
 
             _client.Disconnect();
 
@@ -223,11 +211,7 @@ namespace NetTunnel.Service.TunnelEngine
             }
         }
 
-        #region Endpoint CRUD helpers.
-
-        /*
-         * 
-        public EndpointInbound UpsertInboundEndpoint(NtEndpointConfiguration configuration)
+        public EndpointInbound UpsertEndpoint(NtEndpointConfiguration configuration)
         {
             var existingEndpoint = GetEndpointById(configuration.EndpointId);
             if (existingEndpoint != null)
@@ -236,20 +220,6 @@ namespace NetTunnel.Service.TunnelEngine
             }
 
             var endpoint = new EndpointInbound(Core, this, configuration);
-            Endpoints.Add(endpoint);
-            Core.Tunnels.SaveToDisk();
-            return endpoint;
-        }
-
-        public EndpointOutbound UpsertOutboundEndpoint(NtEndpointConfiguration configuration)
-        {
-            var existingEndpoint = GetEndpointById(configuration.EndpointId);
-            if (existingEndpoint != null)
-            {
-                DeleteEndpoint(existingEndpoint.EndpointId);
-            }
-
-            var endpoint = new EndpointOutbound(Core, this, configuration);
             Endpoints.Add(endpoint);
             Core.Tunnels.SaveToDisk();
             return endpoint;
@@ -265,9 +235,6 @@ namespace NetTunnel.Service.TunnelEngine
                 Core.Tunnels.SaveToDisk();
             }
         }
-        */
-
-        #endregion
 
         private void HeartbeatThreadProc()
         {
@@ -279,10 +246,10 @@ namespace NetTunnel.Service.TunnelEngine
             {
                 if ((DateTime.UtcNow - lastHeartBeat).TotalMilliseconds > Singletons.Configuration.TunnelAndEndpointHeartbeatDelayMs)
                 {
+                    var pingTime = _client.Ping();
+                    Core.Logging.Write(NtLogSeverity.Verbose, $"Roundtrip time for '{Name}': {pingTime:n0}ms"); ;
+
                     lastHeartBeat = DateTime.UtcNow;
-
-                    //TODO: Send a RM ping here and track the round-trip time.
-
                 }
 
                 Thread.Sleep(100);

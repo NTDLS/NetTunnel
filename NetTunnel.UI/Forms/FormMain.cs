@@ -643,7 +643,7 @@ namespace NetTunnel.UI.Forms
             listViewEndpoints.Items.Clear();
 
 
-            _client.GetTunnels().ContinueWith(t =>
+            _client.QueryGetTunnels().ContinueWith(t =>
             {
                 t.Result.Collection.ForEach(t => AddTunnelToGrid(t));
             });

@@ -1,7 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.TunnelEngine.Endpoints;
-using NTDLS.NullExtensions;
 using NTDLS.Semaphore;
 
 namespace NetTunnel.Service.TunnelEngine.Managers
@@ -22,17 +21,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             Core = core;
         }
 
-        public void Add(NtTunnelConfiguration config)
-        {
-            Collection.Use((o) =>
-            {
-                var tunnel = new Tunnel(Core, config);
-                o.Add(tunnel.EnsureNotNull());
-            });
-        }
-
         /*
-
         public void Delete(Guid tunnelId)
         {
             Collection.Use((o) =>

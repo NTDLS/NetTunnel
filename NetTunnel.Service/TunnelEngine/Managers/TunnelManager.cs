@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
+using NTDLS.NullExtensions;
 using NTDLS.Persistence;
 
 namespace NetTunnel.Service.TunnelEngine.Managers
@@ -12,72 +13,32 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             LoadFromDisk();
         }
 
-        /*
-        /// <summary>
-        /// Tell the remote tunnel service to delete the specified endpoint.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tunnelId"></param>
-        /// <param name="endpointId"></param>
-        /// <returns></returns>
-        public async Task<T> DispatchDeleteEndpointToAssociatedTunnelService<T>(Guid tunnelId, Guid endpointId) where T : class, IRmQueryReply
-        {
-            return (await Collection.Use((o) =>
-            {
-                var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                return tunnel.Query(new oldQueryDeleteEndpoint(endpointId));
-            }) as T).EnsureNotNull();
-        }
-
-
-        /// <summary>
-        /// Tell the remote tunnel service to add the inbound endpoint.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tunnelId"></param>
-        /// <param name="endpoint"></param>
-        /// <returns></returns>
-        public async Task<T> DispatchUpsertEndpointInboundToAssociatedTunnelService<T>(Guid tunnelId, NtEndpointInboundConfiguration endpoint) where T : class, IRmQueryReply
-        {
-            return (await Collection.Use((o) =>
-            {
-                var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                return tunnel.Query(new oldQueryUpsertEndpointInbound(endpoint));
-            }) as T).EnsureNotNull();
-        }
-
-        /// <summary>
-        /// Tell the remote tunnel service to add the outbound endpoint.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tunnelId"></param>
-        /// <param name="endpoint"></param>
-        /// <returns></returns>
-        public async Task<T> DispatchUpsertEndpointOutboundToAssociatedTunnelService<T>(Guid tunnelId, NtEndpointOutboundConfiguration endpoint) where T : class, IRmQueryReply
-        {
-            return (await Collection.Use((o) =>
-            {
-                var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                return tunnel.Query(new oldQueryUpsertEndpointOutbound(endpoint));
-            }) as T).EnsureNotNull();
-        }
-
-        public void UpsertEndpointInbound(Guid tunnelId, NtEndpointInboundConfiguration endpoint)
+        public void Load(NtTunnelConfiguration config)
         {
             Collection.Use((o) =>
             {
-                var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                tunnel.UpsertInboundEndpoint(endpoint);
+                var tunnel = new Tunnel(Core, config);
+                o.Add(tunnel.EnsureNotNull());
             });
         }
 
-        public void UpsertEndpointOutbound(Guid tunnelId, NtEndpointOutboundConfiguration endpoint)
+        public void Add(NtTunnelConfiguration config)
         {
             Collection.Use((o) =>
             {
-                var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
-                tunnel.UpsertOutboundEndpoint(endpoint);
-                //tunnel.Start();
+                var tunnel = new Tunnel(Core, config);
+                o.Add(tunnel.EnsureNotNull());
+                SaveToDisk();
+            });
+        }
+
+        public void UpsertEndpoint(NtEndpointConfiguration endpointConfiguration)
+        {
+            Collection.Use((o) =>
+            {
+                var tunnel = o.Where(o => o.TunnelId == endpointConfiguration.TunnelId).Single();
+                tunnel.UpsertEndpoint(endpointConfiguration);
+                SaveToDisk();
             });
         }
 
@@ -91,12 +52,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 endpoint.Stop();
 
                 tunnel.DeleteEndpoint(endpointId);
-
-                endpoint.Start();
             });
         }
-
-        */
 
         public List<NtTunnelConfiguration> CloneConfigurations()
         {
@@ -111,14 +68,15 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-        public void SaveToDisk() => CommonApplicationData.SaveToDisk(Constants.FriendlyName, CloneConfigurations());
+        public void SaveToDisk()
+            => CommonApplicationData.SaveToDisk(Constants.FriendlyName, CloneConfigurations());
 
         private void LoadFromDisk()
         {
             Collection.Use((o) =>
             {
                 if (o.Count != 0) throw new Exception("Can not load configuration on top of existing collection.");
-                CommonApplicationData.LoadFromDisk<List<NtTunnelConfiguration>>(Constants.FriendlyName)?.ForEach(o => Add(o));
+                CommonApplicationData.LoadFromDisk<List<NtTunnelConfiguration>>(Constants.FriendlyName)?.ForEach(o => Load(o));
             });
         }
     }

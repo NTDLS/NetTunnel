@@ -42,6 +42,7 @@
 
         public enum NtDirection
         {
+            Undefined,
             Inbound,
             Outbound
         }

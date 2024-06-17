@@ -60,7 +60,24 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
             var tunnelContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
             Singletons.Core.Tunnels.Add(query.Configuration);
-            Singletons.Core.Tunnels.SaveToDisk();
+
+            return new QueryCreateTunnelReply();
+        }
+
+        public QueryPingReply OnQueryCreateTunnel(RmContext context, QueryPing query)
+        {
+            var tunnelContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+            return new QueryPingReply(query.OriginationTimestamp);
+        }
+
+        public QueryCreateTunnelReply OnQueryUpsertEndpoint(QueryUpsertEndpoint query)
+        {
+            Singletons.Core.Tunnels.UpsertEndpoint(query.Configuration);
+
+            //Since we have a tunnel, we will communicate the alteration of endpoints though the tunnel.
+            //var result = await Singletons.Core.InboundTunnels
+            //    .DispatchUpsertEndpointOutboundToAssociatedTunnelService<oldQueryReplyPayloadBoolean>(tunnelId, endpoint.Outbound);
 
             return new QueryCreateTunnelReply();
         }

@@ -10,7 +10,7 @@ namespace NetTunnel.UI.Forms
     {
         private readonly NtServiceClient? _client;
         private readonly NtTunnelConfiguration? _tunnel;
-        private readonly NtDirection _direction;
+        private readonly NtDirection _direction = NtDirection.Undefined;
         private readonly NtEndpointConfiguration? _existingEndpoint;
 
         /// <summary>
@@ -141,13 +141,11 @@ namespace NetTunnel.UI.Forms
 
                 var endpointId = _existingEndpoint?.EndpointId ?? Guid.NewGuid(); //The endpointId is the same on both services.
 
-                var inboundEndpoint = new NtEndpointConfiguration(_tunnel.TunnelId, endpointId, NtDirection.Inbound,
+                var endpoint = new NtEndpointConfiguration(_tunnel.TunnelId, endpointId, _direction,
                     textBoxName.Text, textBoxOutboundAddress.Text, textBoxInboundPort.ValueAs<int>(),
                     textBoxOutboundPort.ValueAs<int>(), endpointHttpHeaderRules, Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"));
 
-                var outboundEndpoint = new NtEndpointConfiguration(_tunnel.TunnelId, endpointId, NtDirection.Outbound,
-                    textBoxName.Text, textBoxOutboundAddress.Text, textBoxInboundPort.ValueAs<int>(),
-                    textBoxOutboundPort.ValueAs<int>(), endpointHttpHeaderRules, Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"));
+                _client.QueryUpsertEndpoint(endpoint);
 
                 /*
                 if (_tunnel is NtTunnelInboundConfiguration)

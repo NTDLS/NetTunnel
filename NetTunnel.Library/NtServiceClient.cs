@@ -98,30 +98,25 @@ namespace NetTunnel.Library
             }
         }
 
-        public async Task<QueryGetTunnelsReply> GetTunnels()
+        public double Ping()
         {
-            return await Client.Query(new QueryGetTunnels());
+            return Client.Query(new QueryPing()).ContinueWith(t =>
+            {
+                if (t.IsCompletedSuccessfully)
+                {
+                    return (DateTime.UtcNow - t.Result.OriginationTimestamp).TotalMilliseconds;
+                }
+                return 0;
+            }).Result;
         }
 
-        public async Task<QueryCreateTunnelReply> CreateTunnel(NtTunnelConfiguration configuration)
-        {
-            return await Client.Query(new QueryCreateTunnel(configuration));
-        }
+        public async Task<QueryGetTunnelsReply> QueryGetTunnels()
+            => await Client.Query(new QueryGetTunnels());
 
-        /*
-        public void UpsertEndpointInboundPair()
-        {
-            var endpoint = JsonConvert.DeserializeObject<NtEndpointPairConfiguration>(value).EnsureNotNull();
+        public async Task<QueryCreateTunnelReply> QueryCreateTunnel(NtTunnelConfiguration configuration)
+            => await Client.Query(new QueryCreateTunnel(configuration));
 
-            //Add the inbound endpoint to the local tunnel.
-            Singletons.Core.InboundTunnels.UpsertEndpointInbound(tunnelId, endpoint.Inbound);
-            Singletons.Core.InboundTunnels.SaveToDisk();
-
-            //Since we have a tunnel, we will communicate the alteration of endpoints though the tunnel.
-            var result = await Singletons.Core.InboundTunnels
-                .DispatchUpsertEndpointOutboundToAssociatedTunnelService<oldQueryReplyPayloadBoolean>(tunnelId, endpoint.Outbound);
-
-        }
-        */
+        public async Task<QueryUpsertEndpointReply> QueryUpsertEndpoint(NtEndpointConfiguration configuration)
+            => await Client.Query(new QueryUpsertEndpoint(configuration));
     }
 }

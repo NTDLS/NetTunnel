@@ -94,7 +94,7 @@ namespace NetTunnel.UI.Forms
                                 return;
                             }
 
-                            await _client.CreateTunnel(tunnel);
+                            await _client.QueryCreateTunnel(tunnel);
 
                             this.InvokeClose(DialogResult.OK);
                         });
