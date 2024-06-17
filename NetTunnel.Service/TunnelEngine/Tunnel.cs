@@ -203,9 +203,9 @@ namespace NetTunnel.Service.TunnelEngine
             return endpoint;
         }
 
-        public void DeleteEndpoint(Guid endpointPairId)
+        public void DeleteEndpoint(Guid endpointId)
         {
-            var endpoint = GetEndpointById(endpointPairId);
+            var endpoint = GetEndpointById(endpointId);
             if (endpoint != null)
             {
                 endpoint.Stop();
