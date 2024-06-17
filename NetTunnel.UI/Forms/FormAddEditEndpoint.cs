@@ -110,6 +110,8 @@ namespace NetTunnel.UI.Forms
             _client.EnsureNotNull();
             _tunnel.EnsureNotNull();
 
+            buttonSave.InvokeDisable();
+
             try
             {
                 textBoxName.GetAndValidateText("You must specify a name This is for your identification only.");
@@ -137,93 +139,32 @@ namespace NetTunnel.UI.Forms
                     }
                 }
 
-                buttonSave.InvokeEnableControl(false);
-
                 var endpointId = _existingEndpoint?.EndpointId ?? Guid.NewGuid(); //The endpointId is the same on both services.
 
                 var endpoint = new NtEndpointConfiguration(_tunnel.TunnelId, endpointId, _direction,
                     textBoxName.Text, textBoxOutboundAddress.Text, textBoxInboundPort.ValueAs<int>(),
                     textBoxOutboundPort.ValueAs<int>(), endpointHttpHeaderRules, Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"));
 
-                _client.QueryUpsertEndpoint(endpoint);
-
-                /*
-                if (_tunnel is NtTunnelInboundConfiguration)
-                {
-                    if (_direction == NtDirection.Inbound)
+                _client.QueryUpsertEndpoint(endpoint).ContinueWith((o) =>
                     {
-                        _client.UpsertEndpointInboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
+                        if (!o.IsCompletedSuccessfully)
                         {
-                            if (!o.IsCompletedSuccessfully)
-                            {
-                                this.InvokeMessageBox("Failed to add inbound endpoint pair to inbound tunnel.",
-                                    FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                            this.InvokeMessageBox("Failed to save endpoint to tunnel.",
+                                FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 
-                                buttonSave.InvokeEnableControl(true);
+                            buttonSave.InvokeEnable();
 
-                                return;
-                            }
-                            this.InvokeClose(DialogResult.OK);
+                            return;
+                        }
 
-                        });
-                    }
-                    else
-                    {
-                        _client.TunnelInbound.UpsertEndpointOutboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
-                        {
-                            if (!o.IsCompletedSuccessfully)
-                            {
-                                this.InvokeMessageBox("Failed to add outbound endpoint pair to inbound tunnel.",
-                                    FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        this.InvokeClose(DialogResult.OK);
 
-                                buttonSave.InvokeEnableControl(true);
-
-                                return;
-                            }
-                            this.InvokeClose(DialogResult.OK);
-                        });
-                    }
-                }
-                if (_tunnel is NtTunnelOutboundConfiguration)
-                {
-                    if (_direction == NtDirection.Inbound)
-                    {
-                        _client.TunnelOutbound.UpsertEndpointInboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
-                        {
-                            if (!o.IsCompletedSuccessfully)
-                            {
-                                this.InvokeMessageBox("Failed to add outbound endpoint pair to outbound tunnel.",
-                                    FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-
-                                buttonSave.InvokeEnableControl(true);
-
-                                return;
-                            }
-                            this.InvokeClose(DialogResult.OK);
-                        });
-                    }
-                    else
-                    {
-                        _client.TunnelOutbound.UpsertEndpointOutboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
-                        {
-                            if (!o.IsCompletedSuccessfully)
-                            {
-                                this.InvokeMessageBox("Failed to add outbound endpoint pair to outbound tunnel.",
-                                    FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-
-                                buttonSave.InvokeEnableControl(true);
-
-                                return;
-                            }
-                            this.InvokeClose(DialogResult.OK);
-                        });
-                    }
-                }
-                */
+                    });
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK);
+                buttonSave.InvokeEnable();
             }
         }
     }

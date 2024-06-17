@@ -71,7 +71,7 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
             return new QueryPingReply(query.OriginationTimestamp);
         }
 
-        public QueryCreateTunnelReply OnQueryUpsertEndpoint(QueryUpsertEndpoint query)
+        public QueryUpsertEndpointReply OnQueryUpsertEndpoint(QueryUpsertEndpoint query)
         {
             Singletons.Core.Tunnels.UpsertEndpoint(query.Configuration);
 
@@ -79,7 +79,7 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
             //var result = await Singletons.Core.InboundTunnels
             //    .DispatchUpsertEndpointOutboundToAssociatedTunnelService<oldQueryReplyPayloadBoolean>(tunnelId, endpoint.Outbound);
 
-            return new QueryCreateTunnelReply();
+            return new QueryUpsertEndpointReply();
         }
     }
 }
