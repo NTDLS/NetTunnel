@@ -17,6 +17,7 @@ namespace NetTunnel.Library.ReliableMessages.Query
     public class QueryLoginReply : IRmQueryReply
     {
         public bool Successful { get; set; }
+        public Guid? ServiceId { get; set; }
 
         public QueryLoginReply()
         {

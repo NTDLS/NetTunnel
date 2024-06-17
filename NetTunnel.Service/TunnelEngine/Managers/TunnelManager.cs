@@ -36,7 +36,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             Collection.Use((o) =>
             {
-                var tunnel = o.Where(o => o.TunnelId == endpointConfiguration.TunnelId).Single();
+                var tunnel = o.Where(o => o.Configuration.TunnelId == endpointConfiguration.TunnelId).Single();
                 tunnel.UpsertEndpoint(endpointConfiguration);
                 SaveToDisk();
             });
@@ -46,12 +46,13 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             Collection.Use((o) =>
             {
-                var tunnel = o.Where(o => o.TunnelId == tunnelId).Single();
+                var tunnel = o.Where(o => o.Configuration.TunnelId == tunnelId).Single();
                 var endpoint = tunnel.Endpoints.Where(o => o.EndpointId == endpointId).Single();
 
                 endpoint.Stop();
 
                 tunnel.DeleteEndpoint(endpointId);
+                SaveToDisk();
             });
         }
 
@@ -68,15 +69,23 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-        public void SaveToDisk()
-            => CommonApplicationData.SaveToDisk(Constants.FriendlyName, CloneConfigurations());
+        private void SaveToDisk()
+        {
+            var clonedConfig = CloneConfigurations()
+                .Where(o => o.ServiceId == Singletons.Configuration.ServiceId).ToList();
+
+            CommonApplicationData.SaveToDisk(Constants.FriendlyName, CloneConfigurations());
+        }
 
         private void LoadFromDisk()
         {
             Collection.Use((o) =>
             {
                 if (o.Count != 0) throw new Exception("Can not load configuration on top of existing collection.");
-                CommonApplicationData.LoadFromDisk<List<NtTunnelConfiguration>>(Constants.FriendlyName)?.ForEach(o => Load(o));
+
+                CommonApplicationData.LoadFromDisk<List<NtTunnelConfiguration>>(Constants.FriendlyName)?
+                    .Where(o => o.ServiceId == Singletons.Configuration.ServiceId).ToList()
+                    .ForEach(o => Load(o));
             });
         }
     }

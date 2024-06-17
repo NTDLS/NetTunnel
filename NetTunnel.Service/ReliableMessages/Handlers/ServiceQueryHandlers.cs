@@ -39,7 +39,10 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
             {
                 tunnelContext.SetAuthenticated(query.UserName);
 
-                return new QueryLoginReply(true);
+                return new QueryLoginReply(true)
+                {
+                    ServiceId = Singletons.Configuration.ServiceId
+                };
             }
 
             return new QueryLoginReply(false);

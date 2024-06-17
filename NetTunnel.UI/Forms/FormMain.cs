@@ -661,7 +661,7 @@ namespace NetTunnel.UI.Forms
                     item.Tag = tunnel;
                     item.SubItems.Add("????");
                     item.SubItems.Add($"{tunnel.Address}");
-                    item.SubItems.Add($"{tunnel.EndpointConfigurations.Count:n0}");
+                    item.SubItems.Add($"{tunnel.Endpoints.Count:n0}");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
@@ -693,10 +693,10 @@ namespace NetTunnel.UI.Forms
         {
             listViewEndpoints.Items.Clear();
 
-            tunnelInbound.EndpointConfigurations.Where(o => o.Direction == NtDirection.Inbound)
+            tunnelInbound.Endpoints.Where(o => o.Direction == NtDirection.Inbound)
                 .ToList().ForEach(x => AddEndpointInboundToGrid(x));
 
-            tunnelInbound.EndpointConfigurations.Where(o => o.Direction == NtDirection.Outbound)
+            tunnelInbound.Endpoints.Where(o => o.Direction == NtDirection.Outbound)
                 .ToList().ForEach(x => AddEndpointOutboundToGrid(x));
 
             void AddEndpointInboundToGrid(NtEndpointConfiguration endpoint)

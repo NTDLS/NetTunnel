@@ -11,8 +11,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         protected readonly PessimisticCriticalResource<List<Tunnel>> Collection = new();
 
-        public void Start(Guid tunnelId) => Collection.Use((o) => o.Where(o => o.TunnelId == tunnelId).Single().Start());
-        public void Stop(Guid tunnelId) => Collection.Use((o) => o.Where(o => o.TunnelId == tunnelId).Single().Stop());
+        public void Start(Guid tunnelId) => Collection.Use((o) => o.Where(o => o.Configuration.TunnelId == tunnelId).Single().Start());
+        public void Stop(Guid tunnelId) => Collection.Use((o) => o.Where(o => o.Configuration.TunnelId == tunnelId).Single().Stop());
         public void StartAll() => Collection.Use((o) => o.ForEach((o) => o.Start()));
         public void StopAll() => Collection.Use((o) => o.ForEach((o) => o.Stop()));
 
@@ -66,7 +66,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                     {
                         Direction = Constants.NtDirection.Inbound, //TODO: Add some status for in/out bound tunnel.
                         Status = tunnel.Status,
-                        TunnelId = tunnel.TunnelId,
+                        TunnelId = tunnel.Configuration.TunnelId,
                         BytesReceived = tunnel.BytesReceived,
                         BytesSent = tunnel.BytesSent,
                         CurrentConnections = tunnel.CurrentConnections,
@@ -82,7 +82,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                             BytesReceived = endpoint.BytesReceived,
                             BytesSent = endpoint.BytesSent,
                             EndpointId = endpoint.EndpointId,
-                            TunnelId = tunnel.TunnelId,
+                            TunnelId = tunnel.Configuration.TunnelId,
                             CurrentConnections = endpoint.CurrentConnections,
                             TotalConnections = endpoint.TotalConnections,
                             ChangeHash = endpoint.GetHashCode()

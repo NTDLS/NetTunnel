@@ -3,6 +3,10 @@
     public class NtServiceConfiguration
     {
         /// <summary>
+        /// The id for this instance of the tunnel service.
+        /// </summary>
+        public Guid ServiceId { get; set; } = Guid.NewGuid();
+        /// <summary>
         /// The HTTP/HTTPS port for the management web-services.
         /// </summary>
         public int ManagementPort { get; set; } = 52845;

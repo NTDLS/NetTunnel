@@ -71,7 +71,7 @@ namespace NetTunnel.UI.Forms
 
                 var tunnelId = Guid.NewGuid(); //The TunnelId is the same on both services.
 
-                var tunnel = new NtTunnelConfiguration(tunnelId, textBoxName.Text,
+                var tunnel = new NtTunnelConfiguration(_client.ServiceId, tunnelId, textBoxName.Text,
                     textBoxRemoteAddress.Text, textBoxManagementPort.ValueAs<int>(),
                     textBoxRemoteUsername.Text, Utility.ComputeSha256Hash(textBoxRemotePassword.Text));
 

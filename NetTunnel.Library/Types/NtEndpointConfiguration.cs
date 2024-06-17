@@ -56,6 +56,28 @@ namespace NetTunnel.Library.Types
             HttpHeaderRules.AddRange(httpHeaderRules);
         }
 
+        public NtEndpointConfiguration CloneConfiguration()
+        {
+            var clone = new NtEndpointConfiguration
+            {
+                TunnelId = TunnelId,
+                EndpointId = EndpointId,
+                Direction = Direction,
+                Name = Name,
+                OutboundAddress = OutboundAddress,
+                InboundPort = InboundPort,
+                OutboundPort = OutboundPort,
+                TrafficType = TrafficType,
+            };
+
+            foreach (var rule in HttpHeaderRules)
+            {
+                clone.HttpHeaderRules.Add(rule.CloneConfiguration());
+            }
+
+            return clone;
+        }
+
         public override int GetHashCode()
         {
             return EndpointId.GetHashCode()

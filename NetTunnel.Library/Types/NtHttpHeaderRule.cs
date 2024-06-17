@@ -54,6 +54,20 @@ namespace NetTunnel.Library
         {
         }
 
+        public NtHttpHeaderRule CloneConfiguration()
+        {
+            return new NtHttpHeaderRule
+            {
+                Name = Name,
+                Value = Value,
+                Description = Description,
+                Action = Action,
+                Enabled = Enabled,
+                HeaderType = HeaderType,
+                Verb = Verb
+            };
+        }
+
         public override int GetHashCode()
         {
             return Name.GetHashCode()

@@ -2,6 +2,7 @@
 using NetTunnel.Library.ReliableMessages.Query;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.ReliableMessages;
+using NTDLS.NullExtensions;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
 
@@ -19,6 +20,11 @@ namespace NetTunnel.Library
         private readonly int _port;
         private readonly string _userName;
         private readonly string _passwordHash;
+
+        /// <summary>
+        /// The id of the service that we are logged into.
+        /// </summary>
+        public Guid ServiceId { get; private set; }
 
         public NtServiceClient(NtServiceConfiguration configuration, RmClient client, string address, int port, string userName, string passwordHash)
         {
@@ -96,6 +102,8 @@ namespace NetTunnel.Library
             {
                 throw new Exception("Login failed.");
             }
+
+            ServiceId = login.ServiceId.EnsureNotNullOrEmpty();
         }
 
         public double Ping()
