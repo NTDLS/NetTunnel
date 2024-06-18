@@ -117,10 +117,10 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// </summary>
         private void SaveToDisk()
         {
-            var clonedConfig = Clone()
+            var ownedConfiguration = Clone()
                 .Where(o => o.ServiceId == Singletons.Configuration.ServiceId).ToList();
 
-            CommonApplicationData.SaveToDisk(Constants.FriendlyName, Clone());
+            CommonApplicationData.SaveToDisk(Constants.FriendlyName, ownedConfiguration);
         }
 
         private void LoadFromDisk()
