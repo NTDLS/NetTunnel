@@ -65,7 +65,6 @@ namespace NetTunnel.Service.TunnelEngine
             };
         }
 
-
         /// <summary>
         /// Sends a notification to the remote tunnel service to let it know to connect
         ///     the associated outbound endpoint for an incoming endpoint connection.

@@ -24,7 +24,7 @@ namespace NetTunnel.Library.Types
         /// <summary>
         /// Level of information to log to the file/console/etc.
         /// </summary>
-        public LogLevel LogLevel { get; set; } = LogLevel.Normal;
+        public LogLevel LogLevel { get; set; } = LogLevel.Verbose;
 
         /// <summary>
         /// The file path to log to. If the string is empty, the log will not be written to file.
