@@ -143,6 +143,16 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
+        public void SendEndpointData(Guid tunnelId, Guid endpointId, Guid StreamId, byte[] bytes)
+        {
+            Collection.Use((o) =>
+            {
+                o.Where(o => o.Configuration.TunnelId == tunnelId)
+                    .Single().Endpoints.Where(o => o.EndpointId == endpointId)
+                    .Single().SendEndpointData(StreamId, bytes);
+            });
+        }
+
         #region Disk Save/Load.
 
         /// <summary>

@@ -26,6 +26,10 @@ namespace NetTunnel.Service.ReliableMessageHandlers
         {
             //var connectionContext = GetServiceConnectionContext(context);
 
+            var tunnel = (TunnelOutbound)context.Endpoint.Parameter.EnsureNotNull();
+
+            tunnel.SendEndpointData(notification.EndpointId, notification.StreamId, notification.Bytes);
+
             Singletons.Core.Logging.Write(NtLogSeverity.Debug,
                 $"Received endpoint data exchange.");
         }

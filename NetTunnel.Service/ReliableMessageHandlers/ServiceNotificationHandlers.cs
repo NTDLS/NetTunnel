@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Library.ReliableMessages.Notification;
 using NetTunnel.Service.TunnelEngine;
+using NTDLS.NullExtensions;
 using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 
@@ -34,6 +35,8 @@ namespace NetTunnel.Service.ReliableMessageHandlers
         public void OnNotificationEndpointExchange(RmContext context, NotificationEndpointExchange notification)
         {
             var connectionContext = GetServiceConnectionContext(context);
+
+            Singletons.Core.Tunnels.SendEndpointData(notification.TunnelId, notification.EndpointId, notification.StreamId, notification.Bytes);
 
             Singletons.Core.Logging.Write(NtLogSeverity.Debug,
                 $"Received endpoint data exchange.");

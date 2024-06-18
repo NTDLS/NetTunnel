@@ -101,6 +101,11 @@ namespace NetTunnel.Service.TunnelEngine
                 $"Stopped tunnel '{Configuration.Name}'.");
         }
 
+        public void SendEndpointData(Guid endpointId, Guid StreamId, byte[] bytes)
+        {
+            Endpoints.Where(o=>o.EndpointId == endpointId)
+                .Single().SendEndpointData(StreamId, bytes);
+        }
 
         #region Add/Delete Endpoints.
 
