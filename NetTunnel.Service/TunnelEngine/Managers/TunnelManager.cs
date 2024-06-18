@@ -66,10 +66,14 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                     o.Remove(existingTunnel);
                 }
 
+                foreach (var endpoint in config.Endpoints)
+                {
+                    //Since we are receiving the endpoints from the other service, we need to flip the direction of their configuration.
+                    endpoint.Direction = endpoint.Direction == NtDirection.Inbound ? NtDirection.Outbound : NtDirection.Inbound;
+                }
+
                 var newTunnel = new TunnelInbound(_Core, config);
                 o.Add(newTunnel.EnsureNotNull());
-
-                SaveToDisk();
             });
         }
 
