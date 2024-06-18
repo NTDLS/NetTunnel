@@ -37,8 +37,6 @@ namespace NetTunnel.Service.TunnelEngine
         public ulong CurrentConnections { get; set; }
         public ServiceEngine ServiceEngine { get; private set; }
         public bool KeepRunning { get; private set; } = false;
-        //public Guid TunnelId { get; private set; }
-        //public string Name { get; private set; }
         public List<IEndpoint> Endpoints { get; private set; } = new();
         private Thread? _heartbeatThread;
 

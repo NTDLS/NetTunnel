@@ -69,6 +69,14 @@ namespace NetTunnel.Service.TunnelEngine
                 $"Tunnel '{Configuration.Name}' connection successful.");
         }
 
+        public void EnforceLogin()
+        {
+            if (_client.IsLoggedIn != true)
+            {
+                throw new Exception("Client is not logged in or encryption has not been established.");
+            }
+        }
+
         public override void Start()
         {
             base.Start();

@@ -13,8 +13,6 @@ namespace NetTunnel.Library
     /// </summary>
     public class ServiceClient
     {
-        public RmClient Client { get; private set; }
-
         private readonly ServiceConfiguration _configuration;
         private readonly string _address;
         private readonly int _port;
@@ -25,6 +23,8 @@ namespace NetTunnel.Library
         /// The id of the service that we are logged into.
         /// </summary>
         public Guid ServiceId { get; private set; }
+        public RmClient Client { get; private set; }
+        public bool IsLoggedIn { get; private set; } = false;
 
         public ServiceClient(ServiceConfiguration configuration, RmClient client, string address, int port, string userName, string passwordHash)
         {
@@ -34,6 +34,7 @@ namespace NetTunnel.Library
             _port = port;
             _userName = userName;
             _passwordHash = passwordHash;
+            IsLoggedIn = false;
         }
 
         #region Factory.
@@ -70,7 +71,10 @@ namespace NetTunnel.Library
             => Client.IsConnected;
 
         public void Disconnect()
-            => Utility.TryAndIgnore(Client.Disconnect);
+        {
+            IsLoggedIn = false;
+            Utility.TryAndIgnore(Client.Disconnect);
+        }
 
         public async Task ConnectAndLogin()
         {
@@ -86,9 +90,6 @@ namespace NetTunnel.Library
             //We received a reply to the secure key exchange, apply it.
             compoundNegotiator.ApplyNegotiationResponseToken(queryRequestKeyExchangeReply.NegotiationToken);
 
-            //var tunnelConnection = new ClientConnectionContext(queryRequestKeyExchangeReply.ConnectionId);
-            //Client.Parameter = tunnelConnection;
-
             //Prop up encryption.
             var cryptographyProvider = new ClientCryptographyProvider(compoundNegotiator.SharedSecret);
 
@@ -102,8 +103,11 @@ namespace NetTunnel.Library
             {
                 throw new Exception("Login failed.");
             }
-
-            ServiceId = login.ServiceId.EnsureNotNullOrEmpty();
+            else
+            {
+                ServiceId = login.ServiceId.EnsureNotNullOrEmpty();
+                IsLoggedIn = true;
+            }
         }
 
         public double Ping()
