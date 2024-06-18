@@ -2,8 +2,6 @@
 using NetTunnel.UI.Helpers;
 using NTDLS.NullExtensions;
 using NTDLS.WinFormsHelpers;
-using System.Drawing.Text;
-using System.Runtime.InteropServices;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms

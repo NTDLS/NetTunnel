@@ -11,8 +11,12 @@ namespace NetTunnel.Service.TunnelEngine
         /// Contains a list of the connections that have been made TO the local service and the connection state info.
         /// </summary>
         public Dictionary<Guid, ServiceConnectionState> ServiceConnectionStates { get; private set; } = new();
+
+
+        /// <summary>
+        /// Logging provider for event log, console (and file?).
+        /// </summary>
         public Logger Logging { get; private set; }
-        
 
         /// <summary>
         /// Contains the information for all tunnels, inbound and outbound. Keep in mind that we only persist
@@ -25,6 +29,9 @@ namespace NetTunnel.Service.TunnelEngine
         /// </summary>
         public UserManager Users { get; private set; }
 
+        /// <summary>
+        /// The message server that accepts all inbound tunnel connections and sends/receives all messages for all tunnels.
+        /// </summary>
         private readonly RmServer _messageServer;
 
         public ServiceEngine()
