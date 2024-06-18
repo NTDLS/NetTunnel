@@ -3,7 +3,7 @@ using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 
-namespace NetTunnel.Service.ReliableMessages.Handlers
+namespace NetTunnel.Service.ReliableMessageHandlers
 {
     internal class ServiceNotificationHandlers : ServiceHandlerBase, IRmMessageHandler
     {

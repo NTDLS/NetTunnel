@@ -82,6 +82,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
                 var newTunnel = new TunnelInbound(_Core, config);
                 o.Add(newTunnel.EnsureNotNull());
+
+                newTunnel.Start();
             });
         }
 

@@ -1,7 +1,7 @@
 ﻿using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Service.ReliableMessages.Handlers
+namespace NetTunnel.Service.ReliableMessageHandlers
 {
     internal class ServiceHandlerBase
     {

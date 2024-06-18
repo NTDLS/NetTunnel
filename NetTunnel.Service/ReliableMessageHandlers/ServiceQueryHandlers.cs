@@ -3,7 +3,7 @@ using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
 
-namespace NetTunnel.Service.ReliableMessages.Handlers
+namespace NetTunnel.Service.ReliableMessageHandlers
 {
     internal class ServiceQueryHandlers : ServiceHandlerBase, IRmMessageHandler
     {
