@@ -44,7 +44,7 @@ namespace NetTunnel.Library.Types
         /// <summary>
         /// The number of 12-byte segments to generate for tunnel cryptography.
         /// </summary>
-        public int TunnelCryptographyKeySize { get; set; } = 8;
+        public int TunnelCryptographyKeySize { get; set; } = 16;
 
         /// <summary>
         /// The maximum number of milliseconds to allow an endpoint to remain connected without read/write activity.
