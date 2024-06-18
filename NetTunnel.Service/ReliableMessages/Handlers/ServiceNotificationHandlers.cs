@@ -30,5 +30,13 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
 
             Singletons.Core.Tunnels.EstablishOutboundEndpointConnection(notification.TunnelId, notification.EndpointId, notification.StreamId);
         }
+
+        public void OnNotificationEndpointExchange(RmContext context, NotificationEndpointExchange notification)
+        {
+            var connectionContext = GetServiceConnectionContext(context);
+
+            Singletons.Core.Logging.Write(NtLogSeverity.Debug,
+                $"Received endpoint data exchange.");
+        }
     }
 }

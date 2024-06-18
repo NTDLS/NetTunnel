@@ -37,6 +37,10 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         #region Create / Delete.
 
+        /// <summary>
+        /// The local service is adding a new outbound tunnel configuration to the local service.
+        /// </summary>
+        /// <param name="config"></param>
         public void UpsertTunnel(NtTunnelConfiguration config)
         {
             Collection.Use((o) =>
@@ -55,6 +59,10 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
+        /// <summary>
+        /// A remote service is registering its outbound tunnel configuration with the local service.
+        /// </summary>
+        /// <param name="config"></param>
         public void RegisterTunnel(NtTunnelConfiguration config)
         {
             Collection.Use((o) =>
@@ -77,6 +85,11 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
+        /// <summary>
+        /// The local service is adding/editing an endpoint to a local outbound tunnel.
+        /// </summary>
+        /// <param name="tunnelId"></param>
+        /// <param name="endpointConfiguration"></param>
         public void UpsertEndpoint(Guid tunnelId, NtEndpointConfiguration endpointConfiguration)
         {
             Collection.Use((o) =>
@@ -88,6 +101,11 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
+        /// <summary>
+        /// The local service is deleting an endpoint from a local outbound tunnel.
+        /// </summary>
+        /// <param name="tunnelId"></param>
+        /// <param name="endpointId"></param>
         public void DeleteEndpoint(Guid tunnelId, Guid endpointId)
         {
             Collection.Use((o) =>
@@ -101,6 +119,15 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         #endregion
 
+        /// <summary>
+        /// A remote service is telling the local service that an inbound connection has been made to an
+        /// inbound endpoint and is asking the local service to make the associated connection on the associated
+        /// outbound endpoint.
+        /// </summary>
+        /// <param name="tunnelId"></param>
+        /// <param name="endpointId"></param>
+        /// <param name="streamId"></param>
+        /// <exception cref="Exception"></exception>
         public void EstablishOutboundEndpointConnection(Guid tunnelId, Guid endpointId, Guid streamId)
         {
             Collection.Use((o) =>
