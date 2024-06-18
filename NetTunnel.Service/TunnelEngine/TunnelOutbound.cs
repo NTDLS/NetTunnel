@@ -123,25 +123,27 @@ namespace NetTunnel.Service.TunnelEngine
                         TotalConnections++;
                     }
                 }
-                catch (SocketException ex)
+                catch (Exception ex)
                 {
                     Status = NtTunnelStatus.Disconnected;
 
-                    if (ex.SocketErrorCode == SocketError.ConnectionRefused)
+                    if (ex.InnerException is SocketException sockEx)
                     {
-                        ServiceEngine.Logger.Warning(
-                            $"EstablishConnectionThread: {ex.Message}");
+
+                        if (sockEx.SocketErrorCode == SocketError.ConnectionRefused)
+                        {
+                            ServiceEngine.Logger.Warning(
+                                $"EstablishConnectionThread: {ex.Message}");
+                        }
+                        else
+                        {
+                            ServiceEngine.Logger.Exception(ex, $"EstablishConnectionThread: {ex.Message}");
+                        }
                     }
                     else
                     {
                         ServiceEngine.Logger.Exception(ex, $"EstablishConnectionThread: {ex.Message}");
                     }
-                }
-                catch (Exception ex)
-                {
-                    Status = NtTunnelStatus.Disconnected; //TODO: Are we really disconnected here??
-
-                    ServiceEngine.Logger.Exception(ex, $"EstablishConnectionThread: {ex.Message}");
                 }
                 finally
                 {

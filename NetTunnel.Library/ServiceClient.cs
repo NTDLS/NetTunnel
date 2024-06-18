@@ -82,6 +82,8 @@ namespace NetTunnel.Library
 
         public async Task ConnectAndLogin()
         {
+            Client.ClearCryptographyProvider();
+
             Client.Connect(_address, _port);
 
             var compoundNegotiator = new CompoundNegotiator();
