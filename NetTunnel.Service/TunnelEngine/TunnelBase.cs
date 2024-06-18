@@ -103,7 +103,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         public void SendEndpointData(Guid endpointId, Guid StreamId, byte[] bytes)
         {
-            Endpoints.Where(o=>o.EndpointId == endpointId)
+            Endpoints.Where(o => o.EndpointId == endpointId)
                 .Single().SendEndpointData(StreamId, bytes);
         }
 
