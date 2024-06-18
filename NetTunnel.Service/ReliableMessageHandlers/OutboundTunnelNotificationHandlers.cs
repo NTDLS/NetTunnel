@@ -9,6 +9,8 @@ namespace NetTunnel.Service.ReliableMessageHandlers
     {
         public void OnNotificationEndpointConnect(RmContext context, NotificationEndpointConnect notification)
         {
+            //SEARCH FOR: Process:Endpoint:Connect:004: The remote service has communicated though the tunnel that we need to
+            //  establish an associated outbound endpoint connection.
             var connectionContext = GetServiceConnectionContext(context);
 
             Singletons.Core.Logging.Write(NtLogSeverity.Debug,
