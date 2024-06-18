@@ -1,5 +1,4 @@
-﻿using NetTunnel.ClientAPI;
-using NetTunnel.Library;
+﻿using NetTunnel.Library;
 using NetTunnel.Service;
 using NTDLS.NullExtensions;
 using NTDLS.WinFormsHelpers;
@@ -8,7 +7,7 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormChangeUserPassword : Form
     {
-        private readonly NtClient? _client;
+        private readonly NtServiceClient? _client;
         public NtUser? User { get; private set; }
 
         public FormChangeUserPassword()
@@ -16,7 +15,7 @@ namespace NetTunnel.UI.Forms
             InitializeComponent();
         }
 
-        public FormChangeUserPassword(NtClient? client, NtUser user)
+        public FormChangeUserPassword(NtServiceClient? client, NtUser user)
         {
             InitializeComponent();
 

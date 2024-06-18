@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetTunnel.Library", "NetTun
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetTunnel.UI", "NetTunnel.UI\NetTunnel.UI.csproj", "{0FB6DD7B-3303-4FDC-BD1C-D17719C51C73}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetTunnel.ClientAPI", "NetTunnel.ClientAPI\NetTunnel.ClientAPI.csproj", "{6BFB5299-F9EC-41C3-B094-90CAA6279FDB}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetTunnel.Service", "NetTunnel.Service\NetTunnel.Service.csproj", "{1D602D6B-348B-41FE-ABC8-9A98FD6CD247}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F927DF22-97CB-409B-9B79-1B2C77DE1952}"
@@ -31,10 +29,6 @@ Global
 		{0FB6DD7B-3303-4FDC-BD1C-D17719C51C73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FB6DD7B-3303-4FDC-BD1C-D17719C51C73}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0FB6DD7B-3303-4FDC-BD1C-D17719C51C73}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6BFB5299-F9EC-41C3-B094-90CAA6279FDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6BFB5299-F9EC-41C3-B094-90CAA6279FDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6BFB5299-F9EC-41C3-B094-90CAA6279FDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6BFB5299-F9EC-41C3-B094-90CAA6279FDB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1D602D6B-348B-41FE-ABC8-9A98FD6CD247}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1D602D6B-348B-41FE-ABC8-9A98FD6CD247}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D602D6B-348B-41FE-ABC8-9A98FD6CD247}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -1,5 +1,4 @@
-﻿using NetTunnel.ClientAPI;
-using NetTunnel.Library.ReliableMessages.Notification;
+﻿using NetTunnel.Library.ReliableMessages.Notification;
 using NetTunnel.Service.ReliableMessageHandlers;
 using NetTunnel.Service.TunnelEngine.Managers;
 using NTDLS.ReliableMessaging;
@@ -68,6 +67,8 @@ namespace NetTunnel.Service.TunnelEngine
 
         public void NotificationEndpointConnect(Guid connectionId, Guid tunnelId, Guid endpointId, Guid streamId)
         {
+            //PROCESS:EBCONNECT.003: The local client is communicating through the tunnel that an inbound endpoint
+            //  connection has been made so that it can make the associated outbound endpoint connection.
             _messageServer.Notify(connectionId, new NotificationEndpointConnect(tunnelId, endpointId, streamId));
         }
 

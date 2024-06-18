@@ -20,7 +20,9 @@ namespace NetTunnel.Service.TunnelEngine
 
         public override void NotificationEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId)
         {
-            Core.NotificationEndpointConnect(ConnectionId, tunnelId, endpointId, streamId);   
+            //PROCESS:EBCONNECT.002: client connection is asking us to let the remote service know that a new inbound 
+            //  endpoint connection has been made and that is needs to make the associated outbound endpoint connection.
+            Core.NotificationEndpointConnect(ConnectionId, tunnelId, endpointId, streamId);
 
 
             //This needs to go though the _server.
