@@ -141,11 +141,11 @@ namespace NetTunnel.UI.Forms
 
                 var endpointId = _existingEndpoint?.EndpointId ?? Guid.NewGuid(); //The endpointId is the same on both services.
 
-                var endpoint = new NtEndpointConfiguration(_tunnel.TunnelId, endpointId, _direction,
+                var endpoint = new NtEndpointConfiguration(endpointId, _direction,
                     textBoxName.Text, textBoxOutboundAddress.Text, textBoxInboundPort.ValueAs<int>(),
                     textBoxOutboundPort.ValueAs<int>(), endpointHttpHeaderRules, Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"));
 
-                _client.QueryUpsertEndpoint(endpoint).ContinueWith((o) =>
+                _client.QueryUpsertEndpoint(_tunnel.TunnelId, endpoint).ContinueWith((o) =>
                     {
                         if (!o.IsCompletedSuccessfully)
                         {

@@ -75,7 +75,7 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
 
         public QueryUpsertEndpointReply OnQueryUpsertEndpoint(QueryUpsertEndpoint query)
         {
-            Singletons.Core.Tunnels.UpsertEndpoint(query.Configuration);
+            Singletons.Core.Tunnels.UpsertEndpoint(query.TunnelId, query.Configuration);
 
             //Since we have a tunnel, we will communicate the alteration of endpoints though the tunnel.
             //var result = await Singletons.Core.InboundTunnels

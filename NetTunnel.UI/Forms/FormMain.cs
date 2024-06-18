@@ -2,6 +2,8 @@
 using NetTunnel.UI.Helpers;
 using NTDLS.NullExtensions;
 using NTDLS.WinFormsHelpers;
+using System.Drawing.Text;
+using System.Runtime.InteropServices;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms
@@ -27,6 +29,7 @@ namespace NetTunnel.UI.Forms
         }
 
         #endregion
+
 
         private void FormMain_Load(object sender, EventArgs e)
         {
@@ -147,6 +150,9 @@ namespace NetTunnel.UI.Forms
                 }
                 */
 
+
+
+
                 void PopulateEndpointStatistics(List<NtTunnelStatistics> statistics)
                 {
                     if (listViewEndpoints.InvokeRequired)
@@ -159,15 +165,13 @@ namespace NetTunnel.UI.Forms
 
                         foreach (ListViewItem item in listViewEndpoints.Items)
                         {
-                            var endpoint = ((NtEndpointConfiguration?)item.Tag).EnsureNotNull();
+                            var epTag = ((EndpointTag?)item.Tag).EnsureNotNull();
 
-                            var direction = (endpoint is NtEndpointConfiguration) ? NtDirection.Inbound : NtDirection.Outbound;
-
-                            var tunnelStats = statistics.Where(o => o.TunnelId == endpoint.TunnelId).ToList();
+                            var tunnelStats = statistics.Where(o => o.TunnelId == epTag.Tunnel.TunnelId).ToList();
                             if (tunnelStats != null)
                             {
                                 var endpointStats = tunnelStats.SelectMany(o => o.EndpointStatistics)
-                                    .Where(o => o.EndpointId == endpoint.EndpointId && o.Direction == direction).SingleOrDefault();
+                                    .Where(o => o.EndpointId == epTag.Endpoint.EndpointId && o.Direction == epTag.Endpoint.Direction).SingleOrDefault();
                                 if (endpointStats != null)
                                 {
                                     double compressionRatio = 0;
@@ -208,9 +212,9 @@ namespace NetTunnel.UI.Forms
 
                         foreach (ListViewItem item in listViewTunnels.Items)
                         {
-                            var tunnel = ((NtTunnelConfiguration?)item.Tag).EnsureNotNull();
+                            var tTag = ((TunnelTag?)item.Tag).EnsureNotNull();
 
-                            var tunnelStats = statistics.Where(o => o.TunnelId == tunnel.TunnelId).SingleOrDefault();
+                            var tunnelStats = statistics.Where(o => o.TunnelId == tTag.Tunnel.TunnelId).SingleOrDefault();
                             if (tunnelStats != null)
                             {
 
@@ -658,7 +662,7 @@ namespace NetTunnel.UI.Forms
                 else
                 {
                     var item = new ListViewItem(tunnel.Name);
-                    item.Tag = tunnel;
+                    item.Tag = new TunnelTag(tunnel);
                     item.SubItems.Add("????");
                     item.SubItems.Add($"{tunnel.Address}");
                     item.SubItems.Add($"{tunnel.Endpoints.Count:n0}");
@@ -689,17 +693,17 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-        private void RepopulateEndpointsGrid_LockRequired(NtTunnelConfiguration tunnelInbound)
+        private void RepopulateEndpointsGrid_LockRequired(NtTunnelConfiguration tunnel)
         {
             listViewEndpoints.Items.Clear();
 
-            tunnelInbound.Endpoints.Where(o => o.Direction == NtDirection.Inbound)
-                .ToList().ForEach(x => AddEndpointInboundToGrid(x));
+            tunnel.Endpoints.Where(o => o.Direction == NtDirection.Inbound)
+                .ToList().ForEach(x => AddEndpointInboundToGrid(tunnel, x));
 
-            tunnelInbound.Endpoints.Where(o => o.Direction == NtDirection.Outbound)
-                .ToList().ForEach(x => AddEndpointOutboundToGrid(x));
+            tunnel.Endpoints.Where(o => o.Direction == NtDirection.Outbound)
+                .ToList().ForEach(x => AddEndpointOutboundToGrid(tunnel, x));
 
-            void AddEndpointInboundToGrid(NtEndpointConfiguration endpoint)
+            void AddEndpointInboundToGrid(NtTunnelConfiguration tunnel, NtEndpointConfiguration endpoint)
             {
                 if (listViewEndpoints.InvokeRequired)
                 {
@@ -708,7 +712,7 @@ namespace NetTunnel.UI.Forms
                 else
                 {
                     var item = new ListViewItem(endpoint.Name);
-                    item.Tag = endpoint;
+                    item.Tag = new EndpointTag(tunnel, endpoint);
                     item.SubItems.Add("Inbound");
                     item.SubItems.Add($"*:{endpoint.InboundPort}");
                     item.SubItems.Add("∞");
@@ -720,7 +724,7 @@ namespace NetTunnel.UI.Forms
                 }
             }
 
-            void AddEndpointOutboundToGrid(NtEndpointConfiguration endpoint)
+            void AddEndpointOutboundToGrid(NtTunnelConfiguration tunnel, NtEndpointConfiguration endpoint)
             {
                 if (listViewEndpoints.InvokeRequired)
                 {
@@ -729,7 +733,7 @@ namespace NetTunnel.UI.Forms
                 else
                 {
                     var item = new ListViewItem(endpoint.Name);
-                    item.Tag = endpoint;
+                    item.Tag = new EndpointTag(tunnel, endpoint);
                     item.SubItems.Add("Outbound");
                     item.SubItems.Add($"{endpoint.OutboundAddress}:{endpoint.OutboundPort}");
                     item.SubItems.Add("∞");

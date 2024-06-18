@@ -12,7 +12,6 @@ namespace NetTunnel.Library.Types
     public class NtEndpointConfiguration
     {
         public Guid EndpointId { get; set; }
-        public Guid TunnelId { get; set; }
         [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public NtDirection Direction { get; set; }
         public string Name { get; set; } = string.Empty;
@@ -28,10 +27,9 @@ namespace NetTunnel.Library.Types
         {
         }
 
-        public NtEndpointConfiguration(Guid tunnelId, Guid endpointId, string name,
+        public NtEndpointConfiguration(Guid endpointId, string name,
             string outboundAddress, int inboundPort, int outboundPort, List<NtHttpHeaderRule> httpHeaderRules, NtTrafficType trafficType)
         {
-            TunnelId = tunnelId;
             EndpointId = endpointId;
             Direction = NtDirection.Undefined;
             Name = name;
@@ -42,10 +40,9 @@ namespace NetTunnel.Library.Types
             HttpHeaderRules.AddRange(httpHeaderRules);
         }
 
-        public NtEndpointConfiguration(Guid tunnelId, Guid endpointId, NtDirection direction, string name,
+        public NtEndpointConfiguration(Guid endpointId, NtDirection direction, string name,
             string outboundAddress, int inboundPort, int outboundPort, List<NtHttpHeaderRule> httpHeaderRules, NtTrafficType trafficType)
         {
-            TunnelId = tunnelId;
             EndpointId = endpointId;
             Direction = direction;
             Name = name;
@@ -60,7 +57,6 @@ namespace NetTunnel.Library.Types
         {
             var clone = new NtEndpointConfiguration
             {
-                TunnelId = TunnelId,
                 EndpointId = EndpointId,
                 Direction = Direction,
                 Name = Name,
@@ -81,7 +77,6 @@ namespace NetTunnel.Library.Types
         public override int GetHashCode()
         {
             return EndpointId.GetHashCode()
-                + TunnelId.GetHashCode()
                 + Name.GetHashCode()
                 + Direction.GetHashCode()
                 + OutboundAddress.GetHashCode()

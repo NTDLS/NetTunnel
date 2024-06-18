@@ -124,7 +124,7 @@ namespace NetTunnel.Library
         public async Task<QueryCreateTunnelReply> QueryCreateTunnel(NtTunnelConfiguration configuration)
             => await Client.Query(new QueryCreateTunnel(configuration));
 
-        public async Task<QueryUpsertEndpointReply> QueryUpsertEndpoint(NtEndpointConfiguration configuration)
-            => await Client.Query(new QueryUpsertEndpoint(configuration));
+        public async Task<QueryUpsertEndpointReply> QueryUpsertEndpoint(Guid tunnelId, NtEndpointConfiguration configuration)
+            => await Client.Query(new QueryUpsertEndpoint(tunnelId, configuration));
     }
 }

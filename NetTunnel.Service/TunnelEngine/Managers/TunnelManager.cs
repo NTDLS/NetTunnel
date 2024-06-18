@@ -54,11 +54,11 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-        public void UpsertEndpoint(NtEndpointConfiguration endpointConfiguration)
+        public void UpsertEndpoint(Guid tunnelId, NtEndpointConfiguration endpointConfiguration)
         {
             Collection.Use((o) =>
             {
-                var tunnel = o.Where(o => o.Configuration.TunnelId == endpointConfiguration.TunnelId).Single();
+                var tunnel = o.Where(o => o.Configuration.TunnelId == tunnelId).Single();
                 tunnel.UpsertEndpoint(endpointConfiguration);
 
                 SaveToDisk();
