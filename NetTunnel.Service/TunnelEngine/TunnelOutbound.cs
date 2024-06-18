@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
+using NetTunnel.Service.ReliableMessageHandlers;
 using NTDLS.ReliableMessaging;
 using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
@@ -11,14 +12,13 @@ namespace NetTunnel.Service.TunnelEngine
         private readonly NtServiceClient _client;
         private Thread? _establishConnectionThread;
 
-
         public TunnelOutbound(ServiceEngine core, NtTunnelConfiguration configuration)
             : base(core, configuration)
         {
             _client = NtServiceClient.Create(Singletons.Configuration,
                 Configuration.Address, Configuration.ManagementPort, Configuration.Username, Configuration.PasswordHash, this);
 
-            //_client.AddHandler(new oldTunnelOutboundMessageHandlers());
+            _client.Client.AddHandler(new OutboundTunnelNotificationHandlers());
             //_client.AddHandler(new oldTunnelOutboundQueryHandlers());
 
             _client.Client.OnConnected += _client_OnConnected;
