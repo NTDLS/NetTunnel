@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0-windows</TargetFramework>
@@ -10,6 +10,7 @@
     <Authors>NetworkDLS</Authors>
     <Copyright>Copyright © 2024 NetworkDLS</Copyright>
     <Version>2.2.0</Version>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,14 +25,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.6" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NTDLS.NASCCL" Version="1.1.1" />
     <PackageReference Include="NTDLS.NullHelpers" Version="1.0.0" />
     <PackageReference Include="NTDLS.Persistence" Version="1.2.0" />
     <PackageReference Include="NTDLS.SecureKeyExchange" Version="2.2.2" />
     <PackageReference Include="NTDLS.Semaphore" Version="3.3.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
     <PackageReference Include="Topshelf" Version="4.3.0" />
   </ItemGroup>
 
