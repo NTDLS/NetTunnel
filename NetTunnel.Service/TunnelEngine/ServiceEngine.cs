@@ -67,18 +67,31 @@ namespace NetTunnel.Service.TunnelEngine
 
 
         /// <summary>
+        /// Sends a notification to the remote tunnel service to let it know to connect
+        ///     the associated outbound endpoint for an incoming endpoint connection.
+        ///     
         ///SEARCH FOR: Process:Endpoint:Connect:003: The local client is communicating through the tunnel that an inbound endpoint
         ///  connection has been made so that it can make the associated outbound endpoint connection.
         /// </summary>
-        /// <param name="connectionId"></param>
-        /// <param name="tunnelId"></param>
-        /// <param name="endpointId"></param>
-        /// <param name="streamId"></param>
+        /// <param name="tunnelId">The id of the tunnel that owns the endpoint.</param>
+        /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
+        /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
+
         public void SendNotificationOfEndpointConnect(Guid connectionId, Guid tunnelId, Guid endpointId, Guid streamId)
         {
             _messageServer.Notify(connectionId, new NotificationEndpointConnect(tunnelId, endpointId, streamId));
         }
 
+        /// <summary>
+        /// Sends a notification to the remote tunnel service containing the data that was received
+        ///     by an endpoint. This data is to be sent to the endpoint connection with the matching
+        ///     StreamId (which was originally sent to SendNotificationOfEndpointConnect()
+        /// </summary>
+        /// <param name="tunnelId">The id of the tunnel that owns the endpoint.</param>
+        /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
+        /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
+        /// <param name="bytes">Bytes to be sent to endpoint connection.</param>
+        /// <param name="length">Number of bytes to be sent to the endpoint connection.</param>
         public void SendNotificationOfEndpointDataExchange(Guid connectionId, Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
         {
             _messageServer.Notify(connectionId, new NotificationEndpointDataExchange(tunnelId, endpointId, streamId, bytes, length));

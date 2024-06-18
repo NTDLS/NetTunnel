@@ -6,12 +6,19 @@ using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.ReliableMessageHandlers
 {
-    internal class OutboundTunnelNotificationHandlers : ServiceHandlerBase, IRmMessageHandler
+    /// <summary>
+    /// Each outbound tunnel makes its own connection using an RmClient. These are the handlers for each outbound tunnel.
+    /// </summary>
+    internal class TunnelOutboundNotificationHandlers : ServiceHandlerBase, IRmMessageHandler
     {
+        /// <summary>
+        ///SEARCH FOR: Process:Endpoint:Connect:004: The remote service has communicated though the tunnel that we need to
+        ///  establish an associated outbound endpoint connection.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="notification"></param>
         public void OnNotificationEndpointConnect(RmContext context, NotificationEndpointConnect notification)
         {
-            //SEARCH FOR: Process:Endpoint:Connect:004: The remote service has communicated though the tunnel that we need to
-            //  establish an associated outbound endpoint connection.
             //var connectionContext = GetServiceConnectionContext(context);
 
             //var tunnel = context.Endpoint.Parameter.EnsureNotNull();

@@ -146,8 +146,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             {
                 if (Configuration.Direction == NtDirection.Inbound)
                 {
-                    //SEARCH FOR: Process:Endpoint:Connect:001: If this is an inbound endpoint, then let the remote service know that we just received a
-                    //  connection so that it came make the associated outbound connection.
+                    //SEARCH FOR: Process:Endpoint:Connect:001: If this is an inbound endpoint, then let the remote service
+                    //  know that we just received a connection so that it came make the associated outbound connection.
                     _tunnel.SendNotificationOfEndpointConnect(_tunnel.Configuration.TunnelId, EndpointId, activeConnection.StreamId);
                 }
 

@@ -5,6 +5,12 @@ using NTDLS.SecureKeyExchange;
 
 namespace NetTunnel.Service.ReliableMessageHandlers
 {
+    /// <summary>
+    /// The NetTunnel service shares one single instance of RmServer and therefor all inbound tunnels connect to it.
+    /// 
+    /// All Client<->Server query communication (whether they be UI or other services with inbound tunnels)
+    ///     must pass queries though these handlers.
+    /// </summary>
     internal class ServiceQueryHandlers : ServiceHandlerBase, IRmMessageHandler
     {
         /// <summary>

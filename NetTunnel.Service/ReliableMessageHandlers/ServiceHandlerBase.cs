@@ -3,6 +3,12 @@ using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Service.ReliableMessageHandlers
 {
+    /// <summary>
+    /// The NetTunnel service shares one single instance of RmServer and therefor all inbound tunnels connect to it.
+    /// 
+    /// All Client<->Server communication (whether they be UI or other services with inbound tunnels)
+    ///     must pass though these handlers.
+    /// </summary>
     internal class ServiceHandlerBase
     {
         /// <summary>

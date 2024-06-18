@@ -5,9 +5,14 @@ using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.ReliableMessageHandlers
 {
+    /// <summary>
+    /// The NetTunnel service shares one single instance of RmServer and therefor all inbound tunnels connect to it.
+    /// 
+    /// All Client<->Server notifications communication (whether they be UI or other services with inbound tunnels)
+    ///     must pass notification though these handlers.
+    /// </summary>
     internal class ServiceNotificationHandlers : ServiceHandlerBase, IRmMessageHandler
     {
-
         /// <summary>
         /// The remote service is letting us know that they are about to start using the cryptography provider,
         /// so we need to apply the one that we have ready on this end.

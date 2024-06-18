@@ -22,7 +22,25 @@ namespace NetTunnel.Service.TunnelEngine
         public void DeleteEndpoint(Guid endpointId);
         public TunnelConfiguration CloneConfiguration();
 
+        /// <summary>
+        /// Sends a notification to the remote tunnel service containing the data that was received
+        ///     by an endpoint. This data is to be sent to the endpoint connection with the matching
+        ///     StreamId (which was originally sent to SendNotificationOfEndpointConnect()
+        /// </summary>
+        /// <param name="tunnelId">The id of the tunnel that owns the endpoint.</param>
+        /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
+        /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
+        /// <param name="bytes">Bytes to be sent to endpoint connection.</param>
+        /// <param name="length">Number of bytes to be sent to the endpoint connection.</param>
         public void SendNotificationOfEndpointDataExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length);
+
+        /// <summary>
+        /// Sends a notification to the remote tunnel service to let it know to connect
+        ///     the associated outbound endpoint for an incoming endpoint connection.
+        /// </summary>
+        /// <param name="tunnelId">The id of the tunnel that owns the endpoint.</param>
+        /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
+        /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
         public void SendNotificationOfEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId);
     }
 }

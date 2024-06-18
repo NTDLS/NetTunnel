@@ -25,6 +25,16 @@ namespace NetTunnel.Service.TunnelEngine
             ConnectionId = connectionId;
         }
 
+        /// <summary>
+        /// Sends a notification to the remote tunnel service containing the data that was received
+        ///     by an endpoint. This data is to be sent to the endpoint connection with the matching
+        ///     StreamId (which was originally sent to SendNotificationOfEndpointConnect()
+        /// </summary>
+        /// <param name="tunnelId">The id of the tunnel that owns the endpoint.</param>
+        /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
+        /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
+        /// <param name="bytes">Bytes to be sent to endpoint connection.</param>
+        /// <param name="length">Number of bytes to be sent to the endpoint connection.</param>
         public override void SendNotificationOfEndpointDataExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
         {
             //Inbound tunnels communicate all data through the ServiceEngine._messageServer based on the ConnectionId.
@@ -32,12 +42,15 @@ namespace NetTunnel.Service.TunnelEngine
         }
 
         /// <summary>
+        /// Sends a notification to the remote tunnel service to let it know to connect
+        ///     the associated outbound endpoint for an incoming endpoint connection.
+        ///
         ///SEARCH FOR: Process:Endpoint:Connect:002: client connection is asking us to let the remote service know that a new inbound 
         ///  endpoint connection has been made and that is needs to make the associated outbound endpoint connection.
         /// </summary>
-        /// <param name="tunnelId"></param>
-        /// <param name="endpointId"></param>
-        /// <param name="streamId">The ID of the remote stream. This is how we identify which actual endpoint connection this connection is paired to.</param>
+        /// <param name="tunnelId">The id of the tunnel that owns the endpoint.</param>
+        /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
+        /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
         public override void SendNotificationOfEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId)
         {
             //Inbound tunnels communicate all data through the ServiceEngine._messageServer based on the ConnectionId.
