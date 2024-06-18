@@ -118,11 +118,14 @@ namespace NetTunnel.Library
             }).Result;
         }
 
+        public async Task<QueryCreateTunnelReply> QueryCreateTunnel(NtTunnelConfiguration configuration)
+            => await Client.Query(new QueryCreateTunnel(configuration));
+
         public async Task<QueryGetTunnelsReply> QueryGetTunnels()
             => await Client.Query(new QueryGetTunnels());
 
-        public async Task<QueryCreateTunnelReply> QueryCreateTunnel(NtTunnelConfiguration configuration)
-            => await Client.Query(new QueryCreateTunnel(configuration));
+        public async Task<QueryRegisterTunnelReply> QueryRegisterTunnel(NtTunnelConfiguration Collection)
+            => await Client.Query(new QueryRegisterTunnel(Collection));
 
         public async Task<QueryUpsertEndpointReply> QueryUpsertEndpoint(Guid tunnelId, NtEndpointConfiguration configuration)
             => await Client.Query(new QueryUpsertEndpoint(tunnelId, configuration));

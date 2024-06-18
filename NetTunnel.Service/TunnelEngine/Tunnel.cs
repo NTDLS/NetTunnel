@@ -168,6 +168,8 @@ namespace NetTunnel.Service.TunnelEngine
                         //Make the outbound connection to the remote tunnel service.
                         _client.ConnectAndLogin().Wait();
 
+                        _client.QueryRegisterTunnel(Configuration).Wait();
+
                         CurrentConnections++;
                         TotalConnections++;
                     }

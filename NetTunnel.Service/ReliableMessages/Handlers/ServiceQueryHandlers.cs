@@ -83,5 +83,14 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
 
             return new QueryUpsertEndpointReply();
         }
+
+        public QueryRegisterTunnelReply OnRegisterTunnel(RmContext context, QueryRegisterTunnel query)
+        {
+            var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+            //query.Configuration
+
+            return new QueryRegisterTunnelReply();
+        }
     }
 }
