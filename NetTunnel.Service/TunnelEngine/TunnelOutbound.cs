@@ -15,7 +15,7 @@ namespace NetTunnel.Service.TunnelEngine
         public TunnelOutbound(ServiceEngine serviceEngine, TunnelConfiguration configuration)
             : base(serviceEngine, configuration)
         {
-            _client = ServiceClient.Create(Singletons.Configuration,
+            _client = ServiceClient.Create(serviceEngine.Logger, Singletons.Configuration,
                 Configuration.Address, Configuration.ManagementPort, Configuration.Username, Configuration.PasswordHash, this);
 
             _client.Client.AddHandler(new TunnelOutboundNotificationHandlers());
@@ -26,7 +26,7 @@ namespace NetTunnel.Service.TunnelEngine
 
             _client.Client.OnException += (context, ex, payload) =>
             {
-                ServiceEngine.Logging.Write(NtLogSeverity.Exception, $"RPC client exception: '{ex.Message}'"
+                ServiceEngine.Logger.Exception($"RPC client exception: '{ex.Message}'"
                     + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
             };
         }
@@ -58,15 +58,14 @@ namespace NetTunnel.Service.TunnelEngine
         {
             Status = NtTunnelStatus.Disconnected;
 
-            ServiceEngine.Logging.Write(NtLogSeverity.Warning, $"Tunnel '{Configuration.Name}' disconnected.");
+            ServiceEngine.Logger.Warning($"Tunnel '{Configuration.Name}' disconnected.");
         }
 
         private void _client_OnConnected(RmContext context)
         {
             Status = NtTunnelStatus.Established;
 
-            ServiceEngine.Logging.Write(NtLogSeverity.Verbose,
-                $"Tunnel '{Configuration.Name}' connection successful.");
+            ServiceEngine.Logger.Verbose($"Tunnel '{Configuration.Name}' connection successful.");
         }
 
         public void EnforceLogin()
@@ -112,7 +111,7 @@ namespace NetTunnel.Service.TunnelEngine
                     {
                         Status = NtTunnelStatus.Connecting;
 
-                        ServiceEngine.Logging.Write(NtLogSeverity.Verbose,
+                        ServiceEngine.Logger.Verbose(
                             $"Tunnel '{Configuration.Name}' connecting to service at {Configuration.Address}:{Configuration.ManagementPort}.");
 
                         //Make the outbound connection to the remote tunnel service.
@@ -130,21 +129,19 @@ namespace NetTunnel.Service.TunnelEngine
 
                     if (ex.SocketErrorCode == SocketError.ConnectionRefused)
                     {
-                        ServiceEngine.Logging.Write(NtLogSeverity.Warning,
+                        ServiceEngine.Logger.Warning(
                             $"EstablishConnectionThread: {ex.Message}");
                     }
                     else
                     {
-                        ServiceEngine.Logging.Write(NtLogSeverity.Exception,
-                            $"EstablishConnectionThread: {ex.Message}");
+                        ServiceEngine.Logger.Exception(ex, $"EstablishConnectionThread: {ex.Message}");
                     }
                 }
                 catch (Exception ex)
                 {
                     Status = NtTunnelStatus.Disconnected; //TODO: Are we really disconnected here??
 
-                    ServiceEngine.Logging.Write(NtLogSeverity.Exception,
-                        $"EstablishConnectionThread: {ex.Message}");
+                    ServiceEngine.Logger.Exception(ex, $"EstablishConnectionThread: {ex.Message}");
                 }
                 finally
                 {

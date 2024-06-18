@@ -69,24 +69,21 @@ namespace NetTunnel.Service.TunnelEngine
             {
                 return;
             }
-            ServiceEngine.Logging.Write(NtLogSeverity.Verbose,
-                $"Starting tunnel '{Configuration.Name}'.");
+            ServiceEngine.Logger.Verbose($"Starting tunnel '{Configuration.Name}'.");
 
             KeepRunning = true;
 
             _heartbeatThread = new Thread(HeartbeatThreadProc);
             _heartbeatThread.Start();
 
-            ServiceEngine.Logging.Write(NtLogSeverity.Verbose,
-                $"Starting endpoints for tunnel '{Configuration.Name}'.");
+            ServiceEngine.Logger.Verbose($"Starting endpoints for tunnel '{Configuration.Name}'.");
 
             Endpoints.ForEach(x => x.Start());
         }
 
         public virtual void Stop()
         {
-            ServiceEngine.Logging.Write(NtLogSeverity.Verbose,
-                $"Stopping tunnel '{Configuration.Name}'.");
+            ServiceEngine.Logger.Verbose($"Stopping tunnel '{Configuration.Name}'.");
 
             Endpoints.ForEach(o => o.Stop());
 
@@ -95,8 +92,7 @@ namespace NetTunnel.Service.TunnelEngine
 
             Status = NtTunnelStatus.Stopped;
 
-            ServiceEngine.Logging.Write(NtLogSeverity.Verbose,
-                $"Stopped tunnel '{Configuration.Name}'.");
+            ServiceEngine.Logger.Verbose($"Stopped tunnel '{Configuration.Name}'.");
         }
 
         public void SendEndpointData(Guid endpointId, Guid StreamId, byte[] bytes)
@@ -144,8 +140,7 @@ namespace NetTunnel.Service.TunnelEngine
                 if ((DateTime.UtcNow - lastHeartBeat).TotalMilliseconds > Singletons.Configuration.TunnelAndEndpointHeartbeatDelayMs)
                 {
                     //var pingTime = _client.Ping();
-                    //ServiceEngine.Logging.Write(NtLogSeverity.Debug,
-                    //    $"Roundtrip time for '{Configuration.Name}': {pingTime:n0}ms"); ;
+                    //ServiceEngine.Logger.Debug($"Roundtrip time for '{Configuration.Name}': {pingTime:n0}ms"); ;
 
                     lastHeartBeat = DateTime.UtcNow;
                 }

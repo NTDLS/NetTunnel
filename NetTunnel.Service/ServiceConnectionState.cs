@@ -1,4 +1,6 @@
-﻿using NTDLS.NASCCL;
+﻿using NetTunnel.Library;
+using NetTunnel.Service.TunnelEngine;
+using NTDLS.NASCCL;
 
 namespace NetTunnel.Service
 {
@@ -21,6 +23,9 @@ namespace NetTunnel.Service
         public void InitializeCryptographyProvider(byte[] sharedSecret)
         {
             StreamCryptography = new NASCCLStream(sharedSecret);
+
+            Singletons.ServiceEngine.Logger.Verbose(
+                $"Tunnel cryptography initialized {sharedSecret.Length * 8}bits, hash {Utility.ComputeSha256Hash(sharedSecret)}.");
         }
 
         public void ApplyCryptographyProvider()
@@ -29,6 +34,9 @@ namespace NetTunnel.Service
             {
                 throw new Exception("The stream cryptography has not been initialized.");
             }
+
+            Singletons.ServiceEngine.Logger.Verbose("Tunnel cryptography provider has been applied.");
+
             SecureKeyExchangeIsComplete = true;
         }
 

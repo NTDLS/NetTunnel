@@ -94,7 +94,7 @@ namespace NetTunnel.Service
             catch (Exception ex)
             {
                 httpHeaderBuilder.Clear();
-                Singletons.ServiceEngine.Logging.Write(ex, "An error occurred while parsing the HTTP request header.");
+                Singletons.ServiceEngine.Logger.Exception(ex, "An error occurred while parsing the HTTP request header.");
             }
 
             return HTTPHeaderResult.NotPresent;
@@ -156,7 +156,7 @@ namespace NetTunnel.Service
             }
             catch (Exception ex)
             {
-                Singletons.ServiceEngine.Logging.Write(ex, "Failed to process HTTP Header rules.");
+                Singletons.ServiceEngine.Logger.Exception(ex, "Failed to process HTTP Header rules.");
             }
 
             return httpHeader;

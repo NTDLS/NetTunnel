@@ -1,4 +1,6 @@
-﻿namespace NetTunnel.Library.Types
+﻿using static NetTunnel.Library.Logger;
+
+namespace NetTunnel.Library.Types
 {
     public class ServiceConfiguration
     {
@@ -20,14 +22,14 @@
         public int ManagementPortRSASize { get; set; } = 2048;
 
         /// <summary>
-        /// Whether to log debug information.
+        /// Level of information to log to the file/console/etc.
         /// </summary>
-        public bool DebugLogging { get; set; } = false;
+        public LogLevel LogLevel { get; set; } = LogLevel.Normal;
 
         /// <summary>
-        /// Whether to log verbose information.
+        /// The file path to log to. If the string is empty, the log will not be written to file.
         /// </summary>
-        public bool VerboseLogging { get; set; } = true;
+        public string LogPath { get; set; } = string.Empty;
 
         /// <summary>
         /// The duration in milliseconds to wait on message query operations.

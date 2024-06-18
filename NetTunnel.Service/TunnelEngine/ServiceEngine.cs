@@ -1,4 +1,5 @@
-﻿using NetTunnel.Library.ReliableMessages.Notification;
+﻿using NetTunnel.Library;
+using NetTunnel.Library.ReliableMessages.Notification;
 using NetTunnel.Service.ReliableMessageHandlers;
 using NetTunnel.Service.TunnelEngine.Managers;
 using NTDLS.ReliableMessaging;
@@ -13,11 +14,10 @@ namespace NetTunnel.Service.TunnelEngine
         /// </summary>
         public Dictionary<Guid, ServiceConnectionState> ServiceConnectionStates { get; private set; } = new();
 
-
         /// <summary>
         /// Logging provider for event log, console (and file?).
         /// </summary>
-        public Logger Logging { get; private set; }
+        public Logger Logger { get; private set; }
 
         /// <summary>
         /// Contains the information for all tunnels, inbound and outbound. Keep in mind that we only persist
@@ -37,7 +37,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         public ServiceEngine()
         {
-            Logging = new(this);
+            Logger = new(Singletons.Configuration.LogLevel, Singletons.Configuration.LogPath);
             Tunnels = new(this);
             Users = new(this);
 
@@ -60,7 +60,7 @@ namespace NetTunnel.Service.TunnelEngine
 
             _messageServer.OnException += (RmContext? context, Exception ex, IRmPayload? payload) =>
             {
-                Logging.Write(NtLogSeverity.Exception, $"RPC server exception: '{ex.Message}'"
+                Logger.Exception($"RPC server exception: '{ex.Message}'"
                     + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
             };
         }

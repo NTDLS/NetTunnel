@@ -221,21 +221,21 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     if (sockEx.SocketErrorCode == SocketError.ConnectionAborted)
                     {
                         //We don't typically care about this. This is something as simple as a user closing a web-browser.
-                        _tunnel.ServiceEngine.Logging.Write(Constants.NtLogSeverity.Verbose, $"EndpointDataExchangeThreadProc: {ex.Message}");
+                        _tunnel.ServiceEngine.Logger.Verbose($"EndpointDataExchangeThreadProc: {ex.Message}");
                     }
                     else
                     {
-                        _tunnel.ServiceEngine.Logging.Write(Constants.NtLogSeverity.Exception, $"EndpointDataExchangeThreadProc: {ex.Message}");
+                        _tunnel.ServiceEngine.Logger.Exception($"EndpointDataExchangeThreadProc: {ex.Message}");
                     }
                 }
                 else
                 {
-                    _tunnel.ServiceEngine.Logging.Write(Constants.NtLogSeverity.Exception, $"EndpointDataExchangeThreadProc: {ex.Message}");
+                    _tunnel.ServiceEngine.Logger.Exception($"EndpointDataExchangeThreadProc: {ex.Message}");
                 }
             }
             catch (Exception ex)
             {
-                _tunnel.ServiceEngine.Logging.Write(Constants.NtLogSeverity.Exception, $"EndpointDataExchangeThreadProc: {ex.Message}");
+                _tunnel.ServiceEngine.Logger.Exception($"EndpointDataExchangeThreadProc: {ex.Message}");
             }
             finally
             {

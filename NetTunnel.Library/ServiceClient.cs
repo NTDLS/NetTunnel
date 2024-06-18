@@ -25,9 +25,11 @@ namespace NetTunnel.Library
         public Guid ServiceId { get; private set; }
         public RmClient Client { get; private set; }
         public bool IsLoggedIn { get; private set; } = false;
+        public Logger _logger;
 
-        public ServiceClient(ServiceConfiguration configuration, RmClient client, string address, int port, string userName, string passwordHash)
+        public ServiceClient(Logger logger, ServiceConfiguration configuration, RmClient client, string address, int port, string userName, string passwordHash)
         {
+            _logger = logger;
             _configuration = configuration;
             Client = client;
             _address = address;
@@ -41,18 +43,20 @@ namespace NetTunnel.Library
 
         public static async Task<ServiceClient> CreateConnectAndLogin(string address, int port, string userName, string passwordHash, object? owner = null)
         {
-            return await CreateConnectAndLogin(new ServiceConfiguration(), address, port, userName, passwordHash, owner);
+            using var logger = new Logger(Logger.LogLevel.Normal);
+            return await CreateConnectAndLogin(logger, new ServiceConfiguration(), address, port, userName, passwordHash, owner);
         }
 
-        public static async Task<ServiceClient> CreateConnectAndLogin(ServiceConfiguration configuration,
+        public static async Task<ServiceClient> CreateConnectAndLogin(Logger logger, ServiceConfiguration configuration,
              string address, int port, string userName, string passwordHash, object? owner = null)
         {
-            var serviceClient = Create(configuration, address, port, userName, passwordHash, owner);
+            var serviceClient = Create(logger, configuration, address, port, userName, passwordHash, owner);
             await serviceClient.ConnectAndLogin();
             return serviceClient;
         }
 
-        public static ServiceClient Create(ServiceConfiguration configuration, string address, int port, string userName, string passwordHash, object? owner = null)
+        public static ServiceClient Create(Logger logger, ServiceConfiguration configuration,
+            string address, int port, string userName, string passwordHash, object? owner = null)
         {
             var client = new RmClient(new RmConfiguration()
             {
@@ -62,7 +66,7 @@ namespace NetTunnel.Library
                 ReceiveBufferGrowthRate = configuration.ReceiveBufferGrowthRate,
             });
 
-            return new ServiceClient(configuration, client, address, port, userName, passwordHash);
+            return new ServiceClient(logger, configuration, client, address, port, userName, passwordHash);
         }
 
         #endregion
@@ -93,9 +97,14 @@ namespace NetTunnel.Library
             //Prop up encryption.
             var cryptographyProvider = new ClientCryptographyProvider(compoundNegotiator.SharedSecret);
 
+            _logger.Verbose(
+                $"Tunnel cryptography initialized {compoundNegotiator.SharedSecret.Length * 8}bits, hash {Utility.ComputeSha256Hash(compoundNegotiator.SharedSecret)}.");
+
             //Tell the server we are switching to encryption.
             Client.Notify(new NotificationApplyCryptography());
             Client.SetCryptographyProvider(cryptographyProvider);
+
+            _logger.Verbose("Tunnel cryptography provider has been applied.");
 
             //Login.
             var login = await Client.Query(new QueryLogin(_userName, _passwordHash));

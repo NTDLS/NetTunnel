@@ -36,7 +36,7 @@ namespace NetTunnel.Service
             {
                 if (_semaphoreToRequestStop.Wait(500))
                 {
-                    Singletons.ServiceEngine.Logging.Write(Constants.NtLogSeverity.Verbose, $"Stopping...");
+                    Singletons.ServiceEngine.Logger.Verbose("Stopping...");
                     Singletons.ServiceEngine.Stop();
                     break;
                 }

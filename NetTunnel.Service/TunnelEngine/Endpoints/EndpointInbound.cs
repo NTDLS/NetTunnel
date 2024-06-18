@@ -29,7 +29,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
             _listener = new TcpListener(IPAddress.Any, Configuration.InboundPort);
 
-            _tunnel.ServiceEngine.Logging.Write(Constants.NtLogSeverity.Verbose,
+            _tunnel.ServiceEngine.Logger.Verbose(
                 $"Starting inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort}.");
 
             _inboundConnectionThread = new Thread(InboundConnectionThreadProc);
@@ -46,7 +46,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 Utility.TryAndIgnore(_listener.Dispose);
             }
 
-            _tunnel.ServiceEngine.Logging.Write(Constants.NtLogSeverity.Verbose,
+            _tunnel.ServiceEngine.Logger.Verbose(
                 $"Stopping inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort}.");
 
             _activeConnections.Use((o) =>
@@ -58,7 +58,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 o.Clear();
             });
 
-            _tunnel.ServiceEngine.Logging.Write(Constants.NtLogSeverity.Verbose,
+            _tunnel.ServiceEngine.Logger.Verbose(
                 $"Stopped inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort}.");
         }
 
@@ -70,8 +70,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             {
                 _listener.EnsureNotNull().Start();
 
-                _serviceEngine.Logging.Write(Constants.NtLogSeverity.Verbose,
-                    $"Listening inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort}");
+                _serviceEngine.Logger.Verbose($"Listening inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort}");
 
                 while (KeepRunning)
                 {
@@ -87,8 +86,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                             var activeConnection = new ActiveEndpointConnection(dataExchangeThread, tcpClient, Guid.NewGuid());
                             _activeConnections.Use((o) => o.Add(activeConnection.StreamId, activeConnection));
 
-                            _serviceEngine.Logging.Write(Constants.NtLogSeverity.Debug,
-                                $"Accepted inbound endpoint connection: {activeConnection.StreamId}");
+                            _serviceEngine.Logger.Debug($"Accepted inbound endpoint connection: {activeConnection.StreamId}");
 
                             dataExchangeThread.Start(activeConnection);
                         }
@@ -97,8 +95,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             }
             catch (Exception ex)
             {
-                _serviceEngine.Logging.Write(Constants.NtLogSeverity.Exception,
-                    $"InboundConnectionThreadProc: {ex.Message}");
+                _serviceEngine.Logger.Exception($"InboundConnectionThreadProc: {ex.Message}");
             }
             finally
             {

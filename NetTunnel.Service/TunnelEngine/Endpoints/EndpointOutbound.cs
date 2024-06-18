@@ -21,7 +21,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
             base.Start();
 
-            _tunnel.ServiceEngine.Logging.Write(Constants.NtLogSeverity.Verbose,
+            _tunnel.ServiceEngine.Logger.Verbose(
                 $"Starting outbound endpoint '{Configuration.Name}' on port {Configuration.OutboundPort}.");
         }
 
@@ -29,7 +29,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
             base.Stop();
 
-            _tunnel.ServiceEngine.Logging.Write(Constants.NtLogSeverity.Verbose,
+            _tunnel.ServiceEngine.Logger.Verbose(
                 $"Stopping outbound endpoint '{Configuration.Name}' on port {Configuration.OutboundPort}.");
 
             _activeConnections.Use((o) =>
@@ -41,7 +41,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 o.Clear();
             });
 
-            _tunnel.ServiceEngine.Logging.Write(Constants.NtLogSeverity.Verbose,
+            _tunnel.ServiceEngine.Logger.Verbose(
                 $"Stopped outbound endpoint '{Configuration.Name}' on port {Configuration.OutboundPort}.");
         }
 
@@ -61,16 +61,14 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                         var activeConnection = new ActiveEndpointConnection(dataExchangeThread, tcpClient, streamId);
                         var outboundConnection = _activeConnections.Use((o) => o.TryAdd(streamId, activeConnection));
 
-                        _serviceEngine.Logging.Write(Constants.NtLogSeverity.Debug,
-                            $"Established outbound endpoint connection: {activeConnection.StreamId}");
+                        _serviceEngine.Logger.Debug($"Established outbound endpoint connection: {activeConnection.StreamId}");
 
                         dataExchangeThread.Start(activeConnection);
                     }
                 }
                 catch (Exception ex)
                 {
-                    _serviceEngine.Logging.Write(Constants.NtLogSeverity.Exception,
-                        $"EstablishOutboundEndpointConnection: {ex.Message}");
+                    _serviceEngine.Logger.Exception(ex, $"EstablishOutboundEndpointConnection: {ex.Message}");
                     throw;
                 }
             }

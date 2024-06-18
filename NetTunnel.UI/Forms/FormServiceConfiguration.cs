@@ -90,8 +90,6 @@ namespace NetTunnel.UI.Forms
                 textBoxMaxReceiveBufferSize.Text = $"{configuration.MaxReceiveBufferSize:n0}";
                 textBoxReceiveBufferGrowthRate.Text = $"{configuration.ReceiveBufferGrowthRate:n2}";
                 checkBoxManagementUseSSL.Checked = configuration.ManagementPortUseSSL;
-                checkBoxDebugLogging.Checked = configuration.DebugLogging;
-                checkBoxVerboseLogging.Checked = configuration.VerboseLogging;
             }
         }
 
@@ -131,8 +129,6 @@ namespace NetTunnel.UI.Forms
                     "The buffer growth rate (%) must be an decimal value between [min] and [max].");
 
                 configuration.ManagementPortUseSSL = checkBoxManagementUseSSL.Checked;
-                configuration.DebugLogging = checkBoxDebugLogging.Checked;
-                configuration.VerboseLogging = checkBoxVerboseLogging.Checked;
 
                 #endregion
 
