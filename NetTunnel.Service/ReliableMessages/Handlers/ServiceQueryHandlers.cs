@@ -88,7 +88,7 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
         {
             var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
-            //query.Configuration
+            Singletons.Core.Tunnels.RegisterTunnel(query.Configuration);
 
             return new QueryRegisterTunnelReply();
         }

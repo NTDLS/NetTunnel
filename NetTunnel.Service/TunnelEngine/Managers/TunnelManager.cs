@@ -12,7 +12,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
     {
         private readonly ServiceEngine _Core;
 
-        protected readonly PessimisticCriticalResource<List<Tunnel>> Collection = new();
+        protected readonly PessimisticCriticalResource<List<ITunnel>> Collection = new();
 
         public TunnelManager(ServiceEngine core)
         {
@@ -48,7 +48,25 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                     o.Remove(existingTunnel);
                 }
 
-                var newTunnel = new Tunnel(_Core, config);
+                var newTunnel = new TunnelOutbound(_Core, config);
+                o.Add(newTunnel.EnsureNotNull());
+
+                SaveToDisk();
+            });
+        }
+
+        public void RegisterTunnel(NtTunnelConfiguration config)
+        {
+            Collection.Use((o) =>
+            {
+                var existingTunnel = o.Where(o => o.Configuration.TunnelId == config.TunnelId).SingleOrDefault();
+                if (existingTunnel != null)
+                {
+                    existingTunnel.Stop();
+                    o.Remove(existingTunnel);
+                }
+
+                var newTunnel = new TunnelInbound(_Core, config);
                 o.Add(newTunnel.EnsureNotNull());
 
                 SaveToDisk();
@@ -111,9 +129,9 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             {
                 o.Clear();
 
-                CommonApplicationData.LoadFromDisk<List<NtTunnelConfiguration>>(Constants.FriendlyName)?
+                CommonApplicationData.LoadFromDisk<List<NtTunnelConfiguration>>(FriendlyName)?
                     .Where(t => t.ServiceId == Singletons.Configuration.ServiceId).ToList()
-                    .ForEach(c => o.Add(new Tunnel(_Core, c)));
+                    .ForEach(c => o.Add(new TunnelOutbound(_Core, c)));
             });
         }
 
