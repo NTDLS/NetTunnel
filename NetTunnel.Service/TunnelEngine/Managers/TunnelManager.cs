@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
+using NetTunnel.Service.TunnelEngine.Endpoints;
 using NTDLS.NullExtensions;
 using NTDLS.Persistence;
 using NTDLS.Semaphore;
@@ -70,7 +71,6 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             Collection.Use((o) =>
             {
                 var tunnel = o.Where(o => o.Configuration.TunnelId == tunnelId).Single();
-                var endpoint = tunnel.Endpoints.Where(o => o.EndpointId == endpointId).Single();
                 tunnel.DeleteEndpoint(endpointId);
 
                 SaveToDisk();
@@ -78,6 +78,19 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         }
 
         #endregion
+
+        public void EstablishOutboundEndpointConnection(Guid tunnelId, Guid endpointId, Guid streamId)
+        {
+            Collection.Use((o) =>
+            {
+                var tunnel = o.Where(o => o.Configuration.TunnelId == tunnelId).Single();
+
+                var endpoint = tunnel.Endpoints.Where(o => o.EndpointId == endpointId).Single() as EndpointOutbound
+                    ?? throw new Exception("The endpoint could not be converted to outbound.");
+
+                endpoint.EstablishOutboundEndpointConnection(streamId);
+            });
+        }
 
         #region Disk Save/Load.
 

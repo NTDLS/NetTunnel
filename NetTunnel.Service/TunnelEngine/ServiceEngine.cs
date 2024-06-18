@@ -89,6 +89,8 @@ namespace NetTunnel.Service.TunnelEngine
             Tunnels.StopAll();
 
             _messageServer.Stop();
+
+            _messageServer.ClearCryptographyProvider();
         }
     }
 }

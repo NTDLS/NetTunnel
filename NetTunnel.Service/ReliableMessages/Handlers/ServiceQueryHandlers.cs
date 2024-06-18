@@ -19,24 +19,24 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
         /// <returns></returns>
         public QueryReplyKeyExchangeReply OnQueryRequestKeyExchange(RmContext context, QueryRequestKeyExchange query)
         {
-            var tunnelContext = GetServiceConnectionContext(context);
+            var connectionContext = GetServiceConnectionContext(context);
 
             var compoundNegotiator = new CompoundNegotiator();
             var negotiationReplyToken = compoundNegotiator.ApplyNegotiationToken(query.NegotiationToken);
             var negotiationReply = new QueryReplyKeyExchangeReply(context.ConnectionId, negotiationReplyToken);
 
-            tunnelContext.InitializeCryptographyProvider(compoundNegotiator.SharedSecret);
+            connectionContext.InitializeCryptographyProvider(compoundNegotiator.SharedSecret);
 
             return negotiationReply;
         }
 
         public QueryLoginReply OnQueryLogin(RmContext context, QueryLogin query)
         {
-            var tunnelContext = EnforceCryptographyAndGetServiceConnectionContext(context);
+            var connectionContext = EnforceCryptographyAndGetServiceConnectionContext(context);
 
             if (Singletons.Core.Users.ValidatePassword(query.UserName, query.PasswordHash))
             {
-                tunnelContext.SetAuthenticated(query.UserName);
+                connectionContext.SetAuthenticated(query.UserName);
 
                 return new QueryLoginReply(true)
                 {
@@ -49,7 +49,7 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
 
         public QueryGetTunnelsReply OnGetTunnels(RmContext context, QueryGetTunnels query)
         {
-            var tunnelContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+            var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
             return new QueryGetTunnelsReply
             {
@@ -59,7 +59,7 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
 
         public QueryCreateTunnelReply OnQueryCreateTunnel(RmContext context, QueryCreateTunnel query)
         {
-            var tunnelContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+            var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
             Singletons.Core.Tunnels.UpsertTunnel(query.Configuration);
 
@@ -68,7 +68,7 @@ namespace NetTunnel.Service.ReliableMessages.Handlers
 
         public QueryPingReply OnQueryCreateTunnel(RmContext context, QueryPing query)
         {
-            var tunnelContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+            var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
             return new QueryPingReply(query.OriginationTimestamp);
         }

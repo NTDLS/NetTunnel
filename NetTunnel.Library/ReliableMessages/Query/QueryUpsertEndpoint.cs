@@ -8,8 +8,9 @@ namespace NetTunnel.Library.ReliableMessages.Query
         public Guid TunnelId { get; set; }
         public NtEndpointConfiguration Configuration { get; set; }
 
-        public QueryUpsertEndpoint(Guid TunnelId, NtEndpointConfiguration configuration)
+        public QueryUpsertEndpoint(Guid tunnelId, NtEndpointConfiguration configuration)
         {
+            TunnelId = tunnelId;
             Configuration = configuration;
         }
 

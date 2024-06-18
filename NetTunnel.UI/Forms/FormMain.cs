@@ -66,14 +66,14 @@ namespace NetTunnel.UI.Forms
                 return;
             }
 
-            var selectedTunnel = (selectedTunnelRow.Tag as NtTunnelConfiguration).EnsureNotNull();
+            var tTag = (selectedTunnelRow.Tag as TunnelTag).EnsureNotNull();
 
             var selectedEndpointRow = listViewEndpoints.GetItemAt(e.X, e.Y);
             if (selectedEndpointRow != null)
             {
-                var selectedEndpoint = (selectedEndpointRow.Tag as NtEndpointConfiguration).EnsureNotNull();
+                var eTag = (selectedEndpointRow.Tag as EndpointTag).EnsureNotNull();
 
-                using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), selectedTunnel, selectedEndpoint);
+                using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tTag.Tunnel, eTag.Endpoint);
                 if (form.ShowDialog() == DialogResult.OK)
                 {
                     RepopulateTunnelsGrid();
@@ -262,18 +262,18 @@ namespace NetTunnel.UI.Forms
             {
                 var selectedRow = listViewTunnels.SelectedItems[0];
 
-                if (selectedRow.Tag is NtTunnelConfiguration tunnel)
+                if (selectedRow.Tag is TunnelTag tTag)
                 {
-                    if (tunnel is NtTunnelConfiguration)
+                    if (tTag.Tunnel.ServiceId == _client.ServiceId)
                     {
                         labelEndpoints.Text += "outbound tunnel ";
                     }
 
-                    labelEndpoints.Text += $"'{tunnel.Name}'";
+                    labelEndpoints.Text += $"'{tTag.Tunnel.Name}'";
 
                     lock (listViewEndpoints)
                     {
-                        RepopulateEndpointsGrid(tunnel);
+                        RepopulateEndpointsGrid(tTag.Tunnel);
                     }
                 }
             }
@@ -293,7 +293,7 @@ namespace NetTunnel.UI.Forms
                     return;
                 }
 
-                var selectedTunnel = (selectedTunnelRow.Tag as NtTunnelConfiguration).EnsureNotNull();
+                var tTag = (selectedTunnelRow.Tag as TunnelTag).EnsureNotNull();
 
                 var selectedEndpointRow = listViewEndpoints.GetItemAt(e.X, e.Y);
                 if (selectedEndpointRow != null)
@@ -320,7 +320,7 @@ namespace NetTunnel.UI.Forms
 
                     if (e.ClickedItem?.Text == "Add Inbound Endpoint to Tunnel")
                     {
-                        using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), selectedTunnel, NtDirection.Inbound);
+                        using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tTag.Tunnel, NtDirection.Inbound);
                         if (form.ShowDialog() == DialogResult.OK)
                         {
                             RepopulateTunnelsGrid();
@@ -328,7 +328,7 @@ namespace NetTunnel.UI.Forms
                     }
                     else if (e.ClickedItem?.Text == "Add Outbound Endpoint to Tunnel")
                     {
-                        using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), selectedTunnel, NtDirection.Outbound);
+                        using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tTag.Tunnel, NtDirection.Outbound);
                         if (form.ShowDialog() == DialogResult.OK)
                         {
                             RepopulateTunnelsGrid();
@@ -337,7 +337,7 @@ namespace NetTunnel.UI.Forms
                     else if (e.ClickedItem?.Text == "Delete Endpoint")
                     {
                         /*
-                        var selectedEndpoint = (selectedEndpointRow?.Tag as INtEndpointConfiguration).EnsureNotNull();
+                        var selectedEndpoint = (selectedEndpointRow?.Tag as EndpointTag).EnsureNotNull();
 
                         if (MessageBox.Show($"Delete the endpoint '{selectedEndpoint.Name}'?",
                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
@@ -406,7 +406,7 @@ namespace NetTunnel.UI.Forms
                     rowUnderMouse.Selected = true;
                 }
 
-                var selectedTunnel = ((NtTunnelConfiguration?)rowUnderMouse?.Tag);
+                var selectedTunnel = ((TunnelTag?)rowUnderMouse?.Tag);
 
                 var menu = new ContextMenuStrip();
 
@@ -451,9 +451,9 @@ namespace NetTunnel.UI.Forms
                     {
                         rowUnderMouse.EnsureNotNull();
 
-                        var tunnel = ((NtTunnelConfiguration?)rowUnderMouse.Tag).EnsureNotNull();
+                        var tTag = ((TunnelTag?)rowUnderMouse.Tag).EnsureNotNull();
 
-                        using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tunnel, NtDirection.Inbound);
+                        using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tTag.Tunnel, NtDirection.Inbound);
                         if (form.ShowDialog() == DialogResult.OK)
                         {
                             RepopulateTunnelsGrid();
@@ -463,9 +463,9 @@ namespace NetTunnel.UI.Forms
                     {
                         rowUnderMouse.EnsureNotNull();
 
-                        var tunnel = ((NtTunnelConfiguration?)rowUnderMouse.Tag).EnsureNotNull();
+                        var tTag = ((TunnelTag?)rowUnderMouse.Tag).EnsureNotNull();
 
-                        using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tunnel, NtDirection.Outbound);
+                        using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tTag.Tunnel, NtDirection.Outbound);
                         if (form.ShowDialog() == DialogResult.OK)
                         {
                             RepopulateTunnelsGrid();
@@ -476,7 +476,7 @@ namespace NetTunnel.UI.Forms
                         /*
                         rowUnderMouse.EnsureNotNull();
 
-                        var tunnel = ((NtTunnelConfiguration?)rowUnderMouse.Tag).EnsureNotNull();
+                        var tunnel = ((TunnelTag?)rowUnderMouse.Tag).EnsureNotNull();
 
                         if (MessageBox.Show($"Stop the tunnel '{tunnel.Name}'?",
                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
@@ -484,7 +484,7 @@ namespace NetTunnel.UI.Forms
                             return;
                         }
 
-                        if (rowUnderMouse.Tag is NtTunnelInboundConfiguration tunnelInbound)
+                        if (rowUnderMouse.Tag is EndpointTag tunnelInbound)
                         {
                             _client.TunnelInbound.Stop(tunnelInbound.TunnelId).ContinueWith((o) =>
                             {
@@ -497,7 +497,7 @@ namespace NetTunnel.UI.Forms
                                 }
                             });
                         }
-                        else if (rowUnderMouse.Tag is NtTunnelOutboundConfiguration tunnelOutbound)
+                        else if (rowUnderMouse.Tag is TunnelTag tunnelOutbound)
                         {
                             _client.TunnelOutbound.Stop(tunnelOutbound.TunnelId).ContinueWith((o) =>
                             {
@@ -519,9 +519,9 @@ namespace NetTunnel.UI.Forms
                         /*
                         rowUnderMouse.EnsureNotNull();
 
-                        var tunnel = ((NtTunnelConfiguration?)rowUnderMouse.Tag).EnsureNotNull();
+                        var tunnel = ((TunnelTag?)rowUnderMouse.Tag).EnsureNotNull();
 
-                        if (rowUnderMouse.Tag is NtTunnelInboundConfiguration tunnelInbound)
+                        if (rowUnderMouse.Tag is TunnelTag tunnelInbound)
                         {
                             _client.TunnelInbound.Start(tunnelInbound.TunnelId).ContinueWith((o) =>
                             {
@@ -534,7 +534,7 @@ namespace NetTunnel.UI.Forms
                                 }
                             });
                         }
-                        else if (rowUnderMouse.Tag is NtTunnelOutboundConfiguration tunnelOutbound)
+                        else if (rowUnderMouse.Tag is TunnelTag tunnelOutbound)
                         {
                             _client.TunnelOutbound.Start(tunnelOutbound.TunnelId).ContinueWith((o) =>
                             {
@@ -557,7 +557,7 @@ namespace NetTunnel.UI.Forms
                         _client.EnsureNotNull();
                         rowUnderMouse.EnsureNotNull();
 
-                        var tunnel = ((NtTunnelConfiguration?)rowUnderMouse.Tag).EnsureNotNull();
+                        var tunnel = ((TunnelTag?)rowUnderMouse.Tag).EnsureNotNull();
 
                         if (MessageBox.Show($"Delete the tunnel '{tunnel.Name}'?",
                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
@@ -565,7 +565,7 @@ namespace NetTunnel.UI.Forms
                             return;
                         }
 
-                        if (rowUnderMouse.Tag is NtTunnelInboundConfiguration tunnelInbound)
+                        if (rowUnderMouse.Tag is TunnelTag tunnelInbound)
                         {
                             _client.TunnelInbound.DeletePair(tunnelInbound.TunnelId).ContinueWith((o) =>
                             {
@@ -587,7 +587,7 @@ namespace NetTunnel.UI.Forms
                             });
 
                         }
-                        else if (rowUnderMouse.Tag is NtTunnelOutboundConfiguration tunnelOutbound)
+                        else if (rowUnderMouse.Tag is TunnelTag tunnelOutbound)
                         {
                             _client.TunnelOutbound.DeletePair(tunnelOutbound.TunnelId).ContinueWith((o) =>
                             {

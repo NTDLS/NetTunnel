@@ -72,6 +72,12 @@ namespace NetTunnel.Service.TunnelEngine
             };
         }
 
+        public void NotificationEndpointExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
+            => _client.NotificationEndpointExchange(tunnelId, endpointId, streamId, bytes, length);
+
+        public void NotificationEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId)
+            => _client.NotificationEndpointConnect(tunnelId, endpointId, streamId);
+
         public IEndpoint? GetEndpointById(Guid pairId)
             => Endpoints.Where(o => o.EndpointId == pairId).SingleOrDefault();
 
@@ -86,7 +92,8 @@ namespace NetTunnel.Service.TunnelEngine
         {
             Status = NtTunnelStatus.Established;
 
-            Core.Logging.Write(NtLogSeverity.Verbose, $"Tunnel '{Configuration.Name}' connection successful.");
+            Core.Logging.Write(NtLogSeverity.Verbose,
+                $"Tunnel '{Configuration.Name}' connection successful.");
         }
 
         public NtTunnelConfiguration CloneConfiguration()
@@ -100,7 +107,8 @@ namespace NetTunnel.Service.TunnelEngine
             {
                 return;
             }
-            Core.Logging.Write(NtLogSeverity.Verbose, $"Starting tunnel '{Configuration.Name}'.");
+            Core.Logging.Write(NtLogSeverity.Verbose,
+                $"Starting tunnel '{Configuration.Name}'.");
 
             KeepRunning = true;
 
@@ -110,13 +118,17 @@ namespace NetTunnel.Service.TunnelEngine
             _heartbeatThread = new Thread(HeartbeatThreadProc);
             _heartbeatThread.Start();
 
-            Core.Logging.Write(NtLogSeverity.Verbose, $"Starting endpoints for tunnel '{Configuration.Name}'.");
+            Core.Logging.Write(NtLogSeverity.Verbose,
+                $"Starting endpoints for tunnel '{Configuration.Name}'.");
+
             Endpoints.ForEach(x => x.Start());
         }
 
         public void Stop()
         {
-            Core.Logging.Write(NtLogSeverity.Verbose, $"Stopping tunnel '{Configuration.Name}'.");
+            Core.Logging.Write(NtLogSeverity.Verbose,
+                $"Stopping tunnel '{Configuration.Name}'.");
+
             Endpoints.ForEach(o => o.Stop());
 
             KeepRunning = false;
@@ -131,7 +143,8 @@ namespace NetTunnel.Service.TunnelEngine
 
             Status = NtTunnelStatus.Stopped;
 
-            Core.Logging.Write(NtLogSeverity.Verbose, $"Stopped tunnel '{Configuration.Name}'.");
+            Core.Logging.Write(NtLogSeverity.Verbose,
+                $"Stopped tunnel '{Configuration.Name}'.");
         }
 
         /// <summary>
@@ -149,7 +162,8 @@ namespace NetTunnel.Service.TunnelEngine
                     {
                         Status = NtTunnelStatus.Connecting;
 
-                        Core.Logging.Write(NtLogSeverity.Verbose, $"Tunnel '{Configuration.Name}' connecting to service at {Configuration.Address}:{Configuration.ManagementPort}.");
+                        Core.Logging.Write(NtLogSeverity.Verbose,
+                            $"Tunnel '{Configuration.Name}' connecting to service at {Configuration.Address}:{Configuration.ManagementPort}.");
 
                         //Make the outbound connection to the remote tunnel service.
                         _client.ConnectAndLogin().Wait();
@@ -164,17 +178,21 @@ namespace NetTunnel.Service.TunnelEngine
 
                     if (ex.SocketErrorCode == SocketError.ConnectionRefused)
                     {
-                        Core.Logging.Write(NtLogSeverity.Warning, $"EstablishConnectionThread: {ex.Message}");
+                        Core.Logging.Write(NtLogSeverity.Warning,
+                            $"EstablishConnectionThread: {ex.Message}");
                     }
                     else
                     {
-                        Core.Logging.Write(NtLogSeverity.Exception, $"EstablishConnectionThread: {ex.Message}");
+                        Core.Logging.Write(NtLogSeverity.Exception,
+                            $"EstablishConnectionThread: {ex.Message}");
                     }
                 }
                 catch (Exception ex)
                 {
                     Status = NtTunnelStatus.Disconnected; //TODO: Are we really disconnected here??
-                    Core.Logging.Write(NtLogSeverity.Exception, $"EstablishConnectionThread: {ex.Message}");
+
+                    Core.Logging.Write(NtLogSeverity.Exception,
+                        $"EstablishConnectionThread: {ex.Message}");
                 }
                 finally
                 {
@@ -184,6 +202,8 @@ namespace NetTunnel.Service.TunnelEngine
                 Thread.Sleep(1000);
             }
         }
+
+        #region Add/Delete Endpoints.
 
         public EndpointInbound UpsertEndpoint(NtEndpointConfiguration configuration)
         {
@@ -209,6 +229,8 @@ namespace NetTunnel.Service.TunnelEngine
                 Endpoints.Remove(endpoint);
             }
         }
+
+        #endregion
 
         private void HeartbeatThreadProc()
         {

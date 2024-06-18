@@ -144,18 +144,11 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
             try
             {
-                NtEndpointConfiguration? endpointConfig = null;
-
-                if (this is EndpointInbound endpointInbound)
+                if (Configuration.Direction == NtDirection.Inbound)
                 {
-                    endpointConfig = endpointInbound.Configuration;
                     //If this is an inbound endpoint, then let the remote service know that we just received a
                     //  connection so that it came make the associated outbound connection.
-                    //_tunnel.Notify(new oldNotificationEndpointConnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId));
-                }
-                else if (this is EndpointOutbound endpointOutbound)
-                {
-                    endpointConfig = endpointOutbound.Configuration;
+                    _tunnel.NotificationEndpointConnect(_tunnel.Configuration.TunnelId, EndpointId, activeConnection.StreamId);
                 }
 
                 var httpHeaderBuilder = new StringBuilder();
@@ -169,29 +162,29 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                         BytesReceived += (ulong)buffer.Length;
                         _tunnel.BytesReceived += (ulong)buffer.Length;
                     }
-                    #region HTTP Header Augmentation.
 
+                    #region HTTP Header Augmentation.
 
                     if (
                          //Only parse HTTP headers if the traffic type is HTTP.
-                         endpointConfig?.TrafficType == NtTrafficType.Http
+                         Configuration.TrafficType == NtTrafficType.Http
                          &&
                          (
                             // and the direction is inbound/any and we have request rules.
                             (
-                             this is EndpointInbound && endpointConfig.HttpHeaderRules
+                             this is EndpointInbound && Configuration.HttpHeaderRules
                                 .Where(o => o.Enabled && (new[] { NtHttpHeaderType.Request, NtHttpHeaderType.Any }).Contains(o.HeaderType)).Any()
                             )
                             ||
                             (
                                 // or the direction is outbound/any and we have response rules.
-                                this is EndpointOutbound && endpointConfig.HttpHeaderRules
+                                this is EndpointOutbound && Configuration.HttpHeaderRules
                                     .Where(o => o.Enabled && (new[] { NtHttpHeaderType.Request, NtHttpHeaderType.Any }).Contains(o.HeaderType)).Any()
                             )
                          )
                      )
                     {
-                        switch (HttpUtility.Process(ref httpHeaderBuilder, endpointConfig, buffer))
+                        switch (HttpUtility.Process(ref httpHeaderBuilder, Configuration, buffer))
                         {
                             case HttpUtility.HTTPHeaderResult.WaitOnData:
                                 //We received a partial HTTP header, wait on more data.
@@ -215,8 +208,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                     #endregion
 
-                    //_tunnel.Notify(new oldNotificationEndpointExchange
-                    //    (_tunnel.TunnelId, EndpointId, activeConnection.StreamId, buffer.Bytes, buffer.Length));
+                    _tunnel.NotificationEndpointExchange(_tunnel.Configuration.TunnelId,
+                        Configuration.EndpointId, activeConnection.StreamId, buffer.Bytes, buffer.Length);
 
                     buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);
                 }

@@ -126,5 +126,11 @@ namespace NetTunnel.Library
 
         public async Task<QueryUpsertEndpointReply> QueryUpsertEndpoint(Guid tunnelId, NtEndpointConfiguration configuration)
             => await Client.Query(new QueryUpsertEndpoint(tunnelId, configuration));
+
+        public void NotificationEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId)
+            => Client.Notify(new NotificationEndpointConnect(tunnelId, endpointId, streamId));
+
+        public void NotificationEndpointExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
+            => Client.Notify(new NotificationEndpointExchange(tunnelId, endpointId, streamId, bytes, length));
     }
 }

@@ -89,6 +89,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                             _core.Logging.Write(Constants.NtLogSeverity.Debug,
                                 $"Accepted inbound endpoint connection: {activeConnection.StreamId}");
+
                             dataExchangeThread.Start(activeConnection);
                         }
                     }
