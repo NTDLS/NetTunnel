@@ -65,11 +65,17 @@ namespace NetTunnel.Service.TunnelEngine
             };
         }
 
+
         public void NotificationEndpointConnect(Guid connectionId, Guid tunnelId, Guid endpointId, Guid streamId)
         {
             //SEARCH FOR: Process:Endpoint:Connect:003: The local client is communicating through the tunnel that an inbound endpoint
             //  connection has been made so that it can make the associated outbound endpoint connection.
             _messageServer.Notify(connectionId, new NotificationEndpointConnect(tunnelId, endpointId, streamId));
+        }
+
+        public void NotificationEndpointExchange(Guid connectionId, Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
+        {
+            _messageServer.Notify(connectionId, new NotificationEndpointExchange(tunnelId, endpointId, streamId, bytes, length));
         }
 
         private void CoreServer_OnConnected(RmContext context)
