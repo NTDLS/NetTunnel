@@ -1,4 +1,6 @@
-﻿using NetTunnel.Service.ReliableMessageHandlers;
+﻿using NetTunnel.ClientAPI;
+using NetTunnel.Library.ReliableMessages.Notification;
+using NetTunnel.Service.ReliableMessageHandlers;
 using NetTunnel.Service.TunnelEngine.Managers;
 using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
@@ -62,6 +64,11 @@ namespace NetTunnel.Service.TunnelEngine
                 Logging.Write(NtLogSeverity.Exception, $"RPC server exception: '{ex.Message}'"
                     + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
             };
+        }
+
+        public void NotificationEndpointConnect(Guid connectionId, Guid tunnelId, Guid endpointId, Guid streamId)
+        {
+            _messageServer.Notify(connectionId, new NotificationEndpointConnect(tunnelId, endpointId, streamId));
         }
 
         private void CoreServer_OnConnected(RmContext context)

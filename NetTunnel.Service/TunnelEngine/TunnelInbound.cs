@@ -4,9 +4,12 @@ namespace NetTunnel.Service.TunnelEngine
 {
     internal class TunnelInbound : TunnelBase, ITunnel
     {
-        public TunnelInbound(ServiceEngine core, NtTunnelConfiguration configuration)
+        public Guid ConnectionId { get; private set; }
+
+        public TunnelInbound(ServiceEngine core, Guid connectionId, NtTunnelConfiguration configuration)
             : base(core, configuration)
         {
+            ConnectionId = connectionId;
         }
 
         public override void NotificationEndpointExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
@@ -17,6 +20,9 @@ namespace NetTunnel.Service.TunnelEngine
 
         public override void NotificationEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId)
         {
+            Core.NotificationEndpointConnect(ConnectionId, tunnelId, endpointId, streamId);   
+
+
             //This needs to go though the _server.
             //_client.NotificationEndpointConnect(tunnelId, endpointId, streamId);
         }

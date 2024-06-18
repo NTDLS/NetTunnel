@@ -63,7 +63,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// A remote service is registering its outbound tunnel configuration with the local service.
         /// </summary>
         /// <param name="config"></param>
-        public void RegisterTunnel(NtTunnelConfiguration config)
+        public void RegisterTunnel(Guid connectionId, NtTunnelConfiguration config)
         {
             Collection.Use((o) =>
             {
@@ -80,7 +80,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                     endpoint.Direction = endpoint.Direction == NtDirection.Inbound ? NtDirection.Outbound : NtDirection.Inbound;
                 }
 
-                var newTunnel = new TunnelInbound(_Core, config);
+                var newTunnel = new TunnelInbound(_Core, connectionId, config);
                 o.Add(newTunnel.EnsureNotNull());
 
                 newTunnel.Start();
