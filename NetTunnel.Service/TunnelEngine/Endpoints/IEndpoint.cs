@@ -17,6 +17,6 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         public ulong BytesSent { get; }
         public ulong TotalConnections { get; }
         public ulong CurrentConnections { get; }
-        public NtEndpointConfiguration Configuration { get; }
+        public EndpointConfiguration Configuration { get; }
     }
 }

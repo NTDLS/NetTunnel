@@ -11,7 +11,7 @@ namespace NetTunnel.UI.Forms
         private int _allTunnelAndEndpointHashes = -1;
         private bool _needToRepopulateTunnels = false;
 
-        private Library.NtServiceClient? _client;
+        private Library.ServiceClient? _client;
 
         private bool _inTimerTick = false;
         private volatile int _gridPopulationScope = 0;
@@ -151,7 +151,7 @@ namespace NetTunnel.UI.Forms
 
 
 
-                void PopulateEndpointStatistics(List<NtTunnelStatistics> statistics)
+                void PopulateEndpointStatistics(List<TunnelStatistics> statistics)
                 {
                     if (listViewEndpoints.InvokeRequired)
                     {
@@ -198,7 +198,7 @@ namespace NetTunnel.UI.Forms
                     }
                 }
 
-                void PopulateTunnelStatistics(List<NtTunnelStatistics> statistics)
+                void PopulateTunnelStatistics(List<TunnelStatistics> statistics)
                 {
                     if (listViewTunnels.InvokeRequired)
                     {
@@ -651,7 +651,7 @@ namespace NetTunnel.UI.Forms
             });
 
 
-            void AddTunnelToGrid(NtTunnelConfiguration tunnel)
+            void AddTunnelToGrid(TunnelConfiguration tunnel)
             {
                 if (listViewTunnels.InvokeRequired)
                 {
@@ -672,7 +672,7 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-        private void RepopulateEndpointsGrid(NtTunnelConfiguration tunnel)
+        private void RepopulateEndpointsGrid(TunnelConfiguration tunnel)
         {
             try
             {
@@ -691,7 +691,7 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-        private void RepopulateEndpointsGrid_LockRequired(NtTunnelConfiguration tunnel)
+        private void RepopulateEndpointsGrid_LockRequired(TunnelConfiguration tunnel)
         {
             listViewEndpoints.Items.Clear();
 
@@ -701,7 +701,7 @@ namespace NetTunnel.UI.Forms
             tunnel.Endpoints.Where(o => o.Direction == NtDirection.Outbound)
                 .ToList().ForEach(x => AddEndpointOutboundToGrid(tunnel, x));
 
-            void AddEndpointInboundToGrid(NtTunnelConfiguration tunnel, NtEndpointConfiguration endpoint)
+            void AddEndpointInboundToGrid(TunnelConfiguration tunnel, EndpointConfiguration endpoint)
             {
                 if (listViewEndpoints.InvokeRequired)
                 {
@@ -722,7 +722,7 @@ namespace NetTunnel.UI.Forms
                 }
             }
 
-            void AddEndpointOutboundToGrid(NtTunnelConfiguration tunnel, NtEndpointConfiguration endpoint)
+            void AddEndpointOutboundToGrid(TunnelConfiguration tunnel, EndpointConfiguration endpoint)
             {
                 if (listViewEndpoints.InvokeRequired)
                 {

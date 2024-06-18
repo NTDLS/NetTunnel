@@ -9,7 +9,7 @@ namespace NetTunnel.Library.Types
     /// These are sent to the tunnel service when the tunnel is connected, but once the connection
     ///     is made - they can be altered at either end by the service UI.
     /// </summary>
-    public class NtEndpointConfiguration
+    public class EndpointConfiguration
     {
         public Guid EndpointId { get; set; }
         [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
@@ -21,14 +21,14 @@ namespace NetTunnel.Library.Types
 
         [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public NtTrafficType TrafficType { get; set; } = NtTrafficType.Raw;
-        public List<NtHttpHeaderRule> HttpHeaderRules { get; set; } = new();
+        public List<HttpHeaderRule> HttpHeaderRules { get; set; } = new();
 
-        public NtEndpointConfiguration()
+        public EndpointConfiguration()
         {
         }
 
-        public NtEndpointConfiguration(Guid endpointId, string name,
-            string outboundAddress, int inboundPort, int outboundPort, List<NtHttpHeaderRule> httpHeaderRules, NtTrafficType trafficType)
+        public EndpointConfiguration(Guid endpointId, string name,
+            string outboundAddress, int inboundPort, int outboundPort, List<HttpHeaderRule> httpHeaderRules, NtTrafficType trafficType)
         {
             EndpointId = endpointId;
             Direction = NtDirection.Undefined;
@@ -40,8 +40,8 @@ namespace NetTunnel.Library.Types
             HttpHeaderRules.AddRange(httpHeaderRules);
         }
 
-        public NtEndpointConfiguration(Guid endpointId, NtDirection direction, string name,
-            string outboundAddress, int inboundPort, int outboundPort, List<NtHttpHeaderRule> httpHeaderRules, NtTrafficType trafficType)
+        public EndpointConfiguration(Guid endpointId, NtDirection direction, string name,
+            string outboundAddress, int inboundPort, int outboundPort, List<HttpHeaderRule> httpHeaderRules, NtTrafficType trafficType)
         {
             EndpointId = endpointId;
             Direction = direction;
@@ -53,9 +53,9 @@ namespace NetTunnel.Library.Types
             HttpHeaderRules.AddRange(httpHeaderRules);
         }
 
-        public NtEndpointConfiguration CloneConfiguration()
+        public EndpointConfiguration CloneConfiguration()
         {
-            var clone = new NtEndpointConfiguration
+            var clone = new EndpointConfiguration
             {
                 EndpointId = EndpointId,
                 Direction = Direction,

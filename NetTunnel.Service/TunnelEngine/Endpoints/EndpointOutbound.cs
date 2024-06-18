@@ -12,8 +12,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         public override int GetHashCode()
             => Configuration.GetHashCode();
 
-        public EndpointOutbound(ServiceEngine core, ITunnel tunnel, NtEndpointConfiguration configuration)
-            : base(core, tunnel, configuration.EndpointId, configuration)
+        public EndpointOutbound(ServiceEngine serviceEngine, ITunnel tunnel, EndpointConfiguration configuration)
+            : base(serviceEngine, tunnel, configuration.EndpointId, configuration)
         {
         }
 
@@ -21,7 +21,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
             base.Start();
 
-            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose,
+            _tunnel.ServiceEngine.Logging.Write(Constants.NtLogSeverity.Verbose,
                 $"Starting outbound endpoint '{Configuration.Name}' on port {Configuration.OutboundPort}.");
         }
 
@@ -29,7 +29,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
             base.Stop();
 
-            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose,
+            _tunnel.ServiceEngine.Logging.Write(Constants.NtLogSeverity.Verbose,
                 $"Stopping outbound endpoint '{Configuration.Name}' on port {Configuration.OutboundPort}.");
 
             _activeConnections.Use((o) =>
@@ -41,7 +41,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 o.Clear();
             });
 
-            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose,
+            _tunnel.ServiceEngine.Logging.Write(Constants.NtLogSeverity.Verbose,
                 $"Stopped outbound endpoint '{Configuration.Name}' on port {Configuration.OutboundPort}.");
         }
 
@@ -61,7 +61,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                         var activeConnection = new ActiveEndpointConnection(dataExchangeThread, tcpClient, streamId);
                         var outboundConnection = _activeConnections.Use((o) => o.TryAdd(streamId, activeConnection));
 
-                        _core.Logging.Write(Constants.NtLogSeverity.Debug,
+                        _serviceEngine.Logging.Write(Constants.NtLogSeverity.Debug,
                             $"Established outbound endpoint connection: {activeConnection.StreamId}");
 
                         dataExchangeThread.Start(activeConnection);
@@ -69,7 +69,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 }
                 catch (Exception ex)
                 {
-                    _core.Logging.Write(Constants.NtLogSeverity.Exception,
+                    _serviceEngine.Logging.Write(Constants.NtLogSeverity.Exception,
                         $"EstablishOutboundEndpointConnection: {ex.Message}");
                     throw;
                 }

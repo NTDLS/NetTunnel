@@ -2,14 +2,14 @@
 
 namespace NetTunnel.Library.ReliableMessages.Notification
 {
-    public class NotificationEndpointExchange : IRmNotification
+    public class NotificationEndpointDataExchange : IRmNotification
     {
         public Guid StreamId { get; set; }
         public Guid TunnelId { get; set; }
         public Guid EndpointId { get; set; }
         public byte[] Bytes { get; set; }
 
-        public NotificationEndpointExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
+        public NotificationEndpointDataExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
         {
             StreamId = streamId;
             TunnelId = tunnelId;
@@ -19,7 +19,7 @@ namespace NetTunnel.Library.ReliableMessages.Notification
             Array.Copy(bytes, Bytes, length);
         }
 
-        public NotificationEndpointExchange()
+        public NotificationEndpointDataExchange()
         {
             Bytes = Array.Empty<byte>();
         }

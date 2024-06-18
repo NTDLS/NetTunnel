@@ -8,15 +8,15 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormAddEditEndpoint : Form
     {
-        private readonly NtServiceClient? _client;
-        private readonly NtTunnelConfiguration? _tunnel;
+        private readonly ServiceClient? _client;
+        private readonly TunnelConfiguration? _tunnel;
         private readonly NtDirection _direction = NtDirection.Undefined;
-        private readonly NtEndpointConfiguration? _existingEndpoint;
+        private readonly EndpointConfiguration? _existingEndpoint;
 
         /// <summary>
         /// Creates a form for a editing an existing endpoint.
         /// </summary>
-        public FormAddEditEndpoint(NtServiceClient client, NtTunnelConfiguration tunnel, NtEndpointConfiguration existingEndpoint)
+        public FormAddEditEndpoint(ServiceClient client, TunnelConfiguration tunnel, EndpointConfiguration existingEndpoint)
         {
             InitializeComponent();
 
@@ -33,7 +33,7 @@ namespace NetTunnel.UI.Forms
         /// <summary>
         /// Creates a form for a adding a new endpoint.
         /// </summary>
-        public FormAddEditEndpoint(NtServiceClient client, NtTunnelConfiguration tunnel, NtDirection direction)
+        public FormAddEditEndpoint(ServiceClient client, TunnelConfiguration tunnel, NtDirection direction)
         {
             InitializeComponent();
 
@@ -119,7 +119,7 @@ namespace NetTunnel.UI.Forms
                 textBoxOutboundAddress.GetAndValidateText("You must specify a termination endpoint address (ip, hostname or domain). ");
                 textBoxOutboundPort.GetAndValidateNumeric(1, 65535, "You must specify a valid termination port between [min] and [max].");
 
-                var endpointHttpHeaderRules = new List<NtHttpHeaderRule>();
+                var endpointHttpHeaderRules = new List<HttpHeaderRule>();
 
                 foreach (DataGridViewRow row in dataGridViewHTTPHeaders.Rows)
                 {
@@ -127,7 +127,7 @@ namespace NetTunnel.UI.Forms
                     {
                         var headerType = Enum.Parse<NtHttpHeaderType>($"{row.Cells[columnType.Index].Value}");
 
-                        endpointHttpHeaderRules.Add(new NtHttpHeaderRule
+                        endpointHttpHeaderRules.Add(new HttpHeaderRule
                         {
                             Enabled = bool.Parse(row.Cells[columnEnabled.Index].Value?.ToString() ?? "True"),
                             HeaderType = Enum.Parse<NtHttpHeaderType>($"{row.Cells[columnType.Index].Value}"),
@@ -141,7 +141,7 @@ namespace NetTunnel.UI.Forms
 
                 var endpointId = _existingEndpoint?.EndpointId ?? Guid.NewGuid(); //The endpointId is the same on both services.
 
-                var endpoint = new NtEndpointConfiguration(endpointId, _direction,
+                var endpoint = new EndpointConfiguration(endpointId, _direction,
                     textBoxName.Text, textBoxOutboundAddress.Text, textBoxInboundPort.ValueAs<int>(),
                     textBoxOutboundPort.ValueAs<int>(), endpointHttpHeaderRules, Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"));
 

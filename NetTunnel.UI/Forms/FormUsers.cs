@@ -6,14 +6,14 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormUsers : Form
     {
-        private readonly NtServiceClient? _client;
+        private readonly ServiceClient? _client;
 
         public FormUsers()
         {
             InitializeComponent();
         }
 
-        public FormUsers(NtServiceClient client)
+        public FormUsers(ServiceClient client)
         {
             InitializeComponent();
             _client = client;
@@ -34,7 +34,7 @@ namespace NetTunnel.UI.Forms
             */
         }
 
-        void AddUserToGrid(NtUser? user)
+        void AddUserToGrid(User? user)
         {
             if (user == null) return;
 

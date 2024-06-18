@@ -16,13 +16,13 @@ namespace NetTunnel.Service.ReliableMessageHandlers
 
             //var tunnel = context.Endpoint.Parameter.EnsureNotNull();
 
-            Singletons.Core.Logging.Write(NtLogSeverity.Debug,
+            Singletons.ServiceEngine.Logging.Write(NtLogSeverity.Debug,
                 $"Received endpoint connection notification.");
 
-            Singletons.Core.Tunnels.EstablishOutboundEndpointConnection(notification.TunnelId, notification.EndpointId, notification.StreamId);
+            Singletons.ServiceEngine.Tunnels.EstablishOutboundEndpointConnection(notification.TunnelId, notification.EndpointId, notification.StreamId);
         }
 
-        public void OnNotificationEndpointExchange(RmContext context, NotificationEndpointExchange notification)
+        public void OnNotificationEndpointExchange(RmContext context, NotificationEndpointDataExchange notification)
         {
             //var connectionContext = GetServiceConnectionContext(context);
 
@@ -30,7 +30,7 @@ namespace NetTunnel.Service.ReliableMessageHandlers
 
             tunnel.SendEndpointData(notification.EndpointId, notification.StreamId, notification.Bytes);
 
-            Singletons.Core.Logging.Write(NtLogSeverity.Debug,
+            Singletons.ServiceEngine.Logging.Write(NtLogSeverity.Debug,
                 $"Received endpoint data exchange.");
         }
     }

@@ -11,11 +11,11 @@ namespace NetTunnel.Library
     /// <summary>
     /// Used by both the UI to connect to a service and the service to connect to other services.
     /// </summary>
-    public class NtServiceClient
+    public class ServiceClient
     {
         public RmClient Client { get; private set; }
 
-        private readonly NtServiceConfiguration _configuration;
+        private readonly ServiceConfiguration _configuration;
         private readonly string _address;
         private readonly int _port;
         private readonly string _userName;
@@ -26,7 +26,7 @@ namespace NetTunnel.Library
         /// </summary>
         public Guid ServiceId { get; private set; }
 
-        public NtServiceClient(NtServiceConfiguration configuration, RmClient client, string address, int port, string userName, string passwordHash)
+        public ServiceClient(ServiceConfiguration configuration, RmClient client, string address, int port, string userName, string passwordHash)
         {
             _configuration = configuration;
             Client = client;
@@ -38,12 +38,12 @@ namespace NetTunnel.Library
 
         #region Factory.
 
-        public static async Task<NtServiceClient> CreateConnectAndLogin(string address, int port, string userName, string passwordHash, object? owner = null)
+        public static async Task<ServiceClient> CreateConnectAndLogin(string address, int port, string userName, string passwordHash, object? owner = null)
         {
-            return await CreateConnectAndLogin(new NtServiceConfiguration(), address, port, userName, passwordHash, owner);
+            return await CreateConnectAndLogin(new ServiceConfiguration(), address, port, userName, passwordHash, owner);
         }
 
-        public static async Task<NtServiceClient> CreateConnectAndLogin(NtServiceConfiguration configuration,
+        public static async Task<ServiceClient> CreateConnectAndLogin(ServiceConfiguration configuration,
              string address, int port, string userName, string passwordHash, object? owner = null)
         {
             var serviceClient = Create(configuration, address, port, userName, passwordHash, owner);
@@ -51,7 +51,7 @@ namespace NetTunnel.Library
             return serviceClient;
         }
 
-        public static NtServiceClient Create(NtServiceConfiguration configuration, string address, int port, string userName, string passwordHash, object? owner = null)
+        public static ServiceClient Create(ServiceConfiguration configuration, string address, int port, string userName, string passwordHash, object? owner = null)
         {
             var client = new RmClient(new RmConfiguration()
             {
@@ -61,7 +61,7 @@ namespace NetTunnel.Library
                 ReceiveBufferGrowthRate = configuration.ReceiveBufferGrowthRate,
             });
 
-            return new NtServiceClient(configuration, client, address, port, userName, passwordHash);
+            return new ServiceClient(configuration, client, address, port, userName, passwordHash);
         }
 
         #endregion
@@ -118,22 +118,22 @@ namespace NetTunnel.Library
             }).Result;
         }
 
-        public async Task<QueryCreateTunnelReply> QueryCreateTunnel(NtTunnelConfiguration configuration)
+        public async Task<QueryCreateTunnelReply> QueryCreateTunnel(TunnelConfiguration configuration)
             => await Client.Query(new QueryCreateTunnel(configuration));
 
         public async Task<QueryGetTunnelsReply> QueryGetTunnels()
             => await Client.Query(new QueryGetTunnels());
 
-        public async Task<QueryRegisterTunnelReply> QueryRegisterTunnel(NtTunnelConfiguration Collection)
+        public async Task<QueryRegisterTunnelReply> QueryRegisterTunnel(TunnelConfiguration Collection)
             => await Client.Query(new QueryRegisterTunnel(Collection));
 
-        public async Task<QueryUpsertEndpointReply> QueryUpsertEndpoint(Guid tunnelId, NtEndpointConfiguration configuration)
+        public async Task<QueryUpsertEndpointReply> QueryUpsertEndpoint(Guid tunnelId, EndpointConfiguration configuration)
             => await Client.Query(new QueryUpsertEndpoint(tunnelId, configuration));
 
         public void NotificationEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId)
             => Client.Notify(new NotificationEndpointConnect(tunnelId, endpointId, streamId));
 
         public void NotificationEndpointExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
-            => Client.Notify(new NotificationEndpointExchange(tunnelId, endpointId, streamId, bytes, length));
+            => Client.Notify(new NotificationEndpointDataExchange(tunnelId, endpointId, streamId, bytes, length));
     }
 }

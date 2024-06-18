@@ -28,14 +28,14 @@ namespace NetTunnel.Service.TunnelEngine
 
         #region Public Properties.
 
-        public NtTunnelConfiguration Configuration { get; private set; }
+        public TunnelConfiguration Configuration { get; private set; }
 
         public NtTunnelStatus Status { get; set; }
         public ulong BytesReceived { get; set; }
         public ulong BytesSent { get; set; }
         public ulong TotalConnections { get; set; }
         public ulong CurrentConnections { get; set; }
-        public ServiceEngine Core { get; private set; }
+        public ServiceEngine ServiceEngine { get; private set; }
         public bool KeepRunning { get; private set; } = false;
         //public Guid TunnelId { get; private set; }
         //public string Name { get; private set; }
@@ -44,23 +44,23 @@ namespace NetTunnel.Service.TunnelEngine
 
         #endregion
 
-        public TunnelBase(ServiceEngine core, NtTunnelConfiguration configuration)
+        public TunnelBase(ServiceEngine serviceEngine, TunnelConfiguration configuration)
         {
-            Core = core;
+            ServiceEngine = serviceEngine;
             Configuration = configuration.CloneConfiguration();
 
             Configuration.Endpoints.Where(o => o.Direction == NtDirection.Inbound)
-                .ToList().ForEach(o => Endpoints.Add(new EndpointInbound(Core, this, o)));
+                .ToList().ForEach(o => Endpoints.Add(new EndpointInbound(ServiceEngine, this, o)));
 
             Configuration.Endpoints.Where(o => o.Direction == NtDirection.Outbound)
-                .ToList().ForEach(o => Endpoints.Add(new EndpointOutbound(Core, this, o)));
+                .ToList().ForEach(o => Endpoints.Add(new EndpointOutbound(ServiceEngine, this, o)));
 
         }
 
         public IEndpoint? GetEndpointById(Guid pairId)
             => Endpoints.Where(o => o.EndpointId == pairId).SingleOrDefault();
 
-        public NtTunnelConfiguration CloneConfiguration()
+        public TunnelConfiguration CloneConfiguration()
         {
             return Configuration.CloneConfiguration();
         }
@@ -71,7 +71,7 @@ namespace NetTunnel.Service.TunnelEngine
             {
                 return;
             }
-            Core.Logging.Write(NtLogSeverity.Verbose,
+            ServiceEngine.Logging.Write(NtLogSeverity.Verbose,
                 $"Starting tunnel '{Configuration.Name}'.");
 
             KeepRunning = true;
@@ -79,7 +79,7 @@ namespace NetTunnel.Service.TunnelEngine
             _heartbeatThread = new Thread(HeartbeatThreadProc);
             _heartbeatThread.Start();
 
-            Core.Logging.Write(NtLogSeverity.Verbose,
+            ServiceEngine.Logging.Write(NtLogSeverity.Verbose,
                 $"Starting endpoints for tunnel '{Configuration.Name}'.");
 
             Endpoints.ForEach(x => x.Start());
@@ -87,7 +87,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         public virtual void Stop()
         {
-            Core.Logging.Write(NtLogSeverity.Verbose,
+            ServiceEngine.Logging.Write(NtLogSeverity.Verbose,
                 $"Stopping tunnel '{Configuration.Name}'.");
 
             Endpoints.ForEach(o => o.Stop());
@@ -97,19 +97,18 @@ namespace NetTunnel.Service.TunnelEngine
 
             Status = NtTunnelStatus.Stopped;
 
-            Core.Logging.Write(NtLogSeverity.Verbose,
+            ServiceEngine.Logging.Write(NtLogSeverity.Verbose,
                 $"Stopped tunnel '{Configuration.Name}'.");
         }
 
         public void SendEndpointData(Guid endpointId, Guid StreamId, byte[] bytes)
         {
-            Endpoints.Where(o => o.EndpointId == endpointId)
-                .Single().SendEndpointData(StreamId, bytes);
+            Endpoints.Single(o => o.EndpointId == endpointId).SendEndpointData(StreamId, bytes);
         }
 
         #region Add/Delete Endpoints.
 
-        public EndpointInbound UpsertEndpoint(NtEndpointConfiguration configuration)
+        public EndpointInbound UpsertEndpoint(EndpointConfiguration configuration)
         {
             var existingEndpoint = GetEndpointById(configuration.EndpointId);
             if (existingEndpoint != null)
@@ -117,7 +116,7 @@ namespace NetTunnel.Service.TunnelEngine
                 DeleteEndpoint(existingEndpoint.EndpointId);
             }
 
-            var endpoint = new EndpointInbound(Core, this, configuration);
+            var endpoint = new EndpointInbound(ServiceEngine, this, configuration);
             Configuration.Endpoints.Add(configuration);
             Endpoints.Add(endpoint);
             return endpoint;
@@ -147,7 +146,7 @@ namespace NetTunnel.Service.TunnelEngine
                 if ((DateTime.UtcNow - lastHeartBeat).TotalMilliseconds > Singletons.Configuration.TunnelAndEndpointHeartbeatDelayMs)
                 {
                     //var pingTime = _client.Ping();
-                    //Core.Logging.Write(NtLogSeverity.Debug,
+                    //ServiceEngine.Logging.Write(NtLogSeverity.Debug,
                     //    $"Roundtrip time for '{Configuration.Name}': {pingTime:n0}ms"); ;
 
                     lastHeartBeat = DateTime.UtcNow;
@@ -157,10 +156,10 @@ namespace NetTunnel.Service.TunnelEngine
             }
         }
 
-        public virtual void NotificationEndpointExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
+        public virtual void SendNotificationOfEndpointDataExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
             => throw new NotImplementedException("This function should be overridden.");
 
-        public virtual void NotificationEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId)
+        public virtual void SendNotificationOfEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId)
             => throw new NotImplementedException("This function should be overridden.");
     }
 }

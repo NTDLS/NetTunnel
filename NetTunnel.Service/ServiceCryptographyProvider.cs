@@ -7,9 +7,9 @@ namespace NetTunnel.Service
     {
         private readonly ServiceEngine _serviceEngine;
 
-        public ServiceCryptographyProvider(ServiceEngine engineCore)
+        public ServiceCryptographyProvider(ServiceEngine serviceEngine)
         {
-            _serviceEngine = engineCore;
+            _serviceEngine = serviceEngine;
         }
 
         public byte[] Decrypt(RmContext context, byte[] encryptedPayload)

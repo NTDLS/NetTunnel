@@ -10,22 +10,22 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 {
     internal class TunnelManager
     {
-        private readonly ServiceEngine _Core;
+        private readonly ServiceEngine _serviceEngine;
 
         protected readonly PessimisticCriticalResource<List<ITunnel>> Collection = new();
 
-        public TunnelManager(ServiceEngine core)
+        public TunnelManager(ServiceEngine serviceEngine)
         {
-            _Core = core;
+            _serviceEngine = serviceEngine;
             LoadFromDisk();
         }
 
         #region Start / Stop.
 
         public void Start(Guid tunnelId) => Collection.Use((o)
-            => o.Where(o => o.Configuration.TunnelId == tunnelId).Single().Start());
+            => o.Single(o => o.Configuration.TunnelId == tunnelId).Start());
         public void Stop(Guid tunnelId) => Collection.Use((o)
-            => o.Where(o => o.Configuration.TunnelId == tunnelId).Single().Stop());
+            => o.Single(o => o.Configuration.TunnelId == tunnelId).Stop());
 
         public void StartAll()
             => Collection.Use((o) => o.ForEach((o) => o.Start()));
@@ -41,7 +41,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// The local service is adding a new outbound tunnel configuration to the local service.
         /// </summary>
         /// <param name="config"></param>
-        public void UpsertTunnel(NtTunnelConfiguration config)
+        public void UpsertTunnel(TunnelConfiguration config)
         {
             Collection.Use((o) =>
             {
@@ -52,7 +52,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                     o.Remove(existingTunnel);
                 }
 
-                var newTunnel = new TunnelOutbound(_Core, config);
+                var newTunnel = new TunnelOutbound(_serviceEngine, config);
                 o.Add(newTunnel.EnsureNotNull());
 
                 SaveToDisk();
@@ -63,7 +63,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// A remote service is registering its outbound tunnel configuration with the local service.
         /// </summary>
         /// <param name="config"></param>
-        public void RegisterTunnel(Guid connectionId, NtTunnelConfiguration config)
+        public void RegisterTunnel(Guid connectionId, TunnelConfiguration config)
         {
             Collection.Use((o) =>
             {
@@ -80,7 +80,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                     endpoint.Direction = endpoint.Direction == NtDirection.Inbound ? NtDirection.Outbound : NtDirection.Inbound;
                 }
 
-                var newTunnel = new TunnelInbound(_Core, connectionId, config);
+                var newTunnel = new TunnelInbound(_serviceEngine, connectionId, config);
                 o.Add(newTunnel.EnsureNotNull());
 
                 newTunnel.Start();
@@ -92,11 +92,11 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// </summary>
         /// <param name="tunnelId"></param>
         /// <param name="endpointConfiguration"></param>
-        public void UpsertEndpoint(Guid tunnelId, NtEndpointConfiguration endpointConfiguration)
+        public void UpsertEndpoint(Guid tunnelId, EndpointConfiguration endpointConfiguration)
         {
             Collection.Use((o) =>
             {
-                var tunnel = o.Where(o => o.Configuration.TunnelId == tunnelId).Single();
+                var tunnel = o.Single(o => o.Configuration.TunnelId == tunnelId);
                 tunnel.UpsertEndpoint(endpointConfiguration);
 
                 SaveToDisk();
@@ -112,7 +112,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             Collection.Use((o) =>
             {
-                var tunnel = o.Where(o => o.Configuration.TunnelId == tunnelId).Single();
+                var tunnel = o.Single(o => o.Configuration.TunnelId == tunnelId);
                 tunnel.DeleteEndpoint(endpointId);
 
                 SaveToDisk();
@@ -134,9 +134,9 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             Collection.Use((o) =>
             {
-                var tunnel = o.Where(o => o.Configuration.TunnelId == tunnelId).Single();
+                var tunnel = o.Single(o => o.Configuration.TunnelId == tunnelId);
 
-                var endpoint = tunnel.Endpoints.Where(o => o.EndpointId == endpointId).Single() as EndpointOutbound
+                var endpoint = tunnel.Endpoints.Single(o => o.EndpointId == endpointId) as EndpointOutbound
                     ?? throw new Exception("The endpoint could not be converted to outbound.");
 
                 endpoint.EstablishOutboundEndpointConnection(streamId);
@@ -147,9 +147,10 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             Collection.Use((o) =>
             {
-                o.Where(o => o.Configuration.TunnelId == tunnelId)
-                    .Single().Endpoints.Where(o => o.EndpointId == endpointId)
-                    .Single().SendEndpointData(StreamId, bytes);
+                var tunnel = o.Single(o => o.Configuration.TunnelId == tunnelId);
+                var endpoint = tunnel.Endpoints.Single(o => o.EndpointId == endpointId);
+
+                endpoint.SendEndpointData(StreamId, bytes);
             });
         }
 
@@ -172,19 +173,19 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             {
                 o.Clear();
 
-                CommonApplicationData.LoadFromDisk<List<NtTunnelConfiguration>>(FriendlyName)?
+                CommonApplicationData.LoadFromDisk<List<TunnelConfiguration>>(FriendlyName)?
                     .Where(t => t.ServiceId == Singletons.Configuration.ServiceId).ToList()
-                    .ForEach(c => o.Add(new TunnelOutbound(_Core, c)));
+                    .ForEach(c => o.Add(new TunnelOutbound(_serviceEngine, c)));
             });
         }
 
         #endregion
 
-        public List<NtTunnelConfiguration> Clone()
+        public List<TunnelConfiguration> Clone()
         {
             return Collection.Use((o) =>
             {
-                List<NtTunnelConfiguration> clones = new();
+                List<TunnelConfiguration> clones = new();
                 foreach (var tunnel in o)
                 {
                     clones.Add(tunnel.CloneConfiguration());
@@ -193,15 +194,15 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-        public List<NtTunnelStatistics> GetStatistics()
+        public List<TunnelStatistics> GetStatistics()
         {
-            var result = new List<NtTunnelStatistics>();
+            var result = new List<TunnelStatistics>();
 
             Collection.Use((o) =>
             {
                 foreach (var tunnel in o)
                 {
-                    var tunnelStats = new NtTunnelStatistics()
+                    var tunnelStats = new TunnelStatistics()
                     {
                         Direction = tunnel.Configuration.ServiceId == Singletons.Configuration.ServiceId ? NtDirection.Outbound : NtDirection.Inbound,
                         Status = tunnel.Status,
@@ -215,7 +216,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
                     foreach (var endpoint in tunnel.Endpoints)
                     {
-                        var endpointStats = new NtEndpointStatistics()
+                        var endpointStats = new EndpointStatistics()
                         {
                             Direction = endpoint.Configuration.Direction,
                             BytesReceived = endpoint.BytesReceived,

@@ -5,13 +5,13 @@ namespace NetTunnel.Library.ReliableMessages.Query
 {
     public class QueryRegisterTunnel : IRmQuery<QueryRegisterTunnelReply>
     {
-        public NtTunnelConfiguration Configuration { get; set; } = new();
+        public TunnelConfiguration Configuration { get; set; } = new();
 
         public QueryRegisterTunnel()
         {
         }
 
-        public QueryRegisterTunnel(NtTunnelConfiguration configuration)
+        public QueryRegisterTunnel(TunnelConfiguration configuration)
         {
             Configuration = configuration;
         }

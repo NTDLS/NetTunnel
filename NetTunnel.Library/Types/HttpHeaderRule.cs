@@ -3,7 +3,7 @@ using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library
 {
-    public class NtHttpHeaderRule
+    public class HttpHeaderRule
     {
         /// <summary>
         /// Inbound, outbound, etc.
@@ -42,7 +42,7 @@ namespace NetTunnel.Library
         /// </summary>
         public string Description { get; set; } = string.Empty;
 
-        public NtHttpHeaderRule(NtHttpVerb verb, string name, NtHttpHeaderAction action, string value)
+        public HttpHeaderRule(NtHttpVerb verb, string name, NtHttpHeaderAction action, string value)
         {
             Verb = verb;
             Name = name;
@@ -50,13 +50,13 @@ namespace NetTunnel.Library
             Value = value;
         }
 
-        public NtHttpHeaderRule()
+        public HttpHeaderRule()
         {
         }
 
-        public NtHttpHeaderRule CloneConfiguration()
+        public HttpHeaderRule CloneConfiguration()
         {
-            return new NtHttpHeaderRule
+            return new HttpHeaderRule
             {
                 Name = Name,
                 Value = Value,

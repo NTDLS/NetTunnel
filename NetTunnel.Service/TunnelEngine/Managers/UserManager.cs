@@ -6,27 +6,27 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 {
     internal class UserManager
     {
-        private readonly ServiceEngine _core;
+        private readonly ServiceEngine _serviceEngine;
 
-        private readonly PessimisticCriticalResource<List<NtUser>> _collection = new();
+        private readonly PessimisticCriticalResource<List<User>> _collection = new();
 
-        public UserManager(ServiceEngine core)
+        public UserManager(ServiceEngine serviceEngine)
         {
-            _core = core;
+            _serviceEngine = serviceEngine;
 
             LoadFromDisk();
         }
 
         public void Add(string username, string passwordHash)
-            => Add(new NtUser(username, passwordHash));
+            => Add(new User(username, passwordHash));
 
-        public void Add(NtUser user) => _collection.Use((o)
+        public void Add(User user) => _collection.Use((o)
             => o.Add(user));
 
-        public void Delete(NtUser user) => _collection.Use((o)
+        public void Delete(User user) => _collection.Use((o)
             => o.RemoveAll(t => t.Username == user.Username));
 
-        public void ChangePassword(NtUser user)
+        public void ChangePassword(User user)
         {
             _collection.Use((o) =>
             {
@@ -44,7 +44,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         public bool ValidatePassword(string username, string passwordHash)
         {
-            if (_core.Users.ValidateLogin(username, passwordHash))
+            if (_serviceEngine.Users.ValidateLogin(username, passwordHash))
             {
                 return true;
             }
@@ -60,7 +60,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             {
                 o.Clear();
 
-                CommonApplicationData.LoadFromDisk(Constants.FriendlyName, new List<NtUser>()).ForEach(o => Add(o));
+                CommonApplicationData.LoadFromDisk(Constants.FriendlyName, new List<User>()).ForEach(o => Add(o));
 
                 if (o.Count == 0)
                 {

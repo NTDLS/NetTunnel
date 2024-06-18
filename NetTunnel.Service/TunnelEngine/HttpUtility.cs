@@ -21,7 +21,7 @@ namespace NetTunnel.Service
             NotPresent
         }
 
-        public static HTTPHeaderResult Process(ref StringBuilder httpHeaderBuilder, NtEndpointConfiguration endpointConfig, PumpBuffer buffer)
+        public static HTTPHeaderResult Process(ref StringBuilder httpHeaderBuilder, EndpointConfiguration endpointConfig, PumpBuffer buffer)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace NetTunnel.Service
             catch (Exception ex)
             {
                 httpHeaderBuilder.Clear();
-                Singletons.Core.Logging.Write(ex, "An error occurred while parsing the HTTP request header.");
+                Singletons.ServiceEngine.Logging.Write(ex, "An error occurred while parsing the HTTP request header.");
             }
 
             return HTTPHeaderResult.NotPresent;
@@ -119,7 +119,7 @@ namespace NetTunnel.Service
             return -1;
         }
 
-        public static string ApplyHttpHeaderRules(NtEndpointConfiguration endpointConfig,
+        public static string ApplyHttpHeaderRules(EndpointConfiguration endpointConfig,
             string httpHeader, NtHttpHeaderType headerType, string httpRequestVerb, string headerDelimiter)
         {
             try
@@ -156,7 +156,7 @@ namespace NetTunnel.Service
             }
             catch (Exception ex)
             {
-                Singletons.Core.Logging.Write(ex, "Failed to process HTTP Header rules.");
+                Singletons.ServiceEngine.Logging.Write(ex, "Failed to process HTTP Header rules.");
             }
 
             return httpHeader;

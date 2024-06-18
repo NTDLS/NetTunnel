@@ -55,8 +55,8 @@ namespace NetTunnel.Service.TunnelEngine
             _messageServer.AddHandler(new ServiceNotificationHandlers());
             _messageServer.AddHandler(new ServiceQueryHandlers());
 
-            _messageServer.OnConnected += CoreServer_OnConnected;
-            _messageServer.OnDisconnected += CoreServer_OnDisconnected;
+            _messageServer.OnConnected += ServiceEngine_OnConnected;
+            _messageServer.OnDisconnected += ServiceEngine_OnDisconnected;
 
             _messageServer.OnException += (RmContext? context, Exception ex, IRmPayload? payload) =>
             {
@@ -66,25 +66,31 @@ namespace NetTunnel.Service.TunnelEngine
         }
 
 
-        public void NotificationEndpointConnect(Guid connectionId, Guid tunnelId, Guid endpointId, Guid streamId)
+        /// <summary>
+        ///SEARCH FOR: Process:Endpoint:Connect:003: The local client is communicating through the tunnel that an inbound endpoint
+        ///  connection has been made so that it can make the associated outbound endpoint connection.
+        /// </summary>
+        /// <param name="connectionId"></param>
+        /// <param name="tunnelId"></param>
+        /// <param name="endpointId"></param>
+        /// <param name="streamId"></param>
+        public void SendNotificationOfEndpointConnect(Guid connectionId, Guid tunnelId, Guid endpointId, Guid streamId)
         {
-            //SEARCH FOR: Process:Endpoint:Connect:003: The local client is communicating through the tunnel that an inbound endpoint
-            //  connection has been made so that it can make the associated outbound endpoint connection.
             _messageServer.Notify(connectionId, new NotificationEndpointConnect(tunnelId, endpointId, streamId));
         }
 
-        public void NotificationEndpointExchange(Guid connectionId, Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
+        public void SendNotificationOfEndpointDataExchange(Guid connectionId, Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
         {
-            _messageServer.Notify(connectionId, new NotificationEndpointExchange(tunnelId, endpointId, streamId, bytes, length));
+            _messageServer.Notify(connectionId, new NotificationEndpointDataExchange(tunnelId, endpointId, streamId, bytes, length));
         }
 
-        private void CoreServer_OnConnected(RmContext context)
+        private void ServiceEngine_OnConnected(RmContext context)
         {
             ServiceConnectionStates.Add(context.ConnectionId,
                 new ServiceConnectionState(context.ConnectionId, $"{context.TcpClient.Client.RemoteEndPoint}"));
         }
 
-        private void CoreServer_OnDisconnected(RmContext context)
+        private void ServiceEngine_OnDisconnected(RmContext context)
         {
             ServiceConnectionStates.Remove(context.ConnectionId);
         }

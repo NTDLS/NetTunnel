@@ -7,14 +7,14 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormConnectTunnel : Form
     {
-        private readonly NtServiceClient? _client;
+        private readonly ServiceClient? _client;
 
         public FormConnectTunnel()
         {
             InitializeComponent();
         }
 
-        public FormConnectTunnel(NtServiceClient client)
+        public FormConnectTunnel(ServiceClient client)
         {
             InitializeComponent();
 
@@ -71,7 +71,7 @@ namespace NetTunnel.UI.Forms
 
                 var tunnelId = Guid.NewGuid(); //The TunnelId is the same on both services.
 
-                var tunnel = new NtTunnelConfiguration(_client.ServiceId, tunnelId, textBoxName.Text,
+                var tunnel = new TunnelConfiguration(_client.ServiceId, tunnelId, textBoxName.Text,
                     textBoxRemoteAddress.Text, textBoxManagementPort.ValueAs<int>(),
                     textBoxRemoteUsername.Text, Utility.ComputeSha256Hash(textBoxRemotePassword.Text));
 
@@ -81,7 +81,7 @@ namespace NetTunnel.UI.Forms
                 try
                 {
                     //Just to test the login.
-                    var remoteClient = NtServiceClient.CreateConnectAndLogin(tunnel.Address,
+                    var remoteClient = ServiceClient.CreateConnectAndLogin(tunnel.Address,
                         tunnel.ManagementPort, tunnel.Username, tunnel.PasswordHash).ContinueWith(async x =>
                         {
                             if (!x.IsCompletedSuccessfully)

@@ -16,9 +16,9 @@ namespace NetTunnel.Service
                     rc.RestartService(1);
                 });
 
-                x.Service<NetTunnelService>(s =>
+                x.Service<SystemService>(s =>
                 {
-                    s.ConstructUsing(hostSettings => new NetTunnelService());
+                    s.ConstructUsing(hostSettings => new SystemService());
                     s.WhenStarted(tc => tc.Start());
                     s.WhenStopped(tc => tc.Stop());
                 });

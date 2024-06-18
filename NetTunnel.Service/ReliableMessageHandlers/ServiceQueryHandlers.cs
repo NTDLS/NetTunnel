@@ -34,7 +34,7 @@ namespace NetTunnel.Service.ReliableMessageHandlers
         {
             var connectionContext = EnforceCryptographyAndGetServiceConnectionContext(context);
 
-            if (Singletons.Core.Users.ValidatePassword(query.UserName, query.PasswordHash))
+            if (Singletons.ServiceEngine.Users.ValidatePassword(query.UserName, query.PasswordHash))
             {
                 connectionContext.SetAuthenticated(query.UserName);
 
@@ -53,7 +53,7 @@ namespace NetTunnel.Service.ReliableMessageHandlers
 
             return new QueryGetTunnelsReply
             {
-                Collection = Singletons.Core.Tunnels.Clone(),
+                Collection = Singletons.ServiceEngine.Tunnels.Clone(),
             };
         }
 
@@ -61,7 +61,7 @@ namespace NetTunnel.Service.ReliableMessageHandlers
         {
             var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
-            Singletons.Core.Tunnels.UpsertTunnel(query.Configuration);
+            Singletons.ServiceEngine.Tunnels.UpsertTunnel(query.Configuration);
 
             return new QueryCreateTunnelReply();
         }
@@ -75,10 +75,10 @@ namespace NetTunnel.Service.ReliableMessageHandlers
 
         public QueryUpsertEndpointReply OnQueryUpsertEndpoint(QueryUpsertEndpoint query)
         {
-            Singletons.Core.Tunnels.UpsertEndpoint(query.TunnelId, query.Configuration);
+            Singletons.ServiceEngine.Tunnels.UpsertEndpoint(query.TunnelId, query.Configuration);
 
             //Since we have a tunnel, we will communicate the alteration of endpoints though the tunnel.
-            //var result = await Singletons.Core.InboundTunnels
+            //var result = await Singletons.ServiceEngine.InboundTunnels
             //    .DispatchUpsertEndpointOutboundToAssociatedTunnelService<oldQueryReplyPayloadBoolean>(tunnelId, endpoint.Outbound);
 
             return new QueryUpsertEndpointReply();
@@ -88,7 +88,7 @@ namespace NetTunnel.Service.ReliableMessageHandlers
         {
             var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
-            Singletons.Core.Tunnels.RegisterTunnel(context.ConnectionId, query.Configuration);
+            Singletons.ServiceEngine.Tunnels.RegisterTunnel(context.ConnectionId, query.Configuration);
 
             return new QueryRegisterTunnelReply();
         }

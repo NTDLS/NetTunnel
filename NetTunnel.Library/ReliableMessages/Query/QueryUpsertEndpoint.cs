@@ -6,9 +6,9 @@ namespace NetTunnel.Library.ReliableMessages.Query
     public class QueryUpsertEndpoint : IRmQuery<QueryUpsertEndpointReply>
     {
         public Guid TunnelId { get; set; }
-        public NtEndpointConfiguration Configuration { get; set; }
+        public EndpointConfiguration Configuration { get; set; }
 
-        public QueryUpsertEndpoint(Guid tunnelId, NtEndpointConfiguration configuration)
+        public QueryUpsertEndpoint(Guid tunnelId, EndpointConfiguration configuration)
         {
             TunnelId = tunnelId;
             Configuration = configuration;

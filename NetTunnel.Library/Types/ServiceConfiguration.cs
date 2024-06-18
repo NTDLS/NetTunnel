@@ -1,6 +1,6 @@
 ﻿namespace NetTunnel.Library.Types
 {
-    public class NtServiceConfiguration
+    public class ServiceConfiguration
     {
         /// <summary>
         /// The id for this instance of the tunnel service.

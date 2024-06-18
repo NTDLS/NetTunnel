@@ -1,6 +1,6 @@
 ﻿namespace NetTunnel.Library.Types
 {
-    public class NtTunnelConfiguration
+    public class TunnelConfiguration
     {
         /// <summary>
         /// The id of the service that owns this tunnel.
@@ -12,13 +12,13 @@
         public int ManagementPort { get; set; }
         public string Username { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
-        public List<NtEndpointConfiguration> Endpoints { get; set; } = new();
+        public List<EndpointConfiguration> Endpoints { get; set; } = new();
 
-        public NtTunnelConfiguration()
+        public TunnelConfiguration()
         {
         }
 
-        public NtTunnelConfiguration(Guid serviceId, Guid tunnelId, string name, string address, int managementPort, string username, string passwordHash)
+        public TunnelConfiguration(Guid serviceId, Guid tunnelId, string name, string address, int managementPort, string username, string passwordHash)
         {
             ServiceId = serviceId;
             TunnelId = tunnelId;
@@ -29,9 +29,9 @@
             PasswordHash = passwordHash;
         }
 
-        public NtTunnelConfiguration CloneConfiguration()
+        public TunnelConfiguration CloneConfiguration()
         {
-            var clone = new NtTunnelConfiguration
+            var clone = new TunnelConfiguration
             {
                 TunnelId = TunnelId,
                 Name = Name,

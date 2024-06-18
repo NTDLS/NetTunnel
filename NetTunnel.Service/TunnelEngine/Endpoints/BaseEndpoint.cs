@@ -18,7 +18,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         public ulong CurrentConnections { get; internal set; }
         public Guid EndpointId { get; private set; }
 
-        internal readonly ServiceEngine _core;
+        internal readonly ServiceEngine _serviceEngine;
         internal readonly ITunnel _tunnel;
         public bool KeepRunning { get; internal set; } = false;
 
@@ -26,14 +26,14 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         internal readonly PessimisticCriticalResource<Dictionary<Guid, ActiveEndpointConnection>> _activeConnections = new();
 
-        public NtEndpointConfiguration Configuration { get; private set; }
+        public EndpointConfiguration Configuration { get; private set; }
 
-        public BaseEndpoint(ServiceEngine core, ITunnel tunnel,
-            Guid endpointId, NtEndpointConfiguration configuration)
+        public BaseEndpoint(ServiceEngine serviceEngine, ITunnel tunnel,
+            Guid endpointId, EndpointConfiguration configuration)
         {
             Configuration = configuration;
 
-            _core = core;
+            _serviceEngine = serviceEngine;
             _tunnel = tunnel;
             EndpointId = endpointId;
             _heartbeatThread = new Thread(HeartbeatThreadProc);
@@ -148,7 +148,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 {
                     //SEARCH FOR: Process:Endpoint:Connect:001: If this is an inbound endpoint, then let the remote service know that we just received a
                     //  connection so that it came make the associated outbound connection.
-                    _tunnel.NotificationEndpointConnect(_tunnel.Configuration.TunnelId, EndpointId, activeConnection.StreamId);
+                    _tunnel.SendNotificationOfEndpointConnect(_tunnel.Configuration.TunnelId, EndpointId, activeConnection.StreamId);
                 }
 
                 var httpHeaderBuilder = new StringBuilder();
@@ -208,7 +208,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                     #endregion
 
-                    _tunnel.NotificationEndpointExchange(_tunnel.Configuration.TunnelId,
+                    _tunnel.SendNotificationOfEndpointDataExchange(_tunnel.Configuration.TunnelId,
                         Configuration.EndpointId, activeConnection.StreamId, buffer.Bytes, buffer.Length);
 
                     buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);
@@ -221,21 +221,21 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     if (sockEx.SocketErrorCode == SocketError.ConnectionAborted)
                     {
                         //We don't typically care about this. This is something as simple as a user closing a web-browser.
-                        _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"EndpointDataExchangeThreadProc: {ex.Message}");
+                        _tunnel.ServiceEngine.Logging.Write(Constants.NtLogSeverity.Verbose, $"EndpointDataExchangeThreadProc: {ex.Message}");
                     }
                     else
                     {
-                        _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Exception, $"EndpointDataExchangeThreadProc: {ex.Message}");
+                        _tunnel.ServiceEngine.Logging.Write(Constants.NtLogSeverity.Exception, $"EndpointDataExchangeThreadProc: {ex.Message}");
                     }
                 }
                 else
                 {
-                    _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Exception, $"EndpointDataExchangeThreadProc: {ex.Message}");
+                    _tunnel.ServiceEngine.Logging.Write(Constants.NtLogSeverity.Exception, $"EndpointDataExchangeThreadProc: {ex.Message}");
                 }
             }
             catch (Exception ex)
             {
-                _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Exception, $"EndpointDataExchangeThreadProc: {ex.Message}");
+                _tunnel.ServiceEngine.Logging.Write(Constants.NtLogSeverity.Exception, $"EndpointDataExchangeThreadProc: {ex.Message}");
             }
             finally
             {

@@ -7,15 +7,15 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormAddUser : Form
     {
-        private readonly NtServiceClient? _client;
-        public NtUser? CreatedUser { get; set; }
+        private readonly ServiceClient? _client;
+        public User? CreatedUser { get; set; }
 
         public FormAddUser()
         {
             InitializeComponent();
         }
 
-        public FormAddUser(NtServiceClient? client)
+        public FormAddUser(ServiceClient? client)
         {
             InitializeComponent();
 
@@ -38,7 +38,7 @@ namespace NetTunnel.UI.Forms
                 if (textBoxPassword.Text != textBoxConfirmPassword.Text)
                     throw new Exception("The password and confirm-passwords must match.");
 
-                CreatedUser = new NtUser(textBoxUsername.Text, Utility.ComputeSha256Hash(textBoxPassword.Text));
+                CreatedUser = new User(textBoxUsername.Text, Utility.ComputeSha256Hash(textBoxPassword.Text));
 
                 buttonSave.InvokeEnableControl(false);
 

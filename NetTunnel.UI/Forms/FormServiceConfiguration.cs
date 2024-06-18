@@ -6,14 +6,14 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormServiceConfiguration : Form
     {
-        private readonly NtServiceClient? _client;
+        private readonly ServiceClient? _client;
 
         public FormServiceConfiguration()
         {
             InitializeComponent();
         }
 
-        public FormServiceConfiguration(NtServiceClient client)
+        public FormServiceConfiguration(ServiceClient client)
         {
             InitializeComponent();
 
@@ -72,7 +72,7 @@ namespace NetTunnel.UI.Forms
             CancelButton = buttonCancel;
         }
 
-        public void SetFormConfigurationValues(NtServiceConfiguration configuration)
+        public void SetFormConfigurationValues(ServiceConfiguration configuration)
         {
             if (InvokeRequired)
             {
@@ -99,7 +99,7 @@ namespace NetTunnel.UI.Forms
         {
             try
             {
-                var configuration = new NtServiceConfiguration();
+                var configuration = new ServiceConfiguration();
 
                 #region Get and validate form values .
 
