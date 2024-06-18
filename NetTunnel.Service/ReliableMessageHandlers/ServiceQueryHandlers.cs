@@ -79,14 +79,11 @@ namespace NetTunnel.Service.ReliableMessageHandlers
             return new QueryPingReply(query.OriginationTimestamp);
         }
 
-        public QueryUpsertEndpointReply OnQueryUpsertEndpoint(QueryUpsertEndpoint query)
+        public QueryUpsertEndpointReply OnQueryUpsertEndpoint(RmContext context, QueryUpsertEndpoint query)
         {
+            var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
             Singletons.ServiceEngine.Tunnels.UpsertEndpoint(query.TunnelId, query.Configuration);
-
-            //Since we have a tunnel, we will communicate the alteration of endpoints though the tunnel.
-            //var result = await Singletons.ServiceEngine.InboundTunnels
-            //    .DispatchUpsertEndpointOutboundToAssociatedTunnelService<oldQueryReplyPayloadBoolean>(tunnelId, endpoint.Outbound);
-
             return new QueryUpsertEndpointReply();
         }
 
@@ -97,6 +94,26 @@ namespace NetTunnel.Service.ReliableMessageHandlers
             Singletons.ServiceEngine.Tunnels.RegisterTunnel(context.ConnectionId, query.Configuration);
 
             return new QueryRegisterTunnelReply();
+        }
+
+        public QueryGetTunnelStatisticsReply OnQueryGetTunnelStatistics(RmContext context, QueryGetTunnelStatistics query)
+        {
+            var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+            return new QueryGetTunnelStatisticsReply()
+            {
+                Statistics = Singletons.ServiceEngine.Tunnels.GetStatistics()
+            };
+        }
+
+        public QueryDeleteEndpointReply OnQueryDeleteEndpoint(RmContext context, QueryDeleteEndpoint query)
+        {
+            var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+            //We want to stop and delete the tunnel locally.
+            Singletons.ServiceEngine.Tunnels.DeleteTunnel(query.TunnelId);
+
+            return new QueryDeleteEndpointReply();
         }
     }
 }

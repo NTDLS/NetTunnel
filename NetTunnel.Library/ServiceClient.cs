@@ -19,6 +19,8 @@ namespace NetTunnel.Library
         private readonly string _userName;
         private readonly string _passwordHash;
 
+        public string Address { get { return _address; } }
+
         /// <summary>
         /// The id of the service that we are logged into.
         /// </summary>
@@ -133,8 +135,14 @@ namespace NetTunnel.Library
             }).Result;
         }
 
+        public async Task<QueryGetTunnelStatisticsReply> QueryGetTunnelStatistics()
+            => await Client.Query(new QueryGetTunnelStatistics());
+
         public async Task<QueryCreateTunnelReply> QueryCreateTunnel(TunnelConfiguration configuration)
             => await Client.Query(new QueryCreateTunnel(configuration));
+
+        public async Task<QueryDeleteEndpointReply> QueryDeleteEndpoint(Guid tunnelId, Guid endpointId)
+            => await Client.Query(new QueryDeleteEndpoint(tunnelId, endpointId));
 
         public async Task<QueryGetTunnelsReply> QueryGetTunnels()
             => await Client.Query(new QueryGetTunnels());
@@ -147,6 +155,9 @@ namespace NetTunnel.Library
 
         public void NotificationEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId)
             => Client.Notify(new NotificationEndpointConnect(tunnelId, endpointId, streamId));
+
+        public void SendNotificationOfTunnelDeletion(Guid tunnelId)
+            => Client.Notify(new NotificationTunnelDeletion(tunnelId));
 
         public void NotificationEndpointExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
             => Client.Notify(new NotificationEndpointDataExchange(tunnelId, endpointId, streamId, bytes, length));

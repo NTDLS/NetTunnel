@@ -28,7 +28,6 @@ namespace NetTunnel.UI.Forms
 
         #endregion
 
-
         private void FormMain_Load(object sender, EventArgs e)
         {
             Shown += (object? sender, EventArgs e) =>
@@ -90,8 +89,8 @@ namespace NetTunnel.UI.Forms
                 {
                     if (formLogin.ShowDialog() == DialogResult.OK)
                     {
-                        //Text = $"{Constants.FriendlyName} : {formLogin.Address} {(formLogin.UseSSL ? "" : " : [INSECURE]")}";
-                        _client = formLogin.ResultingClient;
+                        _client = formLogin.ResultingClient.EnsureNotNull();
+                        Text = $"{FriendlyName} : {_client.Address}";
                         RepopulateTunnelsGrid();
                         return true;
                     }
@@ -126,76 +125,66 @@ namespace NetTunnel.UI.Forms
 
             try
             {
-                /*
                 if (_client != null && _client.IsConnected)
                 {
-                    _client.GetStatistics().ContinueWith(o =>
+                    _client.QueryGetTunnelStatistics().ContinueWith(o =>
                     {
-                        if (o.Result.Success)
+                        int allTunnelAndEndpointHashes = o.Result.AllTunnelIdAndEndpointIdHashes();
+
+                        if (allTunnelAndEndpointHashes != _allTunnelAndEndpointHashes && _allTunnelAndEndpointHashes != -1)
                         {
-                            int allTunnelAndEndpointHashes = o.Result.AllTunnelIdAndEndpointIdHashes();
-
-                            if (allTunnelAndEndpointHashes != _allTunnelAndEndpointHashes && _allTunnelAndEndpointHashes != -1)
-                            {
-                                _needToRepopulateTunnels = true;
-                            }
-                            _allTunnelAndEndpointHashes = allTunnelAndEndpointHashes;
-
-                            PopulateEndpointStatistics(o.Result.Statistics);
-                            PopulateTunnelStatistics(o.Result.Statistics);
+                            _needToRepopulateTunnels = true;
                         }
+                        _allTunnelAndEndpointHashes = allTunnelAndEndpointHashes;
+
+                        PopulateEndpointStatistics(o.Result.Statistics);
+                        PopulateTunnelStatistics(o.Result.Statistics);
                     });
                 }
-                */
-
-
-
 
                 void PopulateEndpointStatistics(List<TunnelStatistics> statistics)
                 {
                     if (listViewEndpoints.InvokeRequired)
                     {
                         listViewEndpoints.Invoke(PopulateEndpointStatistics, statistics);
+                        return;
                     }
-                    else
+                    listViewEndpoints.BeginUpdate();
+
+                    foreach (ListViewItem item in listViewEndpoints.Items)
                     {
-                        listViewEndpoints.BeginUpdate();
+                        var epTag = ((EndpointTag?)item.Tag).EnsureNotNull();
 
-                        foreach (ListViewItem item in listViewEndpoints.Items)
+                        var tunnelStats = statistics.Where(o => o.TunnelId == epTag.Tunnel.TunnelId).ToList();
+                        if (tunnelStats != null)
                         {
-                            var epTag = ((EndpointTag?)item.Tag).EnsureNotNull();
-
-                            var tunnelStats = statistics.Where(o => o.TunnelId == epTag.Tunnel.TunnelId).ToList();
-                            if (tunnelStats != null)
+                            var endpointStats = tunnelStats.SelectMany(o => o.EndpointStatistics)
+                                .Where(o => o.EndpointId == epTag.Endpoint.EndpointId && o.Direction == epTag.Endpoint.Direction).SingleOrDefault();
+                            if (endpointStats != null)
                             {
-                                var endpointStats = tunnelStats.SelectMany(o => o.EndpointStatistics)
-                                    .Where(o => o.EndpointId == epTag.Endpoint.EndpointId && o.Direction == epTag.Endpoint.Direction).SingleOrDefault();
-                                if (endpointStats != null)
+                                double compressionRatio = 0;
+                                if (endpointStats.BytesSentKb > 0 && endpointStats.BytesReceivedKb > 0)
                                 {
-                                    double compressionRatio = 0;
-                                    if (endpointStats.BytesSentKb > 0 && endpointStats.BytesReceivedKb > 0)
+                                    if (endpointStats.BytesSentKb > endpointStats.BytesReceivedKb)
                                     {
-                                        if (endpointStats.BytesSentKb > endpointStats.BytesReceivedKb)
-                                        {
-                                            compressionRatio = 100 - (endpointStats.BytesReceivedKb / endpointStats.BytesSentKb) * 100.0;
-                                        }
-                                        else
-                                        {
-                                            compressionRatio = 100 - (endpointStats.BytesSentKb / endpointStats.BytesReceivedKb) * 100.0;
-                                        }
+                                        compressionRatio = 100 - (endpointStats.BytesReceivedKb / endpointStats.BytesSentKb) * 100.0;
                                     }
-
-                                    item.SubItems[columnHeaderEndpointBytesSent.Index].Text = $"{endpointStats.BytesSentKb:n0}";
-                                    item.SubItems[columnHeaderEndpointBytesReceived.Index].Text = $"{endpointStats.BytesReceivedKb:n0}";
-                                    item.SubItems[columnHeaderEndpointTotalConnections.Index].Text = $"{endpointStats.TotalConnections:n0}";
-                                    item.SubItems[columnHeaderEndpointCurrentConenctions.Index].Text = $"{endpointStats.CurrentConnections:n0}";
-                                    item.SubItems[columnHeaderCompressionRatio.Index].Text = $"{compressionRatio:n2}";
+                                    else
+                                    {
+                                        compressionRatio = 100 - (endpointStats.BytesSentKb / endpointStats.BytesReceivedKb) * 100.0;
+                                    }
                                 }
+
+                                item.SubItems[columnHeaderEndpointBytesSent.Index].Text = $"{endpointStats.BytesSentKb:n0}";
+                                item.SubItems[columnHeaderEndpointBytesReceived.Index].Text = $"{endpointStats.BytesReceivedKb:n0}";
+                                item.SubItems[columnHeaderEndpointTotalConnections.Index].Text = $"{endpointStats.TotalConnections:n0}";
+                                item.SubItems[columnHeaderEndpointCurrentConenctions.Index].Text = $"{endpointStats.CurrentConnections:n0}";
+                                item.SubItems[columnHeaderCompressionRatio.Index].Text = $"{compressionRatio:n2}";
                             }
                         }
-
-                        listViewEndpoints.EndUpdate();
                     }
+
+                    listViewEndpoints.EndUpdate();
                 }
 
                 void PopulateTunnelStatistics(List<TunnelStatistics> statistics)
@@ -203,44 +192,42 @@ namespace NetTunnel.UI.Forms
                     if (listViewTunnels.InvokeRequired)
                     {
                         listViewTunnels.Invoke(PopulateTunnelStatistics, statistics);
+                        return;
                     }
-                    else
+                    listViewTunnels.BeginUpdate();
+
+                    foreach (ListViewItem item in listViewTunnels.Items)
                     {
-                        listViewTunnels.BeginUpdate();
+                        var tTag = ((TunnelTag?)item.Tag).EnsureNotNull();
 
-                        foreach (ListViewItem item in listViewTunnels.Items)
+                        var tunnelStats = statistics.Where(o => o.TunnelId == tTag.Tunnel.TunnelId).SingleOrDefault();
+                        if (tunnelStats != null)
                         {
-                            var tTag = ((TunnelTag?)item.Tag).EnsureNotNull();
 
-                            var tunnelStats = statistics.Where(o => o.TunnelId == tTag.Tunnel.TunnelId).SingleOrDefault();
-                            if (tunnelStats != null)
+                            item.SubItems[columnHeaderTunnelBytesSent.Index].Text = $"{tunnelStats.BytesSentKb:n0}";
+                            item.SubItems[columnHeaderTunnelBytesReceived.Index].Text = $"{tunnelStats.BytesReceivedKb:n0}";
+                            item.SubItems[columnHeaderTunnelStatus.Index].Text = tunnelStats.Status.ToString();
+
+                            switch (tunnelStats.Status)
                             {
-
-                                item.SubItems[columnHeaderTunnelBytesSent.Index].Text = $"{tunnelStats.BytesSentKb:n0}";
-                                item.SubItems[columnHeaderTunnelBytesReceived.Index].Text = $"{tunnelStats.BytesReceivedKb:n0}";
-                                item.SubItems[columnHeaderTunnelStatus.Index].Text = tunnelStats.Status.ToString();
-
-                                switch (tunnelStats.Status)
-                                {
-                                    case NtTunnelStatus.Connecting:
-                                    case NtTunnelStatus.Disconnected:
-                                        item.BackColor = Color.FromArgb(255, 200, 200);
-                                        break;
-                                    case NtTunnelStatus.Stopped:
-                                        item.BackColor = Color.FromArgb(255, 200, 0);
-                                        break;
-                                    case NtTunnelStatus.Established:
-                                        item.BackColor = Color.FromArgb(200, 255, 200);
-                                        break;
-                                    default:
-                                        item.BackColor = Color.FromArgb(255, 255, 255);
-                                        break;
-                                }
+                                case NtTunnelStatus.Connecting:
+                                case NtTunnelStatus.Disconnected:
+                                    item.BackColor = Color.FromArgb(255, 200, 200);
+                                    break;
+                                case NtTunnelStatus.Stopped:
+                                    item.BackColor = Color.FromArgb(255, 200, 0);
+                                    break;
+                                case NtTunnelStatus.Established:
+                                    item.BackColor = Color.FromArgb(200, 255, 200);
+                                    break;
+                                default:
+                                    item.BackColor = Color.FromArgb(255, 255, 255);
+                                    break;
                             }
                         }
-
-                        listViewTunnels.EndUpdate();
                     }
+
+                    listViewTunnels.EndUpdate();
                 }
             }
             catch
@@ -336,60 +323,25 @@ namespace NetTunnel.UI.Forms
                     }
                     else if (e.ClickedItem?.Text == "Delete Endpoint")
                     {
-                        /*
-                        var selectedEndpoint = (selectedEndpointRow?.Tag as EndpointTag).EnsureNotNull();
+                        var eTag = (selectedEndpointRow?.Tag as EndpointTag).EnsureNotNull();
 
-                        if (MessageBox.Show($"Delete the endpoint '{selectedEndpoint.Name}'?",
+                        if (MessageBox.Show($"Delete the endpoint '{eTag.Endpoint.Name}'?",
                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                         {
                             return;
                         }
 
-                        if (selectedTunnel is NtTunnelInboundConfiguration tunnelInbound)
+                        _client.EnsureNotNull().QueryDeleteEndpoint(eTag.Tunnel.TunnelId, eTag.Endpoint.EndpointId).ContinueWith((o) =>
                         {
-                            _client.TunnelInbound.DeleteEndpointPair(tunnelInbound.TunnelId, selectedEndpoint.EndpointId).ContinueWith((o) =>
+                            if (o.IsCompletedSuccessfully == false)
                             {
-                                if (o.IsCompletedSuccessfully == false)
+                                Invoke(new Action(() =>
                                 {
-                                    Invoke(new Action(() =>
-                                    {
-                                        if (MessageBox.Show(this, $"Failed to delete the remote endpoint, would you like to delete the local one anyway?",
-                                        FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                                        {
-                                            //If the pair deletion failed, just delete the local endpoint.
-                                            _client.TunnelInbound.DeleteEndpoint(tunnelInbound.TunnelId, selectedEndpoint.EndpointId).ContinueWith((o) =>
-                                            {
-                                                _needToRepopulateTunnels = true;
-                                            });
-                                        }
-                                    }));
-                                }
-                            });
-                        }
-                        else if (selectedTunnel is NtTunnelOutboundConfiguration tunnelOutbound)
-                        {
-                            _client.TunnelOutbound.DeleteEndpointPair(tunnelOutbound.TunnelId, selectedEndpoint.EndpointId).ContinueWith((o) =>
-                            {
-                                if (o.IsCompletedSuccessfully == false)
-                                {
-                                    Invoke(new Action(() =>
-                                    {
-                                        if (MessageBox.Show(this, $"Failed to delete the remote endpoint, would you like to delete the local one anyway?",
-                                            FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                                        {
-                                            //If the pair deletion failed, just delete the local endpoint.
-                                            _client.TunnelOutbound.DeleteEndpoint(tunnelOutbound.TunnelId, selectedEndpoint.EndpointId).ContinueWith((o) =>
-                                            {
-                                                _needToRepopulateTunnels = true;
-                                            });
-                                        }
-                                    }));
-                                }
-                            });
+                                    _needToRepopulateTunnels = true;
+                                }));
+                            }
+                        });
 
-                        }
-
-                    */
                         listViewEndpoints.InvokeClearListViewRows();
                     }
                 };

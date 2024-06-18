@@ -54,6 +54,9 @@ namespace NetTunnel.Service.TunnelEngine
         public override void SendNotificationOfEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId)
             => _client.NotificationEndpointConnect(tunnelId, endpointId, streamId);
 
+        public override void SendNotificationOfTunnelDeletion(Guid tunnelId)
+            => _client.SendNotificationOfTunnelDeletion(tunnelId);
+
         private void _client_OnDisconnected(RmContext context)
         {
             Status = NtTunnelStatus.Disconnected;
@@ -118,6 +121,8 @@ namespace NetTunnel.Service.TunnelEngine
                         _client.ConnectAndLogin().Wait();
 
                         _client.QueryRegisterTunnel(Configuration).Wait();
+
+                        Status = NtTunnelStatus.Established;
 
                         CurrentConnections++;
                         TotalConnections++;

@@ -76,9 +76,15 @@ namespace NetTunnel.Service.TunnelEngine
         /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
 
         public void SendNotificationOfEndpointConnect(Guid connectionId, Guid tunnelId, Guid endpointId, Guid streamId)
-        {
-            _messageServer.Notify(connectionId, new NotificationEndpointConnect(tunnelId, endpointId, streamId));
-        }
+            => _messageServer.Notify(connectionId, new NotificationEndpointConnect(tunnelId, endpointId, streamId));
+
+        /// <summary>
+        /// Notify the remote tunnel service that the tunnel is being deleted.
+        /// </summary>
+        /// <param name="connectionId"></param>
+        /// <param name="tunnelId"></param>
+        public void SendNotificationOfTunnelDeletion(Guid connectionId, Guid tunnelId)
+            => _messageServer.Notify(connectionId, new NotificationTunnelDeletion(tunnelId));
 
         /// <summary>
         /// Sends a notification to the remote tunnel service containing the data that was received
@@ -91,9 +97,7 @@ namespace NetTunnel.Service.TunnelEngine
         /// <param name="bytes">Bytes to be sent to endpoint connection.</param>
         /// <param name="length">Number of bytes to be sent to the endpoint connection.</param>
         public void SendNotificationOfEndpointDataExchange(Guid connectionId, Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
-        {
-            _messageServer.Notify(connectionId, new NotificationEndpointDataExchange(tunnelId, endpointId, streamId, bytes, length));
-        }
+            => _messageServer.Notify(connectionId, new NotificationEndpointDataExchange(tunnelId, endpointId, streamId, bytes, length));
 
         private void ServiceEngine_OnConnected(RmContext context)
         {
@@ -103,6 +107,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         private void ServiceEngine_OnDisconnected(RmContext context)
         {
+            Tunnels.DeregisterTunnel(context.ConnectionId);
             ServiceConnectionStates.Remove(context.ConnectionId);
         }
 

@@ -32,5 +32,12 @@ namespace NetTunnel.Service.ReliableMessageHandlers
 
             //Singletons.ServiceEngine.Logger.Debug($"Received endpoint data exchange.");
         }
+
+        public void OnNotificationTunnelDeletion(RmContext context, NotificationTunnelDeletion notification)
+        {
+            var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
+
+            Singletons.ServiceEngine.Tunnels.DeleteTunnel(notification.TunnelId);
+        }
     }
 }

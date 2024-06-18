@@ -28,10 +28,12 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             => o.Single(o => o.Configuration.TunnelId == tunnelId).Stop());
 
         public void StartAll()
-            => Collection.Use((o) => o.ForEach((o) => o.Start()));
+            => Collection.Use((o)
+                => o.ForEach((o) => o.Start()));
 
         public void StopAll()
-            => Collection.Use((o) => o.ForEach((o) => o.Stop()));
+            => Collection.Use((o)
+                => o.ForEach((o) => o.Stop()));
 
         #endregion
 
@@ -56,6 +58,22 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 o.Add(newTunnel.EnsureNotNull());
 
                 SaveToDisk();
+            });
+        }
+
+        public void DeleteTunnel(Guid tunnelId)
+        {
+            Collection.Use((o) =>
+            {
+                var existingTunnel = o.Where(o => o.Configuration.TunnelId == tunnelId).SingleOrDefault();
+                if (existingTunnel != null)
+                {
+                    existingTunnel.SendNotificationOfTunnelDeletion(tunnelId);
+
+                    existingTunnel.Stop();
+                    o.Remove(existingTunnel);
+                    SaveToDisk();
+                }
             });
         }
 
@@ -84,6 +102,24 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 o.Add(newTunnel.EnsureNotNull());
 
                 newTunnel.Start();
+            });
+        }
+
+        /// <summary>
+        /// A remote tunnel service has disconnected.
+        /// </summary>
+        /// <param name="connectionId"></param>
+        /// <param name="config"></param>
+        public void DeregisterTunnel(Guid connectionId)
+        {
+            Collection.Use((o) =>
+            {
+                var existingTunnel = o.OfType<TunnelInbound>().Where(o => o.ConnectionId == connectionId).SingleOrDefault();
+                if (existingTunnel != null)
+                {
+                    existingTunnel.Stop();
+                    o.Remove(existingTunnel);
+                }
             });
         }
 
@@ -120,6 +156,19 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         }
 
         #endregion
+
+        /// <summary>
+        /// Returns true if the local service owns the tunnel.
+        /// </summary>
+        /// <param name="tunnelId"></param>
+        /// <returns></returns>
+        public bool IsOwned(Guid tunnelId)
+        {
+            return Collection.Use((o) =>
+            {
+                return o.Single(o => o.Configuration.TunnelId == tunnelId).Configuration.ServiceId == Singletons.Configuration.ServiceId;
+            });
+        }
 
         /// <summary>
         /// A remote service is telling the local service that an inbound connection has been made to an

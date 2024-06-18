@@ -23,6 +23,8 @@ namespace NetTunnel.Service.TunnelEngine
             : base(serviceEngine, configuration)
         {
             ConnectionId = connectionId;
+
+            Status = Library.Constants.NtTunnelStatus.Established;
         }
 
         /// <summary>
@@ -55,6 +57,12 @@ namespace NetTunnel.Service.TunnelEngine
         {
             //Inbound tunnels communicate all data through the ServiceEngine._messageServer based on the ConnectionId.
             ServiceEngine.SendNotificationOfEndpointConnect(ConnectionId, tunnelId, endpointId, streamId);
+        }
+
+        public override void SendNotificationOfTunnelDeletion(Guid tunnelId)
+        {
+            //Inbound tunnels communicate all data through the ServiceEngine._messageServer based on the ConnectionId.
+            ServiceEngine.SendNotificationOfTunnelDeletion(ConnectionId, tunnelId);
         }
 
         public override void Start()

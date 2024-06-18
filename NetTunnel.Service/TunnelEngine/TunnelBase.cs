@@ -52,7 +52,6 @@ namespace NetTunnel.Service.TunnelEngine
 
             Configuration.Endpoints.Where(o => o.Direction == NtDirection.Outbound)
                 .ToList().ForEach(o => Endpoints.Add(new EndpointOutbound(ServiceEngine, this, o)));
-
         }
 
         public IEndpoint? GetEndpointById(Guid pairId)
@@ -170,6 +169,9 @@ namespace NetTunnel.Service.TunnelEngine
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
         public virtual void SendNotificationOfEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId)
+            => throw new NotImplementedException("This function should be overridden.");
+
+        public virtual void SendNotificationOfTunnelDeletion(Guid tunnelId)
             => throw new NotImplementedException("This function should be overridden.");
     }
 }

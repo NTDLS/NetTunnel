@@ -42,5 +42,7 @@ namespace NetTunnel.Service.TunnelEngine
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
         public void SendNotificationOfEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId);
+
+        public void SendNotificationOfTunnelDeletion(Guid tunnelId);
     }
 }
