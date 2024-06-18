@@ -98,7 +98,7 @@ namespace NetTunnel.Library
             var cryptographyProvider = new ClientCryptographyProvider(compoundNegotiator.SharedSecret);
 
             _logger.Verbose(
-                $"Tunnel cryptography initialized {compoundNegotiator.SharedSecret.Length * 8}bits, hash {Utility.ComputeSha256Hash(compoundNegotiator.SharedSecret)}.");
+                $"Tunnel cryptography initialized to {compoundNegotiator.SharedSecret.Length * 8}bits. Hash {Utility.ComputeSha256Hash(compoundNegotiator.SharedSecret)}.");
 
             //Tell the server we are switching to encryption.
             Client.Notify(new NotificationApplyCryptography());

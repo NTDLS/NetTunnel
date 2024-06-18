@@ -182,62 +182,62 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-    #endregion
+        #endregion
 
-    public List<TunnelConfiguration> Clone()
-    {
-        return Collection.Use((o) =>
+        public List<TunnelConfiguration> Clone()
         {
-            List<TunnelConfiguration> clones = new();
-            foreach (var tunnel in o)
+            return Collection.Use((o) =>
             {
-                clones.Add(tunnel.CloneConfiguration());
-            }
-            return clones;
-        });
-    }
-
-    public List<TunnelStatistics> GetStatistics()
-    {
-        var result = new List<TunnelStatistics>();
-
-        Collection.Use((o) =>
-        {
-            foreach (var tunnel in o)
-            {
-                var tunnelStats = new TunnelStatistics()
+                List<TunnelConfiguration> clones = new();
+                foreach (var tunnel in o)
                 {
-                    Direction = tunnel.Configuration.ServiceId == Singletons.Configuration.ServiceId ? NtDirection.Outbound : NtDirection.Inbound,
-                    Status = tunnel.Status,
-                    TunnelId = tunnel.Configuration.TunnelId,
-                    BytesReceived = tunnel.BytesReceived,
-                    BytesSent = tunnel.BytesSent,
-                    CurrentConnections = tunnel.CurrentConnections,
-                    TotalConnections = tunnel.TotalConnections,
-                    ChangeHash = tunnel.GetHashCode()
-                };
-
-                foreach (var endpoint in tunnel.Endpoints)
-                {
-                    var endpointStats = new EndpointStatistics()
-                    {
-                        Direction = endpoint.Configuration.Direction,
-                        BytesReceived = endpoint.BytesReceived,
-                        BytesSent = endpoint.BytesSent,
-                        EndpointId = endpoint.EndpointId,
-                        TunnelId = tunnel.Configuration.TunnelId,
-                        CurrentConnections = endpoint.CurrentConnections,
-                        TotalConnections = endpoint.TotalConnections,
-                        ChangeHash = endpoint.GetHashCode()
-                    };
-                    tunnelStats.EndpointStatistics.Add(endpointStats);
+                    clones.Add(tunnel.CloneConfiguration());
                 }
+                return clones;
+            });
+        }
 
-                result.Add(tunnelStats);
-            }
-        });
+        public List<TunnelStatistics> GetStatistics()
+        {
+            var result = new List<TunnelStatistics>();
 
-        return result;
+            Collection.Use((o) =>
+            {
+                foreach (var tunnel in o)
+                {
+                    var tunnelStats = new TunnelStatistics()
+                    {
+                        Direction = tunnel.Configuration.ServiceId == Singletons.Configuration.ServiceId ? NtDirection.Outbound : NtDirection.Inbound,
+                        Status = tunnel.Status,
+                        TunnelId = tunnel.Configuration.TunnelId,
+                        BytesReceived = tunnel.BytesReceived,
+                        BytesSent = tunnel.BytesSent,
+                        CurrentConnections = tunnel.CurrentConnections,
+                        TotalConnections = tunnel.TotalConnections,
+                        ChangeHash = tunnel.GetHashCode()
+                    };
+
+                    foreach (var endpoint in tunnel.Endpoints)
+                    {
+                        var endpointStats = new EndpointStatistics()
+                        {
+                            Direction = endpoint.Configuration.Direction,
+                            BytesReceived = endpoint.BytesReceived,
+                            BytesSent = endpoint.BytesSent,
+                            EndpointId = endpoint.EndpointId,
+                            TunnelId = tunnel.Configuration.TunnelId,
+                            CurrentConnections = endpoint.CurrentConnections,
+                            TotalConnections = endpoint.TotalConnections,
+                            ChangeHash = endpoint.GetHashCode()
+                        };
+                        tunnelStats.EndpointStatistics.Add(endpointStats);
+                    }
+
+                    result.Add(tunnelStats);
+                }
+            });
+
+            return result;
+        }
     }
-}
 }

@@ -25,7 +25,7 @@ namespace NetTunnel.Service
             StreamCryptography = new NASCCLStream(sharedSecret);
 
             Singletons.ServiceEngine.Logger.Verbose(
-                $"Tunnel cryptography initialized {sharedSecret.Length * 8}bits, hash {Utility.ComputeSha256Hash(sharedSecret)}.");
+                $"Tunnel cryptography initialized to {sharedSecret.Length * 8}bits. Hash {Utility.ComputeSha256Hash(sharedSecret)}.");
         }
 
         public void ApplyCryptographyProvider()
