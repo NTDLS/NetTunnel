@@ -124,7 +124,7 @@ namespace NetTunnel.Service.ReliableMessageHandlers
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
-                Singletons.ServiceEngine.Tunnels.UpsertEndpoint(query.TunnelId, query.Configuration);
+                Singletons.ServiceEngine.Tunnels.UpsertEndpoint(query.TunnelKey, query.Configuration);
                 return new QueryUpsertEndpointReply();
             }
             catch (Exception ex)

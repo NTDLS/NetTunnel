@@ -17,6 +17,11 @@ namespace NetTunnel.Library.Types
         public NtTrafficType TrafficType { get; set; } = NtTrafficType.Raw;
         public List<HttpHeaderRule> HttpHeaderRules { get; set; } = new();
 
+        /// <summary>
+        /// Unique ID that takes the direction and the ID into account.
+        /// </summary>
+        public DirectionalKey EndpointKey => new DirectionalKey(EndpointId, Direction);
+
         public override int GetHashCode()
         {
             return EndpointId.GetHashCode()

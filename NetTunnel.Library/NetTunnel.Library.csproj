@@ -24,4 +24,8 @@
     <PackageReference Include="NTDLS.SecureKeyExchange" Version="2.2.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Interfaces\" />
+  </ItemGroup>
+
 </Project>

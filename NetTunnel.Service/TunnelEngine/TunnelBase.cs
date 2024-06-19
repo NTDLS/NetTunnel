@@ -12,8 +12,8 @@ namespace NetTunnel.Service.TunnelEngine
         /// <summary>
         /// Returns Outbound if the tunnel is owned by the local service, otherwise returns Inbound.
         /// </summary>
-        public NtDirection Direction
-                => Configuration.ServiceId == Singletons.Configuration.ServiceId ? NtDirection.Outbound : NtDirection.Inbound;
+        public virtual NtDirection Direction { get => NtDirection.Undefined; }
+        public DirectionalKey TunnelKey => new(Configuration.TunnelId, Direction);
 
         public override int GetHashCode()
         {
@@ -38,6 +38,7 @@ namespace NetTunnel.Service.TunnelEngine
         public ServiceEngine ServiceEngine { get; private set; }
         public bool KeepRunning { get; private set; } = false;
         public List<IEndpoint> Endpoints { get; private set; } = new();
+
         private Thread? _heartbeatThread;
 
         #endregion
@@ -101,7 +102,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         #region Add/Delete Endpoints.
 
-        public EndpointInbound UpsertEndpoint(EndpointConfiguration configuration)
+        public IEndpoint UpsertEndpoint(EndpointConfiguration configuration)
         {
             var existingEndpoint = GetEndpointById(configuration.EndpointId);
             if (existingEndpoint != null)

@@ -15,6 +15,12 @@ namespace NetTunnel.Library.Types
         public NtDirection Direction { get; set; }
         public Guid TunnelId { get; set; }
         public Guid EndpointId { get; set; }
+
+        /// <summary>
+        /// Unique ID that takes the direction and the ID into account.
+        /// </summary>
+        public DirectionalKey? EndpointKey { get; set; }
+
         public ulong BytesReceived { get; set; }
         public ulong BytesSent { get; set; }
         public double BytesReceivedKb => BytesReceived / 1024.0;

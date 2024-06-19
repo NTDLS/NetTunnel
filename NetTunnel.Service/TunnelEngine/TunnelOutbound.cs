@@ -12,6 +12,8 @@ namespace NetTunnel.Service.TunnelEngine
         private readonly ServiceClient _client;
         private Thread? _establishConnectionThread;
 
+        public override NtDirection Direction { get => NtDirection.Outbound; }
+
         public TunnelOutbound(ServiceEngine serviceEngine, TunnelConfiguration configuration)
             : base(serviceEngine, configuration)
         {

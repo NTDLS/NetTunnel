@@ -134,16 +134,18 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// </summary>
         /// <param name="tunnelId"></param>
         /// <param name="endpointConfiguration"></param>
-        public void UpsertEndpoint(Guid tunnelId, EndpointConfiguration endpointConfiguration)
+        public void UpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointConfiguration)
         {
             Collection.Use((o) =>
             {
-                var tunnel = o.Single(o => o.Configuration.TunnelId == tunnelId);
+                var tunnel = o.Single(o => o.TunnelKey == tunnelKey);
                 tunnel.UpsertEndpoint(endpointConfiguration);
 
                 SaveToDisk();
             });
         }
+
+
 
         /// <summary>
         /// The local service is deleting an endpoint from a local outbound tunnel.
@@ -286,6 +288,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 {
                     var tunnelStats = new TunnelStatistics()
                     {
+                        TunnelKey = tunnel.TunnelKey,
                         Direction = tunnel is TunnelOutbound ? NtDirection.Outbound : NtDirection.Inbound,
                         Status = tunnel.Status,
                         TunnelId = tunnel.Configuration.TunnelId,
@@ -300,6 +303,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                     {
                         var endpointStats = new EndpointStatistics()
                         {
+                            EndpointKey = endpoint.EndpointKey,
                             Direction = endpoint.Configuration.Direction,
                             BytesReceived = endpoint.BytesReceived,
                             BytesSent = endpoint.BytesSent,

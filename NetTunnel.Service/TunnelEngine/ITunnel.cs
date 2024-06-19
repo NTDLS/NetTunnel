@@ -14,11 +14,16 @@ namespace NetTunnel.Service.TunnelEngine
         public ulong CurrentConnections { get; set; }
         public ServiceEngine ServiceEngine { get; }
         public List<IEndpoint> Endpoints { get; }
+        public NtDirection Direction { get; }
+        /// <summary>
+        /// Unique ID that takes the direction and the ID into account.
+        /// </summary>
+        public DirectionalKey TunnelKey { get; }
 
         public void Start();
         public void Stop();
 
-        public EndpointInbound UpsertEndpoint(EndpointConfiguration configuration);
+        public IEndpoint UpsertEndpoint(EndpointConfiguration configuration);
         public void DeleteEndpoint(Guid endpointId);
         public TunnelConfiguration CloneConfiguration();
 

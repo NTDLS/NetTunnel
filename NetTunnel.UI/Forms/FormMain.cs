@@ -154,11 +154,12 @@ namespace NetTunnel.UI.Forms
                     {
                         var epTag = ((EndpointTag?)item.Tag).EnsureNotNull();
 
-                        var tunnelStats = statistics.Where(o => o.TunnelId == epTag.Tunnel.TunnelId).ToList();
+                        var tunnelStats = statistics.Where(o => o.TunnelKey == epTag.Tunnel.TunnelKey).ToList();
                         if (tunnelStats != null)
                         {
                             var endpointStats = tunnelStats.SelectMany(o => o.EndpointStatistics)
-                                .Where(o => o.EndpointId == epTag.Endpoint.EndpointId && o.Direction == epTag.Endpoint.Direction).SingleOrDefault();
+                                .SingleOrDefault(o => o.EndpointKey == epTag.Endpoint.EndpointKey);
+
                             if (endpointStats != null)
                             {
                                 double compressionRatio = 0;
@@ -199,7 +200,7 @@ namespace NetTunnel.UI.Forms
                     {
                         var tTag = ((TunnelTag?)item.Tag).EnsureNotNull();
 
-                        var tunnelStats = statistics.SingleOrDefault(o => o.Direction == tTag.Tunnel.Direction && o.TunnelId == tTag.Tunnel.TunnelId);
+                        var tunnelStats = statistics.SingleOrDefault(o => o.TunnelKey == tTag.Tunnel.TunnelKey);
                         if (tunnelStats != null)
                         {
 

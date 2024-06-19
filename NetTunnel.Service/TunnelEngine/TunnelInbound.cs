@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library.Types;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine
 {
@@ -9,6 +10,9 @@ namespace NetTunnel.Service.TunnelEngine
     internal class TunnelInbound : TunnelBase, ITunnel
     {
         public Guid ConnectionId { get; private set; }
+
+        public override NtDirection Direction { get => NtDirection.Inbound; }
+
 
         /// <summary>
         /// When a connection comes in and registers a tunnel, we create a new instance of TunnelInbound

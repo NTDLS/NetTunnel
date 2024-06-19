@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library.Types;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
@@ -18,5 +19,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         public ulong TotalConnections { get; }
         public ulong CurrentConnections { get; }
         public EndpointConfiguration Configuration { get; }
+        public NtDirection Direction { get; }
+        /// <summary>
+        /// Unique ID that takes the direction and the ID into account.
+        /// </summary>
+        public DirectionalKey EndpointKey { get; }
     }
 }

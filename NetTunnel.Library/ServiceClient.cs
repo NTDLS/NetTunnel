@@ -150,8 +150,8 @@ namespace NetTunnel.Library
         public async Task<QueryRegisterTunnelReply> QueryRegisterTunnel(TunnelConfiguration Collection)
             => await Client.Query(new QueryRegisterTunnel(Collection));
 
-        public async Task<QueryUpsertEndpointReply> QueryUpsertEndpoint(Guid tunnelId, EndpointConfiguration configuration)
-            => await Client.Query(new QueryUpsertEndpoint(tunnelId, configuration));
+        public async Task<QueryUpsertEndpointReply> QueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration configuration)
+            => await Client.Query(new QueryUpsertEndpoint(tunnelKey, configuration));
 
         public void NotificationEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId)
             => Client.Notify(new NotificationEndpointConnect(tunnelId, endpointId, streamId));

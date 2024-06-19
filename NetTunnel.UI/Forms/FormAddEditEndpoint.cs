@@ -145,7 +145,7 @@ namespace NetTunnel.UI.Forms
                     textBoxName.Text, textBoxOutboundAddress.Text, textBoxInboundPort.ValueAs<int>(),
                     textBoxOutboundPort.ValueAs<int>(), endpointHttpHeaderRules, Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"));
 
-                _client.QueryUpsertEndpoint(_tunnel.TunnelId, endpoint).ContinueWith((o) =>
+                _client.QueryUpsertEndpoint(_tunnel.TunnelKey, endpoint).ContinueWith((o) =>
                     {
                         if (!o.IsCompletedSuccessfully)
                         {
@@ -158,7 +158,6 @@ namespace NetTunnel.UI.Forms
                         }
 
                         this.InvokeClose(DialogResult.OK);
-
                     });
             }
             catch (Exception ex)

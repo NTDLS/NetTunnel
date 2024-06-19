@@ -14,6 +14,11 @@ namespace NetTunnel.Library.Types
         public List<EndpointDisplay> Endpoints { get; set; } = new();
         public NtDirection Direction { get; set; }
 
+        /// <summary>
+        /// Unique ID that takes the direction and the ID into account.
+        /// </summary>
+        public DirectionalKey TunnelKey => new DirectionalKey(TunnelId, Direction);
+
         public TunnelDisplay()
         {
         }

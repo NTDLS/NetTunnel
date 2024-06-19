@@ -3,6 +3,7 @@ using NetTunnel.Library.Types;
 using NTDLS.NullExtensions;
 using System.Net;
 using System.Net.Sockets;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
@@ -14,6 +15,13 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         private Thread? _inboundConnectionThread;
 
         private TcpListener? _listener;
+
+        public NtDirection Direction { get => NtDirection.Inbound; }
+
+        /// <summary>
+        /// Unique ID that takes the direction and the ID into account.
+        /// </summary>
+        public DirectionalKey EndpointKey => new(Configuration.EndpointId, Direction);
 
         public override int GetHashCode()
             => Configuration.GetHashCode();
