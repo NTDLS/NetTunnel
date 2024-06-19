@@ -30,6 +30,15 @@ namespace NetTunnel.Library.Types
             Id = tunnel.Configuration.EndpointId;
         }
 
+        /// <summary>
+        /// Returns a copy of the instance, but with the opposite direction.
+        /// </summary>
+        /// <returns></returns>
+        public DirectionalKey SwapDirection()
+        {
+            return new DirectionalKey(Id, (Direction == NtDirection.Inbound ? NtDirection.Outbound : NtDirection.Outbound));
+        }
+
         public override string ToString() => $"{Id}:{Direction}";
 
         public override bool Equals(object? obj)

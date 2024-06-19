@@ -71,7 +71,11 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 var existingTunnel = o.Where(o => o.TunnelKey == tunnelKey).SingleOrDefault();
                 if (existingTunnel != null)
                 {
-                    existingTunnel.SendNotificationOfTunnelDeletion(tunnelKey);
+                    if (existingTunnel.IsLoggedIn)
+                    {
+                        //Let the other end of the tunnel know that we are deleting the tunnel.
+                        existingTunnel.SendNotificationOfTunnelDeletion(tunnelKey.SwapDirection());
+                    }
 
                     existingTunnel.Stop();
                     o.Remove(existingTunnel);

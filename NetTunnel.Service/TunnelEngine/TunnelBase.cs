@@ -1,6 +1,7 @@
 ﻿using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.TunnelEngine.Endpoints;
+using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine
@@ -175,5 +176,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         public virtual void SendNotificationOfTunnelDeletion(DirectionalKey tunnelKey)
             => throw new NotImplementedException("This function should be overridden.");
+
+        public virtual bool IsLoggedIn => throw new NotImplementedException("This function should be overridden.");
     }
 }

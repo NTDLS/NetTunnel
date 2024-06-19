@@ -19,6 +19,11 @@ namespace NetTunnel.Library.Interfaces
         /// </summary>
         public DirectionalKey TunnelKey { get; }
 
+        /// <summary>
+        /// Lets us know if the tunnel is connected to another service endpoint.
+        /// </summary>
+        public bool IsLoggedIn { get; }
+
         public void Start();
         public void Stop();
 

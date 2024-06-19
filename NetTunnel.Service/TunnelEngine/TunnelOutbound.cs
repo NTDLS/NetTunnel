@@ -15,6 +15,8 @@ namespace NetTunnel.Service.TunnelEngine
 
         public override NtDirection Direction { get => NtDirection.Outbound; }
 
+        public override bool IsLoggedIn => _client.IsLoggedIn;
+
         public TunnelOutbound(ServiceEngine serviceEngine, TunnelConfiguration configuration)
             : base(serviceEngine, configuration)
         {

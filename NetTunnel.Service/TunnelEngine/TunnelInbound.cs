@@ -14,6 +14,9 @@ namespace NetTunnel.Service.TunnelEngine
 
         public override NtDirection Direction { get => NtDirection.Inbound; }
 
+        public override bool IsLoggedIn => true; //The existence of a TunnelInbound means that is is connected. 
+
+
         /// <summary>
         /// When a connection comes in and registers a tunnel, we create a new instance of TunnelInbound
         ///     with the connectionId of the connection that requested the tunnel registration.
