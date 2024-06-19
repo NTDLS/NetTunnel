@@ -2,7 +2,7 @@
 
 namespace NetTunnel.Library.Interfaces
 {
-    public interface ILogger: IDisposable
+    public interface ILogger : IDisposable
     {
         public void Verbose(string message);
         public void Debug(string message);

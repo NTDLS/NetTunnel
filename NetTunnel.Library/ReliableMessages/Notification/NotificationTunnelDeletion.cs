@@ -1,14 +1,15 @@
-﻿using NTDLS.ReliableMessaging;
+﻿using NetTunnel.Library.Types;
+using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Library.ReliableMessages.Notification
 {
     public class NotificationTunnelDeletion : IRmNotification
     {
-        public Guid TunnelId { get; set; }
+        public DirectionalKey? TunnelKey { get; set; }
 
-        public NotificationTunnelDeletion(Guid tunnelId)
+        public NotificationTunnelDeletion(DirectionalKey tunnelKey)
         {
-            TunnelId = tunnelId;
+            TunnelKey = tunnelKey;
         }
 
         public NotificationTunnelDeletion()

@@ -35,7 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\NTDLS.Semaphore\NTDLS.Semaphore\NTDLS.Semaphore.csproj" />
     <ProjectReference Include="..\NetTunnel.Library\NetTunnel.Library.csproj" />
   </ItemGroup>
 

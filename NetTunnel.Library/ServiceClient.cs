@@ -6,7 +6,6 @@ using NetTunnel.Service.ReliableMessages;
 using NTDLS.NullExtensions;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
-using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library
 {
@@ -50,7 +49,7 @@ namespace NetTunnel.Library
             //using var logger = new ConsoleLogger(NtLogSeverity.Warning);
             return await CreateConnectAndLogin(logger, new ServiceConfiguration()
             {
-                     MessageQueryTimeoutMs = 1000
+                MessageQueryTimeoutMs = 1000
             }, address, port, userName, passwordHash, owner);
         }
 
@@ -152,8 +151,8 @@ namespace NetTunnel.Library
         public async Task<QueryCreateTunnelReply> QueryCreateTunnel(TunnelConfiguration configuration)
             => await Client.Query(new QueryCreateTunnel(configuration));
 
-        public async Task<QueryDeleteEndpointReply> QueryDeleteEndpoint(Guid tunnelId, Guid endpointId)
-            => await Client.Query(new QueryDeleteEndpoint(tunnelId, endpointId));
+        public async Task<QueryDeleteTunnelReply> QueryDeleteTunnel(DirectionalKey tunnelKey)
+            => await Client.Query(new QueryDeleteTunnel(tunnelKey));
 
         public async Task<QueryGetTunnelsReply> QueryGetTunnels()
             => await Client.Query(new QueryGetTunnels());
@@ -167,8 +166,8 @@ namespace NetTunnel.Library
         public void NotificationEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId)
             => Client.Notify(new NotificationEndpointConnect(tunnelId, endpointId, streamId));
 
-        public void SendNotificationOfTunnelDeletion(Guid tunnelId)
-            => Client.Notify(new NotificationTunnelDeletion(tunnelId));
+        public void SendNotificationOfTunnelDeletion(DirectionalKey tunnelKey)
+            => Client.Notify(new NotificationTunnelDeletion(tunnelKey));
 
         public void NotificationEndpointExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
             => Client.Notify(new NotificationEndpointDataExchange(tunnelId, endpointId, streamId, bytes, length));

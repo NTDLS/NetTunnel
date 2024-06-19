@@ -64,14 +64,14 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-        public void DeleteTunnel(Guid tunnelId)
+        public void DeleteTunnel(DirectionalKey tunnelKey)
         {
             Collection.Use((o) =>
             {
-                var existingTunnel = o.Where(o => o.Configuration.TunnelId == tunnelId).SingleOrDefault();
+                var existingTunnel = o.Where(o => o.TunnelKey == tunnelKey).SingleOrDefault();
                 if (existingTunnel != null)
                 {
-                    existingTunnel.SendNotificationOfTunnelDeletion(tunnelId);
+                    existingTunnel.SendNotificationOfTunnelDeletion(tunnelKey);
 
                     existingTunnel.Stop();
                     o.Remove(existingTunnel);
@@ -221,7 +221,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// </summary>
         private void SaveToDisk()
         {
-            var ownedConfiguration = Clone()
+            var ownedConfiguration = CloneOutbound()
                 .Where(o => o.ServiceId == Singletons.Configuration.ServiceId).ToList();
 
             CommonApplicationData.SaveToDisk(Constants.FriendlyName, ownedConfiguration);
@@ -246,12 +246,12 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         #endregion
 
-        public List<TunnelConfiguration> Clone()
+        public List<TunnelConfiguration> CloneOutbound()
         {
             return Collection.Use((o) =>
             {
                 List<TunnelConfiguration> clones = new();
-                foreach (var tunnel in o)
+                foreach (var tunnel in o.OfType<TunnelOutbound>())
                 {
                     clones.Add(tunnel.CloneConfiguration());
                 }

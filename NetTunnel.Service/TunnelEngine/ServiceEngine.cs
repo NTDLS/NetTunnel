@@ -1,6 +1,7 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.ReliableMessages.Notification;
+using NetTunnel.Library.Types;
 using NetTunnel.Service.ReliableMessageHandlers;
 using NetTunnel.Service.TunnelEngine.Managers;
 using NTDLS.ReliableMessaging;
@@ -84,8 +85,8 @@ namespace NetTunnel.Service.TunnelEngine
         /// </summary>
         /// <param name="connectionId"></param>
         /// <param name="tunnelId"></param>
-        public void SendNotificationOfTunnelDeletion(Guid connectionId, Guid tunnelId)
-            => _messageServer.Notify(connectionId, new NotificationTunnelDeletion(tunnelId));
+        public void SendNotificationOfTunnelDeletion(Guid connectionId, DirectionalKey tunnelKey)
+            => _messageServer.Notify(connectionId, new NotificationTunnelDeletion(tunnelKey));
 
         /// <summary>
         /// Sends a notification to the remote tunnel service containing the data that was received

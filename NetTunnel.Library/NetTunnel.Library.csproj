@@ -24,8 +24,4 @@
     <PackageReference Include="NTDLS.SecureKeyExchange" Version="2.2.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\NTDLS.Semaphore\NTDLS.Semaphore\NTDLS.Semaphore.csproj" />
-  </ItemGroup>
-
 </Project>

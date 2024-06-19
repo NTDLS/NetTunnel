@@ -57,8 +57,8 @@ namespace NetTunnel.Service.TunnelEngine
         public override void SendNotificationOfEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId)
             => _client.NotificationEndpointConnect(tunnelId, endpointId, streamId);
 
-        public override void SendNotificationOfTunnelDeletion(Guid tunnelId)
-            => _client.SendNotificationOfTunnelDeletion(tunnelId);
+        public override void SendNotificationOfTunnelDeletion(DirectionalKey tunnelKey)
+            => _client.SendNotificationOfTunnelDeletion(tunnelKey);
 
         private void _client_OnDisconnected(RmContext context)
         {
@@ -96,7 +96,7 @@ namespace NetTunnel.Service.TunnelEngine
 
             if (Environment.CurrentManagedThreadId != _establishConnectionThread?.ManagedThreadId)
             {
-                _establishConnectionThread?.Join(); //Wait on thread to finish.
+                //_establishConnectionThread?.Join(); //Wait on thread to finish.
             }
 
             base.Stop();

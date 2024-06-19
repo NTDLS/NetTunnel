@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Library.ReliableMessages.Query;
 using NetTunnel.Service.TunnelEngine;
+using NTDLS.NullExtensions;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
 
@@ -167,16 +168,16 @@ namespace NetTunnel.Service.ReliableMessageHandlers
             }
         }
 
-        public QueryDeleteEndpointReply OnQueryDeleteEndpoint(RmContext context, QueryDeleteEndpoint query)
+        public QueryDeleteTunnelReply OnQueryDeleteTunnel(RmContext context, QueryDeleteTunnel query)
         {
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
                 //We want to stop and delete the tunnel locally.
-                Singletons.ServiceEngine.Tunnels.DeleteTunnel(query.TunnelId);
+                Singletons.ServiceEngine.Tunnels.DeleteTunnel(query.TunnelKey.EnsureNotNull());
 
-                return new QueryDeleteEndpointReply();
+                return new QueryDeleteTunnelReply();
             }
             catch (Exception ex)
             {

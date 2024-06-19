@@ -47,6 +47,6 @@ namespace NetTunnel.Library.Interfaces
         /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
         public void SendNotificationOfEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId);
 
-        public void SendNotificationOfTunnelDeletion(Guid tunnelId);
+        public void SendNotificationOfTunnelDeletion(DirectionalKey tunnelKey);
     }
 }

@@ -173,7 +173,7 @@ namespace NetTunnel.Service.TunnelEngine
         public virtual void SendNotificationOfEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId)
             => throw new NotImplementedException("This function should be overridden.");
 
-        public virtual void SendNotificationOfTunnelDeletion(Guid tunnelId)
+        public virtual void SendNotificationOfTunnelDeletion(DirectionalKey tunnelKey)
             => throw new NotImplementedException("This function should be overridden.");
     }
 }

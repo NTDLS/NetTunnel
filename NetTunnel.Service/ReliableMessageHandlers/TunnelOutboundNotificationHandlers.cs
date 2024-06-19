@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Library.ReliableMessages.Notification;
 using NetTunnel.Service.TunnelEngine;
+using NTDLS.NullExtensions;
 using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Service.ReliableMessageHandlers
@@ -55,7 +56,7 @@ namespace NetTunnel.Service.ReliableMessageHandlers
             {
                 var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
 
-                Singletons.ServiceEngine.Tunnels.DeleteTunnel(notification.TunnelId);
+                Singletons.ServiceEngine.Tunnels.DeleteTunnel(notification.TunnelKey.EnsureNotNull());
             }
             catch (Exception ex)
             {
