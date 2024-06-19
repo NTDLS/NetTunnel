@@ -59,6 +59,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 o.Add(newTunnel.EnsureNotNull());
 
                 SaveToDisk();
+
+                newTunnel.Start();
             });
         }
 

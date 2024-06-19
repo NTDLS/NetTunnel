@@ -87,19 +87,23 @@ namespace NetTunnel.UI.Forms
                     var remoteClient = ServiceClient.CreateConnectAndLogin(_delegateLogger, tunnel.Address,
                         tunnel.ManagementPort, tunnel.Username, tunnel.PasswordHash).ContinueWith(async x =>
                         {
-                            if (!x.IsCompletedSuccessfully)
+                            try
                             {
-                                this.InvokeMessageBox(x.Exception?.Message ?? "An unknown exception occurred.",
-                                    Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                if (!x.IsCompletedSuccessfully)
+                                {
+                                    throw new Exception(x.Exception?.Message ?? "An unknown exception occurred.");
+                                }
 
+                                await _client.QueryCreateTunnel(tunnel);
+
+                                this.InvokeClose(DialogResult.OK);
+                            }
+                            catch (Exception ex)
+                            {
+                                this.InvokeMessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                                 buttonConnect.InvokeEnableControl(true);
                                 buttonCancel.InvokeEnableControl(true);
-                                return;
                             }
-
-                            await _client.QueryCreateTunnel(tunnel);
-
-                            this.InvokeClose(DialogResult.OK);
                         });
 
                     //ConfigureTunnelPair(remoteClient, tunnel, inboundTunnel);

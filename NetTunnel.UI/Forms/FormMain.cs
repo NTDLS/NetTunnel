@@ -53,7 +53,7 @@ namespace NetTunnel.UI.Forms
             _endpointsListViewItemComparer = new ListViewItemComparer();
             listViewEndpoints.ListViewItemSorter = _endpointsListViewItemComparer;
             listViewEndpoints.ColumnClick += ListViewEndpoints_ColumnClick;
-            listViewEndpoints.MouseUp += listViewEndpoints_MouseUp;
+            listViewEndpoints.MouseUp += ListViewEndpoints_MouseUp;
             listViewEndpoints.MouseDoubleClick += ListViewEndpoints_MouseDoubleClick;
         }
 
@@ -280,7 +280,7 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-        private void listViewEndpoints_MouseUp(object? sender, MouseEventArgs e)
+        private void ListViewEndpoints_MouseUp(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
             {
