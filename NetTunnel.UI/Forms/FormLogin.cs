@@ -8,13 +8,11 @@ namespace NetTunnel.UI.Forms
     public partial class FormLogin : Form
     {
         public ServiceClient? ResultingClient { get; private set; } = null;
-        private readonly DelegateLogger _delegateLogger;
+        private readonly DelegateLogger _delegateLogger = UIUtility.CreateActiveWindowMessageBoxLogger(NtLogSeverity.Exception);
 
         public FormLogin()
         {
             InitializeComponent();
-
-            _delegateLogger = new DelegateLogger(NtLogSeverity.Warning, LoggerMessageWritten);
 
             AcceptButton = buttonLogin;
             CancelButton = buttonCancel;
@@ -29,13 +27,6 @@ namespace NetTunnel.UI.Forms
             textBoxPassword.Text = "123456789";
 #endif
             textBoxPassword.Focus();
-        }
-
-        void LoggerMessageWritten(NtLogSeverity severity, string message)
-        {
-            var activeForm = Form.ActiveForm;
-            activeForm ??= Application.OpenForms[0]; // If there is no active form, fall back to the "main form".
-            activeForm?.InvokeMessageBox(message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }
 
         private void buttonLogin_Click(object sender, EventArgs e)

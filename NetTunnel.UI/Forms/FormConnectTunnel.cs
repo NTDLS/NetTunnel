@@ -9,18 +9,16 @@ namespace NetTunnel.UI.Forms
     public partial class FormConnectTunnel : Form
     {
         private readonly ServiceClient? _client;
-        private readonly DelegateLogger _delegateLogger;
+        private readonly DelegateLogger _delegateLogger = UIUtility.CreateActiveWindowMessageBoxLogger(NtLogSeverity.Exception);
 
         public FormConnectTunnel()
         {
             InitializeComponent();
-            _delegateLogger = new DelegateLogger(NtLogSeverity.Warning, LoggerMessageWritten);
         }
 
         public FormConnectTunnel(ServiceClient client)
         {
             InitializeComponent();
-            _delegateLogger = new DelegateLogger(NtLogSeverity.Warning, LoggerMessageWritten);
 
             _client = client;
 
@@ -59,13 +57,6 @@ namespace NetTunnel.UI.Forms
             textBoxRemoteUsername.Text = "debug";
             textBoxRemotePassword.Text = "123456789";
 #endif
-        }
-
-        void LoggerMessageWritten(NtLogSeverity severity, string message)
-        {
-            var activeForm = Form.ActiveForm;
-            activeForm ??= Application.OpenForms[0]; // If there is no active form, fall back to the "main form".
-            activeForm?.InvokeMessageBox(message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }
 
         private void buttonConnect_Click(object sender, EventArgs e)
