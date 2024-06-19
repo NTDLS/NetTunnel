@@ -82,29 +82,39 @@ namespace NetTunnel.UI.Forms
 
                 try
                 {
-                    //Just to test the login.
-                    //TODO: If the connection fails, prompt if the user wants to still add the tunnel.
-                    var remoteClient = ServiceClient.CreateConnectAndLogin(_delegateLogger, tunnel.Address,
-                        tunnel.ManagementPort, tunnel.Username, tunnel.PasswordHash).ContinueWith(async x =>
-                        {
-                            try
+                    new Thread(() =>
+                    {
+                        //Just to test the login.
+                        //TODO: If the connection fails, prompt if the user wants to still add the tunnel.
+                        var remoteClient = ServiceClient.CreateConnectAndLogin(_delegateLogger, tunnel.Address,
+                            tunnel.ManagementPort, tunnel.Username, tunnel.PasswordHash).ContinueWith(async x =>
                             {
-                                if (!x.IsCompletedSuccessfully)
+                                try
                                 {
-                                    throw new Exception(x.Exception?.Message ?? "An unknown exception occurred.");
+                                    if (!x.IsCompletedSuccessfully)
+                                    {
+                                        throw new Exception(x.Exception?.Message ?? "An unknown exception occurred.");
+                                    }
+
+                                    await _client.QueryCreateTunnel(tunnel);
+
+                                    this.InvokeClose(DialogResult.OK);
                                 }
+                                catch (Exception ex)
+                                {
+                                    if (this.InvokeMessageBox(ex.Message + "\r\n\r\n" + "Would you like to add the tunnel anyway?",
+                                        FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                                    {
+                                        await _client.QueryCreateTunnel(tunnel);
+                                        this.InvokeClose(DialogResult.OK);
+                                        return;
+                                    }
 
-                                await _client.QueryCreateTunnel(tunnel);
-
-                                this.InvokeClose(DialogResult.OK);
-                            }
-                            catch (Exception ex)
-                            {
-                                this.InvokeMessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                                buttonConnect.InvokeEnableControl(true);
-                                buttonCancel.InvokeEnableControl(true);
-                            }
-                        });
+                                    buttonConnect.InvokeEnableControl(true);
+                                    buttonCancel.InvokeEnableControl(true);
+                                }
+                            });
+                    }).Start();
 
                     //ConfigureTunnelPair(remoteClient, tunnel, inboundTunnel);
                 }

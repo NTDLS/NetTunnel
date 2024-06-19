@@ -300,13 +300,17 @@ namespace NetTunnel.UI.Forms
 
                 var menu = new ContextMenuStrip();
 
-                menu.Items.Add("Add Inbound Endpoint to Tunnel");
-                menu.Items.Add("Add Outbound Endpoint to Tunnel");
-
-                if (selectedEndpointRow != null)
+                if (tTag.Tunnel.Direction == NtDirection.Outbound
+                    || (tTag.Tunnel.Direction == NtDirection.Inbound && tTag.Tunnel.IsLoggedIn))
                 {
-                    menu.Items.Add(new ToolStripSeparator());
-                    menu.Items.Add("Delete Endpoint");
+                    menu.Items.Add("Add Inbound Endpoint to Tunnel");
+                    menu.Items.Add("Add Outbound Endpoint to Tunnel");
+
+                    if (selectedEndpointRow != null)
+                    {
+                        menu.Items.Add(new ToolStripSeparator());
+                        menu.Items.Add("Delete Endpoint");
+                    }
                 }
 
                 menu.Show(listViewEndpoints, new Point(e.X, e.Y));
@@ -368,17 +372,21 @@ namespace NetTunnel.UI.Forms
                     rowUnderMouse.Selected = true;
                 }
 
-                var selectedTunnel = ((TunnelTag?)rowUnderMouse?.Tag);
+                var tTag = ((TunnelTag?)rowUnderMouse?.Tag);
 
                 var menu = new ContextMenuStrip();
 
                 menu.Items.Add("Connect Tunnel");
 
-                if (rowUnderMouse != null && selectedTunnel != null)
+                if (rowUnderMouse != null && tTag != null)
                 {
-                    menu.Items.Add(new ToolStripSeparator());
-                    menu.Items.Add("Add Inbound Endpoint to Tunnel");
-                    menu.Items.Add("Add Outbound Endpoint to Tunnel");
+                    if (tTag.Tunnel.Direction == NtDirection.Outbound
+                        || (tTag.Tunnel.Direction == NtDirection.Inbound && tTag.Tunnel.IsLoggedIn))
+                    {
+                        menu.Items.Add(new ToolStripSeparator());
+                        menu.Items.Add("Add Inbound Endpoint to Tunnel");
+                        menu.Items.Add("Add Outbound Endpoint to Tunnel");
+                    }
 
                     menu.Items.Add(new ToolStripSeparator());
 

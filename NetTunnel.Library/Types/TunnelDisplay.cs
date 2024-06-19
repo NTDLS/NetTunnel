@@ -13,6 +13,7 @@ namespace NetTunnel.Library.Types
         public string PasswordHash { get; set; } = string.Empty;
         public List<EndpointDisplay> Endpoints { get; set; } = new();
         public NtDirection Direction { get; set; }
+        public bool IsLoggedIn { get; set; }
 
         /// <summary>
         /// Unique ID that takes the direction and the ID into account.

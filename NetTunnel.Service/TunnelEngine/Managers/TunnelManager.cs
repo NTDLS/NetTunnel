@@ -198,7 +198,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             Collection.Use((o) =>
             {
-                var tunnel = o.Single(o => o.TunnelKey == tunnelKey.SwapDirection());
+                var tunnel = o.Single(o => o.TunnelKey == tunnelKey);
 
                 var endpoint = tunnel.Endpoints.Single(o => o.EndpointId == endpointId) as EndpointOutbound
                     ?? throw new Exception("The endpoint could not be converted to outbound.");
@@ -211,7 +211,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             Collection.Use((o) =>
             {
-                var tunnel = o.Single(o => o.TunnelKey.SwapDirection() == tunnelKey);
+                var tunnel = o.Single(o => o.TunnelKey == tunnelKey);
                 var endpoint = tunnel.Endpoints.Single(o => o.EndpointId == endpointId);
 
                 endpoint.SendEndpointData(StreamId, bytes);
@@ -272,6 +272,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 {
                     results.Add(new TunnelDisplay
                     {
+                        IsLoggedIn = tunnel.IsLoggedIn,
                         TunnelId = tunnel.Configuration.TunnelId,
                         Address = tunnel.Configuration.Address,
                         Direction = tunnel is TunnelOutbound ? NtDirection.Outbound : NtDirection.Inbound,

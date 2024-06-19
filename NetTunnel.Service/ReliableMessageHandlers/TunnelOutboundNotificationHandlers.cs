@@ -25,7 +25,7 @@ namespace NetTunnel.Service.ReliableMessageHandlers
                 Singletons.ServiceEngine.Logger.Verbose($"Received endpoint connection notification.");
 
                 Singletons.ServiceEngine.Tunnels.EstablishOutboundEndpointConnection(
-                    notification.TunnelKey.EnsureNotNull(), notification.EndpointId, notification.StreamId);
+                    notification.TunnelKey.EnsureNotNull().SwapDirection(), notification.EndpointId, notification.StreamId);
             }
             catch (Exception ex)
             {
@@ -38,11 +38,11 @@ namespace NetTunnel.Service.ReliableMessageHandlers
         {
             try
             {
+                //Singletons.ServiceEngine.Logger.Debug($"Received endpoint data exchange.");
+
                 var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
 
                 tunnel.SendEndpointData(notification.EndpointId, notification.StreamId, notification.Bytes);
-
-                //Singletons.ServiceEngine.Logger.Debug($"Received endpoint data exchange.");
             }
             catch (Exception ex)
             {
