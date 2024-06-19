@@ -41,7 +41,7 @@ namespace NetTunnel.UI.Forms
                 Interval = 1000
             };
 
-            _timer.Tick += _timer_Tick;
+            _timer.Tick += Timer_Tick;
             _timer.Start();
 
             _tunnelsListViewItemComparer = new ListViewItemComparer();
@@ -102,7 +102,7 @@ namespace NetTunnel.UI.Forms
             return false;
         }
 
-        private void _timer_Tick(object? sender, EventArgs e)
+        private void Timer_Tick(object? sender, EventArgs e)
         {
             _timer.EnsureNotNull();
 
@@ -145,6 +145,8 @@ namespace NetTunnel.UI.Forms
 
                     void PopulateEndpointStatistics(List<TunnelStatistics> statistics)
                     {
+                        #region Populate Endpoint Statistics.
+
                         if (listViewEndpoints.InvokeRequired)
                         {
                             listViewEndpoints.Invoke(PopulateEndpointStatistics, statistics);
@@ -187,10 +189,14 @@ namespace NetTunnel.UI.Forms
                         }
 
                         listViewEndpoints.EndUpdate();
+
+                        #endregion
                     }
 
                     void PopulateTunnelStatistics(List<TunnelStatistics> statistics)
                     {
+                        #region Populate Tunnel Statistics.
+
                         if (listViewTunnels.InvokeRequired)
                         {
                             listViewTunnels.Invoke(PopulateTunnelStatistics, statistics);
@@ -230,6 +236,8 @@ namespace NetTunnel.UI.Forms
                         }
 
                         listViewTunnels.EndUpdate();
+
+                        #endregion
                     }
                 }
                 catch
