@@ -226,6 +226,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                     .ForEach(c =>
                     {
                         c.ServiceId = Singletons.Configuration.ServiceId; //Take ownership of tunnels if they are in the config file.
+                        c.TunnelId = Guid.NewGuid(); //Tunnels get a new ID every time they are loaded. This makes it easy to copy configs to other machines.
+                        c.Endpoints.ForEach(e=> e.EndpointId = Guid.NewGuid()); //Endpoints get a new ID every time they are loaded. This makes it easy to copy configs to other machines.
                         o.Add(new TunnelOutbound(_serviceEngine, c));
                     });
             });

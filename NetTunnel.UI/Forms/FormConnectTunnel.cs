@@ -81,6 +81,7 @@ namespace NetTunnel.UI.Forms
                 try
                 {
                     //Just to test the login.
+                    //TODO: If the connection fails, prompt if the user wants to still add the tunnel.
                     var remoteClient = ServiceClient.CreateConnectAndLogin(tunnel.Address,
                         tunnel.ManagementPort, tunnel.Username, tunnel.PasswordHash).ContinueWith(async x =>
                         {
