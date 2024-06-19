@@ -122,123 +122,125 @@ namespace NetTunnel.UI.Forms
                 _inTimerTick = true;
             }
 
-            try
+            new Thread(() =>
             {
-                if (_client != null && _client.IsConnected)
+                try
                 {
-                    _client.QueryGetTunnelStatistics().ContinueWith(o =>
+                    if (_client != null && _client.IsConnected)
                     {
-                        int allTunnelAndEndpointHashes = o.Result.AllTunnelIdAndEndpointIdHashes();
-
-                        if (allTunnelAndEndpointHashes != _allTunnelAndEndpointHashes && _allTunnelAndEndpointHashes != -1)
+                        _client.QueryGetTunnelStatistics().ContinueWith(o =>
                         {
-                            _needToRepopulateTunnels = true;
-                        }
-                        _allTunnelAndEndpointHashes = allTunnelAndEndpointHashes;
+                            int allTunnelAndEndpointHashes = o.Result.AllTunnelIdAndEndpointIdHashes();
 
-                        PopulateEndpointStatistics(o.Result.Statistics);
-                        PopulateTunnelStatistics(o.Result.Statistics);
-                    });
-                }
-
-                void PopulateEndpointStatistics(List<TunnelStatistics> statistics)
-                {
-                    if (listViewEndpoints.InvokeRequired)
-                    {
-                        listViewEndpoints.Invoke(PopulateEndpointStatistics, statistics);
-                        return;
-                    }
-                    listViewEndpoints.BeginUpdate();
-
-                    foreach (ListViewItem item in listViewEndpoints.Items)
-                    {
-                        var epTag = ((EndpointTag?)item.Tag).EnsureNotNull();
-
-                        var tunnelStats = statistics.Where(o => o.TunnelKey == epTag.Tunnel.TunnelKey).ToList();
-                        if (tunnelStats != null)
-                        {
-                            var endpointStats = tunnelStats.SelectMany(o => o.EndpointStatistics)
-                                .SingleOrDefault(o => o.EndpointKey == epTag.Endpoint.EndpointKey);
-
-                            if (endpointStats != null)
+                            if (allTunnelAndEndpointHashes != _allTunnelAndEndpointHashes && _allTunnelAndEndpointHashes != -1)
                             {
-                                double compressionRatio = 0;
-                                if (endpointStats.BytesSentKb > 0 && endpointStats.BytesReceivedKb > 0)
+                                _needToRepopulateTunnels = true;
+                            }
+                            _allTunnelAndEndpointHashes = allTunnelAndEndpointHashes;
+
+                            PopulateEndpointStatistics(o.Result.Statistics);
+                            PopulateTunnelStatistics(o.Result.Statistics);
+                        }).Wait();
+                    }
+
+                    void PopulateEndpointStatistics(List<TunnelStatistics> statistics)
+                    {
+                        if (listViewEndpoints.InvokeRequired)
+                        {
+                            listViewEndpoints.Invoke(PopulateEndpointStatistics, statistics);
+                            return;
+                        }
+                        listViewEndpoints.BeginUpdate();
+
+                        foreach (ListViewItem item in listViewEndpoints.Items)
+                        {
+                            var epTag = ((EndpointTag?)item.Tag).EnsureNotNull();
+
+                            var tunnelStats = statistics.Where(o => o.TunnelKey == epTag.Tunnel.TunnelKey).ToList();
+                            if (tunnelStats != null)
+                            {
+                                var endpointStats = tunnelStats.SelectMany(o => o.EndpointStatistics)
+                                    .SingleOrDefault(o => o.EndpointKey == epTag.Endpoint.EndpointKey);
+
+                                if (endpointStats != null)
                                 {
-                                    if (endpointStats.BytesSentKb > endpointStats.BytesReceivedKb)
+                                    double compressionRatio = 0;
+                                    if (endpointStats.BytesSentKb > 0 && endpointStats.BytesReceivedKb > 0)
                                     {
-                                        compressionRatio = 100 - (endpointStats.BytesReceivedKb / endpointStats.BytesSentKb) * 100.0;
+                                        if (endpointStats.BytesSentKb > endpointStats.BytesReceivedKb)
+                                        {
+                                            compressionRatio = 100 - (endpointStats.BytesReceivedKb / endpointStats.BytesSentKb) * 100.0;
+                                        }
+                                        else
+                                        {
+                                            compressionRatio = 100 - (endpointStats.BytesSentKb / endpointStats.BytesReceivedKb) * 100.0;
+                                        }
                                     }
-                                    else
-                                    {
-                                        compressionRatio = 100 - (endpointStats.BytesSentKb / endpointStats.BytesReceivedKb) * 100.0;
-                                    }
+
+                                    item.SubItems[columnHeaderEndpointBytesSent.Index].Text = $"{endpointStats.BytesSentKb:n0}";
+                                    item.SubItems[columnHeaderEndpointBytesReceived.Index].Text = $"{endpointStats.BytesReceivedKb:n0}";
+                                    item.SubItems[columnHeaderEndpointTotalConnections.Index].Text = $"{endpointStats.TotalConnections:n0}";
+                                    item.SubItems[columnHeaderEndpointCurrentConenctions.Index].Text = $"{endpointStats.CurrentConnections:n0}";
+                                    item.SubItems[columnHeaderCompressionRatio.Index].Text = $"{compressionRatio:n2}";
                                 }
-
-                                item.SubItems[columnHeaderEndpointBytesSent.Index].Text = $"{endpointStats.BytesSentKb:n0}";
-                                item.SubItems[columnHeaderEndpointBytesReceived.Index].Text = $"{endpointStats.BytesReceivedKb:n0}";
-                                item.SubItems[columnHeaderEndpointTotalConnections.Index].Text = $"{endpointStats.TotalConnections:n0}";
-                                item.SubItems[columnHeaderEndpointCurrentConenctions.Index].Text = $"{endpointStats.CurrentConnections:n0}";
-                                item.SubItems[columnHeaderCompressionRatio.Index].Text = $"{compressionRatio:n2}";
                             }
                         }
+
+                        listViewEndpoints.EndUpdate();
                     }
 
-                    listViewEndpoints.EndUpdate();
-                }
-
-                void PopulateTunnelStatistics(List<TunnelStatistics> statistics)
-                {
-                    if (listViewTunnels.InvokeRequired)
+                    void PopulateTunnelStatistics(List<TunnelStatistics> statistics)
                     {
-                        listViewTunnels.Invoke(PopulateTunnelStatistics, statistics);
-                        return;
-                    }
-                    listViewTunnels.BeginUpdate();
-
-                    foreach (ListViewItem item in listViewTunnels.Items)
-                    {
-                        var tTag = ((TunnelTag?)item.Tag).EnsureNotNull();
-
-                        var tunnelStats = statistics.SingleOrDefault(o => o.TunnelKey == tTag.Tunnel.TunnelKey);
-                        if (tunnelStats != null)
+                        if (listViewTunnels.InvokeRequired)
                         {
+                            listViewTunnels.Invoke(PopulateTunnelStatistics, statistics);
+                            return;
+                        }
+                        listViewTunnels.BeginUpdate();
 
-                            item.SubItems[columnHeaderTunnelBytesSent.Index].Text = $"{tunnelStats.BytesSentKb:n0}";
-                            item.SubItems[columnHeaderTunnelBytesReceived.Index].Text = $"{tunnelStats.BytesReceivedKb:n0}";
-                            item.SubItems[columnHeaderTunnelStatus.Index].Text = tunnelStats.Status.ToString();
+                        foreach (ListViewItem item in listViewTunnels.Items)
+                        {
+                            var tTag = ((TunnelTag?)item.Tag).EnsureNotNull();
 
-                            switch (tunnelStats.Status)
+                            var tunnelStats = statistics.SingleOrDefault(o => o.TunnelKey == tTag.Tunnel.TunnelKey);
+                            if (tunnelStats != null)
                             {
-                                case NtTunnelStatus.Connecting:
-                                case NtTunnelStatus.Disconnected:
-                                    item.BackColor = Color.FromArgb(255, 200, 200);
-                                    break;
-                                case NtTunnelStatus.Stopped:
-                                    item.BackColor = Color.FromArgb(255, 200, 0);
-                                    break;
-                                case NtTunnelStatus.Established:
-                                    item.BackColor = Color.FromArgb(200, 255, 200);
-                                    break;
-                                default:
-                                    item.BackColor = Color.FromArgb(255, 255, 255);
-                                    break;
+
+                                item.SubItems[columnHeaderTunnelBytesSent.Index].Text = $"{tunnelStats.BytesSentKb:n0}";
+                                item.SubItems[columnHeaderTunnelBytesReceived.Index].Text = $"{tunnelStats.BytesReceivedKb:n0}";
+                                item.SubItems[columnHeaderTunnelStatus.Index].Text = tunnelStats.Status.ToString();
+
+                                switch (tunnelStats.Status)
+                                {
+                                    case NtTunnelStatus.Connecting:
+                                    case NtTunnelStatus.Disconnected:
+                                        item.BackColor = Color.FromArgb(255, 200, 200);
+                                        break;
+                                    case NtTunnelStatus.Stopped:
+                                        item.BackColor = Color.FromArgb(255, 200, 0);
+                                        break;
+                                    case NtTunnelStatus.Established:
+                                        item.BackColor = Color.FromArgb(200, 255, 200);
+                                        break;
+                                    default:
+                                        item.BackColor = Color.FromArgb(255, 255, 255);
+                                        break;
+                                }
                             }
                         }
+
+                        listViewTunnels.EndUpdate();
                     }
-
-                    listViewTunnels.EndUpdate();
                 }
-            }
-            catch
-            {
-            }
-            finally
-            {
-                _inTimerTick = false;
-            }
+                catch
+                {
+                }
+                finally
+                {
+                    _inTimerTick = false;
+                }
+            }).Start();
         }
-
         private void ListViewTunnels_SelectedIndexChanged(object? sender, EventArgs e)
         {
             _client.EnsureNotNull();

@@ -17,7 +17,7 @@ namespace NetTunnel.Service.TunnelEngine
         /// <summary>
         /// Logging provider for event log, console (and file?).
         /// </summary>
-        public Logger Logger { get; private set; }
+        public ILogger Logger { get; private set; }
 
         /// <summary>
         /// Contains the information for all tunnels, inbound and outbound. Keep in mind that we only persist
@@ -37,7 +37,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         public ServiceEngine()
         {
-            Logger = new(Singletons.Configuration.LogLevel, Singletons.Configuration.LogPath);
+            Logger = new ConsoleLogger(Singletons.Configuration.LogLevel, Singletons.Configuration.LogPath);
             Tunnels = new(this);
             Users = new(this);
 

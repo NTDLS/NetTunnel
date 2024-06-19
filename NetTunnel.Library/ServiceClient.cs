@@ -1,10 +1,12 @@
-﻿using NetTunnel.Library.ReliableMessages.Notification;
+﻿using NetTunnel.Library.Interfaces;
+using NetTunnel.Library.ReliableMessages.Notification;
 using NetTunnel.Library.ReliableMessages.Query;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.ReliableMessages;
 using NTDLS.NullExtensions;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library
 {
@@ -27,9 +29,9 @@ namespace NetTunnel.Library
         public Guid ServiceId { get; private set; }
         public RmClient Client { get; private set; }
         public bool IsLoggedIn { get; private set; } = false;
-        public Logger _logger;
+        public ILogger _logger;
 
-        public ServiceClient(Logger logger, ServiceConfiguration configuration, RmClient client, string address, int port, string userName, string passwordHash)
+        public ServiceClient(ILogger logger, ServiceConfiguration configuration, RmClient client, string address, int port, string userName, string passwordHash)
         {
             _logger = logger;
             _configuration = configuration;
@@ -43,13 +45,16 @@ namespace NetTunnel.Library
 
         #region Factory.
 
-        public static async Task<ServiceClient> CreateConnectAndLogin(string address, int port, string userName, string passwordHash, object? owner = null)
+        public static async Task<ServiceClient> CreateConnectAndLogin(ILogger logger, string address, int port, string userName, string passwordHash, object? owner = null)
         {
-            using var logger = new Logger(Logger.LogLevel.Normal);
-            return await CreateConnectAndLogin(logger, new ServiceConfiguration(), address, port, userName, passwordHash, owner);
+            //using var logger = new ConsoleLogger(NtLogSeverity.Warning);
+            return await CreateConnectAndLogin(logger, new ServiceConfiguration()
+            {
+                     MessageQueryTimeoutMs = 1000
+            }, address, port, userName, passwordHash, owner);
         }
 
-        public static async Task<ServiceClient> CreateConnectAndLogin(Logger logger, ServiceConfiguration configuration,
+        public static async Task<ServiceClient> CreateConnectAndLogin(ILogger logger, ServiceConfiguration configuration,
              string address, int port, string userName, string passwordHash, object? owner = null)
         {
             var serviceClient = Create(logger, configuration, address, port, userName, passwordHash, owner);
@@ -57,7 +62,7 @@ namespace NetTunnel.Library
             return serviceClient;
         }
 
-        public static ServiceClient Create(Logger logger, ServiceConfiguration configuration,
+        public static ServiceClient Create(ILogger logger, ServiceConfiguration configuration,
             string address, int port, string userName, string passwordHash, object? owner = null)
         {
             var client = new RmClient(new RmConfiguration()
@@ -67,6 +72,12 @@ namespace NetTunnel.Library
                 MaxReceiveBufferSize = configuration.MaxReceiveBufferSize,
                 ReceiveBufferGrowthRate = configuration.ReceiveBufferGrowthRate,
             });
+
+            client.OnException += (RmContext? context, Exception ex, IRmPayload? payload) =>
+            {
+                logger.Exception($"RPC client exception: '{ex.Message}'"
+                    + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
+            };
 
             return new ServiceClient(logger, configuration, client, address, port, userName, passwordHash);
         }

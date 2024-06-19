@@ -2,21 +2,25 @@
 using NetTunnel.Library.Types;
 using NTDLS.NullExtensions;
 using NTDLS.WinFormsHelpers;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms
 {
     public partial class FormConnectTunnel : Form
     {
         private readonly ServiceClient? _client;
+        private readonly DelegateLogger _delegateLogger;
 
         public FormConnectTunnel()
         {
             InitializeComponent();
+            _delegateLogger = new DelegateLogger(NtLogSeverity.Warning, LoggerMessageWritten);
         }
 
         public FormConnectTunnel(ServiceClient client)
         {
             InitializeComponent();
+            _delegateLogger = new DelegateLogger(NtLogSeverity.Warning, LoggerMessageWritten);
 
             _client = client;
 
@@ -57,6 +61,13 @@ namespace NetTunnel.UI.Forms
 #endif
         }
 
+        void LoggerMessageWritten(NtLogSeverity severity, string message)
+        {
+            var activeForm = Form.ActiveForm;
+            activeForm ??= Application.OpenForms[0]; // If there is no active form, fall back to the "main form".
+            activeForm?.InvokeMessageBox(message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+        }
+
         private void buttonConnect_Click(object sender, EventArgs e)
         {
             _client.EnsureNotNull();
@@ -82,7 +93,7 @@ namespace NetTunnel.UI.Forms
                 {
                     //Just to test the login.
                     //TODO: If the connection fails, prompt if the user wants to still add the tunnel.
-                    var remoteClient = ServiceClient.CreateConnectAndLogin(tunnel.Address,
+                    var remoteClient = ServiceClient.CreateConnectAndLogin(_delegateLogger, tunnel.Address,
                         tunnel.ManagementPort, tunnel.Username, tunnel.PasswordHash).ContinueWith(async x =>
                         {
                             if (!x.IsCompletedSuccessfully)

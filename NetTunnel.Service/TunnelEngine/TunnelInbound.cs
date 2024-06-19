@@ -14,7 +14,6 @@ namespace NetTunnel.Service.TunnelEngine
 
         public override NtDirection Direction { get => NtDirection.Inbound; }
 
-
         /// <summary>
         /// When a connection comes in and registers a tunnel, we create a new instance of TunnelInbound
         ///     with the connectionId of the connection that requested the tunnel registration.
@@ -28,8 +27,7 @@ namespace NetTunnel.Service.TunnelEngine
             : base(serviceEngine, configuration)
         {
             ConnectionId = connectionId;
-
-            Status = Library.Constants.NtTunnelStatus.Established;
+            Status = NtTunnelStatus.Established;
         }
 
         /// <summary>

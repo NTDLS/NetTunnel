@@ -5,8 +5,12 @@ namespace NetTunnel.Library.Types
 {
     public class DirectionalKey : IEquatable<DirectionalKey>
     {
-        public NtDirection Direction { get; private set; }
-        public Guid Id { get; private set; }
+        public NtDirection Direction { get; set; } = NtDirection.Undefined;
+        public Guid Id { get; set; } = Guid.Empty;
+
+        public DirectionalKey()
+        {
+        }
 
         public DirectionalKey(Guid id, NtDirection direction)
         {

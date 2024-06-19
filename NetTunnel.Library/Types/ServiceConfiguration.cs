@@ -1,4 +1,4 @@
-﻿using static NetTunnel.Library.Logger;
+﻿using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library.Types
 {
@@ -24,7 +24,7 @@ namespace NetTunnel.Library.Types
         /// <summary>
         /// Level of information to log to the file/console/etc.
         /// </summary>
-        public LogLevel LogLevel { get; set; } = LogLevel.Verbose;
+        public NtLogSeverity LogLevel { get; set; } = NtLogSeverity.Verbose;
 
         /// <summary>
         /// The file path to log to. If the string is empty, the log will not be written to file.

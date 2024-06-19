@@ -1,26 +1,20 @@
-﻿using static NetTunnel.Library.Constants;
+﻿using NetTunnel.Library.Interfaces;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library
 {
-    public class Logger : IDisposable
+    public class ConsoleLogger : ILogger
     {
         private readonly object _lock = new();
-        private readonly LogLevel _logLevel;
+        private readonly NtLogSeverity _logLevel;
         private StreamWriter? _fileStream;
 
-        public enum LogLevel
-        {
-            Normal = 0,
-            Debug = 1,
-            Verbose = 2,
-        }
-
-        public Logger(LogLevel logLevel)
+        public ConsoleLogger(NtLogSeverity logLevel)
         {
             _logLevel = logLevel;
         }
 
-        public Logger(LogLevel logLevel, string logPath)
+        public ConsoleLogger(NtLogSeverity logLevel, string logPath)
         {
             _logLevel = logLevel;
 
@@ -39,8 +33,7 @@ namespace NetTunnel.Library
 
         public void Write(NtLogSeverity severity, string text)
         {
-            if (severity == NtLogSeverity.Debug && _logLevel < LogLevel.Debug
-                || severity == NtLogSeverity.Verbose && _logLevel < LogLevel.Verbose)
+            if (severity > _logLevel)
             {
                 return;
             }
