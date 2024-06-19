@@ -1,10 +1,9 @@
 ﻿using NetTunnel.Library.Types;
-using NetTunnel.Service.TunnelEngine.Endpoints;
 using static NetTunnel.Library.Constants;
 
-namespace NetTunnel.Service.TunnelEngine
+namespace NetTunnel.Library.Interfaces
 {
-    internal interface ITunnel
+    public interface ITunnel
     {
         public TunnelConfiguration Configuration { get; }
         public NtTunnelStatus Status { get; set; }
@@ -12,7 +11,7 @@ namespace NetTunnel.Service.TunnelEngine
         public ulong BytesSent { get; set; }
         public ulong TotalConnections { get; set; }
         public ulong CurrentConnections { get; set; }
-        public ServiceEngine ServiceEngine { get; }
+        public IServiceEngine ServiceEngine { get; }
         public List<IEndpoint> Endpoints { get; }
         public NtDirection Direction { get; }
         /// <summary>

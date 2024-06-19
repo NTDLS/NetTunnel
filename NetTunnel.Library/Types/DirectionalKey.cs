@@ -1,4 +1,5 @@
-﻿using static NetTunnel.Library.Constants;
+﻿using NetTunnel.Library.Interfaces;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library.Types
 {
@@ -11,6 +12,18 @@ namespace NetTunnel.Library.Types
         {
             Direction = direction;
             Id = id;
+        }
+
+        public DirectionalKey(ITunnel tunnel)
+        {
+            Direction = tunnel.Direction;
+            Id = tunnel.Configuration.TunnelId;
+        }
+
+        public DirectionalKey(IEndpoint tunnel)
+        {
+            Direction = tunnel.Direction;
+            Id = tunnel.Configuration.EndpointId;
         }
 
         public override string ToString() => $"{Id}:{Direction}";

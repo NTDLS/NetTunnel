@@ -17,7 +17,7 @@ namespace NetTunnel.Library.Types
         /// <summary>
         /// Unique ID that takes the direction and the ID into account.
         /// </summary>
-        public DirectionalKey TunnelKey => new DirectionalKey(TunnelId, Direction);
+        public DirectionalKey TunnelKey => new(TunnelId, Direction);
 
         public TunnelDisplay()
         {

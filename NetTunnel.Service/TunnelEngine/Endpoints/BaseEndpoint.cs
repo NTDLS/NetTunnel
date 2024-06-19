@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library;
+using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Types;
 using NTDLS.NullExtensions;
 using NTDLS.Semaphore;
@@ -18,7 +19,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         public ulong CurrentConnections { get; internal set; }
         public Guid EndpointId { get; private set; }
 
-        internal readonly ServiceEngine _serviceEngine;
+        internal readonly IServiceEngine _serviceEngine;
         internal readonly ITunnel _tunnel;
         public bool KeepRunning { get; internal set; } = false;
 
@@ -28,7 +29,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         public EndpointConfiguration Configuration { get; private set; }
 
-        public BaseEndpoint(ServiceEngine serviceEngine, ITunnel tunnel,
+        public BaseEndpoint(IServiceEngine serviceEngine, ITunnel tunnel,
             Guid endpointId, EndpointConfiguration configuration)
         {
             Configuration = configuration;

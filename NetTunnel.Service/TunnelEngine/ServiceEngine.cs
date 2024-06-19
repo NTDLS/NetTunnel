@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library;
+using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.ReliableMessages.Notification;
 using NetTunnel.Service.ReliableMessageHandlers;
 using NetTunnel.Service.TunnelEngine.Managers;
@@ -6,7 +7,7 @@ using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Service.TunnelEngine
 {
-    internal class ServiceEngine
+    internal class ServiceEngine : IServiceEngine
     {
         /// <summary>
         /// Contains a list of the connections that have been made TO the local service and the connection state info.

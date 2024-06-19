@@ -20,7 +20,7 @@ namespace NetTunnel.Library.Types
         /// <summary>
         /// Unique ID that takes the direction and the ID into account.
         /// </summary>
-        public DirectionalKey EndpointKey => new DirectionalKey(EndpointId, Direction);
+        public DirectionalKey EndpointKey => new(EndpointId, Direction);
 
         public override int GetHashCode()
         {

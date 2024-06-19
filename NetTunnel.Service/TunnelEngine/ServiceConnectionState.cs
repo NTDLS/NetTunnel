@@ -1,8 +1,7 @@
 ﻿using NetTunnel.Library;
-using NetTunnel.Service.TunnelEngine;
 using NTDLS.NASCCL;
 
-namespace NetTunnel.Service
+namespace NetTunnel.Service.TunnelEngine
 {
     public class ServiceConnectionState
     {

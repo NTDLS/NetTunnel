@@ -1,7 +1,6 @@
-﻿using NetTunnel.Service.TunnelEngine;
-using NTDLS.ReliableMessaging;
+﻿using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Service
+namespace NetTunnel.Service.TunnelEngine
 {
     internal class ServiceCryptographyProvider : IRmCryptographyProvider
     {

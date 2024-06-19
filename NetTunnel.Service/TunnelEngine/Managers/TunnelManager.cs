@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library;
+using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NTDLS.NullExtensions;

@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library;
+using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Types;
 using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
@@ -18,9 +19,9 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         /// <summary>
         /// Unique ID that takes the direction and the ID into account.
         /// </summary>
-        public DirectionalKey EndpointKey => new(Configuration.EndpointId, Direction);
+        public DirectionalKey EndpointKey => new(this);
 
-        public EndpointOutbound(ServiceEngine serviceEngine, ITunnel tunnel, EndpointConfiguration configuration)
+        public EndpointOutbound(IServiceEngine serviceEngine, ITunnel tunnel, EndpointConfiguration configuration)
             : base(serviceEngine, tunnel, configuration.EndpointId, configuration)
         {
         }

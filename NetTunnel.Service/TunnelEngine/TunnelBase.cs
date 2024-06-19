@@ -1,4 +1,5 @@
-﻿using NetTunnel.Library.Types;
+﻿using NetTunnel.Library.Interfaces;
+using NetTunnel.Library.Types;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using static NetTunnel.Library.Constants;
 
@@ -13,7 +14,7 @@ namespace NetTunnel.Service.TunnelEngine
         /// Returns Outbound if the tunnel is owned by the local service, otherwise returns Inbound.
         /// </summary>
         public virtual NtDirection Direction { get => NtDirection.Undefined; }
-        public DirectionalKey TunnelKey => new(Configuration.TunnelId, Direction);
+        public DirectionalKey TunnelKey => new(this);
 
         public override int GetHashCode()
         {
@@ -35,7 +36,7 @@ namespace NetTunnel.Service.TunnelEngine
         public ulong BytesSent { get; set; }
         public ulong TotalConnections { get; set; }
         public ulong CurrentConnections { get; set; }
-        public ServiceEngine ServiceEngine { get; private set; }
+        public IServiceEngine ServiceEngine { get; private set; }
         public bool KeepRunning { get; private set; } = false;
         public List<IEndpoint> Endpoints { get; private set; } = new();
 
