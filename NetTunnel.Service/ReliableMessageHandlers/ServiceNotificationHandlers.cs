@@ -42,7 +42,8 @@ namespace NetTunnel.Service.ReliableMessageHandlers
 
                 Singletons.ServiceEngine.Logger.Verbose($"Received endpoint connection notification.");
 
-                Singletons.ServiceEngine.Tunnels.EstablishOutboundEndpointConnection(notification.TunnelId, notification.EndpointId, notification.StreamId);
+                Singletons.ServiceEngine.Tunnels.EstablishOutboundEndpointConnection(
+                    notification.TunnelKey.EnsureNotNull(), notification.EndpointId, notification.StreamId);
             }
             catch (Exception ex)
             {
@@ -57,7 +58,8 @@ namespace NetTunnel.Service.ReliableMessageHandlers
             {
                 var connectionContext = GetServiceConnectionContext(context);
 
-                Singletons.ServiceEngine.Tunnels.SendEndpointData(notification.TunnelId, notification.EndpointId, notification.StreamId, notification.Bytes);
+                Singletons.ServiceEngine.Tunnels.SendEndpointData(
+                    notification.TunnelKey.EnsureNotNull(), notification.EndpointId, notification.StreamId, notification.Bytes);
 
                 //Singletons.ServiceEngine.Logger.Debug($"Received endpoint data exchange.");
             }

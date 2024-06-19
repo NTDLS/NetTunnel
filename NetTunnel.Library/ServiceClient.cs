@@ -163,13 +163,13 @@ namespace NetTunnel.Library
         public async Task<QueryUpsertEndpointReply> QueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration configuration)
             => await Client.Query(new QueryUpsertEndpoint(tunnelKey, configuration));
 
-        public void NotificationEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId)
-            => Client.Notify(new NotificationEndpointConnect(tunnelId, endpointId, streamId));
+        public void NotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid streamId)
+            => Client.Notify(new NotificationEndpointConnect(tunnelKey, endpointId, streamId));
 
         public void SendNotificationOfTunnelDeletion(DirectionalKey tunnelKey)
             => Client.Notify(new NotificationTunnelDeletion(tunnelKey));
 
-        public void NotificationEndpointExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
-            => Client.Notify(new NotificationEndpointDataExchange(tunnelId, endpointId, streamId, bytes, length));
+        public void NotificationEndpointExchange(DirectionalKey tunnelKey, Guid endpointId, Guid streamId, byte[] bytes, int length)
+            => Client.Notify(new NotificationEndpointDataExchange(tunnelKey, endpointId, streamId, bytes, length));
     }
 }

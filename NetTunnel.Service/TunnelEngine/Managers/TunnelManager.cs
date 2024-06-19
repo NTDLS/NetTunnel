@@ -190,15 +190,15 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// inbound endpoint and is asking the local service to make the associated connection on the associated
         /// outbound endpoint.
         /// </summary>
-        /// <param name="tunnelId"></param>
+        /// <param name="tunnelKey"></param>
         /// <param name="endpointId"></param>
         /// <param name="streamId"></param>
         /// <exception cref="Exception"></exception>
-        public void EstablishOutboundEndpointConnection(Guid tunnelId, Guid endpointId, Guid streamId)
+        public void EstablishOutboundEndpointConnection(DirectionalKey tunnelKey, Guid endpointId, Guid streamId)
         {
             Collection.Use((o) =>
             {
-                var tunnel = o.Single(o => o.Configuration.TunnelId == tunnelId);
+                var tunnel = o.Single(o => o.TunnelKey == tunnelKey.SwapDirection());
 
                 var endpoint = tunnel.Endpoints.Single(o => o.EndpointId == endpointId) as EndpointOutbound
                     ?? throw new Exception("The endpoint could not be converted to outbound.");
@@ -207,11 +207,11 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-        public void SendEndpointData(Guid tunnelId, Guid endpointId, Guid StreamId, byte[] bytes)
+        public void SendEndpointData(DirectionalKey tunnelKey, Guid endpointId, Guid StreamId, byte[] bytes)
         {
             Collection.Use((o) =>
             {
-                var tunnel = o.Single(o => o.Configuration.TunnelId == tunnelId);
+                var tunnel = o.Single(o => o.TunnelKey.SwapDirection() == tunnelKey);
                 var endpoint = tunnel.Endpoints.Single(o => o.EndpointId == endpointId);
 
                 endpoint.SendEndpointData(StreamId, bytes);

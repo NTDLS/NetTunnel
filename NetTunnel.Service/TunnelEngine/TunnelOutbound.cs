@@ -15,7 +15,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         public override NtDirection Direction { get => NtDirection.Outbound; }
 
-        public override bool IsLoggedIn => _client.IsLoggedIn;
+        public bool IsLoggedIn => _client.IsLoggedIn;
 
         public TunnelOutbound(ServiceEngine serviceEngine, TunnelConfiguration configuration)
             : base(serviceEngine, configuration)
@@ -41,25 +41,25 @@ namespace NetTunnel.Service.TunnelEngine
         ///     by an endpoint. This data is to be sent to the endpoint connection with the matching
         ///     StreamId (which was originally sent to SendNotificationOfEndpointConnect()
         /// </summary>
-        /// <param name="tunnelId">The id of the tunnel that owns the endpoint.</param>
+        /// <param name="tunnelKey">The id of the tunnel that owns the endpoint.</param>
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
         /// <param name="bytes">Bytes to be sent to endpoint connection.</param>
         /// <param name="length">Number of bytes to be sent to the endpoint connection.</param>
-        public override void SendNotificationOfEndpointDataExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
-            => _client.NotificationEndpointExchange(tunnelId, endpointId, streamId, bytes, length);
+        public void SendNotificationOfEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid streamId, byte[] bytes, int length)
+            => _client.NotificationEndpointExchange(tunnelKey, endpointId, streamId, bytes, length);
 
         /// <summary>
         /// Sends a notification to the remote tunnel service to let it know to connect
         ///     the associated outbound endpoint for an incoming endpoint connection.
         /// </summary>
-        /// <param name="tunnelId">The id of the tunnel that owns the endpoint.</param>
+        /// <param name="tunnelKey">The id of the tunnel that owns the endpoint.</param>
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
-        public override void SendNotificationOfEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId)
-            => _client.NotificationEndpointConnect(tunnelId, endpointId, streamId);
+        public void SendNotificationOfEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid streamId)
+            => _client.NotificationEndpointConnect(tunnelKey, endpointId, streamId);
 
-        public override void SendNotificationOfTunnelDeletion(DirectionalKey tunnelKey)
+        public void SendNotificationOfTunnelDeletion(DirectionalKey tunnelKey)
             => _client.SendNotificationOfTunnelDeletion(tunnelKey);
 
         private void _client_OnDisconnected(RmContext context)

@@ -14,8 +14,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         public override NtDirection Direction { get => NtDirection.Inbound; }
 
-        public override bool IsLoggedIn => true; //The existence of a TunnelInbound means that is is connected. 
-
+        public bool IsLoggedIn => true; //The existence of a TunnelInbound means that is is connected. 
 
         /// <summary>
         /// When a connection comes in and registers a tunnel, we create a new instance of TunnelInbound
@@ -38,15 +37,15 @@ namespace NetTunnel.Service.TunnelEngine
         ///     by an endpoint. This data is to be sent to the endpoint connection with the matching
         ///     StreamId (which was originally sent to SendNotificationOfEndpointConnect()
         /// </summary>
-        /// <param name="tunnelId">The id of the tunnel that owns the endpoint.</param>
+        /// <param name="tunnelKey">The id of the tunnel that owns the endpoint.</param>
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
         /// <param name="bytes">Bytes to be sent to endpoint connection.</param>
         /// <param name="length">Number of bytes to be sent to the endpoint connection.</param>
-        public override void SendNotificationOfEndpointDataExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
+        public void SendNotificationOfEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid streamId, byte[] bytes, int length)
         {
             //Inbound tunnels communicate all data through the ServiceEngine._messageServer based on the ConnectionId.
-            ServiceEngine.SendNotificationOfEndpointDataExchange(ConnectionId, tunnelId, endpointId, streamId, bytes, length);
+            ServiceEngine.SendNotificationOfEndpointDataExchange(ConnectionId, tunnelKey, endpointId, streamId, bytes, length);
         }
 
         /// <summary>
@@ -56,16 +55,16 @@ namespace NetTunnel.Service.TunnelEngine
         ///SEARCH FOR: Process:Endpoint:Connect:002: client connection is asking us to let the remote service know that a new inbound 
         ///  endpoint connection has been made and that is needs to make the associated outbound endpoint connection.
         /// </summary>
-        /// <param name="tunnelId">The id of the tunnel that owns the endpoint.</param>
+        /// <param name="tunnelKey">The id of the tunnel that owns the endpoint.</param>
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
-        public override void SendNotificationOfEndpointConnect(Guid tunnelId, Guid endpointId, Guid streamId)
+        public void SendNotificationOfEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid streamId)
         {
             //Inbound tunnels communicate all data through the ServiceEngine._messageServer based on the ConnectionId.
-            ServiceEngine.SendNotificationOfEndpointConnect(ConnectionId, tunnelId, endpointId, streamId);
+            ServiceEngine.SendNotificationOfEndpointConnect(ConnectionId, tunnelKey, endpointId, streamId);
         }
 
-        public override void SendNotificationOfTunnelDeletion(DirectionalKey tunnelKey)
+        public void SendNotificationOfTunnelDeletion(DirectionalKey tunnelKey)
         {
             //Inbound tunnels communicate all data through the ServiceEngine._messageServer based on the ConnectionId.
             ServiceEngine.SendNotificationOfTunnelDeletion(ConnectionId, tunnelKey);

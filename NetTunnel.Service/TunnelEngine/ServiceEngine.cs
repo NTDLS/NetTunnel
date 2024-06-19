@@ -77,8 +77,8 @@ namespace NetTunnel.Service.TunnelEngine
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
 
-        public void SendNotificationOfEndpointConnect(Guid connectionId, Guid tunnelId, Guid endpointId, Guid streamId)
-            => _messageServer.Notify(connectionId, new NotificationEndpointConnect(tunnelId, endpointId, streamId));
+        public void SendNotificationOfEndpointConnect(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId, Guid streamId)
+            => _messageServer.Notify(connectionId, new NotificationEndpointConnect(tunnelKey, endpointId, streamId));
 
         /// <summary>
         /// Notify the remote tunnel service that the tunnel is being deleted.
@@ -93,13 +93,13 @@ namespace NetTunnel.Service.TunnelEngine
         ///     by an endpoint. This data is to be sent to the endpoint connection with the matching
         ///     StreamId (which was originally sent to SendNotificationOfEndpointConnect()
         /// </summary>
-        /// <param name="tunnelId">The id of the tunnel that owns the endpoint.</param>
+        /// <param name="tunnelKey">The id of the tunnel that owns the endpoint.</param>
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
         /// <param name="bytes">Bytes to be sent to endpoint connection.</param>
         /// <param name="length">Number of bytes to be sent to the endpoint connection.</param>
-        public void SendNotificationOfEndpointDataExchange(Guid connectionId, Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
-            => _messageServer.Notify(connectionId, new NotificationEndpointDataExchange(tunnelId, endpointId, streamId, bytes, length));
+        public void SendNotificationOfEndpointDataExchange(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId, Guid streamId, byte[] bytes, int length)
+            => _messageServer.Notify(connectionId, new NotificationEndpointDataExchange(tunnelKey, endpointId, streamId, bytes, length));
 
         private void ServiceEngine_OnConnected(RmContext context)
         {

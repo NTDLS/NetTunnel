@@ -24,7 +24,8 @@ namespace NetTunnel.Service.ReliableMessageHandlers
 
                 Singletons.ServiceEngine.Logger.Verbose($"Received endpoint connection notification.");
 
-                Singletons.ServiceEngine.Tunnels.EstablishOutboundEndpointConnection(notification.TunnelId, notification.EndpointId, notification.StreamId);
+                Singletons.ServiceEngine.Tunnels.EstablishOutboundEndpointConnection(
+                    notification.TunnelKey.EnsureNotNull(), notification.EndpointId, notification.StreamId);
             }
             catch (Exception ex)
             {

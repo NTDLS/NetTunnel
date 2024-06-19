@@ -36,7 +36,7 @@ namespace NetTunnel.Library.Types
         /// <returns></returns>
         public DirectionalKey SwapDirection()
         {
-            return new DirectionalKey(Id, (Direction == NtDirection.Inbound ? NtDirection.Outbound : NtDirection.Outbound));
+            return new DirectionalKey(Id, (Direction == NtDirection.Inbound ? NtDirection.Outbound : NtDirection.Inbound));
         }
 
         public override string ToString() => $"{Id}:{Direction}";

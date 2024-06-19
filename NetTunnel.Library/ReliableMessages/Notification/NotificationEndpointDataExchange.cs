@@ -1,18 +1,19 @@
-﻿using NTDLS.ReliableMessaging;
+﻿using NetTunnel.Library.Types;
+using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Library.ReliableMessages.Notification
 {
     public class NotificationEndpointDataExchange : IRmNotification
     {
         public Guid StreamId { get; set; }
-        public Guid TunnelId { get; set; }
+        public DirectionalKey? TunnelKey { get; set; }
         public Guid EndpointId { get; set; }
         public byte[] Bytes { get; set; }
 
-        public NotificationEndpointDataExchange(Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length)
+        public NotificationEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid streamId, byte[] bytes, int length)
         {
             StreamId = streamId;
-            TunnelId = tunnelId;
+            TunnelKey = tunnelKey;
             EndpointId = endpointId;
             Bytes = new byte[length];
 

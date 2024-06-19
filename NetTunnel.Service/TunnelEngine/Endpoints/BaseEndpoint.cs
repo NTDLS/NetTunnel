@@ -149,7 +149,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 {
                     //SEARCH FOR: Process:Endpoint:Connect:001: If this is an inbound endpoint, then let the remote service
                     //  know that we just received a connection so that it came make the associated outbound connection.
-                    _tunnel.SendNotificationOfEndpointConnect(_tunnel.Configuration.TunnelId, EndpointId, activeConnection.StreamId);
+                    _tunnel.SendNotificationOfEndpointConnect(_tunnel.TunnelKey, EndpointId, activeConnection.StreamId);
                 }
 
                 var httpHeaderBuilder = new StringBuilder();
@@ -209,7 +209,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                     #endregion
 
-                    _tunnel.SendNotificationOfEndpointDataExchange(_tunnel.Configuration.TunnelId,
+                    _tunnel.SendNotificationOfEndpointDataExchange(_tunnel.TunnelKey,
                         Configuration.EndpointId, activeConnection.StreamId, buffer.Bytes, buffer.Length);
 
                     buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);

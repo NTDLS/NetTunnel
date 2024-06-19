@@ -6,8 +6,8 @@ namespace NetTunnel.Library.Interfaces
     {
         public ILogger Logger { get; }
 
-        public void SendNotificationOfEndpointConnect(Guid connectionId, Guid tunnelId, Guid endpointId, Guid streamId);
+        public void SendNotificationOfEndpointConnect(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId, Guid streamId);
         public void SendNotificationOfTunnelDeletion(Guid connectionId, DirectionalKey tunnelKey);
-        public void SendNotificationOfEndpointDataExchange(Guid connectionId, Guid tunnelId, Guid endpointId, Guid streamId, byte[] bytes, int length);
+        public void SendNotificationOfEndpointDataExchange(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId, Guid streamId, byte[] bytes, int length);
     }
 }
