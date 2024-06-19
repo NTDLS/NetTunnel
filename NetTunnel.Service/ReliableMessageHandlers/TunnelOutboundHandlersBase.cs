@@ -11,11 +11,19 @@ namespace NetTunnel.Service.ReliableMessageHandlers
         /// </summary>
         public TunnelOutbound EnforceLoginCryptographyAndGetTunnel(RmContext context)
         {
-            var tunnel = (TunnelOutbound)context.Endpoint.Parameter.EnsureNotNull();
+            try
+            {
+                var tunnel = (TunnelOutbound)context.Endpoint.Parameter.EnsureNotNull();
 
-            tunnel.EnforceLogin();
+                tunnel.EnforceLogin();
 
-            return tunnel;
+                return tunnel;
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
     }
 }

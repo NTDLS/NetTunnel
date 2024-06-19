@@ -2,9 +2,9 @@
 {
     public class TunnelTag
     {
-        public TunnelConfiguration Tunnel { get; set; }
+        public TunnelDisplay Tunnel { get; set; }
 
-        public TunnelTag(TunnelConfiguration tunnel)
+        public TunnelTag(TunnelDisplay tunnel)
         {
             Tunnel = tunnel;
         }

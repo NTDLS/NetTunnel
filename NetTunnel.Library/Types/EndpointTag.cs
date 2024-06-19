@@ -2,10 +2,10 @@
 {
     public class EndpointTag
     {
-        public TunnelConfiguration Tunnel { get; set; }
-        public EndpointConfiguration Endpoint { get; set; }
+        public TunnelDisplay Tunnel { get; set; }
+        public EndpointDisplay Endpoint { get; set; }
 
-        public EndpointTag(TunnelConfiguration tunnel, EndpointConfiguration endpoint)
+        public EndpointTag(TunnelDisplay tunnel, EndpointDisplay endpoint)
         {
             Tunnel = tunnel;
             Endpoint = endpoint;

@@ -20,34 +20,66 @@ namespace NetTunnel.Service.ReliableMessageHandlers
         /// <param name="notification"></param>
         public void OnNotificationApplyCryptography(RmContext context, NotificationApplyCryptography notification)
         {
-            var connectionContext = GetServiceConnectionContext(context);
+            try
+            {
+                var connectionContext = GetServiceConnectionContext(context);
 
-            connectionContext.ApplyCryptographyProvider();
+                connectionContext.ApplyCryptographyProvider();
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
 
         public void OnNotificationEndpointConnect(RmContext context, NotificationEndpointConnect notification)
         {
-            var connectionContext = GetServiceConnectionContext(context);
+            try
+            {
+                var connectionContext = GetServiceConnectionContext(context);
 
-            Singletons.ServiceEngine.Logger.Verbose($"Received endpoint connection notification.");
+                Singletons.ServiceEngine.Logger.Verbose($"Received endpoint connection notification.");
 
-            Singletons.ServiceEngine.Tunnels.EstablishOutboundEndpointConnection(notification.TunnelId, notification.EndpointId, notification.StreamId);
+                Singletons.ServiceEngine.Tunnels.EstablishOutboundEndpointConnection(notification.TunnelId, notification.EndpointId, notification.StreamId);
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
 
         public void OnNotificationEndpointExchange(RmContext context, NotificationEndpointDataExchange notification)
         {
-            var connectionContext = GetServiceConnectionContext(context);
+            try
+            {
+                var connectionContext = GetServiceConnectionContext(context);
 
-            Singletons.ServiceEngine.Tunnels.SendEndpointData(notification.TunnelId, notification.EndpointId, notification.StreamId, notification.Bytes);
+                Singletons.ServiceEngine.Tunnels.SendEndpointData(notification.TunnelId, notification.EndpointId, notification.StreamId, notification.Bytes);
 
-            //Singletons.ServiceEngine.Logger.Debug($"Received endpoint data exchange.");
+                //Singletons.ServiceEngine.Logger.Debug($"Received endpoint data exchange.");
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
 
         public void OnNotificationTunnelDeletion(RmContext context, NotificationTunnelDeletion notification)
         {
-            var connectionContext = GetServiceConnectionContext(context);
+            try
+            {
+                var connectionContext = GetServiceConnectionContext(context);
 
-            Singletons.ServiceEngine.Tunnels.DeleteTunnel(notification.TunnelId);
+                Singletons.ServiceEngine.Tunnels.DeleteTunnel(notification.TunnelId);
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
     }
 }

@@ -78,7 +78,6 @@ namespace NetTunnel.UI.Forms
                     RepopulateTunnelsGrid();
                 }
             }
-
         }
 
         private bool ChangeConnection()
@@ -200,7 +199,7 @@ namespace NetTunnel.UI.Forms
                     {
                         var tTag = ((TunnelTag?)item.Tag).EnsureNotNull();
 
-                        var tunnelStats = statistics.Where(o => o.TunnelId == tTag.Tunnel.TunnelId).SingleOrDefault();
+                        var tunnelStats = statistics.SingleOrDefault(o => o.Direction == tTag.Tunnel.Direction && o.TunnelId == tTag.Tunnel.TunnelId);
                         if (tunnelStats != null)
                         {
 
@@ -596,14 +595,12 @@ namespace NetTunnel.UI.Forms
             listViewTunnels.Items.Clear();
             listViewEndpoints.Items.Clear();
 
-
             _client.QueryGetTunnels().ContinueWith(t =>
             {
                 t.Result.Collection.ForEach(t => AddTunnelToGrid(t));
             });
 
-
-            void AddTunnelToGrid(TunnelConfiguration tunnel)
+            void AddTunnelToGrid(TunnelDisplay tunnel)
             {
                 if (listViewTunnels.InvokeRequired)
                 {
@@ -613,7 +610,7 @@ namespace NetTunnel.UI.Forms
                 {
                     var item = new ListViewItem(tunnel.Name);
                     item.Tag = new TunnelTag(tunnel);
-                    item.SubItems.Add("????");
+                    item.SubItems.Add($"{tunnel.Direction}");
                     item.SubItems.Add($"{tunnel.Address}");
                     item.SubItems.Add($"{tunnel.Endpoints.Count:n0}");
                     item.SubItems.Add("∞");
@@ -624,7 +621,7 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-        private void RepopulateEndpointsGrid(TunnelConfiguration tunnel)
+        private void RepopulateEndpointsGrid(TunnelDisplay tunnel)
         {
             try
             {
@@ -643,7 +640,7 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-        private void RepopulateEndpointsGrid_LockRequired(TunnelConfiguration tunnel)
+        private void RepopulateEndpointsGrid_LockRequired(TunnelDisplay tunnel)
         {
             listViewEndpoints.Items.Clear();
 
@@ -653,7 +650,7 @@ namespace NetTunnel.UI.Forms
             tunnel.Endpoints.Where(o => o.Direction == NtDirection.Outbound)
                 .ToList().ForEach(x => AddEndpointOutboundToGrid(tunnel, x));
 
-            void AddEndpointInboundToGrid(TunnelConfiguration tunnel, EndpointConfiguration endpoint)
+            void AddEndpointInboundToGrid(TunnelDisplay tunnel, EndpointDisplay endpoint)
             {
                 if (listViewEndpoints.InvokeRequired)
                 {
@@ -674,7 +671,7 @@ namespace NetTunnel.UI.Forms
                 }
             }
 
-            void AddEndpointOutboundToGrid(TunnelConfiguration tunnel, EndpointConfiguration endpoint)
+            void AddEndpointOutboundToGrid(TunnelDisplay tunnel, EndpointDisplay endpoint)
             {
                 if (listViewEndpoints.InvokeRequired)
                 {

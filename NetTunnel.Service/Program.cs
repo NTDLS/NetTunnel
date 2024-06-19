@@ -7,6 +7,8 @@ namespace NetTunnel.Service
     {
         public static void Main()
         {
+            //NTDLS.Semaphore.ThreadOwnershipTracking.Enable();
+
             HostFactory.Run(x =>
             {
                 x.StartAutomatically();

@@ -12,7 +12,16 @@ namespace NetTunnel.Library.ReliableMessages.Query
         public List<TunnelStatistics> Statistics { get; set; } = new();
 
         public int AllTunnelIdAndEndpointIdHashes()
-            => Statistics.Sum(o => o.ChangeHash);
+        {
+            int combinedHash = int.MaxValue / 2;
+
+            foreach (var stat in Statistics)
+            {
+                combinedHash = Utility.CombineHashes(combinedHash, stat.ChangeHash);
+            }
+
+            return combinedHash;
+        }
 
         public QueryGetTunnelStatisticsReply()
         {

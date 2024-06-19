@@ -17,27 +17,51 @@ namespace NetTunnel.Service.ReliableMessageHandlers
         /// <param name="notification"></param>
         public void OnNotificationEndpointConnect(RmContext context, NotificationEndpointConnect notification)
         {
-            var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
+            try
+            {
+                var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
 
-            Singletons.ServiceEngine.Logger.Verbose($"Received endpoint connection notification.");
+                Singletons.ServiceEngine.Logger.Verbose($"Received endpoint connection notification.");
 
-            Singletons.ServiceEngine.Tunnels.EstablishOutboundEndpointConnection(notification.TunnelId, notification.EndpointId, notification.StreamId);
+                Singletons.ServiceEngine.Tunnels.EstablishOutboundEndpointConnection(notification.TunnelId, notification.EndpointId, notification.StreamId);
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
 
         public void OnNotificationEndpointExchange(RmContext context, NotificationEndpointDataExchange notification)
         {
-            var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
+            try
+            {
+                var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
 
-            tunnel.SendEndpointData(notification.EndpointId, notification.StreamId, notification.Bytes);
+                tunnel.SendEndpointData(notification.EndpointId, notification.StreamId, notification.Bytes);
 
-            //Singletons.ServiceEngine.Logger.Debug($"Received endpoint data exchange.");
+                //Singletons.ServiceEngine.Logger.Debug($"Received endpoint data exchange.");
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
 
         public void OnNotificationTunnelDeletion(RmContext context, NotificationTunnelDeletion notification)
         {
-            var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
+            try
+            {
+                var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
 
-            Singletons.ServiceEngine.Tunnels.DeleteTunnel(notification.TunnelId);
+                Singletons.ServiceEngine.Tunnels.DeleteTunnel(notification.TunnelId);
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
     }
 }

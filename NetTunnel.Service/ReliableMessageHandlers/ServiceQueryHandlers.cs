@@ -25,95 +25,164 @@ namespace NetTunnel.Service.ReliableMessageHandlers
         /// <returns></returns>
         public QueryReplyKeyExchangeReply OnQueryRequestKeyExchange(RmContext context, QueryRequestKeyExchange query)
         {
-            var connectionContext = GetServiceConnectionContext(context);
+            try
+            {
+                var connectionContext = GetServiceConnectionContext(context);
 
-            var compoundNegotiator = new CompoundNegotiator();
-            var negotiationReplyToken = compoundNegotiator.ApplyNegotiationToken(query.NegotiationToken);
-            var negotiationReply = new QueryReplyKeyExchangeReply(context.ConnectionId, negotiationReplyToken);
+                var compoundNegotiator = new CompoundNegotiator();
+                var negotiationReplyToken = compoundNegotiator.ApplyNegotiationToken(query.NegotiationToken);
+                var negotiationReply = new QueryReplyKeyExchangeReply(context.ConnectionId, negotiationReplyToken);
 
-            connectionContext.InitializeCryptographyProvider(compoundNegotiator.SharedSecret);
+                connectionContext.InitializeCryptographyProvider(compoundNegotiator.SharedSecret);
 
-            return negotiationReply;
+                return negotiationReply;
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
 
         public QueryLoginReply OnQueryLogin(RmContext context, QueryLogin query)
         {
-            var connectionContext = EnforceCryptographyAndGetServiceConnectionContext(context);
-
-            if (Singletons.ServiceEngine.Users.ValidatePassword(query.UserName, query.PasswordHash))
+            try
             {
-                connectionContext.SetAuthenticated(query.UserName);
+                var connectionContext = EnforceCryptographyAndGetServiceConnectionContext(context);
 
-                return new QueryLoginReply(true)
+                if (Singletons.ServiceEngine.Users.ValidatePassword(query.UserName, query.PasswordHash))
                 {
-                    ServiceId = Singletons.Configuration.ServiceId
-                };
-            }
+                    connectionContext.SetAuthenticated(query.UserName);
 
-            return new QueryLoginReply(false);
+                    return new QueryLoginReply(true)
+                    {
+                        ServiceId = Singletons.Configuration.ServiceId
+                    };
+                }
+
+                return new QueryLoginReply(false);
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
 
         public QueryGetTunnelsReply OnGetTunnels(RmContext context, QueryGetTunnels query)
         {
-            var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
-
-            return new QueryGetTunnelsReply
+            try
             {
-                Collection = Singletons.ServiceEngine.Tunnels.Clone(),
-            };
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+                return new QueryGetTunnelsReply
+                {
+                    Collection = Singletons.ServiceEngine.Tunnels.GetForDisplay(),
+                };
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
 
         public QueryCreateTunnelReply OnQueryCreateTunnel(RmContext context, QueryCreateTunnel query)
         {
-            var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
-            Singletons.ServiceEngine.Tunnels.UpsertTunnel(query.Configuration);
+                Singletons.ServiceEngine.Tunnels.UpsertTunnel(query.Configuration);
 
-            return new QueryCreateTunnelReply();
+                return new QueryCreateTunnelReply();
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
 
         public QueryPingReply OnQueryCreateTunnel(RmContext context, QueryPing query)
         {
-            var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
-            return new QueryPingReply(query.OriginationTimestamp);
+                return new QueryPingReply(query.OriginationTimestamp);
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
 
         public QueryUpsertEndpointReply OnQueryUpsertEndpoint(RmContext context, QueryUpsertEndpoint query)
         {
-            var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
-            Singletons.ServiceEngine.Tunnels.UpsertEndpoint(query.TunnelId, query.Configuration);
-            return new QueryUpsertEndpointReply();
+                Singletons.ServiceEngine.Tunnels.UpsertEndpoint(query.TunnelId, query.Configuration);
+                return new QueryUpsertEndpointReply();
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
 
         public QueryRegisterTunnelReply OnRegisterTunnel(RmContext context, QueryRegisterTunnel query)
         {
-            var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
-
-            Singletons.ServiceEngine.Tunnels.RegisterTunnel(context.ConnectionId, query.Configuration);
-
-            return new QueryRegisterTunnelReply();
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+                Singletons.ServiceEngine.Tunnels.RegisterTunnel(context.ConnectionId, query.Configuration);
+                return new QueryRegisterTunnelReply();
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
 
         public QueryGetTunnelStatisticsReply OnQueryGetTunnelStatistics(RmContext context, QueryGetTunnelStatistics query)
         {
-            var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
-
-            return new QueryGetTunnelStatisticsReply()
+            try
             {
-                Statistics = Singletons.ServiceEngine.Tunnels.GetStatistics()
-            };
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+                return new QueryGetTunnelStatisticsReply()
+                {
+                    Statistics = Singletons.ServiceEngine.Tunnels.GetStatistics()
+                };
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
 
         public QueryDeleteEndpointReply OnQueryDeleteEndpoint(RmContext context, QueryDeleteEndpoint query)
         {
-            var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
-            //We want to stop and delete the tunnel locally.
-            Singletons.ServiceEngine.Tunnels.DeleteTunnel(query.TunnelId);
+                //We want to stop and delete the tunnel locally.
+                Singletons.ServiceEngine.Tunnels.DeleteTunnel(query.TunnelId);
 
-            return new QueryDeleteEndpointReply();
+                return new QueryDeleteEndpointReply();
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
     }
 }

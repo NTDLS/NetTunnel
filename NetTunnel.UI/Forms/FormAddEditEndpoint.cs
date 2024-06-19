@@ -9,14 +9,14 @@ namespace NetTunnel.UI.Forms
     public partial class FormAddEditEndpoint : Form
     {
         private readonly ServiceClient? _client;
-        private readonly TunnelConfiguration? _tunnel;
+        private readonly TunnelDisplay? _tunnel;
         private readonly NtDirection _direction = NtDirection.Undefined;
-        private readonly EndpointConfiguration? _existingEndpoint;
+        private readonly EndpointDisplay? _existingEndpoint;
 
         /// <summary>
         /// Creates a form for a editing an existing endpoint.
         /// </summary>
-        public FormAddEditEndpoint(ServiceClient client, TunnelConfiguration tunnel, EndpointConfiguration existingEndpoint)
+        public FormAddEditEndpoint(ServiceClient client, TunnelDisplay tunnel, EndpointDisplay existingEndpoint)
         {
             InitializeComponent();
 
@@ -33,7 +33,7 @@ namespace NetTunnel.UI.Forms
         /// <summary>
         /// Creates a form for a adding a new endpoint.
         /// </summary>
-        public FormAddEditEndpoint(ServiceClient client, TunnelConfiguration tunnel, NtDirection direction)
+        public FormAddEditEndpoint(ServiceClient client, TunnelDisplay tunnel, NtDirection direction)
         {
             InitializeComponent();
 

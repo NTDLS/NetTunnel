@@ -16,13 +16,21 @@ namespace NetTunnel.Service.ReliableMessageHandlers
         /// </summary>
         public ServiceConnectionState EnforceLoginCryptographyAndGetServiceConnectionContext(RmContext context)
         {
-            var tunnelContext = GetServiceConnectionContext(context);
-
-            if (!tunnelContext.IsAuthenticated || !tunnelContext.SecureKeyExchangeIsComplete)
+            try
             {
-                throw new Exception("Cryptography has not fully initialized and applied.");
+                var tunnelContext = GetServiceConnectionContext(context);
+
+                if (!tunnelContext.IsAuthenticated || !tunnelContext.SecureKeyExchangeIsComplete)
+                {
+                    throw new Exception("Cryptography has not fully initialized and applied.");
+                }
+                return tunnelContext;
             }
-            return tunnelContext;
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -30,13 +38,21 @@ namespace NetTunnel.Service.ReliableMessageHandlers
         /// </summary>
         public ServiceConnectionState EnforceCryptographyAndGetServiceConnectionContext(RmContext context)
         {
-            var tunnelContext = GetServiceConnectionContext(context);
-
-            if (!tunnelContext.SecureKeyExchangeIsComplete)
+            try
             {
-                throw new Exception("Cryptography has not fully initialized and applied.");
+                var tunnelContext = GetServiceConnectionContext(context);
+
+                if (!tunnelContext.SecureKeyExchangeIsComplete)
+                {
+                    throw new Exception("Cryptography has not fully initialized and applied.");
+                }
+                return tunnelContext;
             }
-            return tunnelContext;
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -44,14 +60,22 @@ namespace NetTunnel.Service.ReliableMessageHandlers
         /// </summary>
         public ServiceConnectionState GetServiceConnectionContext(RmContext context)
         {
-            if (Singletons.ServiceEngine.ServiceConnectionStates.TryGetValue(context.ConnectionId, out var connection))
+            try
             {
-                if (connection.Validate($"{context.TcpClient.Client.RemoteEndPoint}"))
+                if (Singletons.ServiceEngine.ServiceConnectionStates.TryGetValue(context.ConnectionId, out var connection))
                 {
-                    return connection;
+                    if (connection.Validate($"{context.TcpClient.Client.RemoteEndPoint}"))
+                    {
+                        return connection;
+                    }
                 }
+                throw new Exception("Connection not found.");
             }
-            throw new Exception("Connection not found.");
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
         }
     }
 }

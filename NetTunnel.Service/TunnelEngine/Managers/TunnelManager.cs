@@ -85,9 +85,15 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             Collection.Use((o) =>
             {
-                var existingTunnel = o.Where(o => o.Configuration.TunnelId == config.TunnelId).SingleOrDefault();
+                var existingTunnel = o.OfType<TunnelInbound>()
+                    .Where(o => o.Configuration.TunnelId == config.TunnelId).SingleOrDefault();
                 if (existingTunnel != null)
                 {
+                    if (config.ServiceId == Singletons.Configuration.ServiceId)
+                    {
+                        //I'm not even sure if we can get here, but this is definitely an exception.
+                        throw new Exception("This configuration is not supported.");
+                    }
                     existingTunnel.Stop();
                     o.Remove(existingTunnel);
                 }
@@ -227,7 +233,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                     {
                         c.ServiceId = Singletons.Configuration.ServiceId; //Take ownership of tunnels if they are in the config file.
                         c.TunnelId = Guid.NewGuid(); //Tunnels get a new ID every time they are loaded. This makes it easy to copy configs to other machines.
-                        c.Endpoints.ForEach(e=> e.EndpointId = Guid.NewGuid()); //Endpoints get a new ID every time they are loaded. This makes it easy to copy configs to other machines.
+                        c.Endpoints.ForEach(e => e.EndpointId = Guid.NewGuid()); //Endpoints get a new ID every time they are loaded. This makes it easy to copy configs to other machines.
                         o.Add(new TunnelOutbound(_serviceEngine, c));
                     });
             });
@@ -248,6 +254,28 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
+        public List<TunnelDisplay> GetForDisplay()
+        {
+            return Collection.Use((o) =>
+            {
+                List<TunnelDisplay> results = new();
+                foreach (var tunnel in o)
+                {
+                    results.Add(new TunnelDisplay
+                    {
+                        TunnelId = tunnel.Configuration.TunnelId,
+                        Address = tunnel.Configuration.Address,
+                        Direction = tunnel is TunnelOutbound ? NtDirection.Outbound : NtDirection.Inbound,
+                        Endpoints = tunnel.Configuration.GetEndpointsForDisplay(),
+                        ManagementPort = tunnel.Configuration.ManagementPort,
+                        Name = tunnel.Configuration.Name,
+                        ServiceId = tunnel.Configuration.ServiceId,
+                    });
+                }
+                return results;
+            });
+        }
+
         public List<TunnelStatistics> GetStatistics()
         {
             var result = new List<TunnelStatistics>();
@@ -258,7 +286,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 {
                     var tunnelStats = new TunnelStatistics()
                     {
-                        Direction = tunnel.Configuration.ServiceId == Singletons.Configuration.ServiceId ? NtDirection.Outbound : NtDirection.Inbound,
+                        Direction = tunnel is TunnelOutbound ? NtDirection.Outbound : NtDirection.Inbound,
                         Status = tunnel.Status,
                         TunnelId = tunnel.Configuration.TunnelId,
                         BytesReceived = tunnel.BytesReceived,
