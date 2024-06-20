@@ -139,7 +139,6 @@ namespace NetTunnel.Service.TunnelEngine
 
                     if (ex.InnerException is SocketException sockEx)
                     {
-
                         if (sockEx.SocketErrorCode == SocketError.ConnectionRefused)
                         {
                             ServiceEngine.Logger.Warning(

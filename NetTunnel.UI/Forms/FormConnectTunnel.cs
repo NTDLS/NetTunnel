@@ -83,17 +83,12 @@ namespace NetTunnel.UI.Forms
                 {
                     progressForm.Execute(() =>
                     {
-                        //Just to test the login.
-                        //TODO: If the connection fails, prompt if the user wants to still add the tunnel.
                         var remoteClient = ServiceClient.CreateConnectAndLogin(_delegateLogger, tunnel.Address,
                             tunnel.ManagementPort, tunnel.Username, tunnel.PasswordHash).ContinueWith(async x =>
                             {
                                 try
                                 {
-                                    if (!x.IsCompletedSuccessfully)
-                                    {
-                                        throw new Exception(x.Exception?.Message ?? "An unknown exception occurred.");
-                                    }
+                                    Tasks.ThrowTaskException(x);
 
                                     await _client.QueryCreateTunnel(tunnel);
 

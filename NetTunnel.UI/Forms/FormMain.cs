@@ -128,9 +128,11 @@ namespace NetTunnel.UI.Forms
                 {
                     if (_client != null && _client.IsConnected)
                     {
-                        _client.QueryGetTunnelStatistics().ContinueWith(o =>
+                        _client.QueryGetTunnelStatistics().ContinueWith(x =>
                         {
-                            int allTunnelAndEndpointHashes = o.Result.AllTunnelIdAndEndpointIdHashes();
+                            Tasks.ThrowTaskException(x);
+
+                            int allTunnelAndEndpointHashes = x.Result.AllTunnelIdAndEndpointIdHashes();
 
                             if (allTunnelAndEndpointHashes != _allTunnelAndEndpointHashes && _allTunnelAndEndpointHashes != -1)
                             {
@@ -138,8 +140,8 @@ namespace NetTunnel.UI.Forms
                             }
                             _allTunnelAndEndpointHashes = allTunnelAndEndpointHashes;
 
-                            PopulateEndpointStatistics(o.Result.Statistics);
-                            PopulateTunnelStatistics(o.Result.Statistics);
+                            PopulateEndpointStatistics(x.Result.Statistics);
+                            PopulateTunnelStatistics(x.Result.Statistics);
                         }).Wait();
                     }
 
@@ -529,14 +531,20 @@ namespace NetTunnel.UI.Forms
 
                         if (rowUnderMouse.Tag is TunnelTag tunnelInbound)
                         {
-                            _client.EnsureNotNull().QueryDeleteTunnel(tTag.Tunnel.TunnelKey).ContinueWith((o) =>
+                            _client.EnsureNotNull().QueryDeleteTunnel(tTag.Tunnel.TunnelKey).ContinueWith((x) =>
                             {
-                                if (o.IsCompletedSuccessfully == false)
+                                try
                                 {
+                                    Tasks.ThrowTaskException(x);
+
                                     Invoke(new Action(() =>
                                     {
                                         _needToRepopulateTunnels = true;
                                     }));
+                                }
+                                catch (Exception ex)
+                                {
+                                    this.InvokeMessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                                 }
                             });
                         }
