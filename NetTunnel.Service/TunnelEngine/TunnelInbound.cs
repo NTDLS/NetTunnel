@@ -70,6 +70,12 @@ namespace NetTunnel.Service.TunnelEngine
             ServiceEngine.SendNotificationOfTunnelDeletion(ConnectionId, tunnelKey);
         }
 
+        public void SendNotificationOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
+        {
+            //Inbound tunnels communicate all data through the ServiceEngine._messageServer based on the ConnectionId.
+            ServiceEngine.SendNotificationOfEndpointDeletion(ConnectionId, tunnelKey, endpointId);
+        }
+
         public override void Start()
         {
             base.Start();

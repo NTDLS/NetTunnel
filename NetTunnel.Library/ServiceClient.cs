@@ -6,6 +6,7 @@ using NetTunnel.Service.ReliableMessages;
 using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
+using System.Net;
 
 namespace NetTunnel.Library
 {
@@ -154,6 +155,9 @@ namespace NetTunnel.Library
         public QueryDeleteTunnelReply QueryDeleteTunnel(DirectionalKey tunnelKey)
             => Client.Query(new QueryDeleteTunnel(tunnelKey)).Result;
 
+        public QueryDeleteEndpointReply QueryDeleteEndpoint(DirectionalKey tunnelKey, Guid endpointId)
+            => Client.Query(new QueryDeleteEndpoint(tunnelKey, endpointId)).Result;
+
         public QueryGetTunnelsReply QueryGetTunnels()
             => Client.Query(new QueryGetTunnels()).Result;
 
@@ -186,6 +190,9 @@ namespace NetTunnel.Library
 
         public void SendNotificationOfTunnelDeletion(DirectionalKey tunnelKey)
             => Client.Notify(new NotificationTunnelDeletion(tunnelKey));
+
+        public void SendNotificationOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
+            => Client.Notify(new NotificationEndpointDeletion(tunnelKey, endpointId));
 
         public void NotificationEndpointExchange(DirectionalKey tunnelKey, Guid endpointId, Guid streamId, byte[] bytes, int length)
             => Client.Notify(new NotificationEndpointDataExchange(tunnelKey, endpointId, streamId, bytes, length));

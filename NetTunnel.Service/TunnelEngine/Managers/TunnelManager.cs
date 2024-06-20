@@ -137,7 +137,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         }
 
         /// <summary>
-        /// The local service is adding/editing an endpoint to a local outbound tunnel.
+        /// The local service is adding/editing an endpoint to a local tunnel.
         /// </summary>
         /// <param name="tunnelId"></param>
         /// <param name="endpointConfiguration"></param>
@@ -152,18 +152,23 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-
-
         /// <summary>
-        /// The local service is deleting an endpoint from a local outbound tunnel.
+        /// The local service is deleting an endpoint from a local tunnel.
         /// </summary>
         /// <param name="tunnelId"></param>
         /// <param name="endpointId"></param>
-        public void DeleteEndpoint(Guid tunnelId, Guid endpointId)
+        public void DeleteEndpoint(DirectionalKey tunnelKey, Guid endpointId)
         {
             Collection.Use((o) =>
             {
-                var tunnel = o.Single(o => o.Configuration.TunnelId == tunnelId);
+                var tunnel = o.Single(o => o.TunnelKey == tunnelKey);
+
+                if (tunnel.IsLoggedIn)
+                {
+                    //Let the other end of the tunnel know that we are deleting the endpoint.
+                    tunnel.SendNotificationOfEndpointDeletion(tunnelKey.SwapDirection(), endpointId);
+                }
+
                 tunnel.DeleteEndpoint(endpointId);
 
                 SaveToDisk();

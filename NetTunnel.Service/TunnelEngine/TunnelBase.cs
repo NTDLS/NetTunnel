@@ -160,5 +160,9 @@ namespace NetTunnel.Service.TunnelEngine
 
         void ITunnel.SendNotificationOfTunnelDeletion(DirectionalKey tunnelKey)
            => throw new NotImplementedException("This function should be overridden.");
+
+        void ITunnel.SendNotificationOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
+           => throw new NotImplementedException("This function should be overridden.");
+
     }
 }

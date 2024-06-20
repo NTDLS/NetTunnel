@@ -89,6 +89,15 @@ namespace NetTunnel.Service.TunnelEngine
             => _messageServer.Notify(connectionId, new NotificationTunnelDeletion(tunnelKey));
 
         /// <summary>
+        /// Notify the remote tunnel service that the endpoint is being deleted.
+        /// </summary>
+        /// <param name="connectionId"></param>
+        /// <param name="tunnelKey"></param>
+        /// <param name="endpointId"></param>
+        public void SendNotificationOfEndpointDeletion(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId)
+            => _messageServer.Notify(connectionId, new NotificationEndpointDeletion(tunnelKey, endpointId));
+
+        /// <summary>
         /// Sends a notification to the remote tunnel service containing the data that was received
         ///     by an endpoint. This data is to be sent to the endpoint connection with the matching
         ///     StreamId (which was originally sent to SendNotificationOfEndpointConnect()

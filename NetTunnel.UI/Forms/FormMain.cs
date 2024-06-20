@@ -1,8 +1,10 @@
-﻿using NetTunnel.Library.Payloads;
+﻿using NetTunnel.Library.Interfaces;
+using NetTunnel.Library.Payloads;
 using NetTunnel.UI.Helpers;
 using NetTunnel.UI.Types;
 using NTDLS.Helpers;
 using NTDLS.WinFormsHelpers;
+using System.Net;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms
@@ -345,19 +347,23 @@ namespace NetTunnel.UI.Forms
                         {
                             return;
                         }
-                        /*
-                        _client.EnsureNotNull().QueryDeleteEndpoint(eTag.Tunnel.TunnelId, eTag.Endpoint.EndpointId).ContinueWith((o) =>
+
+                        var progressForm = new ProgressForm(FriendlyName, "Deleting endpoint...");
+
+                        progressForm.Execute(() =>
                         {
-                            if (o.IsCompletedSuccessfully == false)
+                            try
                             {
-                                Invoke(new Action(() =>
-                                {
-                                    _needToRepopulateTunnels = true;
-                                }));
+                                _client.EnsureNotNull().QueryDeleteEndpoint(eTag.Tunnel.TunnelKey, eTag.Endpoint.EndpointId);
+
+                                _needToRepopulateTunnels = true;
+                                listViewEndpoints.InvokeClearRows();
+                            }
+                            catch (Exception ex)
+                            {
+                                progressForm.MessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                             }
                         });
-                        */
-                        listViewEndpoints.InvokeClearRows();
                     }
                 };
             }

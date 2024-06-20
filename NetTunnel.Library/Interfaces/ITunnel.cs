@@ -53,5 +53,6 @@ namespace NetTunnel.Library.Interfaces
         public void SendNotificationOfEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid streamId);
 
         public void SendNotificationOfTunnelDeletion(DirectionalKey tunnelKey);
+        public void SendNotificationOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId);
     }
 }

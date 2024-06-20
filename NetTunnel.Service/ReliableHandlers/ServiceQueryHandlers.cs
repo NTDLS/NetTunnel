@@ -289,5 +289,22 @@ namespace NetTunnel.Service.ReliableHandlers
                 throw;
             }
         }
+
+        public QueryDeleteEndpointReply OnQueryDeleteEndpoint(RmContext context, QueryDeleteEndpoint query)
+        {
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+                Singletons.ServiceEngine.Tunnels.DeleteEndpoint(query.TunnelKey, query.EndpointId);
+
+                return new QueryDeleteEndpointReply();
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
+        }
     }
 }

@@ -8,6 +8,7 @@ namespace NetTunnel.Library.Interfaces
 
         public void SendNotificationOfEndpointConnect(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId, Guid streamId);
         public void SendNotificationOfTunnelDeletion(Guid connectionId, DirectionalKey tunnelKey);
+        public void SendNotificationOfEndpointDeletion(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId);
         public void SendNotificationOfEndpointDataExchange(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId, Guid streamId, byte[] bytes, int length);
     }
 }

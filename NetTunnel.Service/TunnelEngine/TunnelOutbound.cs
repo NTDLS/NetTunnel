@@ -62,6 +62,9 @@ namespace NetTunnel.Service.TunnelEngine
         public void SendNotificationOfTunnelDeletion(DirectionalKey tunnelKey)
             => _client.SendNotificationOfTunnelDeletion(tunnelKey);
 
+        public void SendNotificationOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
+            => _client.SendNotificationOfEndpointDeletion(tunnelKey, endpointId);
+
         private void Client_OnDisconnected(RmContext context)
         {
             Status = NtTunnelStatus.Disconnected;

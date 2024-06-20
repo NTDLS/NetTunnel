@@ -1,21 +1,17 @@
-﻿using NTDLS.ReliableMessaging;
+﻿using NetTunnel.Library.Payloads;
+using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Library.ReliablePayloads.Query
 {
     public class QueryDeleteEndpoint : IRmQuery<QueryDeleteEndpointReply>
     {
-        public Guid TunnelId { get; set; }
+        public DirectionalKey TunnelKey { get; set; }
         public Guid EndpointId { get; set; }
 
-        public QueryDeleteEndpoint(Guid tunnelId, Guid endpointId)
+        public QueryDeleteEndpoint(DirectionalKey tunnelKey, Guid endpointId)
         {
-            TunnelId = tunnelId;
+            TunnelKey = tunnelKey;
             EndpointId = endpointId;
-        }
-
-        public QueryDeleteEndpoint()
-        {
-
         }
     }
 

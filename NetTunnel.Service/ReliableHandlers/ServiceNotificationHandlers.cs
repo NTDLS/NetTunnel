@@ -84,5 +84,20 @@ namespace NetTunnel.Service.ReliableHandlers
                 throw;
             }
         }
+
+        public void OnNotificationEndpointDeletion(RmContext context, NotificationEndpointDeletion notification)
+        {
+            try
+            {
+                var connectionContext = GetServiceConnectionContext(context);
+
+                Singletons.ServiceEngine.Tunnels.DeleteEndpoint(notification.TunnelKey.EnsureNotNull(), notification.EndpointId);
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
+        }
     }
 }
