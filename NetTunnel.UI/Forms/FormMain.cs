@@ -1,10 +1,8 @@
-﻿using NetTunnel.Library.Interfaces;
-using NetTunnel.Library.Payloads;
+﻿using NetTunnel.Library.Payloads;
 using NetTunnel.UI.Helpers;
 using NetTunnel.UI.Types;
 using NTDLS.Helpers;
 using NTDLS.WinFormsHelpers;
-using System.Net;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms

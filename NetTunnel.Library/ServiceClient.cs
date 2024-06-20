@@ -6,7 +6,6 @@ using NetTunnel.Service.ReliableMessages;
 using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
-using System.Net;
 
 namespace NetTunnel.Library
 {
