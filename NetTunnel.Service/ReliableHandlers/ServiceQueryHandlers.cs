@@ -185,5 +185,23 @@ namespace NetTunnel.Service.ReliableHandlers
                 throw;
             }
         }
+
+        public QueryGetUsersReply OnQueryGetUsers(RmContext context, QueryGetUsers query)
+        {
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+                return new QueryGetUsersReply()
+                {
+                    Collection = Singletons.ServiceEngine.Users.Clone()
+                };
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
+        }
     }
 }

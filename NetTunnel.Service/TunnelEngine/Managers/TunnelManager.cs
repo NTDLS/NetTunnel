@@ -1,6 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Interfaces;
-using NetTunnel.Library.Types;
+using NetTunnel.Library.Payloads;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using NTDLS.Helpers;
 using NTDLS.Persistence;

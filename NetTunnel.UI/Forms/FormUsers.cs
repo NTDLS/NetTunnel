@@ -1,12 +1,14 @@
 ﻿using NetTunnel.Library;
-using NetTunnel.Service;
+using NetTunnel.Library.Payloads;
 using NTDLS.Helpers;
+using NTDLS.WinFormsHelpers;
 
 namespace NetTunnel.UI.Forms
 {
     public partial class FormUsers : Form
     {
         private readonly ServiceClient? _client;
+        private bool _firstShown = true;
 
         public FormUsers()
         {
@@ -17,24 +19,39 @@ namespace NetTunnel.UI.Forms
         {
             InitializeComponent();
             _client = client;
-
             listViewUsers.MouseUp += ListViewUsers_MouseUp;
+            Shown += FormUsers_Shown;
         }
 
-        private void FormUsers_Load(object sender, EventArgs e)
+        private void FormUsers_Shown(object? sender, EventArgs e)
         {
-            /*
-            _client.EnsureNotNull().Security.ListUsers().ContinueWith(t =>
+            if (!_firstShown)
             {
-                foreach (var user in t.Result.Collection)
+                return;
+            }
+            _firstShown = false;
+
+            var progressForm = new ProgressForm(Constants.FriendlyName, "Logging in...");
+
+            progressForm.Execute(() =>
+            {
+                _client.EnsureNotNull().QueryGetUsers().ContinueWith(x =>
                 {
-                    AddUserToGrid(user);
-                }
+                    try
+                    {
+                        Tasks.ThrowTaskException(x);
+
+                        x.Result.Collection.ForEach(u => AddUserToGrid(u));
+                    }
+                    catch (Exception ex)
+                    {
+                        progressForm.MessageBox(ex.Message, Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    }
+                }).Wait();
             });
-            */
         }
 
-        void AddUserToGrid(User? user)
+        private void AddUserToGrid(User? user)
         {
             if (user == null) return;
 

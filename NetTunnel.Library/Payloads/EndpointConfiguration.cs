@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Converters;
 using static NetTunnel.Library.Constants;
 
-namespace NetTunnel.Library.Types
+namespace NetTunnel.Library.Payloads
 {
     /// <summary>
     /// The endpoint contains information that defines all we need to listen or connect to an endpoint.

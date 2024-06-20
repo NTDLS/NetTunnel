@@ -1,6 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Interfaces;
-using NetTunnel.Library.Types;
+using NetTunnel.Library.Payloads;
 using NTDLS.Helpers;
 using NTDLS.Semaphore;
 using System.Net.Sockets;

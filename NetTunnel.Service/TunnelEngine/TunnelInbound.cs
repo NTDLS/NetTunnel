@@ -1,5 +1,5 @@
 ﻿using NetTunnel.Library.Interfaces;
-using NetTunnel.Library.Types;
+using NetTunnel.Library.Payloads;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine

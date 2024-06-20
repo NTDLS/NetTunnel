@@ -1,4 +1,4 @@
-﻿namespace NetTunnel.Service
+﻿namespace NetTunnel.Library.Payloads
 {
     public class User
     {

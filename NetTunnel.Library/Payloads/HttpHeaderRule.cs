@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Converters;
 using static NetTunnel.Library.Constants;
 
-namespace NetTunnel.Library
+namespace NetTunnel.Library.Payloads
 {
     public class HttpHeaderRule
     {

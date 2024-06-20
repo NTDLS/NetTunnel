@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library;
+using NetTunnel.Library.Payloads;
 using NTDLS.Persistence;
 using NTDLS.Semaphore;
 
@@ -49,6 +50,13 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 return true;
             }
             return false;
+        }
+
+        public List<User> Clone()
+        {
+            var results = new List<User>();
+            _collection.Use((o) => o.ForEach(u => results.Add(u)));
+            return results;
         }
 
         public void SaveToDisk()

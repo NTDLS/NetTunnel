@@ -1,4 +1,4 @@
-﻿using NetTunnel.Library.Types;
+﻿using NetTunnel.Library.Payloads;
 using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Library.ReliablePayloads.Notification

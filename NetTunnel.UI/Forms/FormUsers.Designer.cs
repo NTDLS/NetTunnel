@@ -77,7 +77,6 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
             Text = "NetTunnel : Users";
-            Load += FormUsers_Load;
             ResumeLayout(false);
         }
 

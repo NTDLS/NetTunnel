@@ -1,4 +1,4 @@
-﻿using NetTunnel.Library.Types;
+﻿using NetTunnel.Library.Payloads;
 
 namespace NetTunnel.Library.Interfaces
 {

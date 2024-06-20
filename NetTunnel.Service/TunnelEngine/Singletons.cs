@@ -1,4 +1,4 @@
-﻿using NetTunnel.Library.Types;
+﻿using NetTunnel.Library.Payloads;
 using NTDLS.Persistence;
 
 namespace NetTunnel.Service.TunnelEngine

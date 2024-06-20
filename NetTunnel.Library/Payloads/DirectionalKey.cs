@@ -1,7 +1,7 @@
 ﻿using NetTunnel.Library.Interfaces;
 using static NetTunnel.Library.Constants;
 
-namespace NetTunnel.Library.Types
+namespace NetTunnel.Library.Payloads
 {
     public class DirectionalKey : IEquatable<DirectionalKey>
     {
@@ -36,7 +36,7 @@ namespace NetTunnel.Library.Types
         /// <returns></returns>
         public DirectionalKey SwapDirection()
         {
-            return new DirectionalKey(Id, (Direction == NtDirection.Inbound ? NtDirection.Outbound : NtDirection.Inbound));
+            return new DirectionalKey(Id, Direction == NtDirection.Inbound ? NtDirection.Outbound : NtDirection.Inbound);
         }
 
         public override string ToString() => $"{Id}:{Direction}";

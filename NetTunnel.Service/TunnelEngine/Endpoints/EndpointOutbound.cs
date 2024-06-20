@@ -1,5 +1,5 @@
 ﻿using NetTunnel.Library.Interfaces;
-using NetTunnel.Library.Types;
+using NetTunnel.Library.Payloads;
 using NTDLS.Helpers;
 using System.Net.Sockets;
 using static NetTunnel.Library.Constants;

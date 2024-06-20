@@ -1,6 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Interfaces;
-using NetTunnel.Library.Types;
+using NetTunnel.Library.Payloads;
 using NetTunnel.Service.ReliableHandlers;
 using NTDLS.ReliableMessaging;
 using System.Net.Sockets;

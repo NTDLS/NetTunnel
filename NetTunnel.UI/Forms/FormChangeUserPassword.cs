@@ -1,5 +1,5 @@
 ﻿using NetTunnel.Library;
-using NetTunnel.Service;
+using NetTunnel.Library.Payloads;
 using NTDLS.Helpers;
 using NTDLS.WinFormsHelpers;
 

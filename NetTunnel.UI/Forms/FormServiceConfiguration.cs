@@ -1,5 +1,5 @@
 ﻿using NetTunnel.Library;
-using NetTunnel.Library.Types;
+using NetTunnel.Library.Payloads;
 using NTDLS.WinFormsHelpers;
 
 namespace NetTunnel.UI.Forms

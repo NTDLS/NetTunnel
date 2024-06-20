@@ -1,4 +1,4 @@
-﻿namespace NetTunnel.Library.Types
+﻿namespace NetTunnel.Library.Payloads
 {
     public class TunnelTag
     {

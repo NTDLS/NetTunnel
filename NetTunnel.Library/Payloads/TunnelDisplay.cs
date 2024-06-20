@@ -1,6 +1,6 @@
 ﻿using static NetTunnel.Library.Constants;
 
-namespace NetTunnel.Library.Types
+namespace NetTunnel.Library.Payloads
 {
     public class TunnelDisplay
     {

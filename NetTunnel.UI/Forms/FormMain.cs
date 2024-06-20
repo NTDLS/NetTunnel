@@ -1,4 +1,4 @@
-﻿using NetTunnel.Library.Types;
+﻿using NetTunnel.Library.Payloads;
 using NetTunnel.UI.Helpers;
 using NTDLS.Helpers;
 using NTDLS.WinFormsHelpers;

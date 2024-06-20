@@ -1,7 +1,7 @@
 ﻿using NetTunnel.Library.Interfaces;
+using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Notification;
 using NetTunnel.Library.ReliablePayloads.Query;
-using NetTunnel.Library.Types;
 using NetTunnel.Service.ReliableMessages;
 using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
@@ -162,6 +162,9 @@ namespace NetTunnel.Library
 
         public async Task<QueryUpsertEndpointReply> QueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration configuration)
             => await Client.Query(new QueryUpsertEndpoint(tunnelKey, configuration));
+
+        public async Task<QueryGetUsersReply> QueryGetUsers()
+            => await Client.Query(new QueryGetUsers());
 
         public void NotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid streamId)
             => Client.Notify(new NotificationEndpointConnect(tunnelKey, endpointId, streamId));
