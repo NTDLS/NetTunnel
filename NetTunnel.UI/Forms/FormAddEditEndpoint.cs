@@ -137,11 +137,15 @@ namespace NetTunnel.UI.Forms
                     }
                 }
 
-                var endpointId = _existingEndpoint?.EndpointId ?? Guid.NewGuid(); //The endpointId is the same on both services.
-
-                var endpoint = new EndpointConfiguration(endpointId, _direction,
-                    textBoxName.Text, textBoxOutboundAddress.Text, textBoxInboundPort.ValueAs<int>(),
-                    textBoxOutboundPort.ValueAs<int>(), endpointHttpHeaderRules, Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"));
+                var endpoint = new EndpointConfiguration(
+                    _existingEndpoint?.EndpointId ?? Guid.NewGuid(),
+                    _direction,
+                    textBoxName.Text,
+                    textBoxOutboundAddress.Text,
+                    textBoxInboundPort.ValueAs<int>(),
+                    textBoxOutboundPort.ValueAs<int>(),
+                    endpointHttpHeaderRules,
+                    Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"));
 
                 var progressForm = new ProgressForm(FriendlyName, "Saving endpoint...");
 
@@ -160,7 +164,7 @@ namespace NetTunnel.UI.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK);
+                MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
             }
         }
     }
