@@ -169,6 +169,12 @@ namespace NetTunnel.Library
         public QueryDeleteUserReply QueryDeleteUser(string userName)
             => Client.Query(new QueryDeleteUser(userName)).Result;
 
+        public QueryGetServiceConfigurationReply QueryGetServiceConfiguration()
+            => Client.Query(new QueryGetServiceConfiguration()).Result;
+
+        public QueryPutServiceConfigurationReply QueryPutServiceConfiguration(ServiceConfiguration configuration)
+            => Client.Query(new QueryPutServiceConfiguration(configuration)).Result;
+
         public QueryChangeUserPasswordReply QueryChangeUserPassword(string username, string passwordHash)
             => Client.Query(new QueryChangeUserPassword(username, passwordHash)).Result;
 

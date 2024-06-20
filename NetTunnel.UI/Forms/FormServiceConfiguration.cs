@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Payloads;
+using NTDLS.Helpers;
 using NTDLS.WinFormsHelpers;
 
 namespace NetTunnel.UI.Forms
@@ -7,6 +8,7 @@ namespace NetTunnel.UI.Forms
     public partial class FormServiceConfiguration : Form
     {
         private readonly ServiceClient? _client;
+        private bool _firstShown = true;
 
         public FormServiceConfiguration()
         {
@@ -52,15 +54,35 @@ namespace NetTunnel.UI.Forms
 
             #endregion
 
-            /*
-            _client.EnsureNotNull().Service.GetConfiguration().ContinueWith(t =>
-            {
-                SetFormConfigurationValues(t.Result.Configuration);
-            });
-            */
+            Shown += FormUsers_Shown;
 
             AcceptButton = buttonSave;
             CancelButton = buttonCancel;
+        }
+
+        private void FormUsers_Shown(object? sender, EventArgs e)
+        {
+            if (!_firstShown)
+            {
+                return;
+            }
+            _firstShown = false;
+
+            var progressForm = new ProgressForm(Constants.FriendlyName, "Getting configuration...");
+
+            progressForm.Execute(() =>
+            {
+                try
+                {
+                    var result = _client.EnsureNotNull().QueryGetServiceConfiguration();
+
+                    SetFormConfigurationValues(result.Configuration);
+                }
+                catch (Exception ex)
+                {
+                    progressForm.MessageBox(ex.Message, Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                }
+            });
         }
 
         public void SetFormConfigurationValues(ServiceConfiguration configuration)
@@ -120,19 +142,20 @@ namespace NetTunnel.UI.Forms
 
                 #endregion
 
+                var progressForm = new ProgressForm(Constants.FriendlyName, "Getting configuration...");
 
-                /*
-                _client.EnsureNotNull().Service.PutConfiguration(configuration).ContinueWith(t =>
+                progressForm.Execute(() =>
                 {
-                    if (!t.IsCompletedSuccessfully)
+                    try
                     {
-                        this.InvokeMessageBox("Failed to save the configuration.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                        return;
+                        _client.EnsureNotNull().QueryPutServiceConfiguration(configuration);
+                        this.InvokeClose(DialogResult.OK);
                     }
-
-                    this.InvokeClose(DialogResult.OK);
+                    catch (Exception ex)
+                    {
+                        progressForm.MessageBox(ex.Message, Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    }
                 });
-                */
             }
             catch (Exception ex)
             {

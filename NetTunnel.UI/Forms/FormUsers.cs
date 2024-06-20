@@ -43,7 +43,6 @@ namespace NetTunnel.UI.Forms
 
                     result.Collection.ForEach(u => AddUserToGrid(u));
                 }
-
                 catch (Exception ex)
                 {
                     progressForm.MessageBox(ex.Message, Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);

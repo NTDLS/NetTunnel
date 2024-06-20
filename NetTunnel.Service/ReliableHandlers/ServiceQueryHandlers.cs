@@ -254,5 +254,40 @@ namespace NetTunnel.Service.ReliableHandlers
                 throw;
             }
         }
+
+        public QueryGetServiceConfigurationReply OnQueryGetServiceConfiguration(RmContext context, QueryGetServiceConfiguration query)
+        {
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+                return new QueryGetServiceConfigurationReply()
+                {
+                    Configuration = Singletons.Configuration
+                };
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
+        }
+
+        public QueryPutServiceConfigurationReply OnQueryPutServiceConfiguration(RmContext context, QueryPutServiceConfiguration query)
+        {
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+                Singletons.UpdateConfiguration(query.Configuration);
+
+                return new QueryPutServiceConfigurationReply();
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
+        }
     }
 }
