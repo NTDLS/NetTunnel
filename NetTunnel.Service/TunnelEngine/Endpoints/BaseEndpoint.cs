@@ -1,7 +1,7 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Types;
-using NTDLS.NullExtensions;
+using NTDLS.Helpers;
 using NTDLS.Semaphore;
 using System.Net.Sockets;
 using System.Text;
@@ -57,7 +57,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                         foreach (var connection in o)
                         {
-                            Utility.TryAndIgnore(() =>
+                            Exceptions.Ignore(() =>
                             {
                                 //We've are connected but haven't done much in a while.
                                 if (Singletons.Configuration.StaleEndpointExpirationMs > 0
@@ -70,8 +70,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                         foreach (var connection in connectionsToClose)
                         {
-                            Utility.TryAndIgnore(connection.Disconnect);
-                            Utility.TryAndIgnore(() => o.Remove(connection.StreamId));
+                            Exceptions.Ignore(connection.Disconnect);
+                            Exceptions.Ignore(() => o.Remove(connection.StreamId));
                         }
                     });
 
@@ -99,8 +99,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             {
                 if (o.TryGetValue(streamId, out var activeEndpointConnection))
                 {
-                    Utility.TryAndIgnore(activeEndpointConnection.Disconnect);
-                    Utility.TryAndIgnore(activeEndpointConnection.Dispose);
+                    Exceptions.Ignore(activeEndpointConnection.Disconnect);
+                    Exceptions.Ignore(activeEndpointConnection.Dispose);
                     o.Remove(streamId);
                 }
             });
@@ -245,7 +245,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     CurrentConnections--;
                 }
 
-                Utility.TryAndIgnore(activeConnection.Disconnect);
+                Exceptions.Ignore(activeConnection.Disconnect);
 
                 _activeConnections.Use((o) =>
                 {
@@ -253,7 +253,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 });
             }
 
-            //Utility.TryAndIgnore(() =>
+            //Exceptions.Ignore(() =>
             //    _tunnel.Notify(new oldNotificationEndpointDisconnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId)));
         }
     }

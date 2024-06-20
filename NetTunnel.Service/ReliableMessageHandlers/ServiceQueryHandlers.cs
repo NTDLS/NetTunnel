@@ -1,6 +1,6 @@
 ﻿using NetTunnel.Library.ReliableMessages.Query;
 using NetTunnel.Service.TunnelEngine;
-using NTDLS.NullExtensions;
+using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
 

@@ -1,6 +1,6 @@
-﻿using NetTunnel.Library;
-using NetTunnel.Library.Interfaces;
+﻿using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Types;
+using NTDLS.Helpers;
 using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
 
@@ -45,7 +45,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             {
                 foreach (var activeConnection in o)
                 {
-                    Utility.TryAndIgnore(activeConnection.Value.Disconnect);
+                    Exceptions.Ignore(activeConnection.Value.Disconnect);
                 }
                 o.Clear();
             });

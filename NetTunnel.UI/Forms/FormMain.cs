@@ -1,6 +1,6 @@
 ﻿using NetTunnel.Library.Types;
 using NetTunnel.UI.Helpers;
-using NTDLS.NullExtensions;
+using NTDLS.Helpers;
 using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
 

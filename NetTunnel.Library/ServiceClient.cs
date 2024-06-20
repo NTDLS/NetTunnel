@@ -3,7 +3,7 @@ using NetTunnel.Library.ReliableMessages.Notification;
 using NetTunnel.Library.ReliableMessages.Query;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.ReliableMessages;
-using NTDLS.NullExtensions;
+using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
 
@@ -89,7 +89,7 @@ namespace NetTunnel.Library
         public void Disconnect()
         {
             IsLoggedIn = false;
-            Utility.TryAndIgnore(Client.Disconnect);
+            Exceptions.Ignore(Client.Disconnect);
         }
 
         public async Task ConnectAndLogin()

@@ -1,6 +1,6 @@
 ﻿using NetTunnel.Library.ReliableMessages.Notification;
 using NetTunnel.Service.TunnelEngine;
-using NTDLS.NullExtensions;
+using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Service.ReliableMessageHandlers

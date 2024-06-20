@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library.Interfaces;
+using NTDLS.Helpers;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library
@@ -20,7 +21,7 @@ namespace NetTunnel.Library
 
             if (string.IsNullOrWhiteSpace(logPath) == false)
             {
-                Utility.TryAndIgnore(() => _fileStream = new StreamWriter(logPath));
+                Exceptions.Ignore(() => _fileStream = new StreamWriter(logPath));
             }
         }
 
@@ -68,8 +69,8 @@ namespace NetTunnel.Library
 
         public void Dispose()
         {
-            Utility.TryAndIgnore(() => _fileStream?.Close());
-            Utility.TryAndIgnore(() => _fileStream?.Dispose());
+            Exceptions.Ignore(() => _fileStream?.Close());
+            Exceptions.Ignore(() => _fileStream?.Dispose());
         }
     }
 }

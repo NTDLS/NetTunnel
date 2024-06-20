@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library;
+using NTDLS.Helpers;
 using NTDLS.Persistence;
 using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
@@ -38,29 +39,32 @@ namespace NetTunnel.UI.Forms
                 string passwordHash = Utility.ComputeSha256Hash(textBoxPassword.Text);
                 string address = textBoxAddress.GetAndValidateText("A hostname or IP address is required.");
 
-                var progressForm = new ProgressForm(FriendlyName, "Logging in... please wait.");
+                var progressForm = new ProgressForm(FriendlyName, "Logging in...");
 
                 progressForm.Execute(() =>
                 {
                     ServiceClient.CreateConnectAndLogin(_delegateLogger, address, port, username, passwordHash).ContinueWith(x =>
                     {
-                        if (!x.IsCompletedSuccessfully)
+                        try
                         {
-                            progressForm.MessageBox(x.Exception?.Message ?? "An unknown exception occurred.",
-                                FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                            return;
+                            Tasks.ThrowTaskException(x);
+
+                            var preferences = new UILoginPreferences()
+                            {
+                                Address = textBoxAddress.Text,
+                                Port = textBoxPort.Text,
+                                Username = textBoxUsername.Text,
+                            };
+
+                            LocalUserApplicationData.SaveToDisk(Constants.FriendlyName, preferences);
+
+                            ResultingClient = x.Result;
+                            this.InvokeClose(DialogResult.OK);
                         }
-
-                        var preferences = new UILoginPreferences()
+                        catch (Exception ex)
                         {
-                            Address = textBoxAddress.Text,
-                            Port = textBoxPort.Text,
-                            Username = textBoxUsername.Text,
-                        };
-
-                        LocalUserApplicationData.SaveToDisk(Constants.FriendlyName, preferences);
-
-                        ResultingClient = x.Result;
+                            progressForm.MessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        }
                     }).Wait();
                 });
             }

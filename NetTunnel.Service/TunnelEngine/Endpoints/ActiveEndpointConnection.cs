@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library;
+using NTDLS.Helpers;
 using System.Net.Sockets;
 
 namespace NetTunnel.Service.TunnelEngine.Endpoints
@@ -31,8 +32,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         public void Disconnect()
         {
-            Utility.TryAndIgnore(_stream.Close);
-            Utility.TryAndIgnore(TcpClient.Close);
+            Exceptions.Ignore(_stream.Close);
+            Exceptions.Ignore(TcpClient.Close);
             IsConnected = false;
         }
 
@@ -59,8 +60,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
             Disconnect();
 
-            Utility.TryAndIgnore(_stream.Dispose);
-            Utility.TryAndIgnore(TcpClient.Dispose);
+            Exceptions.Ignore(_stream.Dispose);
+            Exceptions.Ignore(TcpClient.Dispose);
         }
     }
 }

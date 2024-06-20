@@ -1,6 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Types;
-using NTDLS.NullExtensions;
+using NTDLS.Helpers;
 using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
 
@@ -77,12 +77,11 @@ namespace NetTunnel.UI.Forms
                     textBoxRemoteAddress.Text, textBoxManagementPort.ValueAs<int>(),
                     textBoxRemoteUsername.Text, Utility.ComputeSha256Hash(textBoxRemotePassword.Text));
 
-                buttonConnect.InvokeEnableControl(false);
-                buttonCancel.InvokeEnableControl(false);
+                var progressForm = new ProgressForm(FriendlyName, "Logging in to remote tunnel...");
 
                 try
                 {
-                    new Thread(() =>
+                    progressForm.Execute(() =>
                     {
                         //Just to test the login.
                         //TODO: If the connection fails, prompt if the user wants to still add the tunnel.
@@ -102,19 +101,16 @@ namespace NetTunnel.UI.Forms
                                 }
                                 catch (Exception ex)
                                 {
-                                    if (this.InvokeMessageBox(ex.Message + "\r\n\r\n" + "Would you like to add the tunnel anyway?",
+                                    if (progressForm.MessageBox(ex.Message + "\r\n\r\n" + "Would you like to add the tunnel anyway?",
                                         FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                     {
                                         await _client.QueryCreateTunnel(tunnel);
                                         this.InvokeClose(DialogResult.OK);
                                         return;
                                     }
-
-                                    buttonConnect.InvokeEnableControl(true);
-                                    buttonCancel.InvokeEnableControl(true);
                                 }
-                            });
-                    }).Start();
+                            }).Result;
+                    });
 
                     //ConfigureTunnelPair(remoteClient, tunnel, inboundTunnel);
                 }
@@ -125,9 +121,6 @@ namespace NetTunnel.UI.Forms
             }
             catch (Exception ex)
             {
-                buttonConnect.InvokeEnableControl(true);
-                buttonCancel.InvokeEnableControl(true);
-
                 MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK);
             }
         }

@@ -2,7 +2,7 @@
 using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Types;
 using NetTunnel.Service.TunnelEngine.Endpoints;
-using NTDLS.NullExtensions;
+using NTDLS.Helpers;
 using NTDLS.Persistence;
 using NTDLS.Semaphore;
 using static NetTunnel.Library.Constants;

@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 
 namespace NetTunnel.Library
@@ -27,26 +26,6 @@ namespace NetTunnel.Library
 
             return stringBuilder.ToString();
         }
-
-        public delegate void TryAndIgnoreProc();
-        /// <summary>
-        /// We didn't need that exception! Did we?... DID WE?!
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void TryAndIgnore(TryAndIgnoreProc func)
-        {
-            try { func(); } catch { }
-        }
-
-        public delegate T TryAndIgnoreProc<T>();
-        /// <summary>
-        /// We didn't need that exception! Did we?... DID WE?!
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T? TryAndIgnore<T>(TryAndIgnoreProc<T> func)
-        {
-            try { return func(); } catch { }
-            return default;
-        }
     }
 }
+

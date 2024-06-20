@@ -1,7 +1,6 @@
-﻿using NetTunnel.Library;
-using NetTunnel.Library.Interfaces;
+﻿using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Types;
-using NTDLS.NullExtensions;
+using NTDLS.Helpers;
 using System.Net;
 using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
@@ -51,8 +50,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
             if (_listener != null)
             {
-                Utility.TryAndIgnore(_listener.Stop);
-                Utility.TryAndIgnore(_listener.Dispose);
+                Exceptions.Ignore(_listener.Stop);
+                Exceptions.Ignore(_listener.Dispose);
             }
 
             _tunnel.ServiceEngine.Logger.Verbose(
@@ -62,7 +61,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             {
                 foreach (var activeConnection in o)
                 {
-                    Utility.TryAndIgnore(activeConnection.Value.Disconnect);
+                    Exceptions.Ignore(activeConnection.Value.Disconnect);
                 }
                 o.Clear();
             });
@@ -110,7 +109,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             {
                 if (_listener != null)
                 {
-                    Utility.TryAndIgnore(_listener.Stop);
+                    Exceptions.Ignore(_listener.Stop);
                 }
             }
         }
