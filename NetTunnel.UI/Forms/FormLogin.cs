@@ -31,9 +31,6 @@ namespace NetTunnel.UI.Forms
 
         private void buttonLogin_Click(object sender, EventArgs e)
         {
-            buttonLogin.InvokeEnableControl(false);
-            buttonCancel.InvokeEnableControl(false);
-
             try
             {
                 int port = textBoxPort.GetAndValidateNumeric(1, 65535, "A port number between [min] and [max] is required.");
@@ -41,37 +38,35 @@ namespace NetTunnel.UI.Forms
                 string passwordHash = Utility.ComputeSha256Hash(textBoxPassword.Text);
                 string address = textBoxAddress.GetAndValidateText("A hostname or IP address is required.");
 
-                ServiceClient.CreateConnectAndLogin(_delegateLogger, address, port, username, passwordHash).ContinueWith(x =>
+                var progressForm = new ProgressForm(FriendlyName, "Logging in... please wait.");
+
+                progressForm.Execute(() =>
                 {
-                    if (!x.IsCompletedSuccessfully)
+                    ServiceClient.CreateConnectAndLogin(_delegateLogger, address, port, username, passwordHash).ContinueWith(x =>
                     {
-                        this.InvokeMessageBox(x.Exception?.Message ?? "An unknown exception occurred.",
-                            Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        if (!x.IsCompletedSuccessfully)
+                        {
+                            progressForm.MessageBox(x.Exception?.Message ?? "An unknown exception occurred.",
+                                FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                            return;
+                        }
 
-                        buttonLogin.InvokeEnableControl(true);
-                        buttonCancel.InvokeEnableControl(true);
-                        return;
-                    }
+                        var preferences = new UILoginPreferences()
+                        {
+                            Address = textBoxAddress.Text,
+                            Port = textBoxPort.Text,
+                            Username = textBoxUsername.Text,
+                        };
 
-                    var preferences = new UILoginPreferences()
-                    {
-                        Address = textBoxAddress.Text,
-                        Port = textBoxPort.Text,
-                        Username = textBoxUsername.Text,
-                    };
+                        LocalUserApplicationData.SaveToDisk(Constants.FriendlyName, preferences);
 
-                    LocalUserApplicationData.SaveToDisk(Constants.FriendlyName, preferences);
-
-                    ResultingClient = x.Result;
-
-                    this.InvokeClose(DialogResult.OK);
+                        ResultingClient = x.Result;
+                    }).Wait();
                 });
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK);
-                buttonLogin.InvokeEnableControl(true);
-                buttonCancel.InvokeEnableControl(true);
             }
         }
 
