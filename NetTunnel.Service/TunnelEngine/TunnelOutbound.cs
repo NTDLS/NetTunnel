@@ -1,7 +1,7 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Types;
-using NetTunnel.Service.ReliableMessageHandlers;
+using NetTunnel.Service.ReliableHandlers;
 using NTDLS.ReliableMessaging;
 using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
@@ -26,8 +26,8 @@ namespace NetTunnel.Service.TunnelEngine
             _client.Client.AddHandler(new TunnelOutboundNotificationHandlers());
             //_client.AddHandler(new oldTunnelOutboundQueryHandlers());
 
-            _client.Client.OnConnected += _client_OnConnected;
-            _client.Client.OnDisconnected += _client_OnDisconnected;
+            _client.Client.OnConnected += Client_OnConnected;
+            _client.Client.OnDisconnected += Client_OnDisconnected;
 
             _client.Client.OnException += (context, ex, payload) =>
             {
@@ -62,14 +62,14 @@ namespace NetTunnel.Service.TunnelEngine
         public void SendNotificationOfTunnelDeletion(DirectionalKey tunnelKey)
             => _client.SendNotificationOfTunnelDeletion(tunnelKey);
 
-        private void _client_OnDisconnected(RmContext context)
+        private void Client_OnDisconnected(RmContext context)
         {
             Status = NtTunnelStatus.Disconnected;
 
             ServiceEngine.Logger.Warning($"Tunnel '{Configuration.Name}' disconnected.");
         }
 
-        private void _client_OnConnected(RmContext context)
+        private void Client_OnConnected(RmContext context)
         {
             Status = NtTunnelStatus.Established;
 

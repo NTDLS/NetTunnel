@@ -1,6 +1,6 @@
 ﻿using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Library.ReliableMessages.Notification
+namespace NetTunnel.Library.ReliablePayloads.Notification
 {
     public class NotificationApplyCryptography : IRmNotification
     {

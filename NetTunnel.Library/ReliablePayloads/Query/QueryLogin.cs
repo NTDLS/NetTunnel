@@ -1,6 +1,6 @@
 ﻿using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Library.ReliableMessages.Query
+namespace NetTunnel.Library.ReliablePayloads.Query
 {
     public class QueryLogin : IRmQuery<QueryLoginReply>
     {

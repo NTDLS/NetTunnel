@@ -1,7 +1,7 @@
 ﻿using NetTunnel.Library.Types;
 using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Library.ReliableMessages.Notification
+namespace NetTunnel.Library.ReliablePayloads.Notification
 {
     public class NotificationEndpointConnect : IRmNotification
     {

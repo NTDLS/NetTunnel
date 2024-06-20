@@ -1,9 +1,9 @@
-﻿using NetTunnel.Library.ReliableMessages.Notification;
+﻿using NetTunnel.Library.ReliablePayloads.Notification;
 using NetTunnel.Service.TunnelEngine;
 using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Service.ReliableMessageHandlers
+namespace NetTunnel.Service.ReliableHandlers
 {
     /// <summary>
     /// Each outbound tunnel makes its own connection using an RmClient. These are the handlers for each outbound tunnel.

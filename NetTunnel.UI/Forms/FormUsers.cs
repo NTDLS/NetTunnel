@@ -113,16 +113,14 @@ namespace NetTunnel.UI.Forms
             */
         }
 
-        private void buttonAddUser_Click(object sender, EventArgs e)
+        private void ButtonAddUser_Click(object sender, EventArgs e)
         {
             _client.EnsureNotNull();
 
-            using (var formAddUser = new FormAddUser(_client))
+            using var formAddUser = new FormAddUser(_client);
+            if (formAddUser.ShowDialog() == DialogResult.OK)
             {
-                if (formAddUser.ShowDialog() == DialogResult.OK)
-                {
-                    AddUserToGrid(formAddUser.CreatedUser);
-                }
+                AddUserToGrid(formAddUser.CreatedUser);
             }
         }
     }

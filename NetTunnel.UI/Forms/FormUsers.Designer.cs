@@ -60,7 +60,7 @@
             buttonAddUser.TabIndex = 2;
             buttonAddUser.Text = "Add User";
             buttonAddUser.UseVisualStyleBackColor = true;
-            buttonAddUser.Click += buttonAddUser_Click;
+            buttonAddUser.Click += ButtonAddUser_Click;
             // 
             // FormUsers
             // 

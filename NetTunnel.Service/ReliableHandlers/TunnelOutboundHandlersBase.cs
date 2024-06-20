@@ -2,7 +2,7 @@
 using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Service.ReliableMessageHandlers
+namespace NetTunnel.Service.ReliableHandlers
 {
     internal class TunnelOutboundHandlersBase
     {
