@@ -120,7 +120,6 @@ namespace NetTunnel.UI.Forms
 
                 #endregion
 
-                buttonSave.InvokeEnableControl(false);
 
                 /*
                 _client.EnsureNotNull().Service.PutConfiguration(configuration).ContinueWith(t =>
@@ -128,7 +127,6 @@ namespace NetTunnel.UI.Forms
                     if (!t.IsCompletedSuccessfully)
                     {
                         this.InvokeMessageBox("Failed to save the configuration.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                        buttonSave.InvokeEnableControl(true);
                         return;
                     }
 

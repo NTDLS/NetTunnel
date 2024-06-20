@@ -1,5 +1,4 @@
 ﻿using NetTunnel.Library;
-using NTDLS.Helpers;
 using NTDLS.Persistence;
 using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
@@ -43,29 +42,26 @@ namespace NetTunnel.UI.Forms
 
                 progressForm.Execute(() =>
                 {
-                    ServiceClient.CreateConnectAndLogin(_delegateLogger, address, port, username, passwordHash).ContinueWith(x =>
+                    try
                     {
-                        try
+                        var client = ServiceClient.CreateConnectAndLogin(_delegateLogger, address, port, username, passwordHash);
+
+                        var preferences = new UILoginPreferences()
                         {
-                            Tasks.ThrowTaskException(x);
+                            Address = textBoxAddress.Text,
+                            Port = textBoxPort.Text,
+                            Username = textBoxUsername.Text,
+                        };
 
-                            var preferences = new UILoginPreferences()
-                            {
-                                Address = textBoxAddress.Text,
-                                Port = textBoxPort.Text,
-                                Username = textBoxUsername.Text,
-                            };
+                        LocalUserApplicationData.SaveToDisk(Constants.FriendlyName, preferences);
 
-                            LocalUserApplicationData.SaveToDisk(Constants.FriendlyName, preferences);
-
-                            ResultingClient = x.Result;
-                            this.InvokeClose(DialogResult.OK);
-                        }
-                        catch (Exception ex)
-                        {
-                            progressForm.MessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                        }
-                    }).Wait();
+                        ResultingClient = client;
+                        this.InvokeClose(DialogResult.OK);
+                    }
+                    catch (Exception ex)
+                    {
+                        progressForm.MessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    }
                 });
             }
             catch (Exception ex)

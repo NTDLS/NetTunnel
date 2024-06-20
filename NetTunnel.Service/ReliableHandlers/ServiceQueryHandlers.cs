@@ -70,7 +70,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryGetTunnelsReply OnGetTunnels(RmContext context, QueryGetTunnels query)
+        public QueryGetTunnelsReply OnQueryGetTunnels(RmContext context, QueryGetTunnels query)
         {
             try
             {
@@ -104,7 +104,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryPingReply OnQueryCreateTunnel(RmContext context, QueryPing query)
+        public QueryPingReply OnQueryPing(RmContext context, QueryPing query)
         {
             try
             {
@@ -135,7 +135,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryRegisterTunnelReply OnRegisterTunnel(RmContext context, QueryRegisterTunnel query)
+        public QueryRegisterTunnelReply OnQueryRegisterTunnel(RmContext context, QueryRegisterTunnel query)
         {
             try
             {
@@ -196,6 +196,57 @@ namespace NetTunnel.Service.ReliableHandlers
                 {
                     Collection = Singletons.ServiceEngine.Users.Clone()
                 };
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
+        }
+
+        public QueryDeleteUserReply OnQueryDeleteUser(RmContext context, QueryDeleteUser query)
+        {
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+                Singletons.ServiceEngine.Users.Delete(query.UserName);
+
+                return new QueryDeleteUserReply();
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
+        }
+
+        public QueryChangeUserPasswordReply OnQueryChangeUserPassword(RmContext context, QueryChangeUserPassword query)
+        {
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+                Singletons.ServiceEngine.Users.ChangePassword(query.Username, query.PasswordHash);
+
+                return new QueryChangeUserPasswordReply();
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
+        }
+
+        public QueryCreateUserReply OnQueryCreateUser(RmContext context, QueryCreateUser query)
+        {
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+                Singletons.ServiceEngine.Users.Add(query.User);
+
+                return new QueryCreateUserReply();
             }
             catch (Exception ex)
             {

@@ -110,8 +110,6 @@ namespace NetTunnel.UI.Forms
             _client.EnsureNotNull();
             _tunnel.EnsureNotNull();
 
-            buttonSave.InvokeDisable();
-
             try
             {
                 textBoxName.GetAndValidateText("You must specify a name This is for your identification only.");
@@ -145,25 +143,24 @@ namespace NetTunnel.UI.Forms
                     textBoxName.Text, textBoxOutboundAddress.Text, textBoxInboundPort.ValueAs<int>(),
                     textBoxOutboundPort.ValueAs<int>(), endpointHttpHeaderRules, Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"));
 
-                _client.QueryUpsertEndpoint(_tunnel.TunnelKey, endpoint).ContinueWith((o) =>
+                var progressForm = new ProgressForm(FriendlyName, "Saving endpoint...");
+
+                progressForm.Execute(() =>
+                {
+                    try
                     {
-                        if (!o.IsCompletedSuccessfully)
-                        {
-                            this.InvokeMessageBox("Failed to save endpoint to tunnel.",
-                                FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-
-                            buttonSave.InvokeEnable();
-
-                            return;
-                        }
-
+                        _client.QueryUpsertEndpoint(_tunnel.TunnelKey, endpoint);
                         this.InvokeClose(DialogResult.OK);
-                    });
+                    }
+                    catch (Exception ex)
+                    {
+                        progressForm.MessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    }
+                });
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK);
-                buttonSave.InvokeEnable();
             }
         }
     }

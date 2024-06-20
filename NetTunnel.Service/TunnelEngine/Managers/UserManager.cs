@@ -24,15 +24,15 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         public void Add(User user) => _collection.Use((o)
             => o.Add(user));
 
-        public void Delete(User user) => _collection.Use((o)
-            => o.RemoveAll(t => t.Username == user.Username));
+        public void Delete(string username) => _collection.Use((o)
+            => o.RemoveAll(t => t.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase)));
 
-        public void ChangePassword(User user)
+        public void ChangePassword(string username, string passwordHash)
         {
             _collection.Use((o) =>
             {
-                o.Where(x => x.Username == user.Username).FirstOrDefault()?
-                    .SetPasswordHash(user.PasswordHash);
+                o.FirstOrDefault(t => t.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase))?
+                    .SetPasswordHash(passwordHash);
             });
         }
 

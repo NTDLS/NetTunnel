@@ -25,36 +25,38 @@ namespace NetTunnel.UI.Forms
             CancelButton = buttonCancel;
         }
 
-        private void buttonSave_Click(object sender, EventArgs e)
+        private void ButtonSave_Click(object sender, EventArgs e)
         {
             _client.EnsureNotNull();
 
             try
             {
-                if (textBoxUsername.Text.Length == 0)
-                    throw new Exception("You must specify a username.");
-                if (textBoxPassword.Text.Length == 0)
-                    throw new Exception("You must specify a password.");
-                if (textBoxPassword.Text != textBoxConfirmPassword.Text)
-                    throw new Exception("The password and confirm-passwords must match.");
+                string username = textBoxUsername.GetAndValidateText("You must specify a username.");
+                string password = Utility.ComputeSha256Hash(textBoxPassword.GetAndValidateText("You must specify a password."));
+                string passwordConfirm = Utility.ComputeSha256Hash(textBoxPassword.GetAndValidateText("You must specify a confirm-password."));
 
-                CreatedUser = new User(textBoxUsername.Text, Utility.ComputeSha256Hash(textBoxPassword.Text));
-
-                buttonSave.InvokeEnableControl(false);
-
-                /*
-                _client.Security.CreateUser(CreatedUser).ContinueWith(t =>
+                if (password != passwordConfirm)
                 {
-                    if (!t.IsCompletedSuccessfully)
-                    {
-                        this.InvokeMessageBox("Failed to create new user.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                        buttonSave.InvokeEnableControl(true);
-                        return;
-                    }
+                    throw new Exception("The password and confirm-passwords must match.");
+                }
 
-                    this.InvokeClose(DialogResult.OK);
+                var user = new User(username, password);
+
+                var progressForm = new ProgressForm(Constants.FriendlyName, "Creating user...");
+
+                progressForm.Execute(() =>
+                {
+                    try
+                    {
+                        _client.QueryCreateUser(user);
+                        CreatedUser = user;
+                        this.InvokeClose(DialogResult.OK);
+                    }
+                    catch (Exception ex)
+                    {
+                        progressForm.MessageBox(ex.Message, Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    }
                 });
-                */
             }
             catch (Exception ex)
             {
@@ -62,7 +64,7 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-        private void buttonCancel_Click(object sender, EventArgs e)
+        private void ButtonCancel_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
             Close();

@@ -29,37 +29,44 @@ namespace NetTunnel.UI.Forms
             CancelButton = buttonCancel;
         }
 
-        private void buttonSave_Click(object sender, EventArgs e)
+        private void ButtonSave_Click(object sender, EventArgs e)
         {
             _client.EnsureNotNull();
 
             try
             {
-                if (textBoxUsername.Text.Length == 0)
-                    throw new Exception("You must specify a username.");
-                if (textBoxPassword.Text.Length == 0)
-                    throw new Exception("You must specify a password.");
-                if (textBoxPassword.Text != textBoxConfirmPassword.Text)
+                string username = textBoxUsername.GetAndValidateText("You must specify a username.");
+                string password = Utility.ComputeSha256Hash(textBoxPassword.GetAndValidateText("You must specify a password."));
+                string passwordConfirm = Utility.ComputeSha256Hash(textBoxConfirmPassword.GetAndValidateText("You must specify a confirm-password."));
+
+                if (password != passwordConfirm)
+                {
                     throw new Exception("The password and confirm-passwords must match.");
+                }
 
-                var user = new User(textBoxUsername.Text, Utility.ComputeSha256Hash(textBoxPassword.Text));
+                var progressForm = new ProgressForm(Constants.FriendlyName, "Changing password...");
 
-                buttonSave.InvokeEnableControl(false);
-                /*
-                _client.Security.ChangeUserPassword(user).ContinueWith(t =>
-                 {
-                     if (!t.IsCompletedSuccessfully)
-                     {
-                         this.InvokeMessageBox("Failed to change user password.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                         buttonSave.InvokeEnableControl(true);
-                         return;
-                     }
+                var result = progressForm.Execute(() =>
+                {
+                    try
+                    {
+                        _client.QueryChangeUserPassword(username, password);
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        progressForm.MessageBox(ex.Message, Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    }
+                    return false;
+                });
 
-                     this.InvokeMessageBox("The password has been changed.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (result)
+                {
+                    this.InvokeMessageBox("The password has been changed.",
+                        Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                     this.InvokeClose(DialogResult.OK);
-                 });
-                */
+                    Close();
+                }
             }
             catch (Exception ex)
             {
@@ -67,7 +74,7 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-        private void buttonCancel_Click(object sender, EventArgs e)
+        private void ButtonCancel_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
             Close();

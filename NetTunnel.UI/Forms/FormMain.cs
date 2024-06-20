@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Library.Payloads;
 using NetTunnel.UI.Helpers;
+using NetTunnel.UI.Types;
 using NTDLS.Helpers;
 using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
@@ -65,12 +66,12 @@ namespace NetTunnel.UI.Forms
                 return;
             }
 
-            var tTag = (selectedTunnelRow?.Tag as TunnelTag).EnsureNotNull();
+            var tTag = TunnelTag.FromItem(selectedTunnelRow);
 
             var selectedEndpointRow = listViewEndpoints.GetItemAt(e.X, e.Y);
             if (selectedEndpointRow != null)
             {
-                var eTag = (selectedEndpointRow?.Tag as EndpointTag).EnsureNotNull();
+                var eTag = EndpointTag.FromItem(selectedEndpointRow);
 
                 using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tTag.Tunnel, eTag.Endpoint);
                 if (form.ShowDialog() == DialogResult.OK)
@@ -128,21 +129,19 @@ namespace NetTunnel.UI.Forms
                 {
                     if (_client != null && _client.IsConnected)
                     {
-                        _client.QueryGetTunnelStatistics().ContinueWith(x =>
+                        var result = _client.QueryGetTunnelStatistics();
+
+                        int allTunnelAndEndpointHashes = result.AllTunnelIdAndEndpointIdHashes();
+
+                        if (allTunnelAndEndpointHashes != _allTunnelAndEndpointHashes && _allTunnelAndEndpointHashes != -1)
                         {
-                            Tasks.ThrowTaskException(x);
+                            _needToRepopulateTunnels = true;
+                        }
+                        _allTunnelAndEndpointHashes = allTunnelAndEndpointHashes;
 
-                            int allTunnelAndEndpointHashes = x.Result.AllTunnelIdAndEndpointIdHashes();
+                        PopulateEndpointStatistics(result.Statistics);
+                        PopulateTunnelStatistics(result.Statistics);
 
-                            if (allTunnelAndEndpointHashes != _allTunnelAndEndpointHashes && _allTunnelAndEndpointHashes != -1)
-                            {
-                                _needToRepopulateTunnels = true;
-                            }
-                            _allTunnelAndEndpointHashes = allTunnelAndEndpointHashes;
-
-                            PopulateEndpointStatistics(x.Result.Statistics);
-                            PopulateTunnelStatistics(x.Result.Statistics);
-                        }).Wait();
                     }
 
                     void PopulateEndpointStatistics(List<TunnelStatistics> statistics)
@@ -158,7 +157,7 @@ namespace NetTunnel.UI.Forms
 
                         foreach (ListViewItem item in listViewEndpoints.Items)
                         {
-                            var eTag = (item?.Tag as EndpointTag).EnsureNotNull();
+                            var eTag = EndpointTag.FromItem(item);
 
                             var tunnelStats = statistics.Where(o => o.TunnelKey == eTag.Tunnel.TunnelKey).ToList();
                             if (tunnelStats != null)
@@ -208,7 +207,7 @@ namespace NetTunnel.UI.Forms
 
                         foreach (ListViewItem item in listViewTunnels.Items)
                         {
-                            var tTag = (item?.Tag as TunnelTag).EnsureNotNull();
+                            var tTag = TunnelTag.FromItem(item);
 
                             var tunnelStats = statistics.SingleOrDefault(o => o.TunnelKey == tTag.Tunnel.TunnelKey);
                             if (tunnelStats != null)
@@ -292,13 +291,15 @@ namespace NetTunnel.UI.Forms
                     return;
                 }
 
-                var tTag = (selectedTunnelRow?.Tag as TunnelTag).EnsureNotNull();
+                var tTag = TunnelTag.FromItem(selectedTunnelRow);
 
                 var selectedEndpointRow = listViewEndpoints.GetItemAt(e.X, e.Y);
                 if (selectedEndpointRow != null)
                 {
                     selectedEndpointRow.Selected = true;
                 }
+
+                var eTag = EndpointTag.FromItemOrDefault(selectedEndpointRow);
 
                 var menu = new ContextMenuStrip();
 
@@ -308,7 +309,7 @@ namespace NetTunnel.UI.Forms
                     menu.Items.Add("Add Inbound Endpoint to Tunnel");
                     menu.Items.Add("Add Outbound Endpoint to Tunnel");
 
-                    if (selectedEndpointRow != null)
+                    if (eTag != null)
                     {
                         menu.Items.Add(new ToolStripSeparator());
                         menu.Items.Add("Delete Endpoint");
@@ -337,10 +338,8 @@ namespace NetTunnel.UI.Forms
                             RepopulateTunnelsGrid();
                         }
                     }
-                    else if (e.ClickedItem?.Text == "Delete Endpoint")
+                    else if (eTag != null && e.ClickedItem?.Text == "Delete Endpoint")
                     {
-                        var eTag = (selectedEndpointRow?.Tag as EndpointTag).EnsureNotNull();
-
                         if (MessageBox.Show($"Delete the endpoint '{eTag.Endpoint.Name}'?",
                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                         {
@@ -358,7 +357,7 @@ namespace NetTunnel.UI.Forms
                             }
                         });
                         */
-                        listViewEndpoints.InvokeClearListViewRows();
+                        listViewEndpoints.InvokeClearRows();
                     }
                 };
             }
@@ -374,7 +373,7 @@ namespace NetTunnel.UI.Forms
                     rowUnderMouse.Selected = true;
                 }
 
-                var tTag = ((TunnelTag?)rowUnderMouse?.Tag);
+                var tTag = TunnelTag.FromItemOrDefault(rowUnderMouse);
 
                 var menu = new ContextMenuStrip();
 
@@ -419,32 +418,26 @@ namespace NetTunnel.UI.Forms
                             RepopulateTunnelsGrid();
                         }
                     }
-                    else if (e.ClickedItem?.Text == "Add Inbound Endpoint to Tunnel")
+                    else if (tTag != null && e.ClickedItem?.Text == "Add Inbound Endpoint to Tunnel")
                     {
-                        var tTag = (rowUnderMouse?.Tag as TunnelTag).EnsureNotNull();
-
                         using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tTag.Tunnel, NtDirection.Inbound);
                         if (form.ShowDialog() == DialogResult.OK)
                         {
                             RepopulateTunnelsGrid();
                         }
                     }
-                    else if (e.ClickedItem?.Text == "Add Outbound Endpoint to Tunnel")
+                    else if (tTag != null && e.ClickedItem?.Text == "Add Outbound Endpoint to Tunnel")
                     {
-                        var tTag = (rowUnderMouse?.Tag as TunnelTag).EnsureNotNull();
-
                         using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tTag.Tunnel, NtDirection.Outbound);
                         if (form.ShowDialog() == DialogResult.OK)
                         {
                             RepopulateTunnelsGrid();
                         }
                     }
-                    else if (e.ClickedItem?.Text == "Stop")
+                    else if (tTag != null && e.ClickedItem?.Text == "Stop")
                     {
                         /*
                         rowUnderMouse.EnsureNotNull();
-
-                        var tunnel = ((TunnelTag?)rowUnderMouse.Tag).EnsureNotNull();
 
                         if (MessageBox.Show($"Stop the tunnel '{tunnel.Name}'?",
                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
@@ -479,15 +472,15 @@ namespace NetTunnel.UI.Forms
                             });
                         }
                         */
-                        listViewEndpoints.InvokeClearListViewRows();
+                        listViewEndpoints.InvokeClearRows();
                     }
                     // Stop ↑
-                    else if (e.ClickedItem?.Text == "Start")
+                    else if (tTag != null && e.ClickedItem?.Text == "Start")
                     {
                         /*
                         rowUnderMouse.EnsureNotNull();
 
-                        var tunnel = ((TunnelTag?)rowUnderMouse.Tag).EnsureNotNull();
+                        var tTag = TunnelTag.FromItem(rowUnderMouse);
 
                         if (rowUnderMouse.Tag is TunnelTag tunnelInbound)
                         {
@@ -516,40 +509,32 @@ namespace NetTunnel.UI.Forms
                             });
                         }
                         */
-                        listViewEndpoints.InvokeClearListViewRows();
+                        listViewEndpoints.InvokeClearRows();
                     }
                     //Start ↑
-                    else if (e.ClickedItem?.Text == "Delete Tunnel")
+                    else if (tTag != null && e.ClickedItem?.Text == "Delete Tunnel")
                     {
-                        var tTag = (rowUnderMouse?.Tag as TunnelTag).EnsureNotNull();
-
                         if (MessageBox.Show($"Delete the tunnel '{tTag.Tunnel.Name}'?",
                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                         {
                             return;
                         }
 
-                        if (rowUnderMouse.Tag is TunnelTag tunnelInbound)
+                        try
                         {
-                            _client.EnsureNotNull().QueryDeleteTunnel(tTag.Tunnel.TunnelKey).ContinueWith((x) =>
-                            {
-                                try
-                                {
-                                    Tasks.ThrowTaskException(x);
+                            _client.EnsureNotNull().QueryDeleteTunnel(tTag.Tunnel.TunnelKey);
 
-                                    Invoke(new Action(() =>
-                                    {
-                                        _needToRepopulateTunnels = true;
-                                    }));
-                                }
-                                catch (Exception ex)
-                                {
-                                    this.InvokeMessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                                }
-                            });
+                            Invoke(new Action(() =>
+                            {
+                                _needToRepopulateTunnels = true;
+                            }));
+                        }
+                        catch (Exception ex)
+                        {
+                            this.InvokeMessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                         }
 
-                        listViewEndpoints.InvokeClearListViewRows();
+                        listViewEndpoints.InvokeClearRows();
                     }
                 };
             }
@@ -583,10 +568,15 @@ namespace NetTunnel.UI.Forms
             listViewTunnels.Items.Clear();
             listViewEndpoints.Items.Clear();
 
-            _client.QueryGetTunnels().ContinueWith(t =>
+            try
             {
-                t.Result.Collection.ForEach(t => AddTunnelToGrid(t));
-            });
+                var result = _client.QueryGetTunnels();
+                result.Collection.ForEach(t => AddTunnelToGrid(t));
+            }
+            catch (Exception ex)
+            {
+                this.InvokeMessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+            }
 
             void AddTunnelToGrid(TunnelDisplay tunnel)
             {

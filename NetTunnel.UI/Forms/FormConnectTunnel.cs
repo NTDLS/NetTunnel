@@ -83,28 +83,25 @@ namespace NetTunnel.UI.Forms
                 {
                     progressForm.Execute(() =>
                     {
-                        var remoteClient = ServiceClient.CreateConnectAndLogin(_delegateLogger, tunnel.Address,
-                            tunnel.ManagementPort, tunnel.Username, tunnel.PasswordHash).ContinueWith(async x =>
+                        try
+                        {
+                            var remoteClient = ServiceClient.CreateConnectAndLogin(_delegateLogger, tunnel.Address,
+                                tunnel.ManagementPort, tunnel.Username, tunnel.PasswordHash);
+
+                            _client.QueryCreateTunnel(tunnel);
+
+                            this.InvokeClose(DialogResult.OK);
+                        }
+                        catch (Exception ex)
+                        {
+                            if (progressForm.MessageBox(ex.Message + "\r\n\r\n" + "Would you like to add the tunnel anyway?",
+                                FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                             {
-                                try
-                                {
-                                    Tasks.ThrowTaskException(x);
-
-                                    await _client.QueryCreateTunnel(tunnel);
-
-                                    this.InvokeClose(DialogResult.OK);
-                                }
-                                catch (Exception ex)
-                                {
-                                    if (progressForm.MessageBox(ex.Message + "\r\n\r\n" + "Would you like to add the tunnel anyway?",
-                                        FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                                    {
-                                        await _client.QueryCreateTunnel(tunnel);
-                                        this.InvokeClose(DialogResult.OK);
-                                        return;
-                                    }
-                                }
-                            }).Result;
+                                _client.QueryCreateTunnel(tunnel);
+                                this.InvokeClose(DialogResult.OK);
+                                return;
+                            }
+                        }
                     });
 
                     //ConfigureTunnelPair(remoteClient, tunnel, inboundTunnel);

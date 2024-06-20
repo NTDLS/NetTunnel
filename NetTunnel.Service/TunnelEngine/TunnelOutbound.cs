@@ -123,9 +123,9 @@ namespace NetTunnel.Service.TunnelEngine
                             $"Tunnel '{Configuration.Name}' connecting to service at {Configuration.Address}:{Configuration.ManagementPort}.");
 
                         //Make the outbound connection to the remote tunnel service.
-                        _client.ConnectAndLogin().Wait();
+                        _client.ConnectAndLogin();
 
-                        _client.QueryRegisterTunnel(Configuration).Wait();
+                        _client.QueryRegisterTunnel(Configuration);
 
                         Status = NtTunnelStatus.Established;
 

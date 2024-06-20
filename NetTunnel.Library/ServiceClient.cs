@@ -44,20 +44,20 @@ namespace NetTunnel.Library
 
         #region Factory.
 
-        public static async Task<ServiceClient> CreateConnectAndLogin(ILogger logger, string address, int port, string userName, string passwordHash, object? owner = null)
+        public static ServiceClient CreateConnectAndLogin(ILogger logger, string address, int port, string userName, string passwordHash, object? owner = null)
         {
             //using var logger = new ConsoleLogger(NtLogSeverity.Warning);
-            return await CreateConnectAndLogin(logger, new ServiceConfiguration()
+            return CreateConnectAndLogin(logger, new ServiceConfiguration()
             {
                 MessageQueryTimeoutMs = 1000
             }, address, port, userName, passwordHash, owner);
         }
 
-        public static async Task<ServiceClient> CreateConnectAndLogin(ILogger logger, ServiceConfiguration configuration,
+        public static ServiceClient CreateConnectAndLogin(ILogger logger, ServiceConfiguration configuration,
              string address, int port, string userName, string passwordHash, object? owner = null)
         {
             var serviceClient = Create(logger, configuration, address, port, userName, passwordHash, owner);
-            await serviceClient.ConnectAndLogin();
+            serviceClient.ConnectAndLogin();
             return serviceClient;
         }
 
@@ -92,7 +92,7 @@ namespace NetTunnel.Library
             Exceptions.Ignore(Client.Disconnect);
         }
 
-        public async Task ConnectAndLogin()
+        public void ConnectAndLogin()
         {
             Client.ClearCryptographyProvider();
 
@@ -102,8 +102,8 @@ namespace NetTunnel.Library
             var negotiationToken = compoundNegotiator.GenerateNegotiationToken(_configuration.TunnelCryptographyKeySize);
 
             //The first thing we do when we get a connection is start a new key exchange process.
-            var queryRequestKeyExchangeReply = await Client.Query(
-                new QueryRequestKeyExchange(negotiationToken), _configuration.MessageQueryTimeoutMs);
+            var queryRequestKeyExchangeReply = Client.Query(
+                new QueryRequestKeyExchange(negotiationToken), _configuration.MessageQueryTimeoutMs).Result;
 
             //We received a reply to the secure key exchange, apply it.
             compoundNegotiator.ApplyNegotiationResponseToken(queryRequestKeyExchangeReply.NegotiationToken);
@@ -121,7 +121,7 @@ namespace NetTunnel.Library
             _logger.Verbose("Tunnel cryptography provider has been applied.");
 
             //Login.
-            var login = await Client.Query(new QueryLogin(_userName, _passwordHash));
+            var login = Client.Query(new QueryLogin(_userName, _passwordHash)).Result;
             if (login.Successful == false)
             {
                 throw new Exception("Login failed.");
@@ -145,26 +145,35 @@ namespace NetTunnel.Library
             }).Result;
         }
 
-        public async Task<QueryGetTunnelStatisticsReply> QueryGetTunnelStatistics()
-            => await Client.Query(new QueryGetTunnelStatistics());
+        public QueryGetTunnelStatisticsReply QueryGetTunnelStatistics()
+            => Client.Query(new QueryGetTunnelStatistics()).Result;
 
-        public async Task<QueryCreateTunnelReply> QueryCreateTunnel(TunnelConfiguration configuration)
-            => await Client.Query(new QueryCreateTunnel(configuration));
+        public QueryCreateTunnelReply QueryCreateTunnel(TunnelConfiguration configuration)
+            => Client.Query(new QueryCreateTunnel(configuration)).Result;
 
-        public async Task<QueryDeleteTunnelReply> QueryDeleteTunnel(DirectionalKey tunnelKey)
-            => await Client.Query(new QueryDeleteTunnel(tunnelKey));
+        public QueryDeleteTunnelReply QueryDeleteTunnel(DirectionalKey tunnelKey)
+            => Client.Query(new QueryDeleteTunnel(tunnelKey)).Result;
 
-        public async Task<QueryGetTunnelsReply> QueryGetTunnels()
-            => await Client.Query(new QueryGetTunnels());
+        public QueryGetTunnelsReply QueryGetTunnels()
+            => Client.Query(new QueryGetTunnels()).Result;
 
-        public async Task<QueryRegisterTunnelReply> QueryRegisterTunnel(TunnelConfiguration Collection)
-            => await Client.Query(new QueryRegisterTunnel(Collection));
+        public QueryRegisterTunnelReply QueryRegisterTunnel(TunnelConfiguration Collection)
+            => Client.Query(new QueryRegisterTunnel(Collection)).Result;
 
-        public async Task<QueryUpsertEndpointReply> QueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration configuration)
-            => await Client.Query(new QueryUpsertEndpoint(tunnelKey, configuration));
+        public QueryUpsertEndpointReply QueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration configuration)
+            => Client.Query(new QueryUpsertEndpoint(tunnelKey, configuration)).Result;
 
-        public async Task<QueryGetUsersReply> QueryGetUsers()
-            => await Client.Query(new QueryGetUsers());
+        public QueryGetUsersReply QueryGetUsers()
+            => Client.Query(new QueryGetUsers()).Result;
+
+        public QueryDeleteUserReply QueryDeleteUser(string userName)
+            => Client.Query(new QueryDeleteUser(userName)).Result;
+
+        public QueryChangeUserPasswordReply QueryChangeUserPassword(string username, string passwordHash)
+            => Client.Query(new QueryChangeUserPassword(username, passwordHash)).Result;
+
+        public QueryCreateUserReply QueryCreateUser(User user)
+            => Client.Query(new QueryCreateUser(user)).Result;
 
         public void NotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid streamId)
             => Client.Notify(new NotificationEndpointConnect(tunnelKey, endpointId, streamId));
