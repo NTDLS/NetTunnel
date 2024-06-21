@@ -17,7 +17,6 @@ namespace NetTunnel.Service.TunnelEngine
         /// </summary>
         public Dictionary<Guid, ServiceConnectionState> ServiceConnectionStates { get; private set; } = new();
 
-
         /// <summary>
         /// Contains the information for all tunnels, inbound and outbound. Keep in mind that we only persist
         ///     outbound connection information and that inbound tunnels are simply ephemeral registrations. 

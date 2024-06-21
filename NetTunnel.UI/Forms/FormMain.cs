@@ -60,8 +60,8 @@ namespace NetTunnel.UI.Forms
             AddListViewColumn(listViewTunnels, "Direction", "Direction", 75);
             AddListViewColumn(listViewTunnels, "Address", "Address", 120);
             AddListViewColumn(listViewTunnels, "Endpoints", "Endpoints", 70);
-            AddListViewColumn(listViewTunnels, "BytesSent", "Sent (KB)", 80);
-            AddListViewColumn(listViewTunnels, "BytesReceived", "Recvd (KB)", 80);
+            AddListViewColumn(listViewTunnels, "BytesSent", "Sent", 80);
+            AddListViewColumn(listViewTunnels, "BytesReceived", "Received", 80);
             AddListViewColumn(listViewTunnels, "Status", "Status", 140);
             AddListViewColumn(listViewTunnels, "Ping", "Ping", 80);
             _tunnelsGridColumnMap = new ListViewColumnMap(listViewTunnels);
@@ -80,8 +80,8 @@ namespace NetTunnel.UI.Forms
             AddListViewColumn(listViewEndpoints, "Name", "Name", 250);
             AddListViewColumn(listViewEndpoints, "Direction", "Direction", 75);
             AddListViewColumn(listViewEndpoints, "Address", "Address", 120);
-            AddListViewColumn(listViewEndpoints, "BytesSent", "Sent (KB)", 80);
-            AddListViewColumn(listViewEndpoints, "BytesReceived", "Recvd (KB)", 80);
+            AddListViewColumn(listViewEndpoints, "BytesSent", "Sent", 80);
+            AddListViewColumn(listViewEndpoints, "BytesReceived", "Received", 80);
             AddListViewColumn(listViewEndpoints, "CompressionRatio", "Comp. Ratio", 80);
             AddListViewColumn(listViewEndpoints, "CurrentConnections", "Current Conn.", 100);
             AddListViewColumn(listViewEndpoints, "TotalConnections", "Total Conn.", 100);
@@ -208,21 +208,21 @@ namespace NetTunnel.UI.Forms
                                 if (endpointStats != null)
                                 {
                                     double compressionRatio = 0;
-                                    if (endpointStats.BytesSentKb > 0 && endpointStats.BytesReceivedKb > 0)
+                                    if (endpointStats.BytesSent > 0 && endpointStats.BytesReceived > 0)
                                     {
-                                        if (endpointStats.BytesSentKb > endpointStats.BytesReceivedKb)
+                                        if (endpointStats.BytesSent > endpointStats.BytesReceived)
                                         {
-                                            compressionRatio = 100 - (endpointStats.BytesReceivedKb / endpointStats.BytesSentKb) * 100.0;
+                                            compressionRatio = 100 - (endpointStats.BytesReceived / endpointStats.BytesSent) * 100.0;
                                         }
                                         else
                                         {
-                                            compressionRatio = 100 - (endpointStats.BytesSentKb / endpointStats.BytesReceivedKb) * 100.0;
+                                            compressionRatio = 100 - (endpointStats.BytesSent / endpointStats.BytesReceived) * 100.0;
                                         }
                                     }
 
                                     _endpointsGridColumnMap.EnsureNotNull();
-                                    _endpointsGridColumnMap.SubItem(item, "BytesSent").Text = $"{endpointStats.BytesSentKb:n0}";
-                                    _endpointsGridColumnMap.SubItem(item, "BytesReceived").Text = $"{endpointStats.BytesReceivedKb:n0}";
+                                    _endpointsGridColumnMap.SubItem(item, "BytesSent").Text = $"{Formatters.FileSize((long)endpointStats.BytesSent)}";
+                                    _endpointsGridColumnMap.SubItem(item, "BytesReceived").Text = $"{Formatters.FileSize((long)endpointStats.BytesReceived)}";
                                     _endpointsGridColumnMap.SubItem(item, "TotalConnections").Text = $"{endpointStats.TotalConnections:n0}";
                                     _endpointsGridColumnMap.SubItem(item, "CurrentConnections").Text = $"{endpointStats.CurrentConnections:n0}";
                                     _endpointsGridColumnMap.SubItem(item, "CompressionRatio").Text = $"{compressionRatio:n2}";
@@ -254,10 +254,10 @@ namespace NetTunnel.UI.Forms
                             if (tunnelStats != null)
                             {
                                 _tunnelsGridColumnMap.EnsureNotNull();
-                                _tunnelsGridColumnMap.SubItem(item, "BytesSent").Text = $"{tunnelStats.BytesSentKb:n0}";
-                                _tunnelsGridColumnMap.SubItem(item, "BytesReceived").Text = $"{tunnelStats.BytesReceivedKb:n0}";
+                                _tunnelsGridColumnMap.SubItem(item, "BytesSent").Text = $"{Formatters.FileSize((long)tunnelStats.BytesSent)}";
+                                _tunnelsGridColumnMap.SubItem(item, "BytesReceived").Text = $"{Formatters.FileSize((long)tunnelStats.BytesReceived)}";
                                 _tunnelsGridColumnMap.SubItem(item, "Status").Text = tunnelStats.Status.ToString();
-                                _tunnelsGridColumnMap.SubItem(item, "Ping").Text = $"{(tunnelStats.PingMs?.ToString("n2") ?? "∞")}";
+                                _tunnelsGridColumnMap.SubItem(item, "Ping").Text = $"{(tunnelStats.PingMs?.ToString("n2") ?? "∞")}ms";
 
                                 switch (tunnelStats.Status)
                                 {

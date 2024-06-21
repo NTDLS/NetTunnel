@@ -19,9 +19,6 @@ namespace NetTunnel.Library.Payloads
         public Guid TunnelId { get; set; }
         public ulong BytesReceived { get; set; }
         public ulong BytesSent { get; set; }
-        public double BytesReceivedKb => BytesReceived / 1024.0;
-        public double BytesSentKb => BytesSent / 1024.0;
-
         /// <summary>
         /// Unique ID that takes the direction and the ID into account.
         /// </summary>

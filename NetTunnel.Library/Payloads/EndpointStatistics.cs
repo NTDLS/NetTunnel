@@ -23,7 +23,5 @@ namespace NetTunnel.Library.Payloads
 
         public ulong BytesReceived { get; set; }
         public ulong BytesSent { get; set; }
-        public double BytesReceivedKb => BytesReceived / 1024.0;
-        public double BytesSentKb => BytesSent / 1024.0;
     }
 }

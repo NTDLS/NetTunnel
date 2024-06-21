@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NTDLS.Helpers" Version="1.0.0" />
+    <PackageReference Include="NTDLS.Helpers" Version="1.0.1" />
     <PackageReference Include="NTDLS.NASCCL" Version="1.1.2" />
     <PackageReference Include="NTDLS.ReliableMessaging" Version="1.8.5" />
     <PackageReference Include="NTDLS.SecureKeyExchange" Version="2.2.2" />

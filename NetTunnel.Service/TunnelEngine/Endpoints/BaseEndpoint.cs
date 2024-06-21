@@ -160,7 +160,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     lock (_statisticsLock)
                     {
                         BytesReceived += (ulong)buffer.Length;
-                        _tunnel.BytesReceived += (ulong)buffer.Length;
+                        _tunnel.BytesSent += (ulong)buffer.Length;
                     }
 
                     #region HTTP Header Augmentation.
