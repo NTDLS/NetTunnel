@@ -83,14 +83,14 @@ namespace NetTunnel.Library.Payloads
 
         public override int GetHashCode()
         {
-            return EndpointId.GetHashCode()
-                + Name.GetHashCode()
-                + Direction.GetHashCode()
-                + OutboundAddress.GetHashCode()
-                + InboundPort.GetHashCode()
-                + OutboundPort.GetHashCode()
-                + TrafficType.GetHashCode()
-                + HttpHeaderRules.GetHashCode();
+            return Utility.CombineHashes([EndpointId.GetHashCode(),
+                Name.GetHashCode(),
+                Direction.GetHashCode(),
+                OutboundAddress.GetHashCode(),
+                InboundPort.GetHashCode(),
+                OutboundPort.GetHashCode(),
+                TrafficType.GetHashCode(),
+                HttpHeaderRules.GetHashCode()]);
         }
     }
 }
