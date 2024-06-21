@@ -24,7 +24,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         #region Public Properties.
 
-        public double PingMs { get; set; }
+        public double? PingMs { get; set; }
         public TunnelConfiguration Configuration { get; private set; }
         public NtTunnelStatus Status { get; set; }
         public ulong BytesReceived { get; set; }

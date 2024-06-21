@@ -4,6 +4,7 @@ using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Query;
 using NetTunnel.Service.ReliableHandlers;
 using NTDLS.ReliableMessaging;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
 
@@ -141,6 +142,7 @@ namespace NetTunnel.Service.TunnelEngine
                 {
                     if (_client.IsConnected == false)
                     {
+                        PingMs = null;
                         previousPing = null;
                         Status = NtTunnelStatus.Connecting;
 

@@ -13,14 +13,14 @@ namespace NetTunnel.Library
 
         public static int CombineHashes(int[] hashes)
         {
-            int hashCount = hashes.Count();
+            int hashCount = hashes.Length;
             if (hashCount > 1)
             {
                 int runningHash = hashes[0];
 
-                for (int i = 1; i < hashes.Count(); i++)
+                for (int i = 1; i < hashCount; i++)
                 {
-                    runningHash = CombineHashes(runningHash, hashes[1]);
+                    runningHash = CombineHashes(runningHash, hashes[i]);
                 }
                 return runningHash;
             }

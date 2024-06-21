@@ -9,7 +9,7 @@ namespace NetTunnel.Library.Payloads
         /// Used to determine if anything has changed.
         /// </summary>
         public int ChangeHash { get; set; }
-        public double PingMs { get; set; }
+        public double? PingMs { get; set; }
         public List<EndpointStatistics> EndpointStatistics { get; set; } = new();
         public NtTunnelStatus Status { get; set; }
         public ulong CurrentConnections { get; set; }
