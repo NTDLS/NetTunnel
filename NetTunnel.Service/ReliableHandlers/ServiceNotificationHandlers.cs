@@ -1,4 +1,6 @@
-﻿using NetTunnel.Library.ReliablePayloads.Notification;
+﻿using NetTunnel.Library.Interfaces;
+using NetTunnel.Library.ReliablePayloads.Notification;
+using NetTunnel.Service.ReliableMessages.Notification;
 using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
 
@@ -42,7 +44,7 @@ namespace NetTunnel.Service.ReliableHandlers
                 Singletons.ServiceEngine.Logger.Verbose($"Received endpoint connection notification.");
 
                 Singletons.ServiceEngine.Tunnels.EstablishOutboundEndpointConnection(
-                    notification.TunnelKey.SwapDirection(), notification.EndpointId, notification.StreamId);
+                    notification.TunnelKey.SwapDirection(), notification.EndpointId, notification.EdgeId);
             }
             catch (Exception ex)
             {
@@ -58,7 +60,7 @@ namespace NetTunnel.Service.ReliableHandlers
                 var connectionContext = GetServiceConnectionContext(context);
 
                 Singletons.ServiceEngine.Tunnels.WriteEndpointEdgeData(
-                    notification.TunnelKey.SwapDirection(), notification.EndpointId, notification.StreamId, notification.Bytes);
+                    notification.TunnelKey.SwapDirection(), notification.EndpointId, notification.EdgeId, notification.Bytes);
             }
             catch (Exception ex)
             {
@@ -96,5 +98,23 @@ namespace NetTunnel.Service.ReliableHandlers
                 throw;
             }
         }
+
+        public void OnNotificationEndpointDisconnect(RmContext context, NotificationEndpointDisconnect notification)
+        {
+            try
+            {
+                var connectionContext = GetServiceConnectionContext(context);
+
+                Singletons.ServiceEngine.Tunnels.DisconnectEndpointEdge(notification.TunnelKey, notification.EndpointId, notification.EdgeId);
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
+        }
+
+
+
     }
 }

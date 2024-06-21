@@ -53,16 +53,19 @@ namespace NetTunnel.Service.TunnelEngine
 
         #region Interface: ITunnel.
 
-        void ITunnel.PeerNotifyOfEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid streamId, byte[] bytes, int length)
+        void ITunnel.PeerNotifyOfEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length)
            => throw new NotImplementedException("This function should be overridden.");
 
-        void ITunnel.PeerNotifyOfEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid streamId)
+        void ITunnel.PeerNotifyOfEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
            => throw new NotImplementedException("This function should be overridden.");
 
         void ITunnel.PeerNotifyOfTunnelDeletion(DirectionalKey tunnelKey)
            => throw new NotImplementedException("This function should be overridden.");
 
         void ITunnel.PeerNotifyOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
+           => throw new NotImplementedException("This function should be overridden.");
+
+        void ITunnel.PeerNotifyOfEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
            => throw new NotImplementedException("This function should be overridden.");
 
         #endregion
@@ -107,9 +110,9 @@ namespace NetTunnel.Service.TunnelEngine
             ServiceEngine.Logger.Verbose($"Stopped tunnel '{Configuration.Name}'.");
         }
 
-        public void WriteEndpointEdgeData(Guid endpointId, Guid StreamId, byte[] bytes)
+        public void WriteEndpointEdgeData(Guid endpointId, Guid edgeId, byte[] bytes)
         {
-            Endpoints.Single(o => o.EndpointId == endpointId).WriteEndpointEdgeData(StreamId, bytes);
+            Endpoints.Single(o => o.EndpointId == endpointId).WriteEndpointEdgeData(edgeId, bytes);
         }
 
         #region Add/Delete Endpoints.
@@ -140,6 +143,12 @@ namespace NetTunnel.Service.TunnelEngine
         }
 
         #endregion
+
+        /// <summary>
+        /// Disconnect the endpoint edge from the external server, browser, etc.
+        /// </summary>
+        public void DisconnectEndpointEdge(Guid endpointId, Guid edgeId)
+            => GetEndpointById(endpointId)?.Disconnect(edgeId);
 
         private void HeartbeatThreadProc()
         {

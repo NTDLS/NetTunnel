@@ -3,6 +3,7 @@ using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Notification;
 using NetTunnel.Library.ReliablePayloads.Query;
 using NetTunnel.Service.ReliableMessages;
+using NetTunnel.Service.ReliableMessages.Notification;
 using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
@@ -189,8 +190,11 @@ namespace NetTunnel.Library
         public QueryCreateUserReply QueryCreateUser(User user)
             => Client.Query(new QueryCreateUser(user)).Result;
 
-        public void NotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid streamId)
-            => Client.Notify(new NotificationEndpointConnect(tunnelKey, endpointId, streamId));
+        public void NotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
+            => Client.Notify(new NotificationEndpointConnect(tunnelKey, endpointId, edgeId));
+
+        public void PeerNotifyOfEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
+            => Client.Notify(new NotificationEndpointDisconnect(tunnelKey, endpointId, edgeId));
 
         public void PeerNotifyOfTunnelDeletion(DirectionalKey tunnelKey)
             => Client.Notify(new NotificationTunnelDeletion(tunnelKey));
@@ -198,7 +202,7 @@ namespace NetTunnel.Library
         public void PeerNotifyOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
             => Client.Notify(new NotificationEndpointDeletion(tunnelKey, endpointId));
 
-        public void NotificationEndpointExchange(DirectionalKey tunnelKey, Guid endpointId, Guid streamId, byte[] bytes, int length)
-            => Client.Notify(new NotificationEndpointDataExchange(tunnelKey, endpointId, streamId, bytes, length));
+        public void NotificationEndpointExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length)
+            => Client.Notify(new NotificationEndpointDataExchange(tunnelKey, endpointId, edgeId, bytes, length));
     }
 }

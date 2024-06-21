@@ -3,6 +3,7 @@ using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
 using NTDLS.Helpers;
 using NTDLS.Semaphore;
+using System;
 using System.Net.Sockets;
 using System.Text;
 using static NetTunnel.Library.Constants;
@@ -71,7 +72,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                         foreach (var connection in connectionsToClose)
                         {
                             Exceptions.Ignore(connection.Disconnect);
-                            Exceptions.Ignore(() => o.Remove(connection.StreamId));
+                            Exceptions.Ignore(() => o.Remove(connection.EdgeId));
                         }
                     });
 
@@ -93,20 +94,20 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             _heartbeatThread.Join();
         }
 
-        public void Disconnect(Guid streamId)
+        public void Disconnect(Guid edgeId)
         {
             _activeConnections.Use((o) =>
             {
-                if (o.TryGetValue(streamId, out var activeEndpointConnection))
+                if (o.TryGetValue(edgeId, out var activeEndpointConnection))
                 {
                     Exceptions.Ignore(activeEndpointConnection.Disconnect);
                     Exceptions.Ignore(activeEndpointConnection.Dispose);
-                    o.Remove(streamId);
+                    o.Remove(edgeId);
                 }
             });
         }
 
-        public void WriteEndpointEdgeData(Guid streamId, byte[] buffer)
+        public void WriteEndpointEdgeData(Guid edgeId, byte[] buffer)
         {
             lock (_statisticsLock)
             {
@@ -116,7 +117,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
             var outboundConnection = _activeConnections.Use((o) =>
             {
-                if (o.TryGetValue(streamId, out var outboundConnection))
+                if (o.TryGetValue(edgeId, out var outboundConnection))
                 {
                     return outboundConnection;
                 }
@@ -148,7 +149,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 {
                     //SEARCH FOR: Process:Endpoint:Connect:001: If this is an inbound endpoint, then let the remote service
                     //  know that we just received a connection so that it came make the associated outbound connection.
-                    _tunnel.PeerNotifyOfEndpointConnect(_tunnel.TunnelKey, EndpointId, activeConnection.StreamId);
+                    _tunnel.PeerNotifyOfEndpointConnect(_tunnel.TunnelKey, EndpointId, activeConnection.EdgeId);
                 }
 
                 var httpHeaderBuilder = new StringBuilder();
@@ -195,8 +196,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                                 var httpHeaderBytes = Encoding.UTF8.GetBytes(httpHeaderBuilder.ToString());
 
-                                //_tunnel.Notify(new oldNotificationEndpointExchange
-                                //    (_tunnel.TunnelId, EndpointId, activeConnection.StreamId, httpHeaderBytes, httpHeaderBytes.Length));
+                                _tunnel.PeerNotifyOfEndpointDataExchange(
+                                    _tunnel.TunnelKey, EndpointId, activeConnection.EdgeId, httpHeaderBytes, httpHeaderBytes.Length);
 
                                 httpHeaderBuilder.Clear();
                                 break;
@@ -209,10 +210,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     #endregion
 
                     //Send the data to the remote peer, along with all the IDs required to identify the tunnel,
-                    //  endpoint and endpoint-edge-connection (streamId). At the tunnel-peer, This data will be
+                    //  endpoint and endpoint-edge-connection (edgeId). At the tunnel-peer, This data will be
                     //  sent to whatever is connected to the endpoint via a call to WriteEndpointEdgeData().
-                    _tunnel.PeerNotifyOfEndpointDataExchange(_tunnel.TunnelKey,
-                        Configuration.EndpointId, activeConnection.StreamId, buffer.Bytes, buffer.Length);
+                    _tunnel.PeerNotifyOfEndpointDataExchange(
+                        _tunnel.TunnelKey, Configuration.EndpointId, activeConnection.EdgeId, buffer.Bytes, buffer.Length);
 
                     buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);
                 }
@@ -251,12 +252,12 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                 _activeConnections.Use((o) =>
                 {
-                    o.Remove(activeConnection.StreamId);
+                    o.Remove(activeConnection.EdgeId);
                 });
             }
 
-            //Exceptions.Ignore(() =>
-            //    _tunnel.Notify(new oldNotificationEndpointDisconnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId)));
+            Exceptions.Ignore(() =>
+                _tunnel.PeerNotifyOfEndpointDisconnect(_tunnel.TunnelKey, EndpointId, activeConnection.EdgeId));
         }
     }
 }

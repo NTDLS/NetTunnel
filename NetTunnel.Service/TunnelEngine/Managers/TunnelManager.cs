@@ -178,6 +178,16 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         #endregion
 
+        public void DisconnectEndpointEdge(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
+        {
+            Collection.Use((o) =>
+            {
+                var tunnel = o.Single(o => o.TunnelKey == tunnelKey);
+                tunnel.DisconnectEndpointEdge(endpointId, edgeId);
+            });
+        }
+
+
         /// <summary>
         /// Returns true if the local service owns the tunnel.
         /// </summary>
@@ -198,9 +208,9 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// </summary>
         /// <param name="tunnelKey"></param>
         /// <param name="endpointId"></param>
-        /// <param name="streamId"></param>
+        /// <param name="edgeId"></param>
         /// <exception cref="Exception"></exception>
-        public void EstablishOutboundEndpointConnection(DirectionalKey tunnelKey, Guid endpointId, Guid streamId)
+        public void EstablishOutboundEndpointConnection(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
         {
             Collection.Use((o) =>
             {
@@ -209,18 +219,18 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 var endpoint = tunnel.Endpoints.Single(o => o.EndpointId == endpointId) as EndpointOutbound
                     ?? throw new Exception("The endpoint could not be converted to outbound.");
 
-                endpoint.EstablishOutboundEndpointConnection(streamId);
+                endpoint.EstablishOutboundEndpointConnection(edgeId);
             });
         }
 
-        public void WriteEndpointEdgeData(DirectionalKey tunnelKey, Guid endpointId, Guid StreamId, byte[] bytes)
+        public void WriteEndpointEdgeData(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes)
         {
             Collection.Use((o) =>
             {
                 var tunnel = o.Single(o => o.TunnelKey == tunnelKey);
                 var endpoint = tunnel.Endpoints.Single(o => o.EndpointId == endpointId);
 
-                endpoint.WriteEndpointEdgeData(StreamId, bytes);
+                endpoint.WriteEndpointEdgeData(edgeId, bytes);
             });
         }
 

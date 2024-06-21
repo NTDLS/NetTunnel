@@ -92,9 +92,9 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                             //Keep track of the connection. ActiveEndpointConnection will handle closing and disposing of the client and its stream.
                             var activeConnection = new ActiveEndpointConnection(endpointEdgeConnectionPumpThread, tcpClient, Guid.NewGuid());
-                            _activeConnections.Use((o) => o.Add(activeConnection.StreamId, activeConnection));
+                            _activeConnections.Use((o) => o.Add(activeConnection.EdgeId, activeConnection));
 
-                            _serviceEngine.Logger.Debug($"Accepted inbound endpoint connection: {activeConnection.StreamId}");
+                            _serviceEngine.Logger.Debug($"Accepted inbound endpoint connection: {activeConnection.EdgeId}");
 
                             endpointEdgeConnectionPumpThread.Start(activeConnection);
                         }

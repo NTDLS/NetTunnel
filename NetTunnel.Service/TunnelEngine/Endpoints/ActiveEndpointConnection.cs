@@ -8,7 +8,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
     {
         public DateTime StartDateTime { get; private set; } = DateTime.UtcNow;
         public DateTime LastActivityDateTime { get; private set; } = DateTime.UtcNow;
-        public Guid StreamId { get; private set; }
+        public Guid EdgeId { get; private set; }
         public TcpClient TcpClient { get; private set; }
         public Thread Thread { get; private set; }
         public bool IsConnected { get; private set; }
@@ -21,11 +21,11 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         public double StartAgeInMilliseconds
             => (DateTime.UtcNow - StartDateTime).TotalMilliseconds;
 
-        public ActiveEndpointConnection(Thread thread, TcpClient tcpClient, Guid streamId)
+        public ActiveEndpointConnection(Thread thread, TcpClient tcpClient, Guid edgeId)
         {
             Thread = thread;
             TcpClient = tcpClient;
-            StreamId = streamId;
+            EdgeId = edgeId;
             _stream = tcpClient.GetStream();
             IsConnected = true;
         }
