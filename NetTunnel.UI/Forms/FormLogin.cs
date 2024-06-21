@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library;
+using NTDLS.Helpers;
 using NTDLS.Persistence;
 using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
@@ -35,11 +36,14 @@ namespace NetTunnel.UI.Forms
             AcceptButton = buttonLogin;
             CancelButton = buttonCancel;
 
-            var preferences = LocalUserApplicationData.LoadFromDisk(Constants.FriendlyName, new UILoginPreferences());
+            Exceptions.Ignore(() =>
+            {
+                var preferences = LocalUserApplicationData.LoadFromDisk(Constants.FriendlyName, new UILoginPreferences());
 
-            textBoxAddress.Text = preferences.Address;
-            textBoxPort.Text = preferences.Port;
-            textBoxUsername.Text = preferences.Username;
+                textBoxAddress.Text = preferences.Address;
+                textBoxPort.Text = preferences.Port;
+                textBoxUsername.Text = preferences.Username;
+            });
 
 #if DEBUG
             textBoxPassword.Text = "123456789";
@@ -47,7 +51,7 @@ namespace NetTunnel.UI.Forms
             textBoxPassword.Focus();
         }
 
-        private void buttonLogin_Click(object sender, EventArgs e)
+        private void ButtonLogin_Click(object sender, EventArgs e)
         {
             try
             {
@@ -88,13 +92,13 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-        private void buttonCancel_Click(object sender, EventArgs e)
+        private void ButtonCancel_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
             Close();
         }
 
-        private void buttonAbout_Click(object sender, EventArgs e)
+        private void ButtonAbout_Click(object sender, EventArgs e)
         {
             using var form = new FormAbout();
             form.ShowDialog();

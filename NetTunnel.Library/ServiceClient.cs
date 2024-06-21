@@ -45,28 +45,28 @@ namespace NetTunnel.Library
 
         #region Factory.
 
-        public static ServiceClient CreateConnectAndLogin(ILogger logger, string address, int port, string userName, string passwordHash, object? owner = null)
+        public static ServiceClient CreateConnectAndLogin(ILogger logger, string address, int port, string userName, string passwordHash)
         {
             return CreateConnectAndLogin(logger, new ServiceConfiguration()
             {
                 MessageQueryTimeoutMs = 1000
-            }, address, port, userName, passwordHash, owner);
+            }, address, port, userName, passwordHash);
         }
 
         public static ServiceClient CreateConnectAndLogin(ILogger logger, ServiceConfiguration configuration,
-             string address, int port, string userName, string passwordHash, object? owner = null)
+             string address, int port, string userName, string passwordHash)
         {
-            var serviceClient = Create(logger, configuration, address, port, userName, passwordHash, owner);
+            var serviceClient = Create(logger, configuration, address, port, userName, passwordHash);
             serviceClient.ConnectAndLogin();
             return serviceClient;
         }
 
         public static ServiceClient Create(ILogger logger, ServiceConfiguration configuration,
-            string address, int port, string userName, string passwordHash, object? owner = null)
+            string address, int port, string userName, string passwordHash, object? parameter = null)
         {
             var client = new RmClient(new RmConfiguration()
             {
-                Parameter = owner,
+                Parameter = parameter,
                 InitialReceiveBufferSize = configuration.InitialReceiveBufferSize,
                 MaxReceiveBufferSize = configuration.MaxReceiveBufferSize,
                 ReceiveBufferGrowthRate = configuration.ReceiveBufferGrowthRate,

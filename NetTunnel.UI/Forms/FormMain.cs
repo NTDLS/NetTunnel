@@ -127,15 +127,13 @@ namespace NetTunnel.UI.Forms
         {
             try
             {
-                using (var formLogin = new FormLogin())
+                using var form = new FormLogin();
+                if (form.ShowDialog() == DialogResult.OK)
                 {
-                    if (formLogin.ShowDialog() == DialogResult.OK)
-                    {
-                        _client = formLogin.ResultingClient.EnsureNotNull();
-                        Text = $"{FriendlyName} : {_client.Address}";
-                        RepopulateTunnelsGrid();
-                        return true;
-                    }
+                    _client = form.ResultingClient.EnsureNotNull();
+                    Text = $"{FriendlyName} : {_client.Address}";
+                    RepopulateTunnelsGrid();
+                    return true;
                 }
             }
             catch (Exception ex)

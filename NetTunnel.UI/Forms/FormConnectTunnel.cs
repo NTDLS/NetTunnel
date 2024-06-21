@@ -1,6 +1,7 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Payloads;
 using NTDLS.Helpers;
+using NTDLS.Persistence;
 using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
 
@@ -46,7 +47,11 @@ namespace NetTunnel.UI.Forms
             AcceptButton = buttonConnect;
             CancelButton = buttonCancel;
 
-            textBoxPort.Text = "52845"; //TODO: This should be stored in preferences.
+            Exceptions.Ignore(() =>
+            {
+                var preferences = LocalUserApplicationData.LoadFromDisk(Constants.FriendlyName, new UILoginPreferences());
+                textBoxPort.Text = preferences.Port;
+            });
 
 #if DEBUG
             textBoxName.Text = "My First Tunnel";
@@ -58,7 +63,7 @@ namespace NetTunnel.UI.Forms
 #endif
         }
 
-        private void buttonConnect_Click(object sender, EventArgs e)
+        private void ButtonConnect_Click(object sender, EventArgs e)
         {
             _client.EnsureNotNull();
 

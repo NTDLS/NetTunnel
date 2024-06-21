@@ -95,7 +95,7 @@
             buttonCancel.TabIndex = 2;
             buttonCancel.Text = "Cancel";
             buttonCancel.UseVisualStyleBackColor = true;
-            buttonCancel.Click += buttonCancel_Click;
+            buttonCancel.Click += ButtonCancel_Click;
             // 
             // buttonLogin
             // 
@@ -105,7 +105,7 @@
             buttonLogin.TabIndex = 1;
             buttonLogin.Text = "Login";
             buttonLogin.UseVisualStyleBackColor = true;
-            buttonLogin.Click += buttonLogin_Click;
+            buttonLogin.Click += ButtonLogin_Click;
             // 
             // labelPort
             // 
@@ -147,7 +147,7 @@
             buttonAbout.TabIndex = 10;
             buttonAbout.Text = "About";
             buttonAbout.UseVisualStyleBackColor = true;
-            buttonAbout.Click += buttonAbout_Click;
+            buttonAbout.Click += ButtonAbout_Click;
             // 
             // FormLogin
             // 

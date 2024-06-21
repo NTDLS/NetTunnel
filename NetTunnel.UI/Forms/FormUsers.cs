@@ -112,16 +112,16 @@ namespace NetTunnel.UI.Forms
                     {
                         _client.EnsureNotNull();
 
-                        using var formAddUser = new FormAddUser(_client);
-                        if (formAddUser.ShowDialog() == DialogResult.OK)
+                        using var form = new FormAddUser(_client);
+                        if (form.ShowDialog() == DialogResult.OK)
                         {
-                            AddUserToGrid(formAddUser.CreatedUser.EnsureNotNull());
+                            AddUserToGrid(form.CreatedUser.EnsureNotNull());
                         }
                     }
                     else if (uTag != null && e.ClickedItem?.Text == "Change password")
                     {
-                        using var formChangeUserPassword = new FormChangeUserPassword(_client, uTag.User);
-                        formChangeUserPassword.ShowDialog();
+                        using var form = new FormChangeUserPassword(_client, uTag.User);
+                        form.ShowDialog();
                     }
                     else if (uTag != null && e.ClickedItem?.Text == "Delete")
                     {
@@ -154,10 +154,10 @@ namespace NetTunnel.UI.Forms
         {
             _client.EnsureNotNull();
 
-            using var formAddUser = new FormAddUser(_client);
-            if (formAddUser.ShowDialog() == DialogResult.OK)
+            using var form = new FormAddUser(_client);
+            if (form.ShowDialog() == DialogResult.OK)
             {
-                AddUserToGrid(formAddUser.CreatedUser.EnsureNotNull());
+                AddUserToGrid(form.CreatedUser.EnsureNotNull());
             }
         }
 

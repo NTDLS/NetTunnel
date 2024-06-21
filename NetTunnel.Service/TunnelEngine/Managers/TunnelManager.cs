@@ -210,22 +210,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             Collection.Use((o) =>
             {
-                var tunnel = o.Single(o => o.TunnelKey == tunnelKey);
-                tunnel.DisconnectEndpointEdge(endpointId, edgeId);
-            });
-        }
-
-
-        /// <summary>
-        /// Returns true if the local service owns the tunnel.
-        /// </summary>
-        /// <param name="tunnelId"></param>
-        /// <returns></returns>
-        public bool IsOwned(Guid tunnelId)
-        {
-            return Collection.Use((o) =>
-            {
-                return o.Single(o => o.Configuration.TunnelId == tunnelId).Configuration.ServiceId == Singletons.Configuration.ServiceId;
+                var tunnel = o.SingleOrDefault(o => o.TunnelKey == tunnelKey);
+                tunnel?.DisconnectEndpointEdge(endpointId, edgeId);
             });
         }
 

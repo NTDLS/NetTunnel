@@ -143,7 +143,7 @@
             buttonConnect.TabIndex = 5;
             buttonConnect.Text = "Connect";
             buttonConnect.UseVisualStyleBackColor = true;
-            buttonConnect.Click += buttonConnect_Click;
+            buttonConnect.Click += ButtonConnect_Click;
             // 
             // groupBoxRemoteService
             // 

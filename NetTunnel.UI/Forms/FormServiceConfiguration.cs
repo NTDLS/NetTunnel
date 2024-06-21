@@ -54,13 +54,13 @@ namespace NetTunnel.UI.Forms
 
             #endregion
 
-            Shown += FormUsers_Shown;
+            Shown += FormServiceConfiguration_Shown;
 
             AcceptButton = buttonSave;
             CancelButton = buttonCancel;
         }
 
-        private void FormUsers_Shown(object? sender, EventArgs e)
+        private void FormServiceConfiguration_Shown(object? sender, EventArgs e)
         {
             if (!_firstShown)
             {
@@ -142,7 +142,7 @@ namespace NetTunnel.UI.Forms
 
                 #endregion
 
-                var progressForm = new ProgressForm(Constants.FriendlyName, "Getting configuration...");
+                var progressForm = new ProgressForm(Constants.FriendlyName, "Saving configuration...");
 
                 progressForm.Execute(() =>
                 {
