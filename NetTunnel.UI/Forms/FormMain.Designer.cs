@@ -137,7 +137,7 @@
             connectToolStripMenuItem.Name = "connectToolStripMenuItem";
             connectToolStripMenuItem.Size = new Size(119, 22);
             connectToolStripMenuItem.Text = "Connect";
-            connectToolStripMenuItem.Click += connectToolStripMenuItem_Click;
+            connectToolStripMenuItem.Click += ConnectToolStripMenuItem_Click;
             // 
             // toolStripMenuItem1
             // 
@@ -149,7 +149,7 @@
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             exitToolStripMenuItem.Size = new Size(119, 22);
             exitToolStripMenuItem.Text = "Exit";
-            exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
+            exitToolStripMenuItem.Click += ExitToolStripMenuItem_Click;
             // 
             // securityToolStripMenuItem
             // 
@@ -163,14 +163,14 @@
             usersToolStripMenuItem.Name = "usersToolStripMenuItem";
             usersToolStripMenuItem.Size = new Size(148, 22);
             usersToolStripMenuItem.Text = "Users";
-            usersToolStripMenuItem.Click += usersToolStripMenuItem_Click;
+            usersToolStripMenuItem.Click += UsersToolStripMenuItem_Click;
             // 
             // configurationToolStripMenuItem1
             // 
             configurationToolStripMenuItem1.Name = "configurationToolStripMenuItem1";
             configurationToolStripMenuItem1.Size = new Size(148, 22);
             configurationToolStripMenuItem1.Text = "Configuration";
-            configurationToolStripMenuItem1.Click += configurationToolStripMenuItem_Click;
+            configurationToolStripMenuItem1.Click += ConfigurationToolStripMenuItem_Click;
             // 
             // helpToolStripMenuItem
             // 
@@ -184,7 +184,7 @@
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             aboutToolStripMenuItem.Size = new Size(107, 22);
             aboutToolStripMenuItem.Text = "About";
-            aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
+            aboutToolStripMenuItem.Click += AboutToolStripMenuItem_Click;
             // 
             // statusStripBody
             // 

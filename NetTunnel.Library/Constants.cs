@@ -42,6 +42,7 @@
 
         public enum NtDirection
         {
+            Undefined,
             Inbound,
             Outbound
         }
@@ -57,10 +58,10 @@
 
         public enum NtLogSeverity
         {
-            Debug = 0, //Super-verbose, debug information.
-            Verbose = 1, //General status messages.
-            Warning = 2, //Something the user might want to be aware of.
-            Exception = 3 //An actual exception has been thrown.
+            Exception = 0,//An actual exception has been thrown.
+            Warning = 1,//Something the user might want to be aware of.
+            Verbose = 2, //General status messages.
+            Debug = 3, //Super-verbose, debug information.
         }
     }
 }

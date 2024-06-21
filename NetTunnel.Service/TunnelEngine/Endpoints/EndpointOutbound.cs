@@ -1,7 +1,8 @@
-﻿using NetTunnel.Library;
-using NetTunnel.Library.Types;
-using NetTunnel.Service.TunnelEngine.Tunnels;
+﻿using NetTunnel.Library.Interfaces;
+using NetTunnel.Library.Payloads;
+using NTDLS.Helpers;
 using System.Net.Sockets;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
@@ -13,8 +14,15 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         public override int GetHashCode()
             => Configuration.GetHashCode();
 
-        public EndpointOutbound(TunnelEngineCore core, ITunnel tunnel, NtEndpointOutboundConfiguration configuration)
-            : base(core, tunnel, configuration.EndpointId, configuration)
+        public NtDirection Direction { get => NtDirection.Outbound; }
+
+        /// <summary>
+        /// Unique ID that takes the direction and the ID into account.
+        /// </summary>
+        public DirectionalKey EndpointKey => new(this);
+
+        public EndpointOutbound(IServiceEngine serviceEngine, ITunnel tunnel, EndpointConfiguration configuration)
+            : base(serviceEngine, tunnel, configuration.EndpointId, configuration)
         {
         }
 
@@ -22,7 +30,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
             base.Start();
 
-            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose,
+            _tunnel.ServiceEngine.Logger.Verbose(
                 $"Starting outbound endpoint '{Configuration.Name}' on port {Configuration.OutboundPort}.");
         }
 
@@ -30,19 +38,19 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
             base.Stop();
 
-            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose,
+            _tunnel.ServiceEngine.Logger.Verbose(
                 $"Stopping outbound endpoint '{Configuration.Name}' on port {Configuration.OutboundPort}.");
 
             _activeConnections.Use((o) =>
             {
                 foreach (var activeConnection in o)
                 {
-                    Utility.TryAndIgnore(activeConnection.Value.Disconnect);
+                    Exceptions.Ignore(activeConnection.Value.Disconnect);
                 }
                 o.Clear();
             });
 
-            _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose,
+            _tunnel.ServiceEngine.Logger.Verbose(
                 $"Stopped outbound endpoint '{Configuration.Name}' on port {Configuration.OutboundPort}.");
         }
 
@@ -62,16 +70,14 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                         var activeConnection = new ActiveEndpointConnection(dataExchangeThread, tcpClient, streamId);
                         var outboundConnection = _activeConnections.Use((o) => o.TryAdd(streamId, activeConnection));
 
-                        _core.Logging.Write(Constants.NtLogSeverity.Debug,
-                            $"Established outbound endpoint connection: {activeConnection.StreamId}");
+                        _serviceEngine.Logger.Debug($"Established outbound endpoint connection: {activeConnection.StreamId}");
 
                         dataExchangeThread.Start(activeConnection);
                     }
                 }
                 catch (Exception ex)
                 {
-                    _core.Logging.Write(Constants.NtLogSeverity.Exception,
-                        $"EstablishOutboundEndpointConnection: {ex.Message}");
+                    _serviceEngine.Logger.Exception(ex, $"EstablishOutboundEndpointConnection: {ex.Message}");
                     throw;
                 }
             }

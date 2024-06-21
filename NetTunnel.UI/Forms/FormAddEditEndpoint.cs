@@ -1,7 +1,6 @@
-﻿using NetTunnel.ClientAPI;
-using NetTunnel.Library;
-using NetTunnel.Library.Types;
-using NTDLS.NullExtensions;
+﻿using NetTunnel.Library;
+using NetTunnel.Library.Payloads;
+using NTDLS.Helpers;
 using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
 
@@ -9,15 +8,15 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormAddEditEndpoint : Form
     {
-        private readonly NtClient? _client;
-        private readonly INtTunnelConfiguration? _tunnel;
-        private readonly NtDirection _direction;
-        private readonly INtEndpointConfiguration? _existingEndpoint;
+        private readonly ServiceClient? _client;
+        private readonly TunnelDisplay? _tunnel;
+        private readonly NtDirection _direction = NtDirection.Undefined;
+        private readonly EndpointDisplay? _existingEndpoint;
 
         /// <summary>
         /// Creates a form for a editing an existing endpoint.
         /// </summary>
-        public FormAddEditEndpoint(NtClient client, INtTunnelConfiguration tunnel, INtEndpointConfiguration existingEndpoint)
+        public FormAddEditEndpoint(ServiceClient client, TunnelDisplay tunnel, EndpointDisplay existingEndpoint)
         {
             InitializeComponent();
 
@@ -26,19 +25,7 @@ namespace NetTunnel.UI.Forms
             _client = client;
             _tunnel = tunnel;
             _existingEndpoint = existingEndpoint;
-
-            if (existingEndpoint is NtEndpointInboundConfiguration)
-            {
-                _direction = NtDirection.Inbound;
-            }
-            else if (existingEndpoint is NtEndpointOutboundConfiguration)
-            {
-                _direction = NtDirection.Outbound;
-            }
-            else
-            {
-                throw new Exception("Unknown endpoint type.");
-            }
+            _direction = existingEndpoint.Direction;
 
             PopulateForm();
         }
@@ -46,7 +33,7 @@ namespace NetTunnel.UI.Forms
         /// <summary>
         /// Creates a form for a adding a new endpoint.
         /// </summary>
-        public FormAddEditEndpoint(NtClient client, INtTunnelConfiguration tunnel, NtDirection direction)
+        public FormAddEditEndpoint(ServiceClient client, TunnelDisplay tunnel, NtDirection direction)
         {
             InitializeComponent();
 
@@ -130,7 +117,7 @@ namespace NetTunnel.UI.Forms
                 textBoxOutboundAddress.GetAndValidateText("You must specify a termination endpoint address (ip, hostname or domain). ");
                 textBoxOutboundPort.GetAndValidateNumeric(1, 65535, "You must specify a valid termination port between [min] and [max].");
 
-                var endpointHttpHeaderRules = new List<NtHttpHeaderRule>();
+                var endpointHttpHeaderRules = new List<HttpHeaderRule>();
 
                 foreach (DataGridViewRow row in dataGridViewHTTPHeaders.Rows)
                 {
@@ -138,7 +125,7 @@ namespace NetTunnel.UI.Forms
                     {
                         var headerType = Enum.Parse<NtHttpHeaderType>($"{row.Cells[columnType.Index].Value}");
 
-                        endpointHttpHeaderRules.Add(new NtHttpHeaderRule
+                        endpointHttpHeaderRules.Add(new HttpHeaderRule
                         {
                             Enabled = bool.Parse(row.Cells[columnEnabled.Index].Value?.ToString() ?? "True"),
                             HeaderType = Enum.Parse<NtHttpHeaderType>($"{row.Cells[columnType.Index].Value}"),
@@ -150,93 +137,34 @@ namespace NetTunnel.UI.Forms
                     }
                 }
 
-                buttonSave.InvokeEnableControl(false);
+                var endpoint = new EndpointConfiguration(
+                    _existingEndpoint?.EndpointId ?? Guid.NewGuid(),
+                    _direction,
+                    textBoxName.Text,
+                    textBoxOutboundAddress.Text,
+                    textBoxInboundPort.ValueAs<int>(),
+                    textBoxOutboundPort.ValueAs<int>(),
+                    endpointHttpHeaderRules,
+                    Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"));
 
-                var endpointId = _existingEndpoint?.EndpointId ?? Guid.NewGuid(); //The endpointId is the same on both services.
+                var progressForm = new ProgressForm(FriendlyName, "Saving endpoint...");
 
-                var endpointInbound = new NtEndpointInboundConfiguration(_tunnel.TunnelId, endpointId,
-                    textBoxName.Text, textBoxOutboundAddress.Text, textBoxInboundPort.ValueAs<int>(),
-                    textBoxOutboundPort.ValueAs<int>(), endpointHttpHeaderRules, Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"));
-
-                var endpointOutbound = new NtEndpointOutboundConfiguration(_tunnel.TunnelId, endpointId,
-                    textBoxName.Text, textBoxOutboundAddress.Text, textBoxInboundPort.ValueAs<int>(),
-                    textBoxOutboundPort.ValueAs<int>(), endpointHttpHeaderRules, Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"));
-
-                if (_tunnel is NtTunnelInboundConfiguration)
+                progressForm.Execute(() =>
                 {
-                    if (_direction == NtDirection.Inbound)
+                    try
                     {
-                        _client.TunnelInbound.UpsertEndpointInboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
-                        {
-                            if (!o.IsCompletedSuccessfully)
-                            {
-                                this.InvokeMessageBox("Failed to add inbound endpoint pair to inbound tunnel.",
-                                    FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-
-                                buttonSave.InvokeEnableControl(true);
-
-                                return;
-                            }
-                            this.InvokeClose(DialogResult.OK);
-
-                        });
+                        _client.QueryUpsertEndpoint(_tunnel.TunnelKey, endpoint);
+                        this.InvokeClose(DialogResult.OK);
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        _client.TunnelInbound.UpsertEndpointOutboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
-                        {
-                            if (!o.IsCompletedSuccessfully)
-                            {
-                                this.InvokeMessageBox("Failed to add outbound endpoint pair to inbound tunnel.",
-                                    FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-
-                                buttonSave.InvokeEnableControl(true);
-
-                                return;
-                            }
-                            this.InvokeClose(DialogResult.OK);
-                        });
+                        progressForm.MessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     }
-                }
-                if (_tunnel is NtTunnelOutboundConfiguration)
-                {
-                    if (_direction == NtDirection.Inbound)
-                    {
-                        _client.TunnelOutbound.UpsertEndpointInboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
-                        {
-                            if (!o.IsCompletedSuccessfully)
-                            {
-                                this.InvokeMessageBox("Failed to add outbound endpoint pair to outbound tunnel.",
-                                    FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-
-                                buttonSave.InvokeEnableControl(true);
-
-                                return;
-                            }
-                            this.InvokeClose(DialogResult.OK);
-                        });
-                    }
-                    else
-                    {
-                        _client.TunnelOutbound.UpsertEndpointOutboundPair(_tunnel.TunnelId, endpointInbound, endpointOutbound).ContinueWith((o) =>
-                        {
-                            if (!o.IsCompletedSuccessfully)
-                            {
-                                this.InvokeMessageBox("Failed to add outbound endpoint pair to outbound tunnel.",
-                                    FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-
-                                buttonSave.InvokeEnableControl(true);
-
-                                return;
-                            }
-                            this.InvokeClose(DialogResult.OK);
-                        });
-                    }
-                }
+                });
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK);
+                MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
             }
         }
     }

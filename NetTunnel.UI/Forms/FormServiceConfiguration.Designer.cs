@@ -43,8 +43,6 @@
             textBoxTunnelAndEndpointHeartbeatDelayMs = new TextBox();
             textBoxTunnelCryptographyKeySize = new TextBox();
             textBoxStaleEndpointExpirationMs = new TextBox();
-            checkBoxDebugLogging = new CheckBox();
-            checkBoxManagementUseSSL = new CheckBox();
             labelInitialReceiveBufferSize = new Label();
             labelMaxReceiveBufferSize = new Label();
             labelReceiveBufferGrowthRate = new Label();
@@ -56,14 +54,11 @@
             tabPageTunnels = new TabPage();
             groupBoxBuffering = new GroupBox();
             tabPageEndpoints = new TabPage();
-            tabPageMisc = new TabPage();
-            checkBoxVerboseLogging = new CheckBox();
             tabControlBody.SuspendLayout();
             tabPageManagement.SuspendLayout();
             tabPageTunnels.SuspendLayout();
             groupBoxBuffering.SuspendLayout();
             tabPageEndpoints.SuspendLayout();
-            tabPageMisc.SuspendLayout();
             SuspendLayout();
             // 
             // buttonCancel
@@ -182,26 +177,6 @@
             textBoxStaleEndpointExpirationMs.Size = new Size(100, 23);
             textBoxStaleEndpointExpirationMs.TabIndex = 1;
             // 
-            // checkBoxDebugLogging
-            // 
-            checkBoxDebugLogging.AutoSize = true;
-            checkBoxDebugLogging.Location = new Point(14, 21);
-            checkBoxDebugLogging.Name = "checkBoxDebugLogging";
-            checkBoxDebugLogging.Size = new Size(110, 19);
-            checkBoxDebugLogging.TabIndex = 0;
-            checkBoxDebugLogging.Text = "Debug logging?";
-            checkBoxDebugLogging.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxManagementUseSSL
-            // 
-            checkBoxManagementUseSSL.AutoSize = true;
-            checkBoxManagementUseSSL.Location = new Point(244, 22);
-            checkBoxManagementUseSSL.Name = "checkBoxManagementUseSSL";
-            checkBoxManagementUseSSL.Size = new Size(71, 19);
-            checkBoxManagementUseSSL.TabIndex = 1;
-            checkBoxManagementUseSSL.Text = "Use SSL?";
-            checkBoxManagementUseSSL.UseVisualStyleBackColor = true;
-            // 
             // labelInitialReceiveBufferSize
             // 
             labelInitialReceiveBufferSize.AutoSize = true;
@@ -255,7 +230,6 @@
             tabControlBody.Controls.Add(tabPageManagement);
             tabControlBody.Controls.Add(tabPageTunnels);
             tabControlBody.Controls.Add(tabPageEndpoints);
-            tabControlBody.Controls.Add(tabPageMisc);
             tabControlBody.Location = new Point(12, 12);
             tabControlBody.Name = "tabControlBody";
             tabControlBody.SelectedIndex = 0;
@@ -268,7 +242,6 @@
             tabPageManagement.Controls.Add(labelManagementPort);
             tabPageManagement.Controls.Add(labelManagementPortRSASize);
             tabPageManagement.Controls.Add(textBoxManagementPort);
-            tabPageManagement.Controls.Add(checkBoxManagementUseSSL);
             tabPageManagement.Location = new Point(4, 24);
             tabPageManagement.Name = "tabPageManagement";
             tabPageManagement.Padding = new Padding(3);
@@ -320,27 +293,6 @@
             tabPageEndpoints.Text = "Endpoints";
             tabPageEndpoints.UseVisualStyleBackColor = true;
             // 
-            // tabPageMisc
-            // 
-            tabPageMisc.Controls.Add(checkBoxVerboseLogging);
-            tabPageMisc.Controls.Add(checkBoxDebugLogging);
-            tabPageMisc.Location = new Point(4, 24);
-            tabPageMisc.Name = "tabPageMisc";
-            tabPageMisc.Size = new Size(492, 382);
-            tabPageMisc.TabIndex = 3;
-            tabPageMisc.Text = "Misc.";
-            tabPageMisc.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxVerboseLogging
-            // 
-            checkBoxVerboseLogging.AutoSize = true;
-            checkBoxVerboseLogging.Location = new Point(14, 46);
-            checkBoxVerboseLogging.Name = "checkBoxVerboseLogging";
-            checkBoxVerboseLogging.Size = new Size(116, 19);
-            checkBoxVerboseLogging.TabIndex = 1;
-            checkBoxVerboseLogging.Text = "Verbose logging?";
-            checkBoxVerboseLogging.UseVisualStyleBackColor = true;
-            // 
             // FormServiceConfiguration
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -366,8 +318,6 @@
             groupBoxBuffering.PerformLayout();
             tabPageEndpoints.ResumeLayout(false);
             tabPageEndpoints.PerformLayout();
-            tabPageMisc.ResumeLayout(false);
-            tabPageMisc.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -386,8 +336,6 @@
         private TextBox textBoxTunnelAndEndpointHeartbeatDelayMs;
         private TextBox textBoxTunnelCryptographyKeySize;
         private TextBox textBoxStaleEndpointExpirationMs;
-        private CheckBox checkBoxDebugLogging;
-        private CheckBox checkBoxManagementUseSSL;
         private Label labelInitialReceiveBufferSize;
         private Label labelMaxReceiveBufferSize;
         private Label labelReceiveBufferGrowthRate;
@@ -398,8 +346,6 @@
         private TabPage tabPageManagement;
         private TabPage tabPageTunnels;
         private TabPage tabPageEndpoints;
-        private TabPage tabPageMisc;
         private GroupBox groupBoxBuffering;
-        private CheckBox checkBoxVerboseLogging;
     }
 }

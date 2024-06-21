@@ -1,8 +1,7 @@
 ﻿using NetTunnel.Library;
-using NetTunnel.Library.Types;
-using NetTunnel.Service.ReliableMessages.Notification;
-using NetTunnel.Service.TunnelEngine.Tunnels;
-using NTDLS.NullExtensions;
+using NetTunnel.Library.Interfaces;
+using NetTunnel.Library.Payloads;
+using NTDLS.Helpers;
 using NTDLS.Semaphore;
 using System.Net.Sockets;
 using System.Text;
@@ -20,7 +19,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         public ulong CurrentConnections { get; internal set; }
         public Guid EndpointId { get; private set; }
 
-        internal readonly TunnelEngineCore _core;
+        internal readonly IServiceEngine _serviceEngine;
         internal readonly ITunnel _tunnel;
         public bool KeepRunning { get; internal set; } = false;
 
@@ -28,14 +27,14 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         internal readonly PessimisticCriticalResource<Dictionary<Guid, ActiveEndpointConnection>> _activeConnections = new();
 
-        public INtEndpointConfiguration Configuration { get; private set; }
+        public EndpointConfiguration Configuration { get; private set; }
 
-        public BaseEndpoint(TunnelEngineCore core, ITunnel tunnel,
-            Guid endpointId, INtEndpointConfiguration configuration)
+        public BaseEndpoint(IServiceEngine serviceEngine, ITunnel tunnel,
+            Guid endpointId, EndpointConfiguration configuration)
         {
             Configuration = configuration;
 
-            _core = core;
+            _serviceEngine = serviceEngine;
             _tunnel = tunnel;
             EndpointId = endpointId;
             _heartbeatThread = new Thread(HeartbeatThreadProc);
@@ -58,7 +57,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                         foreach (var connection in o)
                         {
-                            Utility.TryAndIgnore(() =>
+                            Exceptions.Ignore(() =>
                             {
                                 //We've are connected but haven't done much in a while.
                                 if (Singletons.Configuration.StaleEndpointExpirationMs > 0
@@ -71,8 +70,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                         foreach (var connection in connectionsToClose)
                         {
-                            Utility.TryAndIgnore(connection.Disconnect);
-                            Utility.TryAndIgnore(() => o.Remove(connection.StreamId));
+                            Exceptions.Ignore(connection.Disconnect);
+                            Exceptions.Ignore(() => o.Remove(connection.StreamId));
                         }
                     });
 
@@ -100,8 +99,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             {
                 if (o.TryGetValue(streamId, out var activeEndpointConnection))
                 {
-                    Utility.TryAndIgnore(activeEndpointConnection.Disconnect);
-                    Utility.TryAndIgnore(activeEndpointConnection.Dispose);
+                    Exceptions.Ignore(activeEndpointConnection.Disconnect);
+                    Exceptions.Ignore(activeEndpointConnection.Dispose);
                     o.Remove(streamId);
                 }
             });
@@ -121,9 +120,11 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 {
                     return outboundConnection;
                 }
-
                 return outboundConnection;
             });
+
+            var wtfAndAlsoWTF = Encoding.UTF8.GetString(buffer);
+
 
             outboundConnection?.Write(buffer);
         }
@@ -136,6 +137,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
             Thread.CurrentThread.Name = $"EndpointDataExchangeThreadProc:{Environment.CurrentManagedThreadId}";
 
+            _tunnel.ServiceEngine.Logger.Warning($"EndpointDataExchangeThreadProc: {Configuration.Direction}");
+
             var activeConnection = ((ActiveEndpointConnection?)obj).EnsureNotNull();
 
             lock (_statisticsLock)
@@ -146,18 +149,11 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
             try
             {
-                INtEndpointConfiguration? endpointConfig = null;
-
-                if (this is EndpointInbound endpointInbound)
+                if (Configuration.Direction == NtDirection.Inbound)
                 {
-                    endpointConfig = endpointInbound.Configuration;
-                    //If this is an inbound endpoint, then let the remote service know that we just received a
-                    //  connection so that it came make the associated outbound connection.
-                    _tunnel.Notify(new NotificationEndpointConnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId));
-                }
-                else if (this is EndpointOutbound endpointOutbound)
-                {
-                    endpointConfig = endpointOutbound.Configuration;
+                    //SEARCH FOR: Process:Endpoint:Connect:001: If this is an inbound endpoint, then let the remote service
+                    //  know that we just received a connection so that it came make the associated outbound connection.
+                    _tunnel.PeerNotifyOfEndpointConnect(_tunnel.TunnelKey, EndpointId, activeConnection.StreamId);
                 }
 
                 var httpHeaderBuilder = new StringBuilder();
@@ -171,29 +167,29 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                         BytesReceived += (ulong)buffer.Length;
                         _tunnel.BytesReceived += (ulong)buffer.Length;
                     }
-                    #region HTTP Header Augmentation.
 
+                    #region HTTP Header Augmentation.
 
                     if (
                          //Only parse HTTP headers if the traffic type is HTTP.
-                         endpointConfig?.TrafficType == NtTrafficType.Http
+                         Configuration.TrafficType == NtTrafficType.Http
                          &&
                          (
                             // and the direction is inbound/any and we have request rules.
                             (
-                             this is EndpointInbound && endpointConfig.HttpHeaderRules
+                             this is EndpointInbound && Configuration.HttpHeaderRules
                                 .Where(o => o.Enabled && (new[] { NtHttpHeaderType.Request, NtHttpHeaderType.Any }).Contains(o.HeaderType)).Any()
                             )
                             ||
                             (
                                 // or the direction is outbound/any and we have response rules.
-                                this is EndpointOutbound && endpointConfig.HttpHeaderRules
+                                this is EndpointOutbound && Configuration.HttpHeaderRules
                                     .Where(o => o.Enabled && (new[] { NtHttpHeaderType.Request, NtHttpHeaderType.Any }).Contains(o.HeaderType)).Any()
                             )
                          )
                      )
                     {
-                        switch (HttpUtility.Process(ref httpHeaderBuilder, endpointConfig, buffer))
+                        switch (HttpUtility.Process(ref httpHeaderBuilder, Configuration, buffer))
                         {
                             case HttpUtility.HTTPHeaderResult.WaitOnData:
                                 //We received a partial HTTP header, wait on more data.
@@ -204,8 +200,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                                 var httpHeaderBytes = Encoding.UTF8.GetBytes(httpHeaderBuilder.ToString());
 
-                                _tunnel.Notify(new NotificationEndpointExchange
-                                    (_tunnel.TunnelId, EndpointId, activeConnection.StreamId, httpHeaderBytes, httpHeaderBytes.Length));
+                                //_tunnel.Notify(new oldNotificationEndpointExchange
+                                //    (_tunnel.TunnelId, EndpointId, activeConnection.StreamId, httpHeaderBytes, httpHeaderBytes.Length));
 
                                 httpHeaderBuilder.Clear();
                                 break;
@@ -217,8 +213,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                     #endregion
 
-                    _tunnel.Notify(new NotificationEndpointExchange
-                        (_tunnel.TunnelId, EndpointId, activeConnection.StreamId, buffer.Bytes, buffer.Length));
+                    _tunnel.PeerNotifyOfEndpointDataExchange(_tunnel.TunnelKey,
+                        Configuration.EndpointId, activeConnection.StreamId, buffer.Bytes, buffer.Length);
 
                     buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);
                 }
@@ -230,21 +226,21 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     if (sockEx.SocketErrorCode == SocketError.ConnectionAborted)
                     {
                         //We don't typically care about this. This is something as simple as a user closing a web-browser.
-                        _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Verbose, $"EndpointDataExchangeThreadProc: {ex.Message}");
+                        _tunnel.ServiceEngine.Logger.Verbose($"EndpointDataExchangeThreadProc: {ex.Message}");
                     }
                     else
                     {
-                        _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Exception, $"EndpointDataExchangeThreadProc: {ex.Message}");
+                        _tunnel.ServiceEngine.Logger.Exception($"EndpointDataExchangeThreadProc: {ex.Message}");
                     }
                 }
                 else
                 {
-                    _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Exception, $"EndpointDataExchangeThreadProc: {ex.Message}");
+                    _tunnel.ServiceEngine.Logger.Exception($"EndpointDataExchangeThreadProc: {ex.Message}");
                 }
             }
             catch (Exception ex)
             {
-                _tunnel.Core.Logging.Write(Constants.NtLogSeverity.Exception, $"EndpointDataExchangeThreadProc: {ex.Message}");
+                _tunnel.ServiceEngine.Logger.Exception($"EndpointDataExchangeThreadProc: {ex.Message}");
             }
             finally
             {
@@ -253,7 +249,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     CurrentConnections--;
                 }
 
-                Utility.TryAndIgnore(activeConnection.Disconnect);
+                Exceptions.Ignore(activeConnection.Disconnect);
 
                 _activeConnections.Use((o) =>
                 {
@@ -261,8 +257,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 });
             }
 
-            Utility.TryAndIgnore(() =>
-                _tunnel.Notify(new NotificationEndpointDisconnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId)));
+            //Exceptions.Ignore(() =>
+            //    _tunnel.Notify(new oldNotificationEndpointDisconnect(_tunnel.TunnelId, EndpointId, activeConnection.StreamId)));
         }
     }
 }

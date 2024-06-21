@@ -1,39 +1,39 @@
-﻿using NetTunnel.Library.Types;
+﻿using NetTunnel.Library.Payloads;
 using NTDLS.Persistence;
 
 namespace NetTunnel.Service.TunnelEngine
 {
     internal static class Singletons
     {
-        private static TunnelEngineCore? _core = null;
-        public static TunnelEngineCore Core
+        private static ServiceEngine? _serviceEngine = null;
+        public static ServiceEngine ServiceEngine
         {
             get
             {
-                _core ??= new TunnelEngineCore();
-                return _core;
+                _serviceEngine ??= new ServiceEngine();
+                return _serviceEngine;
             }
         }
 
-        public static void UpdateConfiguration(NtServiceConfiguration configuration)
+        public static void UpdateConfiguration(ServiceConfiguration configuration)
         {
             _configuration = configuration;
             CommonApplicationData.SaveToDisk(Library.Constants.FriendlyName, _configuration);
         }
 
-        private static NtServiceConfiguration? _configuration = null;
-        public static NtServiceConfiguration Configuration
+        private static ServiceConfiguration? _configuration = null;
+        public static ServiceConfiguration Configuration
         {
             get
             {
                 if (_configuration == null)
                 {
-                    _configuration = CommonApplicationData.LoadFromDisk<NtServiceConfiguration>(Library.Constants.FriendlyName);
+                    _configuration = CommonApplicationData.LoadFromDisk<ServiceConfiguration>(Library.Constants.FriendlyName);
 
                     if (_configuration == null)
                     {
                         //We didn't find a config file, create one with default values.
-                        _configuration = new NtServiceConfiguration();
+                        _configuration = new ServiceConfiguration();
                         CommonApplicationData.SaveToDisk(Library.Constants.FriendlyName, _configuration);
                     }
 

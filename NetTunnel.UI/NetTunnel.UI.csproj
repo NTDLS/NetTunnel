@@ -19,13 +19,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NTDLS.NullHelpers" Version="1.0.0" />
-    <PackageReference Include="NTDLS.Persistence" Version="1.2.0" />
-    <PackageReference Include="NTDLS.WinFormsHelpers" Version="1.0.5" />
+    <PackageReference Include="NTDLS.Helpers" Version="1.0.0" />
+    <PackageReference Include="NTDLS.Persistence" Version="1.2.1" />
+    <PackageReference Include="NTDLS.WinFormsHelpers" Version="1.2.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NetTunnel.ClientAPI\NetTunnel.ClientAPI.csproj" />
     <ProjectReference Include="..\NetTunnel.Library\NetTunnel.Library.csproj" />
   </ItemGroup>
 

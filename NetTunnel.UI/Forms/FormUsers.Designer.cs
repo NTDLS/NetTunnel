@@ -60,7 +60,7 @@
             buttonAddUser.TabIndex = 2;
             buttonAddUser.Text = "Add User";
             buttonAddUser.UseVisualStyleBackColor = true;
-            buttonAddUser.Click += buttonAddUser_Click;
+            buttonAddUser.Click += ButtonAddUser_Click;
             // 
             // FormUsers
             // 
@@ -77,7 +77,6 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
             Text = "NetTunnel : Users";
-            Load += FormUsers_Load;
             ResumeLayout(false);
         }
 

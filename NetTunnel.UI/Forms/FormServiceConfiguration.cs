@@ -1,21 +1,21 @@
-﻿using NetTunnel.ClientAPI;
-using NetTunnel.Library;
-using NetTunnel.Library.Types;
-using NTDLS.NullExtensions;
+﻿using NetTunnel.Library;
+using NetTunnel.Library.Payloads;
+using NTDLS.Helpers;
 using NTDLS.WinFormsHelpers;
 
 namespace NetTunnel.UI.Forms
 {
     public partial class FormServiceConfiguration : Form
     {
-        private readonly NtClient? _client;
+        private readonly ServiceClient? _client;
+        private bool _firstShown = true;
 
         public FormServiceConfiguration()
         {
             InitializeComponent();
         }
 
-        public FormServiceConfiguration(NtClient client)
+        public FormServiceConfiguration(ServiceClient client)
         {
             InitializeComponent();
 
@@ -43,9 +43,6 @@ namespace NetTunnel.UI.Forms
             toolTips.AddControls([labelStaleEndpointExpirationMs, textBoxStaleEndpointExpirationMs],
                 "The maximum number of milliseconds to allow an endpoint to remain connected without read/write activity.");
 
-            toolTips.AddControls([checkBoxManagementUseSSL],
-                "Whether the management web-services should use SSL or not. If checked, the NetTunnel service will generate a self-signed SSL certificate with the encryption key size denoted by the 'Management RSA size'.");
-
             toolTips.AddControls([labelInitialReceiveBufferSize, textBoxInitialReceiveBufferSize],
                 "The initial size of the receive buffer. If the buffer ever gets full while receiving data it will be automatically resized up to MaxReceiveBufferSize.");
 
@@ -55,24 +52,40 @@ namespace NetTunnel.UI.Forms
             toolTips.AddControls([labelReceiveBufferGrowthRate, textBoxReceiveBufferGrowthRate],
                 "The growth rate for auto-resizing the receive buffer from its initial size to its maximum size.");
 
-            toolTips.AddControls([checkBoxDebugLogging],
-                "Whether to log debug information to the console and event log.");
-
-            toolTips.AddControls([checkBoxVerboseLogging],
-                "Whether to log verbose information to the console and event log.");
-
             #endregion
 
-            _client.EnsureNotNull().Service.GetConfiguration().ContinueWith(t =>
-            {
-                SetFormConfigurationValues(t.Result.Configuration);
-            });
+            Shown += FormUsers_Shown;
 
             AcceptButton = buttonSave;
             CancelButton = buttonCancel;
         }
 
-        public void SetFormConfigurationValues(NtServiceConfiguration configuration)
+        private void FormUsers_Shown(object? sender, EventArgs e)
+        {
+            if (!_firstShown)
+            {
+                return;
+            }
+            _firstShown = false;
+
+            var progressForm = new ProgressForm(Constants.FriendlyName, "Getting configuration...");
+
+            progressForm.Execute(() =>
+            {
+                try
+                {
+                    var result = _client.EnsureNotNull().QueryGetServiceConfiguration();
+
+                    SetFormConfigurationValues(result.Configuration);
+                }
+                catch (Exception ex)
+                {
+                    progressForm.MessageBox(ex.Message, Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                }
+            });
+        }
+
+        public void SetFormConfigurationValues(ServiceConfiguration configuration)
         {
             if (InvokeRequired)
             {
@@ -89,9 +102,6 @@ namespace NetTunnel.UI.Forms
                 textBoxInitialReceiveBufferSize.Text = $"{configuration.InitialReceiveBufferSize:n0}";
                 textBoxMaxReceiveBufferSize.Text = $"{configuration.MaxReceiveBufferSize:n0}";
                 textBoxReceiveBufferGrowthRate.Text = $"{configuration.ReceiveBufferGrowthRate:n2}";
-                checkBoxManagementUseSSL.Checked = configuration.ManagementPortUseSSL;
-                checkBoxDebugLogging.Checked = configuration.DebugLogging;
-                checkBoxVerboseLogging.Checked = configuration.VerboseLogging;
             }
         }
 
@@ -99,7 +109,7 @@ namespace NetTunnel.UI.Forms
         {
             try
             {
-                var configuration = new NtServiceConfiguration();
+                var configuration = new ServiceConfiguration();
 
                 #region Get and validate form values .
 
@@ -130,24 +140,21 @@ namespace NetTunnel.UI.Forms
                 configuration.ReceiveBufferGrowthRate = textBoxReceiveBufferGrowthRate.GetAndValidateNumeric(0.01, 1.0,
                     "The buffer growth rate (%) must be an decimal value between [min] and [max].");
 
-                configuration.ManagementPortUseSSL = checkBoxManagementUseSSL.Checked;
-                configuration.DebugLogging = checkBoxDebugLogging.Checked;
-                configuration.VerboseLogging = checkBoxVerboseLogging.Checked;
-
                 #endregion
 
-                buttonSave.InvokeEnableControl(false);
+                var progressForm = new ProgressForm(Constants.FriendlyName, "Getting configuration...");
 
-                _client.EnsureNotNull().Service.PutConfiguration(configuration).ContinueWith(t =>
+                progressForm.Execute(() =>
                 {
-                    if (!t.IsCompletedSuccessfully)
+                    try
                     {
-                        this.InvokeMessageBox("Failed to save the configuration.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                        buttonSave.InvokeEnableControl(true);
-                        return;
+                        _client.EnsureNotNull().QueryPutServiceConfiguration(configuration);
+                        this.InvokeClose(DialogResult.OK);
                     }
-
-                    this.InvokeClose(DialogResult.OK);
+                    catch (Exception ex)
+                    {
+                        progressForm.MessageBox(ex.Message, Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    }
                 });
             }
             catch (Exception ex)

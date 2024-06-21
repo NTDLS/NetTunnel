@@ -1,43 +1,57 @@
-﻿using NetTunnel.ClientAPI;
-using NetTunnel.Library;
-using NetTunnel.Service;
-using NTDLS.NullExtensions;
+﻿using NetTunnel.Library;
+using NetTunnel.Library.Payloads;
+using NetTunnel.UI.Types;
+using NTDLS.Helpers;
 using NTDLS.WinFormsHelpers;
 
 namespace NetTunnel.UI.Forms
 {
     public partial class FormUsers : Form
     {
-        private readonly NtClient? _client;
+        private readonly ServiceClient? _client;
+        private bool _firstShown = true;
 
         public FormUsers()
         {
             InitializeComponent();
         }
 
-        public FormUsers(NtClient client)
+        public FormUsers(ServiceClient client)
         {
             InitializeComponent();
             _client = client;
-
             listViewUsers.MouseUp += ListViewUsers_MouseUp;
+            Shown += FormUsers_Shown;
         }
 
-        private void FormUsers_Load(object sender, EventArgs e)
+        private void FormUsers_Shown(object? sender, EventArgs e)
         {
-            _client.EnsureNotNull().Security.ListUsers().ContinueWith(t =>
+            if (!_firstShown)
             {
-                foreach (var user in t.Result.Collection)
+                return;
+            }
+            _firstShown = false;
+
+            var progressForm = new ProgressForm(Constants.FriendlyName, "Getting users...");
+
+            progressForm.Execute(() =>
+            {
+
+                try
                 {
-                    AddUserToGrid(user);
+                    var result = _client.EnsureNotNull().QueryGetUsers();
+
+                    result.Collection.ForEach(u => AddUserToGrid(u));
+                }
+                catch (Exception ex)
+                {
+                    progressForm.MessageBox(ex.Message, Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                 }
             });
         }
 
-        void AddUserToGrid(NtUser? user)
+        private void AddUserToGrid(User user)
         {
-            if (user == null) return;
-
             if (listViewUsers.InvokeRequired)
             {
                 listViewUsers.Invoke(AddUserToGrid, user);
@@ -45,7 +59,7 @@ namespace NetTunnel.UI.Forms
             else
             {
                 var item = new ListViewItem(user.Username);
-                item.Tag = user;
+                item.Tag = new UserTag(user);
                 listViewUsers.Items.Add(item);
             }
         }
@@ -56,13 +70,17 @@ namespace NetTunnel.UI.Forms
 
             if (e.Button == MouseButtons.Right)
             {
+                listViewUsers.SelectedItems.Clear();
+
                 var itemUnderMouse = listViewUsers.GetItemAt(e.X, e.Y);
                 if (itemUnderMouse != null)
                 {
                     itemUnderMouse.Selected = true;
                 }
 
-                if (itemUnderMouse != null)
+                var uTag = UserTag.FromItemOrDefault(itemUnderMouse);
+
+                if (uTag != null)
                 {
                     var menu = new ContextMenuStrip();
                     menu.Items.Add("Change password");
@@ -74,53 +92,49 @@ namespace NetTunnel.UI.Forms
 
                     menu.ItemClicked += (object? sender, ToolStripItemClickedEventArgs e) =>
                     {
+                        menu.Hide();
+
                         if (e.ClickedItem?.Text == "Change password")
                         {
-                            var user = ((NtUser?)itemUnderMouse.Tag).EnsureNotNull();
-
-                            using (var formChangeUserPassword = new FormChangeUserPassword(_client, user))
-                            {
-                                formChangeUserPassword.ShowDialog();
-                            }
+                            using var formChangeUserPassword = new FormChangeUserPassword(_client, uTag.User);
+                            formChangeUserPassword.ShowDialog();
                         }
                         else if (e.ClickedItem?.Text == "Delete")
                         {
-                            var user = ((NtUser?)itemUnderMouse.Tag).EnsureNotNull();
-
-                            if (MessageBox.Show($"Delete the user '{user.Username}'?",
-                                Constants.FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                            if (MessageBox.Show($"Delete the user '{uTag.User.Username}'?",
+                                Constants.FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                             {
-                                _client.Security.ChangeUserPassword(user).ContinueWith(t =>
-                                {
-                                    if (!t.IsCompletedSuccessfully)
-                                    {
-                                        this.InvokeMessageBox("Failed to delete user.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                                        return;
-                                    }
-
-                                    this.InvokeClose(DialogResult.OK);
-                                });
+                                return;
                             }
-                        }
-                        else if (e.ClickedItem?.Text == "Delete Tunnel")
-                        {
-                            MessageBox.Show("Not implemented");
+
+                            var progressForm = new ProgressForm(Constants.FriendlyName, "Deleting user...");
+
+                            progressForm.Execute(() =>
+                            {
+                                try
+                                {
+                                    _client.QueryDeleteUser(uTag.User.Username);
+                                    listViewUsers.InvokeDeleteSelectedItems();
+                                }
+                                catch (Exception ex)
+                                {
+                                    progressForm.MessageBox(ex.Message, Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                }
+                            });
                         }
                     };
                 }
             }
         }
 
-        private void buttonAddUser_Click(object sender, EventArgs e)
+        private void ButtonAddUser_Click(object sender, EventArgs e)
         {
             _client.EnsureNotNull();
 
-            using (var formAddUser = new FormAddUser(_client))
+            using var formAddUser = new FormAddUser(_client);
+            if (formAddUser.ShowDialog() == DialogResult.OK)
             {
-                if (formAddUser.ShowDialog() == DialogResult.OK)
-                {
-                    AddUserToGrid(formAddUser.CreatedUser);
-                }
+                AddUserToGrid(formAddUser.CreatedUser.EnsureNotNull());
             }
         }
     }

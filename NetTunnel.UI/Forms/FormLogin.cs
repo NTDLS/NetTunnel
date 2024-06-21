@@ -1,18 +1,14 @@
-﻿using NetTunnel.ClientAPI;
-using NetTunnel.Library;
+﻿using NetTunnel.Library;
 using NTDLS.Persistence;
 using NTDLS.WinFormsHelpers;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms
 {
     public partial class FormLogin : Form
     {
-        public string Address { get; private set; } = string.Empty;
-        public string ServerURL { get; private set; } = string.Empty;
-        public string Username { get; private set; } = string.Empty;
-        public string Password { get; private set; } = string.Empty;
-        public bool UseSSL { get; private set; }
-        public NtClient? Client { get; private set; }
+        public ServiceClient? ResultingClient { get; private set; } = null;
+        private readonly DelegateLogger _delegateLogger = UIUtility.CreateActiveWindowMessageBoxLogger(NtLogSeverity.Exception);
 
         public FormLogin()
         {
@@ -26,7 +22,6 @@ namespace NetTunnel.UI.Forms
             textBoxAddress.Text = preferences.Address;
             textBoxPort.Text = preferences.Port;
             textBoxUsername.Text = preferences.Username;
-            checkBoxUseSSL.Checked = preferences.UseSSL;
 
 #if DEBUG
             textBoxPassword.Text = "123456789";
@@ -36,60 +31,42 @@ namespace NetTunnel.UI.Forms
 
         private void buttonLogin_Click(object sender, EventArgs e)
         {
-            buttonLogin.InvokeEnableControl(false);
-            buttonCancel.InvokeEnableControl(false);
-
             try
             {
-                if (int.TryParse(textBoxPort.Text, out var port) == false)
-                    throw new Exception("Invalid port.");
+                int port = textBoxPort.GetAndValidateNumeric(1, 65535, "A port number between [min] and [max] is required.");
+                string username = textBoxUsername.GetAndValidateText("A username is required.");
+                string passwordHash = Utility.ComputeSha256Hash(textBoxPassword.Text);
+                string address = textBoxAddress.GetAndValidateText("A hostname or IP address is required.");
 
-                Username = textBoxUsername.Text;
-                Password = Utility.ComputeSha256Hash(textBoxPassword.Text);
-                UseSSL = checkBoxUseSSL.Checked;
-                Address = textBoxAddress.Text;
+                var progressForm = new ProgressForm(FriendlyName, "Logging in...");
 
-                if (UseSSL)
+                progressForm.Execute(() =>
                 {
-                    ServerURL = $"https://{textBoxAddress.Text}:{port}/";
-                }
-                else
-                {
-                    ServerURL = $"http://{textBoxAddress.Text}:{port}/";
-                }
-
-                var client = new NtClient(ServerURL);
-
-                client.Security.Login(Username, Password).ContinueWith(o =>
-                {
-                    if (!o.IsCompletedSuccessfully)
+                    try
                     {
-                        client.Dispose();
-                        this.InvokeMessageBox($"Login failed: {o.Exception?.Message}.", Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        var client = ServiceClient.CreateConnectAndLogin(_delegateLogger, address, port, username, passwordHash);
 
-                        buttonLogin.InvokeEnableControl(true);
-                        buttonCancel.InvokeEnableControl(true);
+                        var preferences = new UILoginPreferences()
+                        {
+                            Address = textBoxAddress.Text,
+                            Port = textBoxPort.Text,
+                            Username = textBoxUsername.Text,
+                        };
 
-                        return;
+                        LocalUserApplicationData.SaveToDisk(Constants.FriendlyName, preferences);
+
+                        ResultingClient = client;
+                        this.InvokeClose(DialogResult.OK);
                     }
-                    var preferences = new UILoginPreferences()
+                    catch (Exception ex)
                     {
-                        Address = textBoxAddress.Text,
-                        Port = textBoxPort.Text,
-                        Username = textBoxUsername.Text,
-                        UseSSL = checkBoxUseSSL.Checked
-                    };
-
-                    LocalUserApplicationData.SaveToDisk(Constants.FriendlyName, preferences);
-
-                    Client = client;
-
-                    this.InvokeClose(DialogResult.OK);
+                        progressForm.MessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    }
                 });
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK);
+                MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
             }
         }
 
