@@ -130,9 +130,9 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         /// This is where data is received by the endpoint client connections (e.g. web-browser, web-server, etc).
         /// </summary>
         /// <param name="obj"></param>
-        internal void EndpointDataExchangeThreadProc(object? obj)
+        internal void EndpointEdgeConnectionDataPumpThreadProc(object? obj)
         {
-            Thread.CurrentThread.Name = $"EndpointDataExchangeThreadProc:{Environment.CurrentManagedThreadId}";
+            Thread.CurrentThread.Name = $"EndpointEdgeConnectionDataPumpThread:{Environment.CurrentManagedThreadId}";
 
             var activeConnection = ((ActiveEndpointConnection?)obj).EnsureNotNull();
 
@@ -208,6 +208,9 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                     #endregion
 
+                    //Send the data to the remote peer, along with all the IDs required to identify the tunnel,
+                    //  endpoint and endpoint-edge-connection (streamId). At the tunnel-peer, This data will be
+                    //  sent to whatever is connected to the endpoint via a call to WriteEndpointEdgeData().
                     _tunnel.PeerNotifyOfEndpointDataExchange(_tunnel.TunnelKey,
                         Configuration.EndpointId, activeConnection.StreamId, buffer.Bytes, buffer.Length);
 
@@ -221,21 +224,21 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     if (sockEx.SocketErrorCode == SocketError.ConnectionAborted)
                     {
                         //We don't typically care about this. This is something as simple as a user closing a web-browser.
-                        _tunnel.ServiceEngine.Logger.Verbose($"EndpointDataExchangeThreadProc: {ex.Message}");
+                        _tunnel.ServiceEngine.Logger.Verbose($"EndpointEdgeConnectionDataPumpThread: {ex.Message}");
                     }
                     else
                     {
-                        _tunnel.ServiceEngine.Logger.Exception($"EndpointDataExchangeThreadProc: {ex.Message}");
+                        _tunnel.ServiceEngine.Logger.Exception($"EndpointEdgeConnectionDataPumpThread: {ex.Message}");
                     }
                 }
                 else
                 {
-                    _tunnel.ServiceEngine.Logger.Exception($"EndpointDataExchangeThreadProc: {ex.Message}");
+                    _tunnel.ServiceEngine.Logger.Exception($"EndpointEdgeConnectionDataPumpThread: {ex.Message}");
                 }
             }
             catch (Exception ex)
             {
-                _tunnel.ServiceEngine.Logger.Exception($"EndpointDataExchangeThreadProc: {ex.Message}");
+                _tunnel.ServiceEngine.Logger.Exception($"EndpointEdgeConnectionDataPumpThread: {ex.Message}");
             }
             finally
             {
