@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Library.ReliablePayloads.Notification;
 using NetTunnel.Library.ReliablePayloads.Query;
+using NetTunnel.Service.ReliableMessages.Notification;
 using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
 
@@ -105,6 +106,21 @@ namespace NetTunnel.Service.ReliableHandlers
                 Singletons.ServiceEngine.Tunnels.UpsertEndpoint(query.TunnelKey, query.Configuration);
 
                 return new QueryUpsertEndpointReply();
+            }
+            catch (Exception ex)
+            {
+                Singletons.Logger.Exception(ex);
+                throw;
+            }
+        }
+
+        public void OnNotificationEndpointDisconnect(RmContext context, NotificationEndpointDisconnect notification)
+        {
+            try
+            {
+                var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
+
+                Singletons.ServiceEngine.Tunnels.DisconnectEndpointEdge(notification.TunnelKey, notification.EndpointId, notification.EdgeId);
             }
             catch (Exception ex)
             {

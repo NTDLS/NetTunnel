@@ -4,6 +4,7 @@ using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Notification;
 using NetTunnel.Library.ReliablePayloads.Query;
 using NetTunnel.Service.ReliableHandlers;
+using NetTunnel.Service.ReliableMessages.Notification;
 using NetTunnel.Service.TunnelEngine.Managers;
 using NTDLS.ReliableMessaging;
 
@@ -81,7 +82,7 @@ namespace NetTunnel.Service.TunnelEngine
             => _messageServer.Notify(connectionId, new NotificationEndpointConnect(tunnelKey, endpointId, edgeId));
 
         public void PeerNotifyOfEndpointDisconnect(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
-            => _messageServer.Notify(connectionId, new NotificationEndpointConnect(tunnelKey, endpointId, edgeId));
+            => _messageServer.Notify(connectionId, new NotificationEndpointDisconnect(tunnelKey, endpointId, edgeId));
 
         /// <summary>
         /// Notify the remote tunnel service that the tunnel is being deleted.
