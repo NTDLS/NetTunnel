@@ -393,15 +393,18 @@ namespace NetTunnel.UI.Forms
                         menu.Items.Add("Add Outbound Endpoint to Tunnel");
                     }
 
-                    menu.Items.Add(new ToolStripSeparator());
+                    if (tTag.Tunnel.Direction == NtDirection.Outbound)
+                    {
+                        menu.Items.Add(new ToolStripSeparator());
 
-                    if (rowUnderMouse.SubItems[columnHeaderTunnelStatus.Index].Text == "Stopped")
-                    {
-                        menu.Items.Add("Start");
-                    }
-                    else
-                    {
-                        menu.Items.Add("Stop");
+                        if (rowUnderMouse.SubItems[columnHeaderTunnelStatus.Index].Text == "Stopped")
+                        {
+                            menu.Items.Add("Start");
+                        }
+                        else
+                        {
+                            menu.Items.Add("Stop");
+                        }
                     }
 
                     menu.Items.Add(new ToolStripSeparator());
@@ -440,80 +443,47 @@ namespace NetTunnel.UI.Forms
                     }
                     else if (tTag != null && e.ClickedItem?.Text == "Stop")
                     {
-                        /*
-                        rowUnderMouse.EnsureNotNull();
-
-                        if (MessageBox.Show($"Stop the tunnel '{tunnel.Name}'?",
+                        if (MessageBox.Show($"Stop the tunnel '{tTag.Tunnel.Name}'?",
                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                         {
                             return;
                         }
 
-                        if (rowUnderMouse.Tag is EndpointTag tunnelInbound)
-                        {
-                            _client.TunnelInbound.Stop(tunnelInbound.TunnelId).ContinueWith((o) =>
-                            {
-                                if (o.IsCompletedSuccessfully == false)
-                                {
-                                    this.InvokeMessageBox($"Failed to stop the tunnel.",
-                                        FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        var progressForm = new ProgressForm(FriendlyName, "Stopping tunnel...");
 
-                                    _needToRepopulateTunnels = true;
-                                }
-                            });
-                        }
-                        else if (rowUnderMouse.Tag is TunnelTag tunnelOutbound)
+                        progressForm.Execute(() =>
                         {
-                            _client.TunnelOutbound.Stop(tunnelOutbound.TunnelId).ContinueWith((o) =>
+                            try
                             {
-                                if (o.IsCompletedSuccessfully == false)
-                                {
-                                    this.InvokeMessageBox($"Failed to stop the tunnel.",
-                                        FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                _client.EnsureNotNull().QueryStopTunnel(tTag.Tunnel.TunnelKey);
 
-                                    _needToRepopulateTunnels = true;
-                                }
-                            });
-                        }
-                        */
-                        listViewEndpoints.InvokeClearRows();
+                                _needToRepopulateTunnels = true;
+                                listViewEndpoints.InvokeClearRows();
+                            }
+                            catch (Exception ex)
+                            {
+                                progressForm.MessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                            }
+                        });
                     }
-                    // Stop ↑
                     else if (tTag != null && e.ClickedItem?.Text == "Start")
                     {
-                        /*
-                        rowUnderMouse.EnsureNotNull();
+                        var progressForm = new ProgressForm(FriendlyName, "Starting tunnel...");
 
-                        var tTag = TunnelTag.FromItem(rowUnderMouse);
-
-                        if (rowUnderMouse.Tag is TunnelTag tunnelInbound)
+                        progressForm.Execute(() =>
                         {
-                            _client.TunnelInbound.Start(tunnelInbound.TunnelId).ContinueWith((o) =>
+                            try
                             {
-                                if (o.IsCompletedSuccessfully == false)
-                                {
-                                    this.InvokeMessageBox($"Failed to start the tunnel.",
-                                        FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                _client.EnsureNotNull().QueryStartTunnel(tTag.Tunnel.TunnelKey);
 
-                                    _needToRepopulateTunnels = true;
-                                }
-                            });
-                        }
-                        else if (rowUnderMouse.Tag is TunnelTag tunnelOutbound)
-                        {
-                            _client.TunnelOutbound.Start(tunnelOutbound.TunnelId).ContinueWith((o) =>
+                                _needToRepopulateTunnels = true;
+                                listViewEndpoints.InvokeClearRows();
+                            }
+                            catch (Exception ex)
                             {
-                                if (o.IsCompletedSuccessfully == false)
-                                {
-                                    this.InvokeMessageBox($"Failed to start the tunnel.",
-                                        FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-
-                                    _needToRepopulateTunnels = true;
-                                }
-                            });
-                        }
-                        */
-                        listViewEndpoints.InvokeClearRows();
+                                progressForm.MessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                            }
+                        });
                     }
                     //Start ↑
                     else if (tTag != null && e.ClickedItem?.Text == "Delete Tunnel")
@@ -729,29 +699,29 @@ namespace NetTunnel.UI.Forms
 
         #region Body menu click.
 
-        private void connectToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ConnectToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (!ChangeConnection()) Close();
         }
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Close();
         }
 
-        private void usersToolStripMenuItem_Click(object sender, EventArgs e)
+        private void UsersToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using var form = new FormUsers(_client.EnsureNotNull());
             form.ShowDialog();
         }
 
-        private void configurationToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using var form = new FormServiceConfiguration(_client.EnsureNotNull());
             form.ShowDialog();
         }
 
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using var form = new FormAbout();
             form.ShowDialog();

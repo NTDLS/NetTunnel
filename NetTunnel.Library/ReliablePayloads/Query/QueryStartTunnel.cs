@@ -3,19 +3,19 @@ using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Library.ReliablePayloads.Query
 {
-    public class QueryDeleteTunnel : IRmQuery<QueryDeleteTunnelReply>
+    public class QueryStartTunnel : IRmQuery<QueryStartTunnelReply>
     {
         public DirectionalKey TunnelKey { get; set; }
 
-        public QueryDeleteTunnel(DirectionalKey tunnelKey)
+        public QueryStartTunnel(DirectionalKey tunnelKey)
         {
             TunnelKey = tunnelKey;
         }
     }
 
-    public class QueryDeleteTunnelReply : IRmQueryReply
+    public class QueryStartTunnelReply : IRmQueryReply
     {
-        public QueryDeleteTunnelReply()
+        public QueryStartTunnelReply()
         {
         }
     }

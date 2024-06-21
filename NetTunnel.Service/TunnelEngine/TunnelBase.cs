@@ -16,13 +16,6 @@ namespace NetTunnel.Service.TunnelEngine
         public virtual NtDirection Direction { get => throw new NotImplementedException("This function should be overridden."); }
         public DirectionalKey TunnelKey => new(Configuration.TunnelId, Direction);
 
-        public override int GetHashCode()
-        {
-            return Configuration.TunnelId.GetHashCode()
-                + Configuration.Name.GetHashCode()
-                + Endpoints.Sum(o => o.GetHashCode());
-        }
-
         public int ChangeHash
             => Configuration.TunnelId.GetHashCode()
             + Configuration.Name.GetHashCode();
@@ -57,6 +50,22 @@ namespace NetTunnel.Service.TunnelEngine
             Configuration.Endpoints.Where(o => o.Direction == NtDirection.Outbound)
                 .ToList().ForEach(o => Endpoints.Add(new EndpointOutbound(ServiceEngine, this, o)));
         }
+
+        #region Interface: ITunnel.
+
+        void ITunnel.PeerNotifyOfEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid streamId, byte[] bytes, int length)
+           => throw new NotImplementedException("This function should be overridden.");
+
+        void ITunnel.PeerNotifyOfEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid streamId)
+           => throw new NotImplementedException("This function should be overridden.");
+
+        void ITunnel.PeerNotifyOfTunnelDeletion(DirectionalKey tunnelKey)
+           => throw new NotImplementedException("This function should be overridden.");
+
+        void ITunnel.PeerNotifyOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
+           => throw new NotImplementedException("This function should be overridden.");
+
+        #endregion
 
         public IEndpoint? GetEndpointById(Guid pairId)
             => Endpoints.Where(o => o.EndpointId == pairId).SingleOrDefault();
@@ -152,17 +161,11 @@ namespace NetTunnel.Service.TunnelEngine
             }
         }
 
-        void ITunnel.SendNotificationOfEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid streamId, byte[] bytes, int length)
-           => throw new NotImplementedException("This function should be overridden.");
-
-        void ITunnel.SendNotificationOfEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid streamId)
-           => throw new NotImplementedException("This function should be overridden.");
-
-        void ITunnel.SendNotificationOfTunnelDeletion(DirectionalKey tunnelKey)
-           => throw new NotImplementedException("This function should be overridden.");
-
-        void ITunnel.SendNotificationOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
-           => throw new NotImplementedException("This function should be overridden.");
-
+        public override int GetHashCode()
+        {
+            return Configuration.TunnelId.GetHashCode()
+                + Configuration.Name.GetHashCode()
+                + Endpoints.Sum(o => o.GetHashCode());
+        }
     }
 }

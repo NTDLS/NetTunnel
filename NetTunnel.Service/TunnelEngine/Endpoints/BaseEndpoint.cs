@@ -120,9 +120,11 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 {
                     return outboundConnection;
                 }
-
                 return outboundConnection;
             });
+
+            var wtfAndAlsoWTF = Encoding.UTF8.GetString(buffer);
+
 
             outboundConnection?.Write(buffer);
         }
@@ -134,6 +136,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         internal void EndpointDataExchangeThreadProc(object? obj)
         {
             Thread.CurrentThread.Name = $"EndpointDataExchangeThreadProc:{Environment.CurrentManagedThreadId}";
+
+            _tunnel.ServiceEngine.Logger.Warning($"EndpointDataExchangeThreadProc: {Configuration.Direction}");
 
             var activeConnection = ((ActiveEndpointConnection?)obj).EnsureNotNull();
 
@@ -149,7 +153,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 {
                     //SEARCH FOR: Process:Endpoint:Connect:001: If this is an inbound endpoint, then let the remote service
                     //  know that we just received a connection so that it came make the associated outbound connection.
-                    _tunnel.SendNotificationOfEndpointConnect(_tunnel.TunnelKey, EndpointId, activeConnection.StreamId);
+                    _tunnel.PeerNotifyOfEndpointConnect(_tunnel.TunnelKey, EndpointId, activeConnection.StreamId);
                 }
 
                 var httpHeaderBuilder = new StringBuilder();
@@ -209,7 +213,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                     #endregion
 
-                    _tunnel.SendNotificationOfEndpointDataExchange(_tunnel.TunnelKey,
+                    _tunnel.PeerNotifyOfEndpointDataExchange(_tunnel.TunnelKey,
                         Configuration.EndpointId, activeConnection.StreamId, buffer.Bytes, buffer.Length);
 
                     buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);

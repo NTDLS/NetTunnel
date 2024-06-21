@@ -1,6 +1,5 @@
 ﻿using NetTunnel.Library.ReliablePayloads.Query;
 using NetTunnel.Service.TunnelEngine;
-using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
 
@@ -175,7 +174,7 @@ namespace NetTunnel.Service.ReliableHandlers
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
                 //We want to stop and delete the tunnel locally.
-                Singletons.ServiceEngine.Tunnels.DeleteTunnel(query.TunnelKey.EnsureNotNull());
+                Singletons.ServiceEngine.Tunnels.DeleteTunnel(query.TunnelKey);
 
                 return new QueryDeleteTunnelReply();
             }
@@ -299,6 +298,40 @@ namespace NetTunnel.Service.ReliableHandlers
                 Singletons.ServiceEngine.Tunnels.DeleteEndpoint(query.TunnelKey, query.EndpointId);
 
                 return new QueryDeleteEndpointReply();
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
+        }
+
+        public QueryStartTunnelReply OnQueryStartTunnel(RmContext context, QueryStartTunnel query)
+        {
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+                Singletons.ServiceEngine.Tunnels.Start(query.TunnelKey);
+
+                return new QueryStartTunnelReply();
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
+        }
+
+        public QueryStopTunnelReply OnQueryStopTunnel(RmContext context, QueryStopTunnel query)
+        {
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+                Singletons.ServiceEngine.Tunnels.Stop(query.TunnelKey);
+
+                return new QueryStopTunnelReply();
             }
             catch (Exception ex)
             {

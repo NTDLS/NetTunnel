@@ -36,17 +36,19 @@ namespace NetTunnel.Service.TunnelEngine
             };
         }
 
+        #region Interface: ITunnel.
+
         /// <summary>
         /// Sends a notification to the remote tunnel service containing the data that was received
         ///     by an endpoint. This data is to be sent to the endpoint connection with the matching
-        ///     StreamId (which was originally sent to SendNotificationOfEndpointConnect()
+        ///     StreamId (which was originally sent to PeerNotifyOfEndpointConnect()
         /// </summary>
         /// <param name="tunnelKey">The id of the tunnel that owns the endpoint.</param>
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
         /// <param name="bytes">Bytes to be sent to endpoint connection.</param>
         /// <param name="length">Number of bytes to be sent to the endpoint connection.</param>
-        public void SendNotificationOfEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid streamId, byte[] bytes, int length)
+        public void PeerNotifyOfEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid streamId, byte[] bytes, int length)
             => _client.NotificationEndpointExchange(tunnelKey, endpointId, streamId, bytes, length);
 
         /// <summary>
@@ -56,14 +58,16 @@ namespace NetTunnel.Service.TunnelEngine
         /// <param name="tunnelKey">The id of the tunnel that owns the endpoint.</param>
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
-        public void SendNotificationOfEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid streamId)
+        public void PeerNotifyOfEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid streamId)
             => _client.NotificationEndpointConnect(tunnelKey, endpointId, streamId);
 
-        public void SendNotificationOfTunnelDeletion(DirectionalKey tunnelKey)
-            => _client.SendNotificationOfTunnelDeletion(tunnelKey);
+        public void PeerNotifyOfTunnelDeletion(DirectionalKey tunnelKey)
+            => _client.PeerNotifyOfTunnelDeletion(tunnelKey);
 
-        public void SendNotificationOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
-            => _client.SendNotificationOfEndpointDeletion(tunnelKey, endpointId);
+        public void PeerNotifyOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
+            => _client.PeerNotifyOfEndpointDeletion(tunnelKey, endpointId);
+
+        #endregion
 
         private void Client_OnDisconnected(RmContext context)
         {

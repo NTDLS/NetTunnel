@@ -181,16 +181,22 @@ namespace NetTunnel.Library
         public QueryChangeUserPasswordReply QueryChangeUserPassword(string username, string passwordHash)
             => Client.Query(new QueryChangeUserPassword(username, passwordHash)).Result;
 
+        public QueryStopTunnelReply QueryStopTunnel(DirectionalKey tunnelKey)
+            => Client.Query(new QueryStopTunnel(tunnelKey)).Result;
+
+        public QueryStartTunnelReply QueryStartTunnel(DirectionalKey tunnelKey)
+            => Client.Query(new QueryStartTunnel(tunnelKey)).Result;
+
         public QueryCreateUserReply QueryCreateUser(User user)
             => Client.Query(new QueryCreateUser(user)).Result;
 
         public void NotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid streamId)
             => Client.Notify(new NotificationEndpointConnect(tunnelKey, endpointId, streamId));
 
-        public void SendNotificationOfTunnelDeletion(DirectionalKey tunnelKey)
+        public void PeerNotifyOfTunnelDeletion(DirectionalKey tunnelKey)
             => Client.Notify(new NotificationTunnelDeletion(tunnelKey));
 
-        public void SendNotificationOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
+        public void PeerNotifyOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
             => Client.Notify(new NotificationEndpointDeletion(tunnelKey, endpointId));
 
         public void NotificationEndpointExchange(DirectionalKey tunnelKey, Guid endpointId, Guid streamId, byte[] bytes, int length)

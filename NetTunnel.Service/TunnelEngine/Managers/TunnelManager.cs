@@ -23,10 +23,11 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         #region Start / Stop.
 
-        public void Start(Guid tunnelId) => Collection.Use((o)
-            => o.Single(o => o.Configuration.TunnelId == tunnelId).Start());
-        public void Stop(Guid tunnelId) => Collection.Use((o)
-            => o.Single(o => o.Configuration.TunnelId == tunnelId).Stop());
+        public void Start(DirectionalKey tunnelKey) => Collection.Use((o)
+            => o.Single(o => o.TunnelKey == tunnelKey).Start());
+
+        public void Stop(DirectionalKey tunnelKey) => Collection.Use((o)
+            => o.Single(o => o.TunnelKey == tunnelKey).Stop());
 
         public void StartAll()
             => Collection.Use((o)
@@ -74,7 +75,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                     if (existingTunnel.IsLoggedIn)
                     {
                         //Let the other end of the tunnel know that we are deleting the tunnel.
-                        existingTunnel.SendNotificationOfTunnelDeletion(tunnelKey.SwapDirection());
+                        existingTunnel.PeerNotifyOfTunnelDeletion(tunnelKey.SwapDirection());
                     }
 
                     existingTunnel.Stop();
@@ -166,7 +167,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 if (tunnel.IsLoggedIn)
                 {
                     //Let the other end of the tunnel know that we are deleting the endpoint.
-                    tunnel.SendNotificationOfEndpointDeletion(tunnelKey.SwapDirection(), endpointId);
+                    tunnel.PeerNotifyOfEndpointDeletion(tunnelKey.SwapDirection(), endpointId);
                 }
 
                 tunnel.DeleteEndpoint(endpointId);

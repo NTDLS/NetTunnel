@@ -66,6 +66,8 @@ namespace NetTunnel.Service.TunnelEngine
             };
         }
 
+        #region Interface: IServiceEngine
+
         /// <summary>
         /// Sends a notification to the remote tunnel service to let it know to connect
         ///     the associated outbound endpoint for an incoming endpoint connection.
@@ -77,7 +79,7 @@ namespace NetTunnel.Service.TunnelEngine
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
 
-        public void SendNotificationOfEndpointConnect(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId, Guid streamId)
+        public void PeerNotifyOfEndpointConnect(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId, Guid streamId)
             => _messageServer.Notify(connectionId, new NotificationEndpointConnect(tunnelKey, endpointId, streamId));
 
         /// <summary>
@@ -85,7 +87,7 @@ namespace NetTunnel.Service.TunnelEngine
         /// </summary>
         /// <param name="connectionId"></param>
         /// <param name="tunnelId"></param>
-        public void SendNotificationOfTunnelDeletion(Guid connectionId, DirectionalKey tunnelKey)
+        public void PeerNotifyOfTunnelDeletion(Guid connectionId, DirectionalKey tunnelKey)
             => _messageServer.Notify(connectionId, new NotificationTunnelDeletion(tunnelKey));
 
         /// <summary>
@@ -94,21 +96,23 @@ namespace NetTunnel.Service.TunnelEngine
         /// <param name="connectionId"></param>
         /// <param name="tunnelKey"></param>
         /// <param name="endpointId"></param>
-        public void SendNotificationOfEndpointDeletion(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId)
+        public void PeerNotifyOfEndpointDeletion(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId)
             => _messageServer.Notify(connectionId, new NotificationEndpointDeletion(tunnelKey, endpointId));
 
         /// <summary>
         /// Sends a notification to the remote tunnel service containing the data that was received
         ///     by an endpoint. This data is to be sent to the endpoint connection with the matching
-        ///     StreamId (which was originally sent to SendNotificationOfEndpointConnect()
+        ///     StreamId (which was originally sent to PeerNotifyOfEndpointConnect()
         /// </summary>
         /// <param name="tunnelKey">The id of the tunnel that owns the endpoint.</param>
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="streamId">The id that will uniquely identity the associated endpoint connections at each service</param>
         /// <param name="bytes">Bytes to be sent to endpoint connection.</param>
         /// <param name="length">Number of bytes to be sent to the endpoint connection.</param>
-        public void SendNotificationOfEndpointDataExchange(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId, Guid streamId, byte[] bytes, int length)
+        public void PeerNotifyOfEndpointDataExchange(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId, Guid streamId, byte[] bytes, int length)
             => _messageServer.Notify(connectionId, new NotificationEndpointDataExchange(tunnelKey, endpointId, streamId, bytes, length));
+
+        #endregion
 
         private void ServiceEngine_OnConnected(RmContext context)
         {

@@ -1,6 +1,5 @@
 ﻿using NetTunnel.Library.ReliablePayloads.Notification;
 using NetTunnel.Service.TunnelEngine;
-using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Service.ReliableHandlers
@@ -25,7 +24,7 @@ namespace NetTunnel.Service.ReliableHandlers
                 Singletons.ServiceEngine.Logger.Verbose($"Received endpoint connection notification.");
 
                 Singletons.ServiceEngine.Tunnels.EstablishOutboundEndpointConnection(
-                    notification.TunnelKey.EnsureNotNull().SwapDirection(), notification.EndpointId, notification.StreamId);
+                    notification.TunnelKey.SwapDirection(), notification.EndpointId, notification.StreamId);
             }
             catch (Exception ex)
             {
@@ -38,8 +37,6 @@ namespace NetTunnel.Service.ReliableHandlers
         {
             try
             {
-                //Singletons.ServiceEngine.Logger.Debug($"Received endpoint data exchange.");
-
                 var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
 
                 tunnel.SendEndpointData(notification.EndpointId, notification.StreamId, notification.Bytes);
@@ -57,7 +54,7 @@ namespace NetTunnel.Service.ReliableHandlers
             {
                 var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
 
-                Singletons.ServiceEngine.Tunnels.DeleteTunnel(notification.TunnelKey.EnsureNotNull());
+                Singletons.ServiceEngine.Tunnels.DeleteTunnel(notification.TunnelKey);
             }
             catch (Exception ex)
             {
@@ -72,7 +69,7 @@ namespace NetTunnel.Service.ReliableHandlers
             {
                 var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
 
-                Singletons.ServiceEngine.Tunnels.DeleteEndpoint(notification.TunnelKey.EnsureNotNull(), notification.EndpointId);
+                Singletons.ServiceEngine.Tunnels.DeleteEndpoint(notification.TunnelKey, notification.EndpointId);
             }
             catch (Exception ex)
             {
