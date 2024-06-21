@@ -82,7 +82,7 @@ namespace NetTunnel.UI.Forms
             AddListViewColumn(listViewEndpoints, "Address", "Address", 120);
             AddListViewColumn(listViewEndpoints, "BytesSent", "Sent", 80);
             AddListViewColumn(listViewEndpoints, "BytesReceived", "Received", 80);
-            AddListViewColumn(listViewEndpoints, "CompressionRatio", "Comp. Ratio", 80);
+            //AddListViewColumn(listViewEndpoints, "CompressionRatio", "Comp. Ratio", 80);
             AddListViewColumn(listViewEndpoints, "CurrentConnections", "Current Conn.", 100);
             AddListViewColumn(listViewEndpoints, "TotalConnections", "Total Conn.", 100);
             _endpointsGridColumnMap = new ListViewColumnMap(listViewEndpoints);
@@ -207,6 +207,7 @@ namespace NetTunnel.UI.Forms
 
                                 if (endpointStats != null)
                                 {
+                                    /*
                                     double compressionRatio = 0;
                                     if (endpointStats.BytesSent > 0 && endpointStats.BytesReceived > 0)
                                     {
@@ -219,13 +220,14 @@ namespace NetTunnel.UI.Forms
                                             compressionRatio = 100 - (endpointStats.BytesSent / endpointStats.BytesReceived) * 100.0;
                                         }
                                     }
+                                    */
 
                                     _endpointsGridColumnMap.EnsureNotNull();
                                     _endpointsGridColumnMap.SubItem(item, "BytesSent").Text = $"{Formatters.FileSize((long)endpointStats.BytesSent)}";
                                     _endpointsGridColumnMap.SubItem(item, "BytesReceived").Text = $"{Formatters.FileSize((long)endpointStats.BytesReceived)}";
                                     _endpointsGridColumnMap.SubItem(item, "TotalConnections").Text = $"{endpointStats.TotalConnections:n0}";
                                     _endpointsGridColumnMap.SubItem(item, "CurrentConnections").Text = $"{endpointStats.CurrentConnections:n0}";
-                                    _endpointsGridColumnMap.SubItem(item, "CompressionRatio").Text = $"{compressionRatio:n2}";
+                                    //_endpointsGridColumnMap.SubItem(item, "CompressionRatio").Text = $"{compressionRatio:n2}";
                                 }
                             }
                         }
