@@ -397,7 +397,7 @@ namespace NetTunnel.UI.Forms
                     {
                         menu.Items.Add(new ToolStripSeparator());
 
-                        if (rowUnderMouse.SubItems[columnHeaderTunnelStatus.Index].Text == "Stopped")
+                        if (rowUnderMouse.SubItems[columnHeaderTunnelStatus.Index].Text == NtTunnelStatus.Stopped.ToString())
                         {
                             menu.Items.Add("Start");
                         }

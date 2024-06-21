@@ -6,7 +6,7 @@ namespace NetTunnel.Library.ReliablePayloads.Notification
     public class NotificationEndpointDataExchange : IRmNotification
     {
         public Guid StreamId { get; set; }
-        public DirectionalKey? TunnelKey { get; set; }
+        public DirectionalKey TunnelKey { get; set; }
         public Guid EndpointId { get; set; }
         public byte[] Bytes { get; set; }
 
@@ -23,6 +23,7 @@ namespace NetTunnel.Library.ReliablePayloads.Notification
         public NotificationEndpointDataExchange()
         {
             Bytes = Array.Empty<byte>();
+            TunnelKey = new DirectionalKey();
         }
     }
 }

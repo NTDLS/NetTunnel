@@ -101,14 +101,16 @@ namespace NetTunnel.Service.TunnelEngine
 
         public override void Stop()
         {
+            base.Stop();
+
             _client.Disconnect();
 
             if (Environment.CurrentManagedThreadId != _establishConnectionThread?.ManagedThreadId)
             {
-                //_establishConnectionThread?.Join(); //Wait on thread to finish.
+                _establishConnectionThread?.Join(); //Wait on thread to finish.
             }
 
-            base.Stop();
+            Status = NtTunnelStatus.Stopped;
         }
 
         /// <summary>
@@ -169,8 +171,6 @@ namespace NetTunnel.Service.TunnelEngine
                 Thread.Sleep(1000);
             }
         }
-
-
     }
 
 }
