@@ -109,6 +109,11 @@ namespace NetTunnel.Service.ReliableHandlers
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
+                if (query.PreviousPing != null)
+                {
+                    Singletons.ServiceEngine.Tunnels.UpdateLastPing(query.TunnelKey, (double)query.PreviousPing);
+                }
+
                 return new QueryPingReply(query.OriginationTimestamp);
             }
             catch (Exception ex)

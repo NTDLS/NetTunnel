@@ -22,7 +22,7 @@ namespace NetTunnel.Service.TunnelEngine
             : base(serviceEngine, configuration)
         {
             _client = ServiceClient.Create(serviceEngine.Logger, Singletons.Configuration,
-                Configuration.Address, Configuration.ManagementPort, Configuration.Username, Configuration.PasswordHash, this);
+                Configuration.Address, Configuration.ServicePort, Configuration.Username, Configuration.PasswordHash, this);
 
             _client.Client.AddHandler(new TunnelOutboundNotificationHandlers());
             //_client.AddHandler(new oldTunnelOutboundQueryHandlers());
@@ -132,16 +132,20 @@ namespace NetTunnel.Service.TunnelEngine
         {
             Thread.CurrentThread.Name = $"EstablishConnectionThread:{Environment.CurrentManagedThreadId}";
 
+            double? previousPing = null;
+            DateTime lastPingDateTime = DateTime.UtcNow;
+
             while (KeepRunning)
             {
                 try
                 {
                     if (_client.IsConnected == false)
                     {
+                        previousPing = null;
                         Status = NtTunnelStatus.Connecting;
 
                         ServiceEngine.Logger.Verbose(
-                            $"Tunnel '{Configuration.Name}' connecting to service at {Configuration.Address}:{Configuration.ManagementPort}.");
+                            $"Tunnel '{Configuration.Name}' connecting to service at {Configuration.Address}:{Configuration.ServicePort}.");
 
                         //Make the outbound connection to the remote tunnel service.
                         _client.ConnectAndLogin();
@@ -149,6 +153,21 @@ namespace NetTunnel.Service.TunnelEngine
                         _client.QueryRegisterTunnel(Configuration);
 
                         Status = NtTunnelStatus.Established;
+                    }
+                    else
+                    {
+                        if (
+                            Singletons.Configuration.PingCadence > 0 &&
+                            (DateTime.UtcNow - lastPingDateTime).TotalMilliseconds > Singletons.Configuration.PingCadence)
+                        {
+                            previousPing = _client.Ping(TunnelKey, previousPing);
+                            if (previousPing != null)
+                            {
+                                PingMs = (double)previousPing;
+                                ServiceEngine.Logger.Debug($"Ping {previousPing:n2}");
+                            }
+                            lastPingDateTime = DateTime.UtcNow;
+                        }
                     }
                 }
                 catch (Exception ex)

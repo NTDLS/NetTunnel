@@ -136,7 +136,7 @@ namespace NetTunnel.Service.TunnelEngine
         {
             _messageServer.SetCryptographyProvider(new ServiceCryptographyProvider(this));
 
-            _messageServer.Start(Singletons.Configuration.ManagementPort);
+            _messageServer.Start(Singletons.Configuration.ServicePort);
 
             Tunnels.StartAll();
         }

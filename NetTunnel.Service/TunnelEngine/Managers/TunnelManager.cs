@@ -137,6 +137,15 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
+        public void UpdateLastPing(DirectionalKey tunnelKey, double pingMs)
+        {
+            Collection.Use((o) =>
+            {
+                var tunnel = o.Single(o => o.TunnelKey == tunnelKey.SwapDirection());
+                tunnel.PingMs = pingMs;
+            });
+        }
+
         /// <summary>
         /// The local service is adding/editing an endpoint to a local tunnel.
         /// </summary>
@@ -312,7 +321,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                         Address = tunnel.Configuration.Address,
                         Direction = tunnel is TunnelOutbound ? NtDirection.Outbound : NtDirection.Inbound,
                         Endpoints = tunnel.Configuration.GetEndpointsForDisplay(),
-                        ManagementPort = tunnel.Configuration.ManagementPort,
+                        ServicePort = tunnel.Configuration.ServicePort,
                         Name = tunnel.Configuration.Name,
                         ServiceId = tunnel.Configuration.ServiceId,
                     });
@@ -339,7 +348,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                         BytesSent = tunnel.BytesSent,
                         CurrentConnections = tunnel.CurrentConnections,
                         TotalConnections = tunnel.TotalConnections,
-                        ChangeHash = tunnel.GetHashCode()
+                        ChangeHash = tunnel.GetHashCode(),
+                        PingMs = tunnel.PingMs
                     };
 
                     foreach (var endpoint in tunnel.Endpoints)

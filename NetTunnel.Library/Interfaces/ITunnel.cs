@@ -6,6 +6,7 @@ namespace NetTunnel.Library.Interfaces
 {
     public interface ITunnel
     {
+        public double PingMs { get; set; }
         public TunnelConfiguration Configuration { get; }
         public NtTunnelStatus Status { get; set; }
         public ulong BytesReceived { get; set; }

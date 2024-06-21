@@ -11,15 +11,12 @@ namespace NetTunnel.Library.Payloads
         /// <summary>
         /// The HTTP/HTTPS port for the management web-services.
         /// </summary>
-        public int ManagementPort { get; set; } = 52845;
+        public int ServicePort { get; set; } = 52845;
+
         /// <summary>
-        /// Whether the management web-services should use SSL or not.
+        /// The number of milliseconds to wait between pings to the remote service. (0 = disabled);
         /// </summary>
-        public bool ManagementPortUseSSL { get; set; } = true;
-        /// <summary>
-        /// The key size to use when generating the self signed SSL certificate.
-        /// </summary>
-        public int ManagementPortRSASize { get; set; } = 2048;
+        public int PingCadence { get; set; } = 5000;
 
         /// <summary>
         /// Level of information to log to the file/console/etc.
@@ -49,15 +46,9 @@ namespace NetTunnel.Library.Payloads
         /// <summary>
         /// The maximum number of milliseconds to allow an endpoint to remain connected without read/write activity.
         /// </summary>
-        public int StaleEndpointExpirationMs { get; set; } = 600000;
-
+        public int StaleEndpointExpirationMs { get; set; } = 0;
 
         #region Reliable Messaging Configuration.
-
-        /// <summary>
-        /// The frame header delimiter. Used to literally seperate and detect the beginning of each packet.
-        /// </summary>
-        public int FrameDelimiter = 1277337552;
 
         /// <summary>
         /// The initial size of the receive buffer. If the buffer ever gets full while receiving data it will be automatically resized up to MaxReceiveBufferSize.

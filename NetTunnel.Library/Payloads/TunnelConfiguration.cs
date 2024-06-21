@@ -9,7 +9,7 @@
         public Guid TunnelId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
-        public int ManagementPort { get; set; }
+        public int ServicePort { get; set; }
         public string Username { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
         public List<EndpointConfiguration> Endpoints { get; set; } = new();
@@ -18,13 +18,13 @@
         {
         }
 
-        public TunnelConfiguration(Guid serviceId, Guid tunnelId, string name, string address, int managementPort, string username, string passwordHash)
+        public TunnelConfiguration(Guid serviceId, Guid tunnelId, string name, string address, int servicePort, string username, string passwordHash)
         {
             ServiceId = serviceId;
             TunnelId = tunnelId;
             Name = name;
             Address = address;
-            ManagementPort = managementPort;
+            ServicePort = servicePort;
             Username = username;
             PasswordHash = passwordHash;
         }
@@ -36,7 +36,7 @@
                 TunnelId = TunnelId,
                 Name = Name,
                 Address = Address,
-                ManagementPort = ManagementPort,
+                ServicePort = ServicePort,
                 Username = Username,
                 PasswordHash = PasswordHash,
                 ServiceId = ServiceId,

@@ -28,9 +28,6 @@ namespace NetTunnel.UI.Forms
             toolTips.AddControls([labelManagementPort, textBoxManagementPort],
                 "The management port is used by both the user-interface and a remote NetTunnel service to communicate configuration changes to this NetTunnel service.");
 
-            toolTips.AddControls([labelManagementPortRSASize, textBoxManagementPortRSASize],
-                "The key size to use when generating the self-signed SSL certificate for the management port.");
-
             toolTips.AddControls([labelMessageQueryTimeoutMs, textBoxMessageQueryTimeoutMs],
                 "The duration in milliseconds to wait on message query operations.");
 
@@ -51,6 +48,9 @@ namespace NetTunnel.UI.Forms
 
             toolTips.AddControls([labelReceiveBufferGrowthRate, textBoxReceiveBufferGrowthRate],
                 "The growth rate for auto-resizing the receive buffer from its initial size to its maximum size.");
+
+            toolTips.AddControls([labelPingCadence, textBoxPingCadence],
+                "The number of milliseconds to wait between pings to the remote service. (0 = disabled);");
 
             #endregion
 
@@ -93,8 +93,7 @@ namespace NetTunnel.UI.Forms
             }
             else
             {
-                textBoxManagementPort.Text = $"{configuration.ManagementPort:n0}";
-                textBoxManagementPortRSASize.Text = $"{configuration.ManagementPortRSASize:n0}";
+                textBoxManagementPort.Text = $"{configuration.ServicePort:n0}";
                 textBoxMessageQueryTimeoutMs.Text = $"{configuration.MessageQueryTimeoutMs:n0}";
                 textBoxTunnelAndEndpointHeartbeatDelayMs.Text = $"{configuration.TunnelAndEndpointHeartbeatDelayMs:n0}";
                 textBoxTunnelCryptographyKeySize.Text = $"{configuration.TunnelCryptographyKeySize:n0}";
@@ -102,6 +101,7 @@ namespace NetTunnel.UI.Forms
                 textBoxInitialReceiveBufferSize.Text = $"{configuration.InitialReceiveBufferSize:n0}";
                 textBoxMaxReceiveBufferSize.Text = $"{configuration.MaxReceiveBufferSize:n0}";
                 textBoxReceiveBufferGrowthRate.Text = $"{configuration.ReceiveBufferGrowthRate:n2}";
+                textBoxPingCadence.Text = $"{configuration.PingCadence:n0}";
             }
         }
 
@@ -113,11 +113,8 @@ namespace NetTunnel.UI.Forms
 
                 #region Get and validate form values .
 
-                configuration.ManagementPort = textBoxManagementPort.GetAndValidateNumeric(1, 65535,
-                    "The management port must be an integer value between [min] and [max].");
-
-                configuration.ManagementPortRSASize = textBoxManagementPortRSASize.GetAndValidateNumeric(2048, 4096,
-                    "The management RSA size must be an integer value between [min] and 4096.");
+                configuration.ServicePort = textBoxManagementPort.GetAndValidateNumeric(1, 65535,
+                    "The service port must be an integer value between [min] and [max].");
 
                 configuration.MessageQueryTimeoutMs = textBoxMessageQueryTimeoutMs.GetAndValidateNumeric(1000, 3600000,
                     "The message query timeout (ms) must be an integer value between [min] and [max].");
@@ -125,11 +122,11 @@ namespace NetTunnel.UI.Forms
                 configuration.TunnelAndEndpointHeartbeatDelayMs = textBoxTunnelAndEndpointHeartbeatDelayMs.GetAndValidateNumeric(1000, 216000000,
                     "The tunnel and endpoint heartbeat (ms) must be an integer value between [min] and [max].");
 
-                configuration.TunnelCryptographyKeySize = textBoxTunnelCryptographyKeySize.GetAndValidateNumeric(1, 100,
+                configuration.TunnelCryptographyKeySize = textBoxTunnelCryptographyKeySize.GetAndValidateNumeric(1, 128,
                     "The tunnel cryptography key-size must be an integer value between [min] and [max].");
 
-                configuration.StaleEndpointExpirationMs = textBoxStaleEndpointExpirationMs.GetAndValidateNumeric(1000, 216000000,
-                    "The stale endpoint expiration (ms) must be an integer value between [min] and [max].");
+                configuration.StaleEndpointExpirationMs = textBoxStaleEndpointExpirationMs.GetAndValidateNumeric(0, 216000000,
+                    "The stale endpoint expiration (ms) must be an integer value between [min] (infinite) and [max].");
 
                 configuration.InitialReceiveBufferSize = textBoxInitialReceiveBufferSize.GetAndValidateNumeric(1024, 1073741824,
                     "The initial buffer size (bytes) must be an integer value between [min] and [max].");
@@ -139,6 +136,9 @@ namespace NetTunnel.UI.Forms
 
                 configuration.ReceiveBufferGrowthRate = textBoxReceiveBufferGrowthRate.GetAndValidateNumeric(0.01, 1.0,
                     "The buffer growth rate (%) must be an decimal value between [min] and [max].");
+
+                configuration.PingCadence = textBoxPingCadence.GetAndValidateNumeric(0, 1073741824,
+                    "The ping cadence must be an decimal value between [min] (disabled) and [max].");
 
                 #endregion
 

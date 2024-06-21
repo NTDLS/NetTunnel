@@ -11,6 +11,26 @@ namespace NetTunnel.Library
             return ((int)rol5 + hash1) ^ hash2;
         }
 
+        public static int CombineHashes(int[] hashes)
+        {
+            int hashCount = hashes.Count();
+            if (hashCount > 1)
+            {
+                int runningHash = hashes[0];
+
+                for (int i = 1; i < hashes.Count(); i++)
+                {
+                    runningHash = CombineHashes(runningHash, hashes[1]);
+                }
+            }
+            else if (hashCount > 0)
+            {
+                return hashes[0];
+            }
+
+            return 0;
+        }
+
         public static string ComputeSha256Hash(string input)
             => ComputeSha256Hash(Encoding.UTF8.GetBytes(input));
 

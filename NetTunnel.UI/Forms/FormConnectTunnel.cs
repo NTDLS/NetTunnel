@@ -86,7 +86,7 @@ namespace NetTunnel.UI.Forms
                         try
                         {
                             var remoteClient = ServiceClient.CreateConnectAndLogin(_delegateLogger, tunnel.Address,
-                                tunnel.ManagementPort, tunnel.Username, tunnel.PasswordHash);
+                                tunnel.ServicePort, tunnel.Username, tunnel.PasswordHash);
 
                             _client.QueryCreateTunnel(tunnel);
 

@@ -1,4 +1,5 @@
-﻿using NetTunnel.Library.Interfaces;
+﻿using NetTunnel.Library;
+using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Query;
 using NetTunnel.Service.TunnelEngine.Endpoints;
@@ -23,8 +24,8 @@ namespace NetTunnel.Service.TunnelEngine
 
         #region Public Properties.
 
+        public double PingMs { get; set; }
         public TunnelConfiguration Configuration { get; private set; }
-
         public NtTunnelStatus Status { get; set; }
         public ulong BytesReceived { get; set; }
         public ulong BytesSent { get; set; }
@@ -33,10 +34,8 @@ namespace NetTunnel.Service.TunnelEngine
         public IServiceEngine ServiceEngine { get; private set; }
         public bool KeepRunning { get; private set; } = false;
         public List<IEndpoint> Endpoints { get; private set; } = new();
-
         bool ITunnel.IsLoggedIn => throw new NotImplementedException("This function should be overridden.");
 
-        private Thread? _heartbeatThread;
 
         #endregion
 
@@ -92,9 +91,6 @@ namespace NetTunnel.Service.TunnelEngine
 
             KeepRunning = true;
 
-            _heartbeatThread = new Thread(HeartbeatThreadProc);
-            _heartbeatThread.Start();
-
             ServiceEngine.Logger.Verbose($"Starting endpoints for tunnel '{Configuration.Name}'.");
 
             Endpoints.ForEach(x => x.Start());
@@ -107,7 +103,6 @@ namespace NetTunnel.Service.TunnelEngine
             Endpoints.ForEach(o => o.Stop());
 
             KeepRunning = false;
-            _heartbeatThread?.Join();
 
             Status = NtTunnelStatus.Stopped;
 
@@ -169,31 +164,21 @@ namespace NetTunnel.Service.TunnelEngine
         public void DisconnectEndpointEdge(Guid endpointId, Guid edgeId)
             => GetEndpointById(endpointId)?.Disconnect(edgeId);
 
-        private void HeartbeatThreadProc()
-        {
-            Thread.CurrentThread.Name = $"HeartbeatThreadProc:{Environment.CurrentManagedThreadId}";
-
-            DateTime lastHeartBeat = DateTime.UtcNow;
-
-            while (KeepRunning)
-            {
-                if ((DateTime.UtcNow - lastHeartBeat).TotalMilliseconds > Singletons.Configuration.TunnelAndEndpointHeartbeatDelayMs)
-                {
-                    //var pingTime = _client.Ping();
-                    //ServiceEngine.Logger.Debug($"Roundtrip time for '{Configuration.Name}': {pingTime:n0}ms"); ;
-
-                    lastHeartBeat = DateTime.UtcNow;
-                }
-
-                Thread.Sleep(100);
-            }
-        }
-
         public override int GetHashCode()
         {
-            return Configuration.TunnelId.GetHashCode()
-                + Configuration.Name.GetHashCode()
-                + Endpoints.Sum(o => o.GetHashCode());
+            int endpointHashes = int.MaxValue / 2;
+
+            foreach (var endpoint in Endpoints)
+            {
+                endpointHashes = Utility.CombineHashes(endpointHashes, endpoint.GetHashCode());
+            }
+
+            return Utility.CombineHashes(
+                [
+                    Configuration.TunnelId.GetHashCode(),
+                    Configuration.Name.GetHashCode(),
+                    endpointHashes
+                ]);
         }
     }
 }

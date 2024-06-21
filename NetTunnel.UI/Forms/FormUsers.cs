@@ -22,6 +22,14 @@ namespace NetTunnel.UI.Forms
             _client = client;
             listViewUsers.MouseUp += ListViewUsers_MouseUp;
             Shown += FormUsers_Shown;
+
+            var cancelButton = new Button();
+            cancelButton.Click += (object? sender, EventArgs e) =>
+            {
+                Close();
+            };
+
+            CancelButton = cancelButton;
         }
 
         private void FormUsers_Shown(object? sender, EventArgs e)
@@ -79,51 +87,66 @@ namespace NetTunnel.UI.Forms
                 }
 
                 var uTag = UserTag.FromItemOrDefault(itemUnderMouse);
+                var menu = new ContextMenuStrip();
 
                 if (uTag != null)
                 {
-                    var menu = new ContextMenuStrip();
                     menu.Items.Add("Change password");
                     if (listViewUsers.Items.Count > 1)
                     {
                         menu.Items.Add("Delete");
                     }
-                    menu.Show(listViewUsers, new Point(e.X, e.Y));
-
-                    menu.ItemClicked += (object? sender, ToolStripItemClickedEventArgs e) =>
-                    {
-                        menu.Hide();
-
-                        if (e.ClickedItem?.Text == "Change password")
-                        {
-                            using var formChangeUserPassword = new FormChangeUserPassword(_client, uTag.User);
-                            formChangeUserPassword.ShowDialog();
-                        }
-                        else if (e.ClickedItem?.Text == "Delete")
-                        {
-                            if (MessageBox.Show($"Delete the user '{uTag.User.Username}'?",
-                                Constants.FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
-                            {
-                                return;
-                            }
-
-                            var progressForm = new ProgressForm(Constants.FriendlyName, "Deleting user...");
-
-                            progressForm.Execute(() =>
-                            {
-                                try
-                                {
-                                    _client.QueryDeleteUser(uTag.User.Username);
-                                    listViewUsers.InvokeDeleteSelectedItems();
-                                }
-                                catch (Exception ex)
-                                {
-                                    progressForm.MessageBox(ex.Message, Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                                }
-                            });
-                        }
-                    };
                 }
+                else
+                {
+                    menu.Items.Add("Add new user");
+                }
+
+                menu.Show(listViewUsers, new Point(e.X, e.Y));
+
+                menu.ItemClicked += (object? sender, ToolStripItemClickedEventArgs e) =>
+                {
+                    menu.Hide();
+
+                    if (e.ClickedItem?.Text == "Add new user")
+                    {
+                        _client.EnsureNotNull();
+
+                        using var formAddUser = new FormAddUser(_client);
+                        if (formAddUser.ShowDialog() == DialogResult.OK)
+                        {
+                            AddUserToGrid(formAddUser.CreatedUser.EnsureNotNull());
+                        }
+                    }
+                    else if (uTag != null && e.ClickedItem?.Text == "Change password")
+                    {
+                        using var formChangeUserPassword = new FormChangeUserPassword(_client, uTag.User);
+                        formChangeUserPassword.ShowDialog();
+                    }
+                    else if (uTag != null && e.ClickedItem?.Text == "Delete")
+                    {
+                        if (MessageBox.Show($"Delete the user '{uTag.User.Username}'?",
+                            Constants.FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                        {
+                            return;
+                        }
+
+                        var progressForm = new ProgressForm(Constants.FriendlyName, "Deleting user...");
+
+                        progressForm.Execute(() =>
+                        {
+                            try
+                            {
+                                _client.QueryDeleteUser(uTag.User.Username);
+                                listViewUsers.InvokeDeleteSelectedItems();
+                            }
+                            catch (Exception ex)
+                            {
+                                progressForm.MessageBox(ex.Message, Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                            }
+                        });
+                    }
+                };
             }
         }
 
@@ -136,6 +159,11 @@ namespace NetTunnel.UI.Forms
             {
                 AddUserToGrid(formAddUser.CreatedUser.EnsureNotNull());
             }
+        }
+
+        private void buttonClose_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

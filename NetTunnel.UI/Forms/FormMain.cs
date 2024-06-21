@@ -62,7 +62,8 @@ namespace NetTunnel.UI.Forms
             AddListViewColumn(listViewTunnels, "Endpoints", "Endpoints", 70);
             AddListViewColumn(listViewTunnels, "BytesSent", "Sent (KB)", 80);
             AddListViewColumn(listViewTunnels, "BytesReceived", "Recvd (KB)", 80);
-            AddListViewColumn(listViewTunnels, "Status", "Status", 200);
+            AddListViewColumn(listViewTunnels, "Status", "Status", 140);
+            AddListViewColumn(listViewTunnels, "Ping", "Ping", 80);
             _tunnelsGridColumnMap = new ListViewColumnMap(listViewTunnels);
 
             #endregion
@@ -258,6 +259,7 @@ namespace NetTunnel.UI.Forms
                                 _tunnelsGridColumnMap.SubItem(item, "BytesSent").Text = $"{tunnelStats.BytesSentKb:n0}";
                                 _tunnelsGridColumnMap.SubItem(item, "BytesReceived").Text = $"{tunnelStats.BytesReceivedKb:n0}";
                                 _tunnelsGridColumnMap.SubItem(item, "Status").Text = tunnelStats.Status.ToString();
+                                _tunnelsGridColumnMap.SubItem(item, "Ping").Text = $"{tunnelStats.PingMs:n2}";
 
                                 switch (tunnelStats.Status)
                                 {
@@ -607,6 +609,7 @@ namespace NetTunnel.UI.Forms
                     item.SubItems.Add($"{tunnel.Direction}");
                     item.SubItems.Add($"{tunnel.Address}");
                     item.SubItems.Add($"{tunnel.Endpoints.Count:n0}");
+                    item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");

@@ -32,13 +32,11 @@
             buttonCancel = new Button();
             buttonSave = new Button();
             labelManagementPort = new Label();
-            labelManagementPortRSASize = new Label();
             labelMessageQueryTimeoutMs = new Label();
             labelTunnelAndEndpointHeartbeatDelayMs = new Label();
             labelTunnelCryptographyKeySize = new Label();
             labelStaleEndpointExpirationMs = new Label();
             textBoxManagementPort = new TextBox();
-            textBoxManagementPortRSASize = new TextBox();
             textBoxMessageQueryTimeoutMs = new TextBox();
             textBoxTunnelAndEndpointHeartbeatDelayMs = new TextBox();
             textBoxTunnelCryptographyKeySize = new TextBox();
@@ -52,6 +50,8 @@
             tabControlBody = new TabControl();
             tabPageManagement = new TabPage();
             tabPageTunnels = new TabPage();
+            textBoxPingCadence = new TextBox();
+            labelPingCadence = new Label();
             groupBoxBuffering = new GroupBox();
             tabPageEndpoints = new TabPage();
             tabControlBody.SuspendLayout();
@@ -86,18 +86,9 @@
             labelManagementPort.AutoSize = true;
             labelManagementPort.Location = new Point(29, 23);
             labelManagementPort.Name = "labelManagementPort";
-            labelManagementPort.Size = new Size(103, 15);
+            labelManagementPort.Size = new Size(69, 15);
             labelManagementPort.TabIndex = 3;
-            labelManagementPort.Text = "Management port";
-            // 
-            // labelManagementPortRSASize
-            // 
-            labelManagementPortRSASize.AutoSize = true;
-            labelManagementPortRSASize.Location = new Point(8, 52);
-            labelManagementPortRSASize.Name = "labelManagementPortRSASize";
-            labelManagementPortRSASize.Size = new Size(124, 15);
-            labelManagementPortRSASize.TabIndex = 4;
-            labelManagementPortRSASize.Text = "Management RSA size";
+            labelManagementPort.Text = "Service port";
             // 
             // labelMessageQueryTimeoutMs
             // 
@@ -137,17 +128,10 @@
             // 
             // textBoxManagementPort
             // 
-            textBoxManagementPort.Location = new Point(138, 20);
+            textBoxManagementPort.Location = new Point(104, 20);
             textBoxManagementPort.Name = "textBoxManagementPort";
             textBoxManagementPort.Size = new Size(100, 23);
             textBoxManagementPort.TabIndex = 0;
-            // 
-            // textBoxManagementPortRSASize
-            // 
-            textBoxManagementPortRSASize.Location = new Point(138, 49);
-            textBoxManagementPortRSASize.Name = "textBoxManagementPortRSASize";
-            textBoxManagementPortRSASize.Size = new Size(100, 23);
-            textBoxManagementPortRSASize.TabIndex = 2;
             // 
             // textBoxMessageQueryTimeoutMs
             // 
@@ -180,7 +164,7 @@
             // labelInitialReceiveBufferSize
             // 
             labelInitialReceiveBufferSize.AutoSize = true;
-            labelInitialReceiveBufferSize.Location = new Point(26, 25);
+            labelInitialReceiveBufferSize.Location = new Point(26, 26);
             labelInitialReceiveBufferSize.Name = "labelInitialReceiveBufferSize";
             labelInitialReceiveBufferSize.Size = new Size(132, 15);
             labelInitialReceiveBufferSize.TabIndex = 22;
@@ -189,7 +173,7 @@
             // labelMaxReceiveBufferSize
             // 
             labelMaxReceiveBufferSize.AutoSize = true;
-            labelMaxReceiveBufferSize.Location = new Point(32, 54);
+            labelMaxReceiveBufferSize.Location = new Point(32, 55);
             labelMaxReceiveBufferSize.Name = "labelMaxReceiveBufferSize";
             labelMaxReceiveBufferSize.Size = new Size(126, 15);
             labelMaxReceiveBufferSize.TabIndex = 23;
@@ -198,7 +182,7 @@
             // labelReceiveBufferGrowthRate
             // 
             labelReceiveBufferGrowthRate.AutoSize = true;
-            labelReceiveBufferGrowthRate.Location = new Point(34, 83);
+            labelReceiveBufferGrowthRate.Location = new Point(34, 84);
             labelReceiveBufferGrowthRate.Name = "labelReceiveBufferGrowthRate";
             labelReceiveBufferGrowthRate.Size = new Size(124, 15);
             labelReceiveBufferGrowthRate.TabIndex = 24;
@@ -206,24 +190,24 @@
             // 
             // textBoxInitialReceiveBufferSize
             // 
-            textBoxInitialReceiveBufferSize.Location = new Point(164, 22);
+            textBoxInitialReceiveBufferSize.Location = new Point(164, 23);
             textBoxInitialReceiveBufferSize.Name = "textBoxInitialReceiveBufferSize";
             textBoxInitialReceiveBufferSize.Size = new Size(100, 23);
-            textBoxInitialReceiveBufferSize.TabIndex = 2;
+            textBoxInitialReceiveBufferSize.TabIndex = 3;
             // 
             // textBoxMaxReceiveBufferSize
             // 
-            textBoxMaxReceiveBufferSize.Location = new Point(164, 51);
+            textBoxMaxReceiveBufferSize.Location = new Point(164, 52);
             textBoxMaxReceiveBufferSize.Name = "textBoxMaxReceiveBufferSize";
             textBoxMaxReceiveBufferSize.Size = new Size(100, 23);
-            textBoxMaxReceiveBufferSize.TabIndex = 3;
+            textBoxMaxReceiveBufferSize.TabIndex = 4;
             // 
             // textBoxReceiveBufferGrowthRate
             // 
-            textBoxReceiveBufferGrowthRate.Location = new Point(164, 80);
+            textBoxReceiveBufferGrowthRate.Location = new Point(164, 81);
             textBoxReceiveBufferGrowthRate.Name = "textBoxReceiveBufferGrowthRate";
             textBoxReceiveBufferGrowthRate.Size = new Size(100, 23);
-            textBoxReceiveBufferGrowthRate.TabIndex = 4;
+            textBoxReceiveBufferGrowthRate.TabIndex = 5;
             // 
             // tabControlBody
             // 
@@ -238,9 +222,7 @@
             // 
             // tabPageManagement
             // 
-            tabPageManagement.Controls.Add(textBoxManagementPortRSASize);
             tabPageManagement.Controls.Add(labelManagementPort);
-            tabPageManagement.Controls.Add(labelManagementPortRSASize);
             tabPageManagement.Controls.Add(textBoxManagementPort);
             tabPageManagement.Location = new Point(4, 24);
             tabPageManagement.Name = "tabPageManagement";
@@ -252,6 +234,8 @@
             // 
             // tabPageTunnels
             // 
+            tabPageTunnels.Controls.Add(textBoxPingCadence);
+            tabPageTunnels.Controls.Add(labelPingCadence);
             tabPageTunnels.Controls.Add(groupBoxBuffering);
             tabPageTunnels.Controls.Add(textBoxTunnelCryptographyKeySize);
             tabPageTunnels.Controls.Add(textBoxMessageQueryTimeoutMs);
@@ -265,6 +249,22 @@
             tabPageTunnels.Text = "Tunnels";
             tabPageTunnels.UseVisualStyleBackColor = true;
             // 
+            // textBoxPingCadence
+            // 
+            textBoxPingCadence.Location = new Point(186, 76);
+            textBoxPingCadence.Name = "textBoxPingCadence";
+            textBoxPingCadence.Size = new Size(100, 23);
+            textBoxPingCadence.TabIndex = 2;
+            // 
+            // labelPingCadence
+            // 
+            labelPingCadence.AutoSize = true;
+            labelPingCadence.Location = new Point(72, 79);
+            labelPingCadence.Name = "labelPingCadence";
+            labelPingCadence.Size = new Size(108, 15);
+            labelPingCadence.TabIndex = 30;
+            labelPingCadence.Text = "Ping cadence  (ms)";
+            // 
             // groupBoxBuffering
             // 
             groupBoxBuffering.Controls.Add(labelInitialReceiveBufferSize);
@@ -273,7 +273,7 @@
             groupBoxBuffering.Controls.Add(labelReceiveBufferGrowthRate);
             groupBoxBuffering.Controls.Add(textBoxInitialReceiveBufferSize);
             groupBoxBuffering.Controls.Add(textBoxMaxReceiveBufferSize);
-            groupBoxBuffering.Location = new Point(22, 82);
+            groupBoxBuffering.Location = new Point(22, 118);
             groupBoxBuffering.Name = "groupBoxBuffering";
             groupBoxBuffering.Size = new Size(280, 125);
             groupBoxBuffering.TabIndex = 28;
@@ -325,13 +325,11 @@
         private Button buttonCancel;
         private Button buttonSave;
         private Label labelManagementPort;
-        private Label labelManagementPortRSASize;
         private Label labelMessageQueryTimeoutMs;
         private Label labelTunnelAndEndpointHeartbeatDelayMs;
         private Label labelTunnelCryptographyKeySize;
         private Label labelStaleEndpointExpirationMs;
         private TextBox textBoxManagementPort;
-        private TextBox textBoxManagementPortRSASize;
         private TextBox textBoxMessageQueryTimeoutMs;
         private TextBox textBoxTunnelAndEndpointHeartbeatDelayMs;
         private TextBox textBoxTunnelCryptographyKeySize;
@@ -347,5 +345,7 @@
         private TabPage tabPageTunnels;
         private TabPage tabPageEndpoints;
         private GroupBox groupBoxBuffering;
+        private TextBox textBoxPingCadence;
+        private Label labelPingCadence;
     }
 }

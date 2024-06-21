@@ -133,16 +133,10 @@ namespace NetTunnel.Library
             }
         }
 
-        public double Ping()
+        public double Ping(DirectionalKey tunnelKey, double? previousPing)
         {
-            return Client.Query(new QueryPing()).ContinueWith(t =>
-            {
-                if (t.IsCompletedSuccessfully)
-                {
-                    return (DateTime.UtcNow - t.Result.OriginationTimestamp).TotalMilliseconds;
-                }
-                return 0;
-            }).Result;
+            var result = Client.Query(new QueryPing(tunnelKey, previousPing)).Result;
+            return (DateTime.UtcNow - result.OriginationTimestamp).TotalMilliseconds;
         }
 
         public QueryGetTunnelStatisticsReply QueryGetTunnelStatistics()
