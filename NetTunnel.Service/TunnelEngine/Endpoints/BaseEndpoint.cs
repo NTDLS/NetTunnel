@@ -256,7 +256,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             }
 
             Exceptions.Ignore(() =>
-                _tunnel.PeerNotifyOfEndpointDisconnect(_tunnel.TunnelKey, EndpointId, activeConnection.EdgeId));
+                _tunnel.PeerNotifyOfEndpointDisconnect(_tunnel.TunnelKey.SwapDirection(), EndpointId, activeConnection.EdgeId));
         }
     }
 }
