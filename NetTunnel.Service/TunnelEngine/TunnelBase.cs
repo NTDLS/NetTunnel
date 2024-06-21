@@ -87,18 +87,18 @@ namespace NetTunnel.Service.TunnelEngine
             {
                 return;
             }
-            ServiceEngine.Logger.Verbose($"Starting tunnel '{Configuration.Name}'.");
+            Singletons.Logger.Verbose($"Starting tunnel '{Configuration.Name}'.");
 
             KeepRunning = true;
 
-            ServiceEngine.Logger.Verbose($"Starting endpoints for tunnel '{Configuration.Name}'.");
+            Singletons.Logger.Verbose($"Starting endpoints for tunnel '{Configuration.Name}'.");
 
             Endpoints.ForEach(x => x.Start());
         }
 
         public virtual void Stop()
         {
-            ServiceEngine.Logger.Verbose($"Stopping tunnel '{Configuration.Name}'.");
+            Singletons.Logger.Verbose($"Stopping tunnel '{Configuration.Name}'.");
 
             Endpoints.ForEach(o => o.Stop());
 
@@ -106,7 +106,7 @@ namespace NetTunnel.Service.TunnelEngine
 
             Status = NtTunnelStatus.Stopped;
 
-            ServiceEngine.Logger.Verbose($"Stopped tunnel '{Configuration.Name}'.");
+            Singletons.Logger.Verbose($"Stopped tunnel '{Configuration.Name}'.");
         }
 
         public void WriteEndpointEdgeData(Guid endpointId, Guid edgeId, byte[] bytes)

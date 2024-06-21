@@ -14,6 +14,24 @@ namespace NetTunnel.UI.Forms
         {
             InitializeComponent();
 
+            #region Set Tool-tips.
+
+            var toolTips = ToolTipHelpers.CreateToolTipControl(this);
+
+            toolTips.AddControls([labelAddress, textBoxAddress],
+                "The host name, domain or IP address of the NetTunnel service you want to connect to.");
+
+            toolTips.AddControls([labelPort, textBoxPort],
+                "The port of the NetTunnel service you want to connect to.");
+
+            toolTips.AddControls([labelUsername, textBoxUsername],
+                "The username to use when connecting to the NetTunnel service.");
+
+            toolTips.AddControls([labelPassword, textBoxPassword],
+                "The password for the user to use when connecting to the NetTunnel service.");
+
+            #endregion
+
             AcceptButton = buttonLogin;
             CancelButton = buttonCancel;
 

@@ -37,7 +37,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
             _listener = new TcpListener(IPAddress.Any, Configuration.InboundPort);
 
-            _tunnel.ServiceEngine.Logger.Verbose(
+            Singletons.Logger.Verbose(
                 $"Starting inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort}.");
 
             _inboundConnectionThread = new Thread(InboundConnectionThreadProc);
@@ -54,7 +54,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 Exceptions.Ignore(_listener.Dispose);
             }
 
-            _tunnel.ServiceEngine.Logger.Verbose(
+            Singletons.Logger.Verbose(
                 $"Stopping inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort}.");
 
             _activeConnections.Use((o) =>
@@ -66,7 +66,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 o.Clear();
             });
 
-            _tunnel.ServiceEngine.Logger.Verbose(
+            Singletons.Logger.Verbose(
                 $"Stopped inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort}.");
         }
 
@@ -78,7 +78,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             {
                 _listener.EnsureNotNull().Start();
 
-                _serviceEngine.Logger.Verbose($"Listening inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort}");
+                Singletons.Logger.Verbose($"Listening inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort}");
 
                 while (KeepRunning)
                 {
@@ -94,7 +94,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                             var activeConnection = new ActiveEndpointConnection(endpointEdgeConnectionPumpThread, tcpClient, Guid.NewGuid());
                             _activeConnections.Use((o) => o.Add(activeConnection.EdgeId, activeConnection));
 
-                            _serviceEngine.Logger.Debug($"Accepted inbound endpoint connection: {activeConnection.EdgeId}");
+                            Singletons.Logger.Debug($"Accepted inbound endpoint connection: {activeConnection.EdgeId}");
 
                             endpointEdgeConnectionPumpThread.Start(activeConnection);
                         }
@@ -103,7 +103,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             }
             catch (Exception ex)
             {
-                _serviceEngine.Logger.Exception($"InboundConnectionThreadProc: {ex.Message}");
+                Singletons.Logger.Exception($"InboundConnectionThreadProc: {ex.Message}");
             }
             finally
             {

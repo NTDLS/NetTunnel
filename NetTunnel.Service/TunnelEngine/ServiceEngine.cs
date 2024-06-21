@@ -16,10 +16,6 @@ namespace NetTunnel.Service.TunnelEngine
         /// </summary>
         public Dictionary<Guid, ServiceConnectionState> ServiceConnectionStates { get; private set; } = new();
 
-        /// <summary>
-        /// Logging provider for event log, console (and file?).
-        /// </summary>
-        public ILogger Logger { get; private set; }
 
         /// <summary>
         /// Contains the information for all tunnels, inbound and outbound. Keep in mind that we only persist
@@ -39,7 +35,6 @@ namespace NetTunnel.Service.TunnelEngine
 
         public ServiceEngine()
         {
-            Logger = new ConsoleLogger(Singletons.Configuration.LogLevel, Singletons.Configuration.LogPath);
             Tunnels = new(this);
             Users = new(this);
 
@@ -62,7 +57,7 @@ namespace NetTunnel.Service.TunnelEngine
 
             _messageServer.OnException += (RmContext? context, Exception ex, IRmPayload? payload) =>
             {
-                Logger.Exception($"RPC server exception: '{ex.Message}'"
+                Singletons.Logger.Exception($"RPC server exception: '{ex.Message}'"
                     + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
             };
         }

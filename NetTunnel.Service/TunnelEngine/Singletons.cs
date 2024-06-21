@@ -1,4 +1,6 @@
-﻿using NetTunnel.Library.Payloads;
+﻿using NetTunnel.Library;
+using NetTunnel.Library.Interfaces;
+using NetTunnel.Library.Payloads;
 using NTDLS.Persistence;
 
 namespace NetTunnel.Service.TunnelEngine
@@ -12,6 +14,19 @@ namespace NetTunnel.Service.TunnelEngine
             {
                 _serviceEngine ??= new ServiceEngine();
                 return _serviceEngine;
+            }
+        }
+
+        /// <summary>
+        /// Logging provider for event log, console (and file?).
+        /// </summary>
+        private static ILogger? _logger;
+        public static ILogger Logger
+        {
+            get
+            {
+                _logger ??= new ConsoleLogger(Configuration.LogLevel, Configuration.LogPath);
+                return _logger;
             }
         }
 

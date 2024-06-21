@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormConnectTunnel));
-            labelRemoteAddress = new Label();
-            labelRemoteUsername = new Label();
-            labelRemotePassword = new Label();
-            textBoxRemoteAddress = new TextBox();
-            textBoxRemoteUsername = new TextBox();
-            textBoxRemotePassword = new TextBox();
-            textBoxManagementPort = new TextBox();
+            labelAddress = new Label();
+            labelUsername = new Label();
+            labelPassword = new Label();
+            textBoxAddress = new TextBox();
+            textBoxUsername = new TextBox();
+            textBoxPassword = new TextBox();
+            textBoxPort = new TextBox();
             labelPort = new Label();
             buttonCancel = new Button();
             textBoxName = new TextBox();
@@ -45,61 +45,61 @@
             groupBoxRemoteService.SuspendLayout();
             SuspendLayout();
             // 
-            // labelRemoteAddress
+            // labelAddress
             // 
-            labelRemoteAddress.AutoSize = true;
-            labelRemoteAddress.Location = new Point(19, 36);
-            labelRemoteAddress.Name = "labelRemoteAddress";
-            labelRemoteAddress.Size = new Size(86, 15);
-            labelRemoteAddress.TabIndex = 0;
-            labelRemoteAddress.Text = "Address / host:";
+            labelAddress.AutoSize = true;
+            labelAddress.Location = new Point(19, 36);
+            labelAddress.Name = "labelAddress";
+            labelAddress.Size = new Size(86, 15);
+            labelAddress.TabIndex = 0;
+            labelAddress.Text = "Address / host:";
             // 
-            // labelRemoteUsername
+            // labelUsername
             // 
-            labelRemoteUsername.AutoSize = true;
-            labelRemoteUsername.Location = new Point(20, 90);
-            labelRemoteUsername.Name = "labelRemoteUsername";
-            labelRemoteUsername.Size = new Size(63, 15);
-            labelRemoteUsername.TabIndex = 1;
-            labelRemoteUsername.Text = "Username:";
+            labelUsername.AutoSize = true;
+            labelUsername.Location = new Point(20, 90);
+            labelUsername.Name = "labelUsername";
+            labelUsername.Size = new Size(63, 15);
+            labelUsername.TabIndex = 1;
+            labelUsername.Text = "Username:";
             // 
-            // labelRemotePassword
+            // labelPassword
             // 
-            labelRemotePassword.AutoSize = true;
-            labelRemotePassword.Location = new Point(19, 139);
-            labelRemotePassword.Name = "labelRemotePassword";
-            labelRemotePassword.Size = new Size(57, 15);
-            labelRemotePassword.TabIndex = 2;
-            labelRemotePassword.Text = "Password";
+            labelPassword.AutoSize = true;
+            labelPassword.Location = new Point(19, 139);
+            labelPassword.Name = "labelPassword";
+            labelPassword.Size = new Size(57, 15);
+            labelPassword.TabIndex = 2;
+            labelPassword.Text = "Password";
             // 
-            // textBoxRemoteAddress
+            // textBoxAddress
             // 
-            textBoxRemoteAddress.Location = new Point(20, 54);
-            textBoxRemoteAddress.Name = "textBoxRemoteAddress";
-            textBoxRemoteAddress.Size = new Size(156, 23);
-            textBoxRemoteAddress.TabIndex = 2;
+            textBoxAddress.Location = new Point(20, 54);
+            textBoxAddress.Name = "textBoxAddress";
+            textBoxAddress.Size = new Size(156, 23);
+            textBoxAddress.TabIndex = 1;
             // 
-            // textBoxRemoteUsername
+            // textBoxUsername
             // 
-            textBoxRemoteUsername.Location = new Point(20, 108);
-            textBoxRemoteUsername.Name = "textBoxRemoteUsername";
-            textBoxRemoteUsername.Size = new Size(239, 23);
-            textBoxRemoteUsername.TabIndex = 4;
+            textBoxUsername.Location = new Point(20, 108);
+            textBoxUsername.Name = "textBoxUsername";
+            textBoxUsername.Size = new Size(239, 23);
+            textBoxUsername.TabIndex = 3;
             // 
-            // textBoxRemotePassword
+            // textBoxPassword
             // 
-            textBoxRemotePassword.Location = new Point(20, 157);
-            textBoxRemotePassword.Name = "textBoxRemotePassword";
-            textBoxRemotePassword.PasswordChar = '*';
-            textBoxRemotePassword.Size = new Size(239, 23);
-            textBoxRemotePassword.TabIndex = 5;
+            textBoxPassword.Location = new Point(20, 157);
+            textBoxPassword.Name = "textBoxPassword";
+            textBoxPassword.PasswordChar = '*';
+            textBoxPassword.Size = new Size(239, 23);
+            textBoxPassword.TabIndex = 4;
             // 
-            // textBoxManagementPort
+            // textBoxPort
             // 
-            textBoxManagementPort.Location = new Point(182, 54);
-            textBoxManagementPort.Name = "textBoxManagementPort";
-            textBoxManagementPort.Size = new Size(77, 23);
-            textBoxManagementPort.TabIndex = 3;
+            textBoxPort.Location = new Point(182, 54);
+            textBoxPort.Name = "textBoxPort";
+            textBoxPort.Size = new Size(77, 23);
+            textBoxPort.TabIndex = 2;
             // 
             // labelPort
             // 
@@ -115,7 +115,7 @@
             buttonCancel.Location = new Point(141, 272);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(67, 23);
-            buttonCancel.TabIndex = 7;
+            buttonCancel.TabIndex = 6;
             buttonCancel.Text = "Cancel";
             buttonCancel.UseVisualStyleBackColor = true;
             // 
@@ -140,21 +140,21 @@
             buttonConnect.Location = new Point(214, 272);
             buttonConnect.Name = "buttonConnect";
             buttonConnect.Size = new Size(75, 23);
-            buttonConnect.TabIndex = 30;
+            buttonConnect.TabIndex = 5;
             buttonConnect.Text = "Connect";
             buttonConnect.UseVisualStyleBackColor = true;
             buttonConnect.Click += buttonConnect_Click;
             // 
             // groupBoxRemoteService
             // 
-            groupBoxRemoteService.Controls.Add(labelRemoteAddress);
-            groupBoxRemoteService.Controls.Add(textBoxRemoteUsername);
-            groupBoxRemoteService.Controls.Add(textBoxRemotePassword);
-            groupBoxRemoteService.Controls.Add(textBoxManagementPort);
-            groupBoxRemoteService.Controls.Add(labelRemoteUsername);
-            groupBoxRemoteService.Controls.Add(textBoxRemoteAddress);
+            groupBoxRemoteService.Controls.Add(labelAddress);
+            groupBoxRemoteService.Controls.Add(textBoxUsername);
+            groupBoxRemoteService.Controls.Add(textBoxPassword);
+            groupBoxRemoteService.Controls.Add(textBoxPort);
+            groupBoxRemoteService.Controls.Add(labelUsername);
+            groupBoxRemoteService.Controls.Add(textBoxAddress);
             groupBoxRemoteService.Controls.Add(labelPort);
-            groupBoxRemoteService.Controls.Add(labelRemotePassword);
+            groupBoxRemoteService.Controls.Add(labelPassword);
             groupBoxRemoteService.Location = new Point(12, 58);
             groupBoxRemoteService.Name = "groupBoxRemoteService";
             groupBoxRemoteService.Size = new Size(277, 208);
@@ -188,13 +188,13 @@
 
         #endregion
 
-        private Label labelRemoteAddress;
-        private Label labelRemoteUsername;
-        private Label labelRemotePassword;
-        private TextBox textBoxRemoteAddress;
-        private TextBox textBoxRemoteUsername;
-        private TextBox textBoxRemotePassword;
-        private TextBox textBoxManagementPort;
+        private Label labelAddress;
+        private Label labelUsername;
+        private Label labelPassword;
+        private TextBox textBoxAddress;
+        private TextBox textBoxUsername;
+        private TextBox textBoxPassword;
+        private TextBox textBoxPort;
         private Label labelPort;
         private Button buttonCancel;
         private TextBox textBoxName;

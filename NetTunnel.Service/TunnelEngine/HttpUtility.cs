@@ -42,8 +42,14 @@ namespace NetTunnel.Service
                 {
                     var headerType = IsHttpHeader(httpHeaderBuilder.ToString(), out string? requestVerb);
 
-                    //TODO: We should throw an exception if this is an inbound endpoint and the headerType == NtHttpHeaderType.Response
-                    //TODO: We should throw an exception if this is an outbound endpoint and the headerType == NtHttpHeaderType.Request
+                    if (endpointConfig.Direction == NtDirection.Inbound && headerType == NtHttpHeaderType.Response)
+                    {
+                        Singletons.Logger.Warning("A HTTP response header was detected on an inbound endpoint.");
+                    }
+                    else if (endpointConfig.Direction == NtDirection.Outbound && headerType == NtHttpHeaderType.Response)
+                    {
+                        Singletons.Logger.Warning("A HTTP request header was detected on an outbound endpoint.");
+                    }
 
                     if (headerType != NtHttpHeaderType.None && requestVerb != null)
                     {
@@ -94,7 +100,7 @@ namespace NetTunnel.Service
             catch (Exception ex)
             {
                 httpHeaderBuilder.Clear();
-                Singletons.ServiceEngine.Logger.Exception(ex, "An error occurred while parsing the HTTP request header.");
+                Singletons.Logger.Exception(ex, "An error occurred while parsing the HTTP request header.");
             }
 
             return HTTPHeaderResult.NotPresent;
@@ -156,7 +162,7 @@ namespace NetTunnel.Service
             }
             catch (Exception ex)
             {
-                Singletons.ServiceEngine.Logger.Exception(ex, "Failed to process HTTP Header rules.");
+                Singletons.Logger.Exception(ex, "Failed to process HTTP Header rules.");
             }
 
             return httpHeader;

@@ -224,21 +224,21 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     if (sockEx.SocketErrorCode == SocketError.ConnectionAborted)
                     {
                         //We don't typically care about this. This is something as simple as a user closing a web-browser.
-                        _tunnel.ServiceEngine.Logger.Verbose($"EndpointEdgeConnectionDataPumpThread: {ex.Message}");
+                        Singletons.Logger.Verbose($"EndpointEdgeConnectionDataPumpThread: {ex.Message}");
                     }
                     else
                     {
-                        _tunnel.ServiceEngine.Logger.Exception($"EndpointEdgeConnectionDataPumpThread: {ex.Message}");
+                        Singletons.Logger.Exception($"EndpointEdgeConnectionDataPumpThread: {ex.Message}");
                     }
                 }
                 else
                 {
-                    _tunnel.ServiceEngine.Logger.Exception($"EndpointEdgeConnectionDataPumpThread: {ex.Message}");
+                    Singletons.Logger.Exception($"EndpointEdgeConnectionDataPumpThread: {ex.Message}");
                 }
             }
             catch (Exception ex)
             {
-                _tunnel.ServiceEngine.Logger.Exception($"EndpointEdgeConnectionDataPumpThread: {ex.Message}");
+                Singletons.Logger.Exception($"EndpointEdgeConnectionDataPumpThread: {ex.Message}");
             }
             finally
             {

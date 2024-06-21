@@ -31,11 +31,11 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormAddEditEndpoint));
             textBoxName = new TextBox();
             labelName = new Label();
-            textBoxInboundPort = new TextBox();
+            textBoxListenPort = new TextBox();
             labelListenPort = new Label();
-            textBoxOutboundAddress = new TextBox();
+            textBoxTerminationAddress = new TextBox();
             labelTerminationAddress = new Label();
-            textBoxOutboundPort = new TextBox();
+            textBoxTerminationPort = new TextBox();
             labelTerminationPort = new Label();
             buttonSave = new Button();
             buttonCancel = new Button();
@@ -51,7 +51,7 @@
             columnValue = new DataGridViewTextBoxColumn();
             label1 = new Label();
             comboBoxTrafficType = new ComboBox();
-            label2 = new Label();
+            labelTrafficType = new Label();
             tabControlBody.SuspendLayout();
             tabPageEndpoint.SuspendLayout();
             tabPageHttpHeaders.SuspendLayout();
@@ -74,12 +74,12 @@
             labelName.TabIndex = 8;
             labelName.Text = "Name or description";
             // 
-            // textBoxInboundPort
+            // textBoxListenPort
             // 
-            textBoxInboundPort.Location = new Point(13, 82);
-            textBoxInboundPort.Name = "textBoxInboundPort";
-            textBoxInboundPort.Size = new Size(74, 23);
-            textBoxInboundPort.TabIndex = 1;
+            textBoxListenPort.Location = new Point(13, 82);
+            textBoxListenPort.Name = "textBoxListenPort";
+            textBoxListenPort.Size = new Size(74, 23);
+            textBoxListenPort.TabIndex = 1;
             // 
             // labelListenPort
             // 
@@ -90,12 +90,12 @@
             labelListenPort.TabIndex = 13;
             labelListenPort.Text = "Listen port";
             // 
-            // textBoxOutboundAddress
+            // textBoxTerminationAddress
             // 
-            textBoxOutboundAddress.Location = new Point(93, 82);
-            textBoxOutboundAddress.Name = "textBoxOutboundAddress";
-            textBoxOutboundAddress.Size = new Size(191, 23);
-            textBoxOutboundAddress.TabIndex = 2;
+            textBoxTerminationAddress.Location = new Point(93, 82);
+            textBoxTerminationAddress.Name = "textBoxTerminationAddress";
+            textBoxTerminationAddress.Size = new Size(191, 23);
+            textBoxTerminationAddress.TabIndex = 2;
             // 
             // labelTerminationAddress
             // 
@@ -106,21 +106,21 @@
             labelTerminationAddress.TabIndex = 15;
             labelTerminationAddress.Text = "Termination address / host";
             // 
-            // textBoxOutboundPort
+            // textBoxTerminationPort
             // 
-            textBoxOutboundPort.Location = new Point(290, 82);
-            textBoxOutboundPort.Name = "textBoxOutboundPort";
-            textBoxOutboundPort.Size = new Size(92, 23);
-            textBoxOutboundPort.TabIndex = 3;
+            textBoxTerminationPort.Location = new Point(290, 82);
+            textBoxTerminationPort.Name = "textBoxTerminationPort";
+            textBoxTerminationPort.Size = new Size(92, 23);
+            textBoxTerminationPort.TabIndex = 3;
             // 
             // labelTerminationPort
             // 
             labelTerminationPort.AutoSize = true;
             labelTerminationPort.Location = new Point(290, 64);
             labelTerminationPort.Name = "labelTerminationPort";
-            labelTerminationPort.Size = new Size(92, 15);
+            labelTerminationPort.Size = new Size(95, 15);
             labelTerminationPort.TabIndex = 17;
-            labelTerminationPort.Text = "Destination Port";
+            labelTerminationPort.Text = "Termination port";
             // 
             // buttonSave
             // 
@@ -156,11 +156,11 @@
             tabPageEndpoint.Controls.Add(labelName);
             tabPageEndpoint.Controls.Add(textBoxName);
             tabPageEndpoint.Controls.Add(labelListenPort);
-            tabPageEndpoint.Controls.Add(textBoxOutboundPort);
-            tabPageEndpoint.Controls.Add(textBoxInboundPort);
+            tabPageEndpoint.Controls.Add(textBoxTerminationPort);
+            tabPageEndpoint.Controls.Add(textBoxListenPort);
             tabPageEndpoint.Controls.Add(labelTerminationPort);
             tabPageEndpoint.Controls.Add(labelTerminationAddress);
-            tabPageEndpoint.Controls.Add(textBoxOutboundAddress);
+            tabPageEndpoint.Controls.Add(textBoxTerminationAddress);
             tabPageEndpoint.Location = new Point(4, 24);
             tabPageEndpoint.Name = "tabPageEndpoint";
             tabPageEndpoint.Size = new Size(594, 321);
@@ -173,7 +173,7 @@
             tabPageHttpHeaders.Controls.Add(dataGridViewHTTPHeaders);
             tabPageHttpHeaders.Controls.Add(label1);
             tabPageHttpHeaders.Controls.Add(comboBoxTrafficType);
-            tabPageHttpHeaders.Controls.Add(label2);
+            tabPageHttpHeaders.Controls.Add(labelTrafficType);
             tabPageHttpHeaders.Location = new Point(4, 24);
             tabPageHttpHeaders.Name = "tabPageHttpHeaders";
             tabPageHttpHeaders.Size = new Size(594, 321);
@@ -247,15 +247,15 @@
             comboBoxTrafficType.Size = new Size(157, 23);
             comboBoxTrafficType.TabIndex = 12;
             // 
-            // label2
+            // labelTrafficType
             // 
-            label2.AutoSize = true;
-            label2.Location = new Point(13, 10);
-            label2.Margin = new Padding(4, 0, 4, 0);
-            label2.Name = "label2";
-            label2.Size = new Size(65, 15);
-            label2.TabIndex = 11;
-            label2.Text = "Traffic type";
+            labelTrafficType.AutoSize = true;
+            labelTrafficType.Location = new Point(13, 10);
+            labelTrafficType.Margin = new Padding(4, 0, 4, 0);
+            labelTrafficType.Name = "labelTrafficType";
+            labelTrafficType.Size = new Size(65, 15);
+            labelTrafficType.TabIndex = 11;
+            labelTrafficType.Text = "Traffic type";
             // 
             // FormAddEditEndpoint
             // 
@@ -287,11 +287,11 @@
 
         private TextBox textBoxName;
         private Label labelName;
-        private TextBox textBoxInboundPort;
+        private TextBox textBoxListenPort;
         private Label labelListenPort;
-        private TextBox textBoxOutboundAddress;
+        private TextBox textBoxTerminationAddress;
         private Label labelTerminationAddress;
-        private TextBox textBoxOutboundPort;
+        private TextBox textBoxTerminationPort;
         private Label labelTerminationPort;
         private Button buttonSave;
         private Button buttonCancel;
@@ -300,7 +300,7 @@
         private TabPage tabPageHttpHeaders;
         private Label label1;
         private ComboBox comboBoxTrafficType;
-        private Label label2;
+        private Label labelTrafficType;
         private DataGridView dataGridViewHTTPHeaders;
         private DataGridViewCheckBoxColumn columnEnabled;
         private DataGridViewComboBoxColumn columnType;

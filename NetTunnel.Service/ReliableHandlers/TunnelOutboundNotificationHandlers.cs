@@ -22,14 +22,14 @@ namespace NetTunnel.Service.ReliableHandlers
             {
                 var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
 
-                Singletons.ServiceEngine.Logger.Verbose($"Received endpoint connection notification.");
+                Singletons.Logger.Verbose($"Received endpoint connection notification.");
 
                 Singletons.ServiceEngine.Tunnels.EstablishOutboundEndpointConnection(
                     notification.TunnelKey.SwapDirection(), notification.EndpointId, notification.EdgeId);
             }
             catch (Exception ex)
             {
-                Singletons.ServiceEngine.Logger.Exception(ex);
+                Singletons.Logger.Exception(ex);
                 throw;
             }
         }
@@ -44,7 +44,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
             catch (Exception ex)
             {
-                Singletons.ServiceEngine.Logger.Exception(ex);
+                Singletons.Logger.Exception(ex);
                 throw;
             }
         }
@@ -59,7 +59,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
             catch (Exception ex)
             {
-                Singletons.ServiceEngine.Logger.Exception(ex);
+                Singletons.Logger.Exception(ex);
                 throw;
             }
         }
@@ -74,7 +74,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
             catch (Exception ex)
             {
-                Singletons.ServiceEngine.Logger.Exception(ex);
+                Singletons.Logger.Exception(ex);
                 throw;
             }
         }
@@ -91,7 +91,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
             catch (Exception ex)
             {
-                Singletons.ServiceEngine.Logger.Exception(ex);
+                Singletons.Logger.Exception(ex);
                 throw;
             }
         }
@@ -108,7 +108,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
             catch (Exception ex)
             {
-                Singletons.ServiceEngine.Logger.Exception(ex);
+                Singletons.Logger.Exception(ex);
                 throw;
             }
         }

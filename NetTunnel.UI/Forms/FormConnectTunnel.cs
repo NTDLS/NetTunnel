@@ -26,36 +26,35 @@ namespace NetTunnel.UI.Forms
 
             var toolTips = ToolTipHelpers.CreateToolTipControl(this);
 
-            toolTips.AddControls([labelRemoteAddress, textBoxRemoteAddress],
-                        "The IP address or hostname of the remote TunnelService instance. This is used so that this instance can reach out to the remote TunnelService instance and configure an inbound tunnel for this outbound tunnel.");
+            toolTips.AddControls([textBoxName],
+                "The name or description you want to use to identify this tunnel.");
 
-            toolTips.AddControls([labelRemoteUsername, textBoxRemoteUsername],
-                    "The username at the remote TunnelService instance.");
+            toolTips.AddControls([labelAddress, textBoxAddress],
+                "The host name, domain or IP address of the remote NetTunnel service you want the new tunnel to connect to.");
 
-            toolTips.AddControls([labelRemotePassword, textBoxRemotePassword],
-                    "The password for the specified user name. This user and password need to exist at the remote TunnelService instance.");
+            toolTips.AddControls([labelPort, textBoxPort],
+                "The port of the remote NetTunnel service you want the new tunnel to connect to.");
 
-            toolTips.AddControls([labelPort, textBoxManagementPort],
-                    "The management port of the remote TunnelService. This is used so that this instance can reach out to the remote TunnelService instance and configure an inbound tunnel for this outbound tunnel.");
+            toolTips.AddControls([labelUsername, textBoxUsername],
+                "The username that will be used when connecting the tunnel to the remote NetTunnel service.");
 
-            toolTips.AddControls([labelName, textBoxName],
-                    "The user friendly name of this tunnel.");
-
+            toolTips.AddControls([labelPassword, textBoxPassword],
+                "The password that will be used when connecting the tunnel to the remote NetTunnel service.");
 
             #endregion
 
             AcceptButton = buttonConnect;
             CancelButton = buttonCancel;
 
-            textBoxManagementPort.Text = "52845"; //TODO: This should be stored in preferences.
+            textBoxPort.Text = "52845"; //TODO: This should be stored in preferences.
 
 #if DEBUG
             textBoxName.Text = "My First Tunnel";
 
-            textBoxRemoteAddress.Text = "10.20.1.120";
+            textBoxAddress.Text = "10.20.1.120";
 
-            textBoxRemoteUsername.Text = "debug";
-            textBoxRemotePassword.Text = "123456789";
+            textBoxUsername.Text = "debug";
+            textBoxPassword.Text = "123456789";
 #endif
         }
 
@@ -66,16 +65,16 @@ namespace NetTunnel.UI.Forms
             try
             {
                 textBoxName.GetAndValidateText("You must specify a name. This is for your identification only.");
-                textBoxRemoteAddress.GetAndValidateText("You must specify a remote tunnel address.");
-                textBoxManagementPort.GetAndValidateNumeric(1, 65535, "You must specify a valid remote tunnel management port between [min] and [max].");
-                textBoxRemoteUsername.GetAndValidateText("You must specify a remote tunnel username.");
-                textBoxRemotePassword.GetAndValidateText("You must specify a valid remote tunnel password.");
+                textBoxAddress.GetAndValidateText("You must specify a remote tunnel address.");
+                textBoxPort.GetAndValidateNumeric(1, 65535, "You must specify a valid remote tunnel management port between [min] and [max].");
+                textBoxUsername.GetAndValidateText("You must specify a remote tunnel username.");
+                textBoxPassword.GetAndValidateText("You must specify a valid remote tunnel password.");
 
                 var tunnelId = Guid.NewGuid(); //The TunnelId is the same on both services.
 
                 var tunnel = new TunnelConfiguration(_client.ServiceId, tunnelId, textBoxName.Text,
-                    textBoxRemoteAddress.Text, textBoxManagementPort.ValueAs<int>(),
-                    textBoxRemoteUsername.Text, Utility.ComputeSha256Hash(textBoxRemotePassword.Text));
+                    textBoxAddress.Text, textBoxPort.ValueAs<int>(),
+                    textBoxUsername.Text, Utility.ComputeSha256Hash(textBoxPassword.Text));
 
                 var progressForm = new ProgressForm(FriendlyName, "Logging in to remote tunnel...");
 

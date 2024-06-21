@@ -36,10 +36,10 @@
             textBoxPassword = new TextBox();
             buttonCancel = new Button();
             buttonLogin = new Button();
-            labelRemotePort = new Label();
+            labelPort = new Label();
             textBoxPort = new TextBox();
             textBoxAddress = new TextBox();
-            labelRemoteAddress = new Label();
+            labelAddress = new Label();
             buttonAbout = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBoxLogin).BeginInit();
             SuspendLayout();
@@ -107,14 +107,14 @@
             buttonLogin.UseVisualStyleBackColor = true;
             buttonLogin.Click += buttonLogin_Click;
             // 
-            // labelRemotePort
+            // labelPort
             // 
-            labelRemotePort.AutoSize = true;
-            labelRemotePort.Location = new Point(294, 16);
-            labelRemotePort.Name = "labelRemotePort";
-            labelRemotePort.Size = new Size(29, 15);
-            labelRemotePort.TabIndex = 8;
-            labelRemotePort.Text = "Port";
+            labelPort.AutoSize = true;
+            labelPort.Location = new Point(294, 16);
+            labelPort.Name = "labelPort";
+            labelPort.Size = new Size(29, 15);
+            labelPort.TabIndex = 8;
+            labelPort.Text = "Port";
             // 
             // textBoxPort
             // 
@@ -130,14 +130,14 @@
             textBoxAddress.Size = new Size(198, 23);
             textBoxAddress.TabIndex = 3;
             // 
-            // labelRemoteAddress
+            // labelAddress
             // 
-            labelRemoteAddress.AutoSize = true;
-            labelRemoteAddress.Location = new Point(90, 16);
-            labelRemoteAddress.Name = "labelRemoteAddress";
-            labelRemoteAddress.Size = new Size(86, 15);
-            labelRemoteAddress.TabIndex = 5;
-            labelRemoteAddress.Text = "Address / host:";
+            labelAddress.AutoSize = true;
+            labelAddress.Location = new Point(90, 16);
+            labelAddress.Name = "labelAddress";
+            labelAddress.Size = new Size(86, 15);
+            labelAddress.TabIndex = 5;
+            labelAddress.Text = "Address / host:";
             // 
             // buttonAbout
             // 
@@ -155,10 +155,10 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(380, 227);
             Controls.Add(buttonAbout);
-            Controls.Add(labelRemotePort);
+            Controls.Add(labelPort);
             Controls.Add(textBoxPort);
             Controls.Add(textBoxAddress);
-            Controls.Add(labelRemoteAddress);
+            Controls.Add(labelAddress);
             Controls.Add(buttonLogin);
             Controls.Add(buttonCancel);
             Controls.Add(textBoxPassword);
@@ -188,10 +188,10 @@
         private TextBox textBoxPassword;
         private Button buttonCancel;
         private Button buttonLogin;
-        private Label labelRemotePort;
+        private Label labelPort;
         private TextBox textBoxPort;
         private TextBox textBoxAddress;
-        private Label labelRemoteAddress;
+        private Label labelAddress;
         private Button buttonAbout;
     }
 }

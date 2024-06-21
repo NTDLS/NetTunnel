@@ -28,7 +28,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
             catch (Exception ex)
             {
-                Singletons.ServiceEngine.Logger.Exception(ex);
+                Singletons.Logger.Exception(ex);
                 throw;
             }
         }
@@ -50,7 +50,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
             catch (Exception ex)
             {
-                Singletons.ServiceEngine.Logger.Exception(ex);
+                Singletons.Logger.Exception(ex);
                 throw;
             }
         }
@@ -73,7 +73,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
             catch (Exception ex)
             {
-                Singletons.ServiceEngine.Logger.Exception(ex);
+                Singletons.Logger.Exception(ex);
                 throw;
             }
         }

@@ -50,6 +50,27 @@ namespace NetTunnel.UI.Forms
         {
             Text = $"NetTunnel : {(_existingEndpoint == null ? "Add" : "Edit")} {_direction} Endpoint";
 
+            #region Set Tool-tips.
+
+            var toolTips = ToolTipHelpers.CreateToolTipControl(this);
+
+            toolTips.AddControls([labelName, textBoxName],
+                "name or description you want to use to identify this endpoint.");
+
+            toolTips.AddControls([labelListenPort, textBoxListenPort],
+                "The port that will accept new connections at the inbound endpoint.");
+
+            toolTips.AddControls([labelTerminationAddress, textBoxTerminationAddress],
+                "The host name, domain or IP address that the outbound endpoint will make a connection to.");
+
+            toolTips.AddControls([labelTerminationPort, textBoxTerminationPort],
+                "The host name, domain or IP address that the outbound endpoint will make a connection to.");
+
+            toolTips.AddControls([labelTrafficType, comboBoxTrafficType],
+                "The type of traffic that is expected be tunneled on this endpoint. Note that HTTP headers can only be manipulated if HTTP is selected (HTTPS is not supported for header manipulation). ");
+
+            #endregion
+
             var trafficTypes = new List<ComboItem>
             {
                 new ("Raw", NtTrafficType.Raw),
@@ -72,9 +93,9 @@ namespace NetTunnel.UI.Forms
                 comboBoxTrafficType.SelectedValue = _existingEndpoint.TrafficType;
 
                 textBoxName.Text = _existingEndpoint.Name;
-                textBoxInboundPort.Text = $"{_existingEndpoint.InboundPort:n0}";
-                textBoxOutboundAddress.Text = _existingEndpoint.OutboundAddress;
-                textBoxOutboundPort.Text = $"{_existingEndpoint.OutboundPort:n0}";
+                textBoxListenPort.Text = $"{_existingEndpoint.InboundPort:n0}";
+                textBoxTerminationAddress.Text = _existingEndpoint.OutboundAddress;
+                textBoxTerminationPort.Text = $"{_existingEndpoint.OutboundPort:n0}";
             }
             else
             {
@@ -83,9 +104,9 @@ namespace NetTunnel.UI.Forms
 #if DEBUG
 
                 textBoxName.Text = "Website Redirector Endpoint";
-                textBoxInboundPort.Text = "8080";
-                textBoxOutboundAddress.Text = "127.0.0.1";
-                textBoxOutboundPort.Text = "80";
+                textBoxListenPort.Text = "8080";
+                textBoxTerminationAddress.Text = "127.0.0.1";
+                textBoxTerminationPort.Text = "80";
 #endif
             }
         }
@@ -112,10 +133,10 @@ namespace NetTunnel.UI.Forms
 
             try
             {
-                textBoxName.GetAndValidateText("You must specify a name This is for your identification only.");
-                textBoxInboundPort.GetAndValidateNumeric(1, 65535, "You must specify a valid listen port between [min] and [max].");
-                textBoxOutboundAddress.GetAndValidateText("You must specify a termination endpoint address (ip, hostname or domain). ");
-                textBoxOutboundPort.GetAndValidateNumeric(1, 65535, "You must specify a valid termination port between [min] and [max].");
+                textBoxName.GetAndValidateText("You must specify a name.");
+                textBoxListenPort.GetAndValidateNumeric(1, 65535, "You must specify a valid listen port between [min] and [max].");
+                textBoxTerminationAddress.GetAndValidateText("You must specify a termination address (ip, hostname or domain). ");
+                textBoxTerminationPort.GetAndValidateNumeric(1, 65535, "You must specify a valid termination port between [min] and [max].");
 
                 var endpointHttpHeaderRules = new List<HttpHeaderRule>();
 
@@ -141,9 +162,9 @@ namespace NetTunnel.UI.Forms
                     _existingEndpoint?.EndpointId ?? Guid.NewGuid(),
                     _direction,
                     textBoxName.Text,
-                    textBoxOutboundAddress.Text,
-                    textBoxInboundPort.ValueAs<int>(),
-                    textBoxOutboundPort.ValueAs<int>(),
+                    textBoxTerminationAddress.Text,
+                    textBoxListenPort.ValueAs<int>(),
+                    textBoxTerminationPort.ValueAs<int>(),
                     endpointHttpHeaderRules,
                     Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"));
 

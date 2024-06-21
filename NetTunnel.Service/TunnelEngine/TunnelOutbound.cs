@@ -21,7 +21,7 @@ namespace NetTunnel.Service.TunnelEngine
         public TunnelOutbound(ServiceEngine serviceEngine, TunnelConfiguration configuration)
             : base(serviceEngine, configuration)
         {
-            _client = ServiceClient.Create(serviceEngine.Logger, Singletons.Configuration,
+            _client = ServiceClient.Create(Singletons.Logger, Singletons.Configuration,
                 Configuration.Address, Configuration.ServicePort, Configuration.Username, Configuration.PasswordHash, this);
 
             _client.Client.AddHandler(new TunnelOutboundNotificationHandlers());
@@ -32,7 +32,7 @@ namespace NetTunnel.Service.TunnelEngine
 
             _client.Client.OnException += (context, ex, payload) =>
             {
-                ServiceEngine.Logger.Exception($"RPC client exception: '{ex.Message}'"
+                Singletons.Logger.Exception($"RPC client exception: '{ex.Message}'"
                     + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
             };
         }
@@ -82,7 +82,7 @@ namespace NetTunnel.Service.TunnelEngine
 
             CurrentConnections--;
 
-            ServiceEngine.Logger.Warning($"Tunnel '{Configuration.Name}' disconnected.");
+            Singletons.Logger.Warning($"Tunnel '{Configuration.Name}' disconnected.");
         }
 
         private void Client_OnConnected(RmContext context)
@@ -92,7 +92,7 @@ namespace NetTunnel.Service.TunnelEngine
             CurrentConnections++;
             TotalConnections++;
 
-            ServiceEngine.Logger.Verbose($"Tunnel '{Configuration.Name}' connection successful.");
+            Singletons.Logger.Verbose($"Tunnel '{Configuration.Name}' connection successful.");
         }
 
         public void EnforceLogin()
@@ -144,7 +144,7 @@ namespace NetTunnel.Service.TunnelEngine
                         previousPing = null;
                         Status = NtTunnelStatus.Connecting;
 
-                        ServiceEngine.Logger.Verbose(
+                        Singletons.Logger.Verbose(
                             $"Tunnel '{Configuration.Name}' connecting to service at {Configuration.Address}:{Configuration.ServicePort}.");
 
                         //Make the outbound connection to the remote tunnel service.
@@ -164,7 +164,7 @@ namespace NetTunnel.Service.TunnelEngine
                             if (previousPing != null)
                             {
                                 PingMs = (double)previousPing;
-                                ServiceEngine.Logger.Debug($"Ping {previousPing:n2}");
+                                Singletons.Logger.Debug($"Ping {previousPing:n2}");
                             }
                             lastPingDateTime = DateTime.UtcNow;
                         }
@@ -178,17 +178,17 @@ namespace NetTunnel.Service.TunnelEngine
                     {
                         if (sockEx.SocketErrorCode == SocketError.ConnectionRefused)
                         {
-                            ServiceEngine.Logger.Warning(
+                            Singletons.Logger.Warning(
                                 $"EstablishConnectionThread: {ex.Message}");
                         }
                         else
                         {
-                            ServiceEngine.Logger.Exception(ex, $"EstablishConnectionThread: {ex.Message}");
+                            Singletons.Logger.Exception(ex, $"EstablishConnectionThread: {ex.Message}");
                         }
                     }
                     else
                     {
-                        ServiceEngine.Logger.Exception(ex, $"EstablishConnectionThread: {ex.Message}");
+                        Singletons.Logger.Exception(ex, $"EstablishConnectionThread: {ex.Message}");
                     }
                 }
 

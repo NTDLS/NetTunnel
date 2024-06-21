@@ -23,7 +23,7 @@ namespace NetTunnel.Service.TunnelEngine
         {
             StreamCryptography = new NASCCLStream(sharedSecret);
 
-            Singletons.ServiceEngine.Logger.Verbose(
+            Singletons.Logger.Verbose(
                 $"Tunnel cryptography initialized to {sharedSecret.Length * 8}bits. Hash {Utility.ComputeSha256Hash(sharedSecret)}.");
         }
 
@@ -34,7 +34,7 @@ namespace NetTunnel.Service.TunnelEngine
                 throw new Exception("The stream cryptography has not been initialized.");
             }
 
-            Singletons.ServiceEngine.Logger.Verbose("Tunnel cryptography provider has been applied.");
+            Singletons.Logger.Verbose("Tunnel cryptography provider has been applied.");
 
             SecureKeyExchangeIsComplete = true;
         }

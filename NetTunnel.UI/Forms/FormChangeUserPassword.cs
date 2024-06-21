@@ -21,6 +21,18 @@ namespace NetTunnel.UI.Forms
 
             _client = client;
 
+            #region Set Tool-tips.
+
+            var toolTips = ToolTipHelpers.CreateToolTipControl(this);
+
+            toolTips.AddControls([labelUsername, textBoxUsername],
+                "The user name which the user will use when logging in to the NetTunnel service.");
+
+            toolTips.AddControls([labelPassword, textBoxPassword, labelConfirmPassword, textBoxConfirmPassword],
+                "The password which the user will use when logging in to the NetTunnel service.");
+
+            #endregion
+
             User = user;
 
             textBoxUsername.Text = user.Username;

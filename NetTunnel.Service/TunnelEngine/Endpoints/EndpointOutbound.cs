@@ -30,7 +30,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
             base.Start();
 
-            _tunnel.ServiceEngine.Logger.Verbose(
+            Singletons.Logger.Verbose(
                 $"Starting outbound endpoint '{Configuration.Name}' on port {Configuration.OutboundPort}.");
         }
 
@@ -38,7 +38,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
             base.Stop();
 
-            _tunnel.ServiceEngine.Logger.Verbose(
+            Singletons.Logger.Verbose(
                 $"Stopping outbound endpoint '{Configuration.Name}' on port {Configuration.OutboundPort}.");
 
             _activeConnections.Use((o) =>
@@ -50,7 +50,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 o.Clear();
             });
 
-            _tunnel.ServiceEngine.Logger.Verbose(
+            Singletons.Logger.Verbose(
                 $"Stopped outbound endpoint '{Configuration.Name}' on port {Configuration.OutboundPort}.");
         }
 
@@ -70,14 +70,14 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                         var activeConnection = new ActiveEndpointConnection(dataExchangeThread, tcpClient, edgeId);
                         var outboundConnection = _activeConnections.Use((o) => o.TryAdd(edgeId, activeConnection));
 
-                        _serviceEngine.Logger.Debug($"Established outbound endpoint connection: {activeConnection.EdgeId}");
+                        Singletons.Logger.Debug($"Established outbound endpoint connection: {activeConnection.EdgeId}");
 
                         dataExchangeThread.Start(activeConnection);
                     }
                 }
                 catch (Exception ex)
                 {
-                    _serviceEngine.Logger.Exception(ex, $"EstablishOutboundEndpointConnection: {ex.Message}");
+                    Singletons.Logger.Exception(ex, $"EstablishOutboundEndpointConnection: {ex.Message}");
                     throw;
                 }
             }
