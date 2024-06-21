@@ -6,7 +6,7 @@ using NTDLS.ReliableMessaging;
 namespace NetTunnel.Service.ReliableHandlers
 {
     /// <summary>
-    /// The NetTunnel service shares one single instance of RmServer and therefor all inbound tunnels connect to it.
+    /// The NetTunnel service shares one single instance of RmServer and therefore all inbound tunnels connect to it.
     /// 
     /// All Client<->Server notifications communication (whether they be UI or other services with inbound tunnels)
     ///     must pass notification though these handlers.
@@ -112,8 +112,5 @@ namespace NetTunnel.Service.ReliableHandlers
                 throw;
             }
         }
-
-
-
     }
 }

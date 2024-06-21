@@ -9,8 +9,10 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormMain : Form
     {
-        private int _allTunnelAndEndpointHashes = -1;
+        private int _changeDetectionHash = -1;
         private bool _needToRepopulateTunnels = false;
+        private ListViewColumnMap? _tunnelsGridColumnMap;
+        private ListViewColumnMap? _endpointsGridColumnMap;
 
         private Library.ServiceClient? _client;
 
@@ -45,17 +47,56 @@ namespace NetTunnel.UI.Forms
             _timer.Tick += Timer_Tick;
             _timer.Start();
 
+            #region Setup listViewTunnels.
+
             _tunnelsListViewItemComparer = new ListViewItemComparer();
             listViewTunnels.ListViewItemSorter = _tunnelsListViewItemComparer;
             listViewTunnels.ColumnClick += ListViewTunnels_ColumnClick;
             listViewTunnels.MouseUp += ListViewTunnels_MouseUp;
             listViewTunnels.SelectedIndexChanged += ListViewTunnels_SelectedIndexChanged;
 
+            listViewTunnels.Columns.Clear();
+            AddListViewColumn(listViewTunnels, "Name", "Name", 250);
+            AddListViewColumn(listViewTunnels, "Direction", "Direction", 75);
+            AddListViewColumn(listViewTunnels, "Address", "Address", 120);
+            AddListViewColumn(listViewTunnels, "Endpoints", "Endpoints", 70);
+            AddListViewColumn(listViewTunnels, "BytesSent", "Sent (KB)", 80);
+            AddListViewColumn(listViewTunnels, "BytesReceived", "Recvd (KB)", 80);
+            AddListViewColumn(listViewTunnels, "Status", "Status", 200);
+            _tunnelsGridColumnMap = new ListViewColumnMap(listViewTunnels);
+
+            #endregion
+
+            #region Setup listViewEndpoints.
+
             _endpointsListViewItemComparer = new ListViewItemComparer();
             listViewEndpoints.ListViewItemSorter = _endpointsListViewItemComparer;
             listViewEndpoints.ColumnClick += ListViewEndpoints_ColumnClick;
             listViewEndpoints.MouseUp += ListViewEndpoints_MouseUp;
             listViewEndpoints.MouseDoubleClick += ListViewEndpoints_MouseDoubleClick;
+
+            listViewEndpoints.Columns.Clear();
+            AddListViewColumn(listViewEndpoints, "Name", "Name", 250);
+            AddListViewColumn(listViewEndpoints, "Direction", "Direction", 75);
+            AddListViewColumn(listViewEndpoints, "Address", "Address", 120);
+            AddListViewColumn(listViewEndpoints, "BytesSent", "Sent (KB)", 80);
+            AddListViewColumn(listViewEndpoints, "BytesReceived", "Recvd (KB)", 80);
+            AddListViewColumn(listViewEndpoints, "CompressionRatio", "Comp. Ratio", 80);
+            AddListViewColumn(listViewEndpoints, "CurrentConnections", "Current Conn.", 100);
+            AddListViewColumn(listViewEndpoints, "TotalConnections", "Total Conn.", 100);
+            _endpointsGridColumnMap = new ListViewColumnMap(listViewEndpoints);
+
+            #endregion
+
+            static void AddListViewColumn(ListView listView, string name, string text, int width)
+            {
+                listView.Columns.Add(new ColumnHeader
+                {
+                    Name = name,
+                    Text = text,
+                    Width = width
+                });
+            }
         }
 
         private void ListViewEndpoints_MouseDoubleClick(object? sender, MouseEventArgs e)
@@ -131,13 +172,13 @@ namespace NetTunnel.UI.Forms
                     {
                         var result = _client.QueryGetTunnelStatistics();
 
-                        int allTunnelAndEndpointHashes = result.AllTunnelIdAndEndpointIdHashes();
+                        int changeDetectionHash = result.AllTunnelIdAndEndpointIdHashes();
 
-                        if (allTunnelAndEndpointHashes != _allTunnelAndEndpointHashes && _allTunnelAndEndpointHashes != -1)
+                        if (changeDetectionHash != _changeDetectionHash && _changeDetectionHash != -1)
                         {
                             _needToRepopulateTunnels = true;
                         }
-                        _allTunnelAndEndpointHashes = allTunnelAndEndpointHashes;
+                        _changeDetectionHash = changeDetectionHash;
 
                         PopulateEndpointStatistics(result.Statistics);
                         PopulateTunnelStatistics(result.Statistics);
@@ -180,11 +221,12 @@ namespace NetTunnel.UI.Forms
                                         }
                                     }
 
-                                    item.SubItems[columnHeaderEndpointBytesSent.Index].Text = $"{endpointStats.BytesSentKb:n0}";
-                                    item.SubItems[columnHeaderEndpointBytesReceived.Index].Text = $"{endpointStats.BytesReceivedKb:n0}";
-                                    item.SubItems[columnHeaderEndpointTotalConnections.Index].Text = $"{endpointStats.TotalConnections:n0}";
-                                    item.SubItems[columnHeaderEndpointCurrentConenctions.Index].Text = $"{endpointStats.CurrentConnections:n0}";
-                                    item.SubItems[columnHeaderCompressionRatio.Index].Text = $"{compressionRatio:n2}";
+                                    _endpointsGridColumnMap.EnsureNotNull();
+                                    _endpointsGridColumnMap.SubItem(item, "BytesSent").Text = $"{endpointStats.BytesSentKb:n0}";
+                                    _endpointsGridColumnMap.SubItem(item, "BytesReceived").Text = $"{endpointStats.BytesReceivedKb:n0}";
+                                    _endpointsGridColumnMap.SubItem(item, "TotalConnections").Text = $"{endpointStats.TotalConnections:n0}";
+                                    _endpointsGridColumnMap.SubItem(item, "CurrentConnections").Text = $"{endpointStats.CurrentConnections:n0}";
+                                    _endpointsGridColumnMap.SubItem(item, "CompressionRatio").Text = $"{compressionRatio:n2}";
                                 }
                             }
                         }
@@ -212,10 +254,10 @@ namespace NetTunnel.UI.Forms
                             var tunnelStats = statistics.SingleOrDefault(o => o.TunnelKey == tTag.Tunnel.TunnelKey);
                             if (tunnelStats != null)
                             {
-
-                                item.SubItems[columnHeaderTunnelBytesSent.Index].Text = $"{tunnelStats.BytesSentKb:n0}";
-                                item.SubItems[columnHeaderTunnelBytesReceived.Index].Text = $"{tunnelStats.BytesReceivedKb:n0}";
-                                item.SubItems[columnHeaderTunnelStatus.Index].Text = tunnelStats.Status.ToString();
+                                _tunnelsGridColumnMap.EnsureNotNull();
+                                _tunnelsGridColumnMap.SubItem(item, "BytesSent").Text = $"{tunnelStats.BytesSentKb:n0}";
+                                _tunnelsGridColumnMap.SubItem(item, "BytesReceived").Text = $"{tunnelStats.BytesReceivedKb:n0}";
+                                _tunnelsGridColumnMap.SubItem(item, "Status").Text = tunnelStats.Status.ToString();
 
                                 switch (tunnelStats.Status)
                                 {
@@ -371,19 +413,19 @@ namespace NetTunnel.UI.Forms
         {
             if (e.Button == MouseButtons.Right)
             {
-                var rowUnderMouse = listViewTunnels.GetItemAt(e.X, e.Y);
-                if (rowUnderMouse != null)
+                var selectedRow = listViewTunnels.GetItemAt(e.X, e.Y);
+                if (selectedRow != null)
                 {
-                    rowUnderMouse.Selected = true;
+                    selectedRow.Selected = true;
                 }
 
-                var tTag = TunnelTag.FromItemOrDefault(rowUnderMouse);
+                var tTag = TunnelTag.FromItemOrDefault(selectedRow);
 
                 var menu = new ContextMenuStrip();
 
                 menu.Items.Add("Connect Tunnel");
 
-                if (rowUnderMouse != null && tTag != null)
+                if (selectedRow != null && tTag != null)
                 {
                     if (tTag.Tunnel.Direction == NtDirection.Outbound
                         || (tTag.Tunnel.Direction == NtDirection.Inbound && tTag.Tunnel.IsLoggedIn))
@@ -397,7 +439,7 @@ namespace NetTunnel.UI.Forms
                     {
                         menu.Items.Add(new ToolStripSeparator());
 
-                        if (rowUnderMouse.SubItems[columnHeaderTunnelStatus.Index].Text == NtTunnelStatus.Stopped.ToString())
+                        if (tTag.TunnelStatus == NtTunnelStatus.Stopped)
                         {
                             menu.Items.Add("Start");
                         }

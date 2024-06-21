@@ -76,12 +76,17 @@ namespace NetTunnel.Service.TunnelEngine
         {
             Status = NtTunnelStatus.Disconnected;
 
+            CurrentConnections--;
+
             ServiceEngine.Logger.Warning($"Tunnel '{Configuration.Name}' disconnected.");
         }
 
         private void Client_OnConnected(RmContext context)
         {
             Status = NtTunnelStatus.Established;
+
+            CurrentConnections++;
+            TotalConnections++;
 
             ServiceEngine.Logger.Verbose($"Tunnel '{Configuration.Name}' connection successful.");
         }
@@ -140,9 +145,6 @@ namespace NetTunnel.Service.TunnelEngine
                         _client.QueryRegisterTunnel(Configuration);
 
                         Status = NtTunnelStatus.Established;
-
-                        CurrentConnections++;
-                        TotalConnections++;
                     }
                 }
                 catch (Exception ex)
@@ -166,14 +168,9 @@ namespace NetTunnel.Service.TunnelEngine
                         ServiceEngine.Logger.Exception(ex, $"EstablishConnectionThread: {ex.Message}");
                     }
                 }
-                finally
-                {
-                    CurrentConnections--;
-                }
 
                 Thread.Sleep(1000);
             }
         }
     }
-
 }
