@@ -11,7 +11,7 @@ namespace NetTunnel.Library.Interfaces
         public Guid EndpointId { get; }
         public bool KeepRunning { get; }
         public void Disconnect(Guid streamId);
-        public void SendEndpointData(Guid streamId, byte[] buffer);
+        public void WriteEndpointEdgeData(Guid streamId, byte[] buffer);
         public void Start();
         public void Stop();
         public ulong BytesReceived { get; }

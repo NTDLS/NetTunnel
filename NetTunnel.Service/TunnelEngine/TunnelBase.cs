@@ -107,9 +107,9 @@ namespace NetTunnel.Service.TunnelEngine
             ServiceEngine.Logger.Verbose($"Stopped tunnel '{Configuration.Name}'.");
         }
 
-        public void SendEndpointData(Guid endpointId, Guid StreamId, byte[] bytes)
+        public void WriteEndpointEdgeData(Guid endpointId, Guid StreamId, byte[] bytes)
         {
-            Endpoints.Single(o => o.EndpointId == endpointId).SendEndpointData(StreamId, bytes);
+            Endpoints.Single(o => o.EndpointId == endpointId).WriteEndpointEdgeData(StreamId, bytes);
         }
 
         #region Add/Delete Endpoints.

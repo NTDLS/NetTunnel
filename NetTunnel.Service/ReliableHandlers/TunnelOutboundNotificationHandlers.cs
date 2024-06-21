@@ -39,7 +39,7 @@ namespace NetTunnel.Service.ReliableHandlers
             {
                 var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
 
-                tunnel.SendEndpointData(notification.EndpointId, notification.StreamId, notification.Bytes);
+                tunnel.WriteEndpointEdgeData(notification.EndpointId, notification.StreamId, notification.Bytes);
             }
             catch (Exception ex)
             {

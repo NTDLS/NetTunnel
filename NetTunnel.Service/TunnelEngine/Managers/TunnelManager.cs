@@ -213,14 +213,14 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-        public void SendEndpointData(DirectionalKey tunnelKey, Guid endpointId, Guid StreamId, byte[] bytes)
+        public void WriteEndpointEdgeData(DirectionalKey tunnelKey, Guid endpointId, Guid StreamId, byte[] bytes)
         {
             Collection.Use((o) =>
             {
                 var tunnel = o.Single(o => o.TunnelKey == tunnelKey);
                 var endpoint = tunnel.Endpoints.Single(o => o.EndpointId == endpointId);
 
-                endpoint.SendEndpointData(StreamId, bytes);
+                endpoint.WriteEndpointEdgeData(StreamId, bytes);
             });
         }
 

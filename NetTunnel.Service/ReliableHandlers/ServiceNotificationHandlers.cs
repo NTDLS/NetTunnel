@@ -57,7 +57,7 @@ namespace NetTunnel.Service.ReliableHandlers
             {
                 var connectionContext = GetServiceConnectionContext(context);
 
-                Singletons.ServiceEngine.Tunnels.SendEndpointData(
+                Singletons.ServiceEngine.Tunnels.WriteEndpointEdgeData(
                     notification.TunnelKey.SwapDirection(), notification.EndpointId, notification.StreamId, notification.Bytes);
             }
             catch (Exception ex)

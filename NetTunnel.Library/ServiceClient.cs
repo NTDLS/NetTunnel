@@ -46,7 +46,6 @@ namespace NetTunnel.Library
 
         public static ServiceClient CreateConnectAndLogin(ILogger logger, string address, int port, string userName, string passwordHash, object? owner = null)
         {
-            //using var logger = new ConsoleLogger(NtLogSeverity.Warning);
             return CreateConnectAndLogin(logger, new ServiceConfiguration()
             {
                 MessageQueryTimeoutMs = 1000

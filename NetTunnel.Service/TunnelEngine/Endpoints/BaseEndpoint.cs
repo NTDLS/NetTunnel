@@ -106,7 +106,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             });
         }
 
-        public void SendEndpointData(Guid streamId, byte[] buffer)
+        public void WriteEndpointEdgeData(Guid streamId, byte[] buffer)
         {
             lock (_statisticsLock)
             {
@@ -123,9 +123,6 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 return outboundConnection;
             });
 
-            var wtfAndAlsoWTF = Encoding.UTF8.GetString(buffer);
-
-
             outboundConnection?.Write(buffer);
         }
 
@@ -136,8 +133,6 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         internal void EndpointDataExchangeThreadProc(object? obj)
         {
             Thread.CurrentThread.Name = $"EndpointDataExchangeThreadProc:{Environment.CurrentManagedThreadId}";
-
-            _tunnel.ServiceEngine.Logger.Warning($"EndpointDataExchangeThreadProc: {Configuration.Direction}");
 
             var activeConnection = ((ActiveEndpointConnection?)obj).EnsureNotNull();
 
