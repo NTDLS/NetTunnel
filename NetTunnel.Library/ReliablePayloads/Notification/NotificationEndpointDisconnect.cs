@@ -1,6 +1,5 @@
 ﻿using NetTunnel.Library.Payloads;
 using NTDLS.ReliableMessaging;
-using ProtoBuf;
 
 namespace NetTunnel.Service.ReliableMessages.Notification
 {

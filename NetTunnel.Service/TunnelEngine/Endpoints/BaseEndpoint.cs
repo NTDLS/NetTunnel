@@ -3,7 +3,6 @@ using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
 using NTDLS.Helpers;
 using NTDLS.Semaphore;
-using System;
 using System.Net.Sockets;
 using System.Text;
 using static NetTunnel.Library.Constants;
