@@ -22,6 +22,7 @@ namespace NetTunnel.Library
                 {
                     runningHash = CombineHashes(runningHash, hashes[1]);
                 }
+                return runningHash;
             }
             else if (hashCount > 0)
             {
