@@ -163,8 +163,8 @@ namespace NetTunnel.Library
         public QueryRegisterTunnelReply QueryRegisterTunnel(TunnelConfiguration Collection)
             => Client.Query(new QueryRegisterTunnel(Collection)).Result;
 
-        public QueryUpsertEndpointReply QueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration configuration)
-            => Client.Query(new QueryUpsertEndpoint(tunnelKey, configuration)).Result;
+        public QueryDistributeUpsertEndpointReply QueryDistributeUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration configuration)
+            => Client.Query(new QueryDistributeUpsertEndpoint(tunnelKey, configuration)).Result;
 
         public QueryGetUsersReply QueryGetUsers()
             => Client.Query(new QueryGetUsers()).Result;
@@ -204,5 +204,8 @@ namespace NetTunnel.Library
 
         public void NotificationEndpointExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length)
             => Client.Notify(new NotificationEndpointDataExchange(tunnelKey, endpointId, edgeId, bytes, length));
+
+        public QueryUpsertEndpointReply PeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpoint)
+            => Client.Query(new QueryUpsertEndpoint(tunnelKey, endpoint)).Result;
     }
 }

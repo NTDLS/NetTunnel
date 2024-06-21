@@ -47,6 +47,19 @@
             Outbound
         }
 
+        public static NtDirection SwapDirection(NtDirection direction)
+        {
+            if (direction == NtDirection.Inbound)
+            {
+                return NtDirection.Outbound;
+            }
+            if (direction == NtDirection.Outbound)
+            {
+                return NtDirection.Inbound;
+            }
+            throw new Exception("The direction cannot be reversed.");
+        }
+
         public enum NtTunnelStatus
         {
             Undefined,

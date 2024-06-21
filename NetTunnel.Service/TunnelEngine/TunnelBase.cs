@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
+using NetTunnel.Library.ReliablePayloads.Query;
 using NetTunnel.Service.TunnelEngine.Endpoints;
 using static NetTunnel.Library.Constants;
 
@@ -52,6 +53,9 @@ namespace NetTunnel.Service.TunnelEngine
         }
 
         #region Interface: ITunnel.
+
+        QueryUpsertEndpointReply ITunnel.PeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointId)
+           => throw new NotImplementedException("This function should be overridden.");
 
         void ITunnel.PeerNotifyOfEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length)
            => throw new NotImplementedException("This function should be overridden.");
@@ -125,9 +129,24 @@ namespace NetTunnel.Service.TunnelEngine
                 DeleteEndpoint(existingEndpoint.EndpointId);
             }
 
-            var endpoint = new EndpointInbound(ServiceEngine, this, configuration);
+            IEndpoint endpoint;
+
+            if (configuration.Direction == NtDirection.Inbound)
+            {
+                endpoint = new EndpointInbound(ServiceEngine, this, configuration);
+            }
+            else if (configuration.Direction == NtDirection.Outbound)
+            {
+                endpoint = new EndpointOutbound(ServiceEngine, this, configuration);
+            }
+            else
+            {
+                throw new Exception("Endpoint direction is not well defined.");
+            }
+
             Configuration.Endpoints.Add(configuration);
             Endpoints.Add(endpoint);
+            endpoint.Start();
             return endpoint;
         }
 

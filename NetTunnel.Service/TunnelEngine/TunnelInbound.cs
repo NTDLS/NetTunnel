@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
+using NetTunnel.Library.ReliablePayloads.Query;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine
@@ -33,6 +34,9 @@ namespace NetTunnel.Service.TunnelEngine
         }
 
         #region Interface: ITunnel.
+
+        public QueryUpsertEndpointReply PeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpoint)
+            => ServiceEngine.PeerQueryUpsertEndpoint(ConnectionId, tunnelKey, endpoint);
 
         /// <summary>
         /// Sends a notification to the remote tunnel service containing the data that was received

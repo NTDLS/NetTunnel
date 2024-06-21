@@ -2,6 +2,7 @@
 using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Notification;
+using NetTunnel.Library.ReliablePayloads.Query;
 using NetTunnel.Service.ReliableHandlers;
 using NetTunnel.Service.TunnelEngine.Managers;
 using NTDLS.ReliableMessaging;
@@ -67,6 +68,9 @@ namespace NetTunnel.Service.TunnelEngine
         }
 
         #region Interface: IServiceEngine
+
+        public QueryUpsertEndpointReply PeerQueryUpsertEndpoint(Guid connectionId, DirectionalKey tunnelKey, EndpointConfiguration endpoint)
+            => _messageServer.Query(connectionId, new QueryUpsertEndpoint(tunnelKey, endpoint)).Result;
 
         /// <summary>
         /// Sends a notification to the remote tunnel service to let it know to connect

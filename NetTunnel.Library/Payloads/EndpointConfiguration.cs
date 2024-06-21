@@ -23,6 +23,13 @@ namespace NetTunnel.Library.Payloads
         public NtTrafficType TrafficType { get; set; } = NtTrafficType.Raw;
         public List<HttpHeaderRule> HttpHeaderRules { get; set; } = new();
 
+        public EndpointConfiguration SwapDirection()
+        {
+            var clone = CloneConfiguration();
+            clone.Direction = Constants.SwapDirection(clone.Direction);
+            return clone;
+        }
+
         public EndpointConfiguration()
         {
         }

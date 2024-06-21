@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library.ReliablePayloads.Notification;
+using NetTunnel.Library.ReliablePayloads.Query;
 using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
 
@@ -70,6 +71,40 @@ namespace NetTunnel.Service.ReliableHandlers
                 var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
 
                 Singletons.ServiceEngine.Tunnels.DeleteEndpoint(notification.TunnelKey, notification.EndpointId);
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
+        }
+
+        public QueryDistributeUpsertEndpointReply OnQueryUpsertEndpoint(RmContext context, QueryDistributeUpsertEndpoint query)
+        {
+            try
+            {
+                var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
+
+                Singletons.ServiceEngine.Tunnels.DistributeUpsertEndpoint(query.TunnelKey, query.Configuration);
+
+                return new QueryDistributeUpsertEndpointReply();
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
+        }
+
+        public QueryUpsertEndpointReply OnQueryUpsertEndpoint(RmContext context, QueryUpsertEndpoint query)
+        {
+            try
+            {
+                var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
+
+                Singletons.ServiceEngine.Tunnels.UpsertEndpoint(query.TunnelKey, query.Configuration);
+
+                return new QueryUpsertEndpointReply();
             }
             catch (Exception ex)
             {

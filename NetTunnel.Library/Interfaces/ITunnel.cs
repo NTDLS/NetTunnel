@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library.Payloads;
+using NetTunnel.Library.ReliablePayloads.Query;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library.Interfaces
@@ -57,11 +58,9 @@ namespace NetTunnel.Library.Interfaces
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="edgeId">The id that will uniquely identity the associated endpoint connections at each service</param>
         public void PeerNotifyOfEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId);
-
         public void PeerNotifyOfEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId);
-
         public void PeerNotifyOfTunnelDeletion(DirectionalKey tunnelKey);
         public void PeerNotifyOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId);
+        public QueryUpsertEndpointReply PeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointId);
     }
 }
-

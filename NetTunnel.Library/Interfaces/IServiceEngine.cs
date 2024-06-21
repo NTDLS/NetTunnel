@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library.Payloads;
+using NetTunnel.Library.ReliablePayloads.Query;
 
 namespace NetTunnel.Library.Interfaces
 {
@@ -11,5 +12,6 @@ namespace NetTunnel.Library.Interfaces
         public void PeerNotifyOfTunnelDeletion(Guid connectionId, DirectionalKey tunnelKey);
         public void PeerNotifyOfEndpointDeletion(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId);
         public void PeerNotifyOfEndpointDataExchange(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length);
+        public QueryUpsertEndpointReply PeerQueryUpsertEndpoint(Guid connectionId, DirectionalKey tunnelKey, EndpointConfiguration endpoint);
     }
 }

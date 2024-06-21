@@ -65,7 +65,8 @@ namespace NetTunnel.UI.Forms
             {
                 foreach (var rule in _existingEndpoint.HttpHeaderRules)
                 {
-                    dataGridViewHTTPHeaders.Rows.Add([$"{rule.Enabled}", $"{rule.HeaderType}", $"{rule.Verb}", rule.Name, $"{rule.Action}", rule.Value]);
+                    dataGridViewHTTPHeaders.Rows.Add([$"{rule.Enabled}", $"{rule.HeaderType}",
+                        $"{rule.Verb}", rule.Name, $"{rule.Action}", rule.Value]);
                 }
 
                 comboBoxTrafficType.SelectedValue = _existingEndpoint.TrafficType;
@@ -91,7 +92,6 @@ namespace NetTunnel.UI.Forms
 
         private void DataGridViewHTTPHeaders_DataError(object? sender, DataGridViewDataErrorEventArgs e)
         {
-
         }
 
         public FormAddEditEndpoint()
@@ -153,7 +153,7 @@ namespace NetTunnel.UI.Forms
                 {
                     try
                     {
-                        _client.QueryUpsertEndpoint(_tunnel.TunnelKey, endpoint);
+                        _client.QueryDistributeUpsertEndpoint(_tunnel.TunnelKey, endpoint);
                         this.InvokeClose(DialogResult.OK);
                     }
                     catch (Exception ex)

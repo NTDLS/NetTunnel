@@ -109,7 +109,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 foreach (var endpoint in config.Endpoints)
                 {
                     //Since we are receiving the endpoints from the other service, we need to flip the direction of their configuration.
-                    endpoint.Direction = endpoint.Direction == NtDirection.Inbound ? NtDirection.Outbound : NtDirection.Inbound;
+                    endpoint.Direction = SwapDirection(endpoint.Direction);
                 }
 
                 var newTunnel = new TunnelInbound(_serviceEngine, connectionId, config);
@@ -144,13 +144,32 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// <param name="endpointConfiguration"></param>
         public void UpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointConfiguration)
         {
-            Collection.Use((o) =>
-            {
-                var tunnel = o.Single(o => o.TunnelKey == tunnelKey);
-                tunnel.UpsertEndpoint(endpointConfiguration);
+            var tunnel = Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey));
 
+            //Apply the endpoint here:
+            tunnel.UpsertEndpoint(endpointConfiguration);
+
+            if (tunnelKey.Direction == NtDirection.Outbound)
+            {
+                //Outbound tunnels own the configuration, so save it.
                 SaveToDisk();
-            });
+            }
+        }
+
+        /// <summary>
+        /// The local service is adding/editing an endpoint to a local tunnel.
+        /// </summary>
+        /// <param name="tunnelId"></param>
+        /// <param name="endpointConfiguration"></param>
+        public void DistributeUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointConfiguration)
+        {
+            var tunnel = Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey));
+
+            //Apply the endpoint here:
+            UpsertEndpoint(tunnelKey, endpointConfiguration);
+
+            //Apply the endpoint at the peer.
+            tunnel.PeerQueryUpsertEndpoint(tunnelKey.SwapDirection(), endpointConfiguration.SwapDirection());
         }
 
         /// <summary>

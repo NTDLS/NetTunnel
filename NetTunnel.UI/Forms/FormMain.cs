@@ -348,8 +348,8 @@ namespace NetTunnel.UI.Forms
                 if (tTag.Tunnel.Direction == NtDirection.Outbound
                     || (tTag.Tunnel.Direction == NtDirection.Inbound && tTag.Tunnel.IsLoggedIn))
                 {
-                    menu.Items.Add("Add Inbound Endpoint to Tunnel");
-                    menu.Items.Add("Add Outbound Endpoint to Tunnel");
+                    menu.Items.Add("Add Inbound Endpoint");
+                    menu.Items.Add("Add Outbound Endpoint");
 
                     if (eTag != null)
                     {
@@ -364,7 +364,7 @@ namespace NetTunnel.UI.Forms
                 {
                     menu.Hide();
 
-                    if (e.ClickedItem?.Text == "Add Inbound Endpoint to Tunnel")
+                    if (e.ClickedItem?.Text == "Add Inbound Endpoint")
                     {
                         using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tTag.Tunnel, NtDirection.Inbound);
                         if (form.ShowDialog() == DialogResult.OK)
@@ -372,7 +372,7 @@ namespace NetTunnel.UI.Forms
                             RepopulateTunnelsGrid();
                         }
                     }
-                    else if (e.ClickedItem?.Text == "Add Outbound Endpoint to Tunnel")
+                    else if (e.ClickedItem?.Text == "Add Outbound Endpoint")
                     {
                         using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tTag.Tunnel, NtDirection.Outbound);
                         if (form.ShowDialog() == DialogResult.OK)
@@ -431,8 +431,8 @@ namespace NetTunnel.UI.Forms
                         || (tTag.Tunnel.Direction == NtDirection.Inbound && tTag.Tunnel.IsLoggedIn))
                     {
                         menu.Items.Add(new ToolStripSeparator());
-                        menu.Items.Add("Add Inbound Endpoint to Tunnel");
-                        menu.Items.Add("Add Outbound Endpoint to Tunnel");
+                        menu.Items.Add("Add Inbound Endpoint");
+                        menu.Items.Add("Add Outbound Endpoint");
                     }
 
                     if (tTag.Tunnel.Direction == NtDirection.Outbound)
@@ -467,7 +467,7 @@ namespace NetTunnel.UI.Forms
                             RepopulateTunnelsGrid();
                         }
                     }
-                    else if (tTag != null && e.ClickedItem?.Text == "Add Inbound Endpoint to Tunnel")
+                    else if (tTag != null && e.ClickedItem?.Text == "Add Inbound Endpoint")
                     {
                         using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tTag.Tunnel, NtDirection.Inbound);
                         if (form.ShowDialog() == DialogResult.OK)
@@ -475,7 +475,7 @@ namespace NetTunnel.UI.Forms
                             RepopulateTunnelsGrid();
                         }
                     }
-                    else if (tTag != null && e.ClickedItem?.Text == "Add Outbound Endpoint to Tunnel")
+                    else if (tTag != null && e.ClickedItem?.Text == "Add Outbound Endpoint")
                     {
                         using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tTag.Tunnel, NtDirection.Outbound);
                         if (form.ShowDialog() == DialogResult.OK)

@@ -118,6 +118,23 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
+        public QueryDistributeUpsertEndpointReply OnQueryUpsertEndpoint(RmContext context, QueryDistributeUpsertEndpoint query)
+        {
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+                Singletons.ServiceEngine.Tunnels.DistributeUpsertEndpoint(query.TunnelKey, query.Configuration);
+
+                return new QueryDistributeUpsertEndpointReply();
+            }
+            catch (Exception ex)
+            {
+                Singletons.ServiceEngine.Logger.Exception(ex);
+                throw;
+            }
+        }
+
         public QueryUpsertEndpointReply OnQueryUpsertEndpoint(RmContext context, QueryUpsertEndpoint query)
         {
             try
@@ -125,6 +142,7 @@ namespace NetTunnel.Service.ReliableHandlers
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
                 Singletons.ServiceEngine.Tunnels.UpsertEndpoint(query.TunnelKey, query.Configuration);
+
                 return new QueryUpsertEndpointReply();
             }
             catch (Exception ex)
