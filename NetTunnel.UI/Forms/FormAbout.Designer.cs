@@ -42,17 +42,16 @@
             // 
             pictureBox1.BackgroundImageLayout = ImageLayout.Center;
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(35, 35);
+            pictureBox1.Location = new Point(13, 34);
             pictureBox1.Margin = new Padding(4, 3, 4, 3);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(103, 108);
-            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox1.Size = new Size(71, 69);
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
             // 
             // cmdOk
             // 
-            cmdOk.Location = new Point(419, 171);
+            cmdOk.Location = new Point(336, 171);
             cmdOk.Margin = new Padding(4, 3, 4, 3);
             cmdOk.Name = "cmdOk";
             cmdOk.Size = new Size(88, 27);
@@ -65,7 +64,7 @@
             listViewVersions.Columns.AddRange(new ColumnHeader[] { columnHeaderApplication, columnHeaderVersion });
             listViewVersions.FullRowSelect = true;
             listViewVersions.HeaderStyle = ColumnHeaderStyle.Nonclickable;
-            listViewVersions.Location = new Point(174, 14);
+            listViewVersions.Location = new Point(92, 12);
             listViewVersions.Margin = new Padding(4, 3, 4, 3);
             listViewVersions.MultiSelect = false;
             listViewVersions.Name = "listViewVersions";
@@ -89,7 +88,7 @@
             // 
             linkWebsite.AutoSize = true;
             linkWebsite.Font = new Font("Microsoft Sans Serif", 11F);
-            linkWebsite.Location = new Point(170, 171);
+            linkWebsite.Location = new Point(92, 171);
             linkWebsite.Margin = new Padding(4, 0, 4, 0);
             linkWebsite.Name = "linkWebsite";
             linkWebsite.Size = new Size(164, 18);
@@ -102,7 +101,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(517, 210);
+            ClientSize = new Size(439, 210);
             Controls.Add(linkWebsite);
             Controls.Add(listViewVersions);
             Controls.Add(cmdOk);
