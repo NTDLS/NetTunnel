@@ -1,5 +1,4 @@
-﻿using NetTunnel.Library;
-using NetTunnel.Library.Interfaces;
+﻿using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Notification;
 using NetTunnel.Library.ReliablePayloads.Query;

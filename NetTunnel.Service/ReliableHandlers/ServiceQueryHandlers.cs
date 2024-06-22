@@ -1,5 +1,4 @@
-﻿using NetTunnel.Library.ReliablePayloads.Notification;
-using NetTunnel.Library.ReliablePayloads.Query;
+﻿using NetTunnel.Library.ReliablePayloads.Query;
 using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;

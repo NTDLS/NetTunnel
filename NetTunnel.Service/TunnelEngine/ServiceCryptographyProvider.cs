@@ -1,5 +1,4 @@
-﻿using NetTunnel.Library.Interfaces;
-using NTDLS.ReliableMessaging;
+﻿using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Service.TunnelEngine
 {

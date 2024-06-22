@@ -41,7 +41,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             Singletons.Logger.Verbose(
                 $"Stopping outbound endpoint '{Configuration.Name}' on port {Configuration.OutboundPort}.");
 
-            _activeConnections.Use((o) =>
+            _edgeConnections.Use((o) =>
             {
                 foreach (var activeConnection in o)
                 {
@@ -67,8 +67,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     {
                         var dataExchangeThread = new Thread(EndpointEdgeConnectionDataPumpThreadProc);
                         //Keep track of the connection. ActiveEndpointConnection will handle closing and disposing of the client and its stream.
-                        var activeConnection = new ActiveEndpointConnection(dataExchangeThread, tcpClient, edgeId);
-                        var outboundConnection = _activeConnections.Use((o) => o.TryAdd(edgeId, activeConnection));
+                        var activeConnection = new EndpointEdgeConnection(dataExchangeThread, tcpClient, edgeId);
+                        var outboundConnection = _edgeConnections.Use((o) => o.TryAdd(edgeId, activeConnection));
 
                         Singletons.Logger.Debug($"Established outbound endpoint connection: {activeConnection.EdgeId}");
 

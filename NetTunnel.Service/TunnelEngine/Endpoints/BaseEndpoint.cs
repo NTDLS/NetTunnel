@@ -25,7 +25,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         private readonly Thread _heartbeatThread;
 
-        internal readonly PessimisticCriticalResource<Dictionary<Guid, ActiveEndpointConnection>> _activeConnections = new();
+        internal readonly PessimisticCriticalResource<Dictionary<Guid, EndpointEdgeConnection>> _edgeConnections = new();
 
         public EndpointConfiguration Configuration { get; private set; }
 
@@ -51,9 +51,9 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             {
                 if ((DateTime.UtcNow - lastHeartBeat).TotalMilliseconds > Singletons.Configuration.TunnelAndEndpointHeartbeatDelayMs)
                 {
-                    _activeConnections.Use((o) =>
+                    _edgeConnections.Use((o) =>
                     {
-                        List<ActiveEndpointConnection> connectionsToClose = new();
+                        List<EndpointEdgeConnection> connectionsToClose = new();
 
                         foreach (var connection in o)
                         {
@@ -95,7 +95,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         public void Disconnect(Guid edgeId)
         {
-            _activeConnections.Use((o) =>
+            _edgeConnections.Use((o) =>
             {
                 if (o.TryGetValue(edgeId, out var activeEndpointConnection))
                 {
@@ -113,16 +113,13 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 BytesSent += (ulong)buffer.Length;
             }
 
-            var outboundConnection = _activeConnections.Use((o) =>
+            var edgeConnection = _edgeConnections.Use((o) =>
             {
-                if (o.TryGetValue(edgeId, out var outboundConnection))
-                {
-                    return outboundConnection;
-                }
-                return outboundConnection;
+                o.TryGetValue(edgeId, out var edgeConnection);
+                return edgeConnection;
             });
 
-            outboundConnection?.Write(buffer);
+            edgeConnection?.Write(buffer);
         }
 
         /// <summary>
@@ -133,7 +130,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
             Thread.CurrentThread.Name = $"EndpointEdgeConnectionDataPumpThread:{Environment.CurrentManagedThreadId}";
 
-            var activeConnection = ((ActiveEndpointConnection?)obj).EnsureNotNull();
+            var edgeConnection = ((EndpointEdgeConnection?)obj).EnsureNotNull();
 
             lock (_statisticsLock)
             {
@@ -147,14 +144,14 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 {
                     //SEARCH FOR: Process:Endpoint:Connect:001: If this is an inbound endpoint, then let the remote service
                     //  know that we just received a connection so that it came make the associated outbound connection.
-                    _tunnel.PeerNotifyOfEndpointConnect(_tunnel.TunnelKey, EndpointId, activeConnection.EdgeId);
+                    _tunnel.PeerNotifyOfEndpointConnect(_tunnel.TunnelKey, EndpointId, edgeConnection.EdgeId);
                 }
 
                 var httpHeaderBuilder = new StringBuilder();
 
                 var buffer = new PumpBuffer(Singletons.Configuration.InitialReceiveBufferSize);
 
-                while (KeepRunning && activeConnection.IsConnected && activeConnection.Read(ref buffer))
+                while (KeepRunning && edgeConnection.IsConnected && edgeConnection.Read(ref buffer))
                 {
                     lock (_statisticsLock)
                     {
@@ -194,7 +191,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                                 var httpHeaderBytes = Encoding.UTF8.GetBytes(httpHeaderBuilder.ToString());
 
                                 _tunnel.PeerNotifyOfEndpointDataExchange(
-                                    _tunnel.TunnelKey, EndpointId, activeConnection.EdgeId, httpHeaderBytes, httpHeaderBytes.Length);
+                                    _tunnel.TunnelKey, EndpointId, edgeConnection.EdgeId, httpHeaderBytes, httpHeaderBytes.Length);
 
                                 httpHeaderBuilder.Clear();
                                 break;
@@ -210,7 +207,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     //  endpoint and endpoint-edge-connection (edgeId). At the tunnel-peer, This data will be
                     //  sent to whatever is connected to the endpoint via a call to WriteEndpointEdgeData().
                     _tunnel.PeerNotifyOfEndpointDataExchange(
-                        _tunnel.TunnelKey, Configuration.EndpointId, activeConnection.EdgeId, buffer.Bytes, buffer.Length);
+                        _tunnel.TunnelKey, Configuration.EndpointId, edgeConnection.EdgeId, buffer.Bytes, buffer.Length);
 
                     buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);
                 }
@@ -245,16 +242,16 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     CurrentConnections--;
                 }
 
-                Exceptions.Ignore(activeConnection.Disconnect);
+                Exceptions.Ignore(edgeConnection.Disconnect);
 
-                _activeConnections.Use((o) =>
+                _edgeConnections.Use((o) =>
                 {
-                    o.Remove(activeConnection.EdgeId);
+                    o.Remove(edgeConnection.EdgeId);
                 });
             }
 
             Exceptions.Ignore(() =>
-                _tunnel.PeerNotifyOfEndpointDisconnect(_tunnel.TunnelKey.SwapDirection(), EndpointId, activeConnection.EdgeId));
+                _tunnel.PeerNotifyOfEndpointDisconnect(_tunnel.TunnelKey.SwapDirection(), EndpointId, edgeConnection.EdgeId));
         }
     }
 }
