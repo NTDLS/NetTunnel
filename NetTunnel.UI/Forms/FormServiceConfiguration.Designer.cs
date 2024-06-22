@@ -33,12 +33,12 @@
             buttonSave = new Button();
             labelManagementPort = new Label();
             labelMessageQueryTimeoutMs = new Label();
-            labelTunnelAndEndpointHeartbeatDelayMs = new Label();
+            labelEndpointHeartbeatDelayMs = new Label();
             labelTunnelCryptographyKeySize = new Label();
             labelStaleEndpointExpirationMs = new Label();
             textBoxManagementPort = new TextBox();
             textBoxMessageQueryTimeoutMs = new TextBox();
-            textBoxTunnelAndEndpointHeartbeatDelayMs = new TextBox();
+            textBoxEndpointHeartbeatDelayMs = new TextBox();
             textBoxTunnelCryptographyKeySize = new TextBox();
             textBoxStaleEndpointExpirationMs = new TextBox();
             labelInitialReceiveBufferSize = new Label();
@@ -69,7 +69,7 @@
             buttonCancel.TabIndex = 1;
             buttonCancel.Text = "Cancel";
             buttonCancel.UseVisualStyleBackColor = true;
-            buttonCancel.Click += buttonCancel_Click;
+            buttonCancel.Click += ButtonCancel_Click;
             // 
             // buttonSave
             // 
@@ -79,7 +79,7 @@
             buttonSave.TabIndex = 0;
             buttonSave.Text = "Save";
             buttonSave.UseVisualStyleBackColor = true;
-            buttonSave.Click += buttonSave_Click;
+            buttonSave.Click += ButtonSave_Click;
             // 
             // labelManagementPort
             // 
@@ -99,14 +99,14 @@
             labelMessageQueryTimeoutMs.TabIndex = 8;
             labelMessageQueryTimeoutMs.Text = "Message query timeout (ms)";
             // 
-            // labelTunnelAndEndpointHeartbeatDelayMs
+            // labelEndpointHeartbeatDelayMs
             // 
-            labelTunnelAndEndpointHeartbeatDelayMs.AutoSize = true;
-            labelTunnelAndEndpointHeartbeatDelayMs.Location = new Point(6, 23);
-            labelTunnelAndEndpointHeartbeatDelayMs.Name = "labelTunnelAndEndpointHeartbeatDelayMs";
-            labelTunnelAndEndpointHeartbeatDelayMs.Size = new Size(197, 15);
-            labelTunnelAndEndpointHeartbeatDelayMs.TabIndex = 9;
-            labelTunnelAndEndpointHeartbeatDelayMs.Text = "Tunnel and endpoint heartbeat (ms)";
+            labelEndpointHeartbeatDelayMs.AutoSize = true;
+            labelEndpointHeartbeatDelayMs.Location = new Point(47, 28);
+            labelEndpointHeartbeatDelayMs.Name = "labelEndpointHeartbeatDelayMs";
+            labelEndpointHeartbeatDelayMs.Size = new Size(135, 15);
+            labelEndpointHeartbeatDelayMs.TabIndex = 9;
+            labelEndpointHeartbeatDelayMs.Text = "Endpoint heartbeat (ms)";
             // 
             // labelTunnelCryptographyKeySize
             // 
@@ -120,7 +120,7 @@
             // labelStaleEndpointExpirationMs
             // 
             labelStaleEndpointExpirationMs.AutoSize = true;
-            labelStaleEndpointExpirationMs.Location = new Point(37, 52);
+            labelStaleEndpointExpirationMs.Location = new Point(16, 52);
             labelStaleEndpointExpirationMs.Name = "labelStaleEndpointExpirationMs";
             labelStaleEndpointExpirationMs.Size = new Size(166, 15);
             labelStaleEndpointExpirationMs.TabIndex = 11;
@@ -140,12 +140,12 @@
             textBoxMessageQueryTimeoutMs.Size = new Size(100, 23);
             textBoxMessageQueryTimeoutMs.TabIndex = 1;
             // 
-            // textBoxTunnelAndEndpointHeartbeatDelayMs
+            // textBoxEndpointHeartbeatDelayMs
             // 
-            textBoxTunnelAndEndpointHeartbeatDelayMs.Location = new Point(209, 20);
-            textBoxTunnelAndEndpointHeartbeatDelayMs.Name = "textBoxTunnelAndEndpointHeartbeatDelayMs";
-            textBoxTunnelAndEndpointHeartbeatDelayMs.Size = new Size(100, 23);
-            textBoxTunnelAndEndpointHeartbeatDelayMs.TabIndex = 0;
+            textBoxEndpointHeartbeatDelayMs.Location = new Point(188, 20);
+            textBoxEndpointHeartbeatDelayMs.Name = "textBoxEndpointHeartbeatDelayMs";
+            textBoxEndpointHeartbeatDelayMs.Size = new Size(100, 23);
+            textBoxEndpointHeartbeatDelayMs.TabIndex = 0;
             // 
             // textBoxTunnelCryptographyKeySize
             // 
@@ -156,7 +156,7 @@
             // 
             // textBoxStaleEndpointExpirationMs
             // 
-            textBoxStaleEndpointExpirationMs.Location = new Point(209, 49);
+            textBoxStaleEndpointExpirationMs.Location = new Point(188, 49);
             textBoxStaleEndpointExpirationMs.Name = "textBoxStaleEndpointExpirationMs";
             textBoxStaleEndpointExpirationMs.Size = new Size(100, 23);
             textBoxStaleEndpointExpirationMs.TabIndex = 1;
@@ -175,9 +175,9 @@
             labelMaxReceiveBufferSize.AutoSize = true;
             labelMaxReceiveBufferSize.Location = new Point(32, 55);
             labelMaxReceiveBufferSize.Name = "labelMaxReceiveBufferSize";
-            labelMaxReceiveBufferSize.Size = new Size(126, 15);
+            labelMaxReceiveBufferSize.Size = new Size(129, 15);
             labelMaxReceiveBufferSize.TabIndex = 23;
-            labelMaxReceiveBufferSize.Text = "Max buffer size (bytes)";
+            labelMaxReceiveBufferSize.Text = "Max. buffer size (bytes)";
             // 
             // labelReceiveBufferGrowthRate
             // 
@@ -282,10 +282,10 @@
             // 
             // tabPageEndpoints
             // 
-            tabPageEndpoints.Controls.Add(labelTunnelAndEndpointHeartbeatDelayMs);
+            tabPageEndpoints.Controls.Add(labelEndpointHeartbeatDelayMs);
             tabPageEndpoints.Controls.Add(labelStaleEndpointExpirationMs);
             tabPageEndpoints.Controls.Add(textBoxStaleEndpointExpirationMs);
-            tabPageEndpoints.Controls.Add(textBoxTunnelAndEndpointHeartbeatDelayMs);
+            tabPageEndpoints.Controls.Add(textBoxEndpointHeartbeatDelayMs);
             tabPageEndpoints.Location = new Point(4, 24);
             tabPageEndpoints.Name = "tabPageEndpoints";
             tabPageEndpoints.Size = new Size(492, 382);
@@ -326,12 +326,12 @@
         private Button buttonSave;
         private Label labelManagementPort;
         private Label labelMessageQueryTimeoutMs;
-        private Label labelTunnelAndEndpointHeartbeatDelayMs;
+        private Label labelEndpointHeartbeatDelayMs;
         private Label labelTunnelCryptographyKeySize;
         private Label labelStaleEndpointExpirationMs;
         private TextBox textBoxManagementPort;
         private TextBox textBoxMessageQueryTimeoutMs;
-        private TextBox textBoxTunnelAndEndpointHeartbeatDelayMs;
+        private TextBox textBoxEndpointHeartbeatDelayMs;
         private TextBox textBoxTunnelCryptographyKeySize;
         private TextBox textBoxStaleEndpointExpirationMs;
         private Label labelInitialReceiveBufferSize;

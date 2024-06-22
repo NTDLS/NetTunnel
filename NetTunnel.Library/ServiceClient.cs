@@ -99,7 +99,7 @@ namespace NetTunnel.Library
             Client.Connect(_address, _port);
 
             var compoundNegotiator = new CompoundNegotiator();
-            var negotiationToken = compoundNegotiator.GenerateNegotiationToken(_configuration.TunnelCryptographyKeySize);
+            var negotiationToken = compoundNegotiator.GenerateNegotiationToken((int)(Math.Ceiling(_configuration.TunnelCryptographyKeySize / 128.0)));
 
             //The first thing we do when we get a connection is start a new key exchange process.
             var queryRequestKeyExchangeReply = Client.Query(

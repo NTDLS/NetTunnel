@@ -45,11 +45,11 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
             Thread.CurrentThread.Name = $"HeartbeatThreadProc:{Environment.CurrentManagedThreadId}";
 
-            DateTime lastHeartBeat = DateTime.UtcNow;
+            var lastHeartBeat = DateTime.UtcNow;
 
             while (KeepRunning)
             {
-                if ((DateTime.UtcNow - lastHeartBeat).TotalMilliseconds > Singletons.Configuration.TunnelAndEndpointHeartbeatDelayMs)
+                if ((DateTime.UtcNow - lastHeartBeat).TotalMilliseconds > Singletons.Configuration.EndpointHeartbeatDelayMs)
                 {
                     _edgeConnections.Use((o) =>
                     {

@@ -9,7 +9,7 @@
     <Company>NetworkDLS</Company>
     <Authors>NetworkDLS</Authors>
     <Copyright>Copyright © 2024 NetworkDLS</Copyright>
-    <Version>3.0.0</Version>
+    <Version>3.1.0</Version>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
@@ -30,7 +30,7 @@
     <PackageReference Include="NTDLS.NASCCL" Version="1.1.2" />
     <PackageReference Include="NTDLS.Persistence" Version="1.2.1" />
     <PackageReference Include="NTDLS.ReliableMessaging" Version="1.8.5" />
-    <PackageReference Include="NTDLS.SecureKeyExchange" Version="2.2.2" />
+    <PackageReference Include="NTDLS.SecureKeyExchange" Version="3.0.1" />
     <PackageReference Include="Topshelf" Version="4.3.0" />
   </ItemGroup>
 

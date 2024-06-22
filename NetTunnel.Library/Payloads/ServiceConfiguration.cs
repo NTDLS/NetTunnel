@@ -36,12 +36,12 @@ namespace NetTunnel.Library.Payloads
         /// <summary>
         /// The delay in milliseconds between tunnel heartbeats.
         /// </summary>
-        public int TunnelAndEndpointHeartbeatDelayMs { get; set; } = 5000;
+        public int EndpointHeartbeatDelayMs { get; set; } = 5000;
 
         /// <summary>
-        /// The number of 12-byte segments to generate for tunnel cryptography.
+        /// The number bits to generate for tunnel cryptography.
         /// </summary>
-        public int TunnelCryptographyKeySize { get; set; } = 16;
+        public int TunnelCryptographyKeySize { get; set; } = 4096;
 
         /// <summary>
         /// The maximum number of milliseconds to allow an endpoint to remain connected without read/write activity.

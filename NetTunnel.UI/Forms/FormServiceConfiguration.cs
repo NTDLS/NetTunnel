@@ -23,34 +23,36 @@ namespace NetTunnel.UI.Forms
 
             #region Set Tool-tips.
 
+            var defaults = new ServiceConfiguration();
+
             var toolTips = ToolTipHelpers.CreateToolTipControl(this);
 
             toolTips.AddControls([labelManagementPort, textBoxManagementPort],
-                "The management port is used by both the user-interface and a remote NetTunnel service to communicate configuration changes to this NetTunnel service.");
+                $"The port is used by both the user-interface and a remote NetTunnel service to communicate configuration changes to this NetTunnel service. Default: {defaults.ServicePort:n0}");
 
             toolTips.AddControls([labelMessageQueryTimeoutMs, textBoxMessageQueryTimeoutMs],
-                "The duration in milliseconds to wait on message query operations.");
+                $"The duration in milliseconds to wait on message query operations. Default: {defaults.MessageQueryTimeoutMs:n0}");
 
-            toolTips.AddControls([labelTunnelAndEndpointHeartbeatDelayMs, textBoxTunnelAndEndpointHeartbeatDelayMs],
-                "The delay in milliseconds between tunnel heartbeats.");
+            toolTips.AddControls([labelEndpointHeartbeatDelayMs, textBoxEndpointHeartbeatDelayMs],
+                $"The delay in milliseconds between tunnel heartbeats. Default: {defaults.EndpointHeartbeatDelayMs:n0}");
 
             toolTips.AddControls([labelTunnelCryptographyKeySize, textBoxTunnelCryptographyKeySize],
-                "The number of 12-byte segments to generate for tunnel cryptography.");
+                $"The number of encryption key bits to generate for tunnel cryptography. Default: {defaults.TunnelCryptographyKeySize:n0}.");
 
             toolTips.AddControls([labelStaleEndpointExpirationMs, textBoxStaleEndpointExpirationMs],
-                "The maximum number of milliseconds to allow an endpoint to remain connected without read/write activity.");
+                $"The maximum number of milliseconds to allow an endpoint to remain connected without read/write activity. (0 = disabled). Default: {defaults.StaleEndpointExpirationMs:n0}");
 
             toolTips.AddControls([labelInitialReceiveBufferSize, textBoxInitialReceiveBufferSize],
-                "The initial size of the receive buffer. If the buffer ever gets full while receiving data it will be automatically resized up to MaxReceiveBufferSize.");
+                $"The initial size of the receive buffer. If the buffer ever gets full while receiving data it will be automatically resized up to MaxReceiveBufferSize. Default: {defaults.InitialReceiveBufferSize:n0}");
 
             toolTips.AddControls([labelMaxReceiveBufferSize, textBoxMaxReceiveBufferSize],
-                "The maximum size of the receive buffer. If the buffer ever gets full while receiving data it will be automatically resized up to MaxReceiveBufferSize.");
+                $"The maximum size of the receive buffer. If the buffer ever gets full while receiving data it will be automatically resized up to MaxReceiveBufferSize. Default: {defaults.MaxReceiveBufferSize:n0}");
 
             toolTips.AddControls([labelReceiveBufferGrowthRate, textBoxReceiveBufferGrowthRate],
-                "The growth rate for auto-resizing the receive buffer from its initial size to its maximum size.");
+                $"The growth rate for auto-resizing the receive buffer from its initial size to its maximum size. Default: {defaults.ReceiveBufferGrowthRate:n2}");
 
             toolTips.AddControls([labelPingCadence, textBoxPingCadence],
-                "The number of milliseconds to wait between pings to the remote service. (0 = disabled);");
+                $"The number of milliseconds to wait between pings to the remote service. (0 = disabled). Default: {defaults.PingCadence:n0}");
 
             #endregion
 
@@ -95,7 +97,7 @@ namespace NetTunnel.UI.Forms
             {
                 textBoxManagementPort.Text = $"{configuration.ServicePort:n0}";
                 textBoxMessageQueryTimeoutMs.Text = $"{configuration.MessageQueryTimeoutMs:n0}";
-                textBoxTunnelAndEndpointHeartbeatDelayMs.Text = $"{configuration.TunnelAndEndpointHeartbeatDelayMs:n0}";
+                textBoxEndpointHeartbeatDelayMs.Text = $"{configuration.EndpointHeartbeatDelayMs:n0}";
                 textBoxTunnelCryptographyKeySize.Text = $"{configuration.TunnelCryptographyKeySize:n0}";
                 textBoxStaleEndpointExpirationMs.Text = $"{configuration.StaleEndpointExpirationMs:n0}";
                 textBoxInitialReceiveBufferSize.Text = $"{configuration.InitialReceiveBufferSize:n0}";
@@ -105,7 +107,7 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-        private void buttonSave_Click(object sender, EventArgs e)
+        private void ButtonSave_Click(object sender, EventArgs e)
         {
             try
             {
@@ -119,7 +121,7 @@ namespace NetTunnel.UI.Forms
                 configuration.MessageQueryTimeoutMs = textBoxMessageQueryTimeoutMs.GetAndValidateNumeric(1000, 3600000,
                     "The message query timeout (ms) must be an integer value between [min] and [max].");
 
-                configuration.TunnelAndEndpointHeartbeatDelayMs = textBoxTunnelAndEndpointHeartbeatDelayMs.GetAndValidateNumeric(1000, 216000000,
+                configuration.EndpointHeartbeatDelayMs = textBoxEndpointHeartbeatDelayMs.GetAndValidateNumeric(1000, 216000000,
                     "The tunnel and endpoint heartbeat (ms) must be an integer value between [min] and [max].");
 
                 configuration.TunnelCryptographyKeySize = textBoxTunnelCryptographyKeySize.GetAndValidateNumeric(1, 128,
@@ -163,7 +165,7 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-        private void buttonCancel_Click(object sender, EventArgs e)
+        private void ButtonCancel_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
             Close();
