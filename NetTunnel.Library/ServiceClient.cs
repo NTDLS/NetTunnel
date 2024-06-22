@@ -20,8 +20,8 @@ namespace NetTunnel.Library
         private readonly int _port;
         private readonly string _userName;
         private readonly string _passwordHash;
-        public string Address { get { return _address; } }
 
+        public string Address { get { return _address; } }
         /// <summary>
         /// The id of the service that we are logged into.
         /// </summary>
@@ -165,6 +165,9 @@ namespace NetTunnel.Library
 
         public QueryCreateTunnelReply QueryCreateTunnel(TunnelConfiguration configuration)
             => Client.Query(new QueryCreateTunnel(configuration)).Result;
+
+        public QueryGetTunnelPropertiesReply QueryGetTunnelProperties(DirectionalKey tunnelKey)
+            => Client.Query(new QueryGetTunnelProperties(tunnelKey)).Result;
 
         public QueryDeleteTunnelReply QueryDeleteTunnel(DirectionalKey tunnelKey)
             => Client.Query(new QueryDeleteTunnel(tunnelKey)).Result;

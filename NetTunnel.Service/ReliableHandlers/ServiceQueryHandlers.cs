@@ -364,5 +364,22 @@ namespace NetTunnel.Service.ReliableHandlers
                 throw;
             }
         }
+
+        public QueryGetTunnelPropertiesReply OnQueryGetTunnelProperties(RmContext context, QueryGetTunnelProperties query)
+        {
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+                Singletons.ServiceEngine.Tunnels.GetProperties(query.TunnelKey);
+
+                return new QueryGetTunnelPropertiesReply();
+            }
+            catch (Exception ex)
+            {
+                Singletons.Logger.Exception(ex);
+                throw;
+            }
+        }
     }
 }

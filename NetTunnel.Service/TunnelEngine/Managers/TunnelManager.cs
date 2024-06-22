@@ -23,19 +23,21 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         #region Start / Stop.
 
-        public void Start(DirectionalKey tunnelKey) => Collection.Use((o)
-            => o.Single(o => o.TunnelKey == tunnelKey).Start());
+        public void Start(DirectionalKey tunnelKey)
+            => Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey).Start());
 
-        public void Stop(DirectionalKey tunnelKey) => Collection.Use((o)
-            => o.Single(o => o.TunnelKey == tunnelKey).Stop());
+        public void Stop(DirectionalKey tunnelKey)
+            => Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey).Stop());
 
         public void StartAll()
-            => Collection.Use((o)
-                => o.ForEach((o) => o.Start()));
+            => Collection.Use((o) => o.ForEach((o) => o.Start()));
 
         public void StopAll()
-            => Collection.Use((o)
-                => o.ForEach((o) => o.Stop()));
+            => Collection.Use((o) => o.ForEach((o) => o.Stop()));
+
+
+        public void GetProperties(DirectionalKey tunnelKey)
+            => Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey).GetProperties());
 
         #endregion
 

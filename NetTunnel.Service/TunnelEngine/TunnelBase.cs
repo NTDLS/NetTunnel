@@ -77,6 +77,44 @@ namespace NetTunnel.Service.TunnelEngine
         void ITunnel.PeerNotifyOfEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
            => throw new NotImplementedException("This function should be overridden.");
 
+        public void GetProperties()
+        {
+            var serviceConnectionState = Singletons.ServiceEngine
+                .ServiceConnectionStates.SingleOrDefault(o => o.Value.TunnelKey?.Id == TunnelKey.Id).Value;
+
+            var prop = new TunnelStatisticsProperties()
+            {
+                KeyHash = serviceConnectionState.KeyHash,
+                KeyLength = serviceConnectionState.KeyLength,
+                BytesReceived = BytesReceived,
+                BytesSent = BytesSent,
+                CurrentConnections = CurrentConnections,
+                Direction = Direction,
+                PingMs = PingMs,
+                Status = Status,
+                TotalConnections = TotalConnections,
+                TunnelKey = TunnelKey,
+                PeerIpAddress = serviceConnectionState.ClientIpAddress,
+                ClientIpAddress = serviceConnectionState.ClientIpAddress,
+                IsAuthenticated = serviceConnectionState.IsAuthenticated,
+                KeepRunning = KeepRunning,
+                LoginTime = serviceConnectionState.LoginTime,
+                SecureKeyExchangeIsComplete = serviceConnectionState.SecureKeyExchangeIsComplete,
+                UserName = serviceConnectionState.UserName,
+            };
+
+            if (this is TunnelOutbound outboundTunnel)
+            {
+                prop.IsLoggedIn = outboundTunnel.IsLoggedIn;
+                prop.ConnectionId = Guid.Empty; //Outbound tunnels use a dedicated connection and do not have connectionIds.
+            }
+            else if (this is TunnelInbound inboundTunnel)
+            {
+                prop.IsLoggedIn = inboundTunnel.IsLoggedIn;
+                prop.ConnectionId = inboundTunnel.ConnectionId;
+            }
+        }
+
         #endregion
 
         public IEndpoint? GetEndpointById(Guid pairId)

@@ -13,6 +13,9 @@ namespace NetTunnel.Service.TunnelEngine
         public string UserName { get; private set; } = string.Empty;
         public string ClientIpAddress { get; private set; }
         public DateTime LoginTime { get; private set; } = DateTime.UtcNow;
+        public string KeyHash { get; private set; } = string.Empty;
+        public int KeyLength { get; private set; }
+
 
         /// <summary>
         /// If the Service Connection is associated with a tunnel connection, this will be set at tunnel registration.
@@ -35,8 +38,11 @@ namespace NetTunnel.Service.TunnelEngine
         {
             StreamCryptography = new NASCCLStream(sharedSecret);
 
+            KeyHash = Utility.ComputeSha256Hash(sharedSecret);
+            KeyLength = sharedSecret.Length;
+
             Singletons.Logger.Verbose(
-                $"Tunnel cryptography initialized to {sharedSecret.Length * 8}bits. Hash {Utility.ComputeSha256Hash(sharedSecret)}.");
+                    $"Tunnel cryptography initialized to {sharedSecret.Length * 8}bits. Hash {Utility.ComputeSha256Hash(sharedSecret)}.");
         }
 
         public void ApplyCryptographyProvider()

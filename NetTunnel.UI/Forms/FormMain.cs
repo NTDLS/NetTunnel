@@ -494,6 +494,8 @@ namespace NetTunnel.UI.Forms
 
                     menu.Items.Add(new ToolStripSeparator());
                     menu.Items.Add("Delete Tunnel");
+                    menu.Items.Add(new ToolStripSeparator());
+                    menu.Items.Add("Properties");
                 }
 
                 menu.Show(listViewTunnels, new Point(e.X, e.Y));
@@ -570,7 +572,24 @@ namespace NetTunnel.UI.Forms
                             }
                         });
                     }
-                    //Start ↑
+                    else if (tTag != null && e.ClickedItem?.Text == "Properties")
+                    {
+                        try
+                        {
+                            _client.EnsureNotNull().QueryGetTunnelProperties(tTag.Tunnel.TunnelKey);
+
+                            Invoke(new Action(() =>
+                            {
+                                _needToRepopulateTunnels = true;
+                            }));
+                        }
+                        catch (Exception ex)
+                        {
+                            this.InvokeMessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        }
+
+                        listViewEndpoints.InvokeClearRows();
+                    }
                     else if (tTag != null && e.ClickedItem?.Text == "Delete Tunnel")
                     {
                         if (MessageBox.Show($"Delete the tunnel '{tTag.Tunnel.Name}'?",
