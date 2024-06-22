@@ -10,6 +10,7 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormMain : Form
     {
+        private bool _formClosing = false;
         private int _changeDetectionHash = -1;
         private bool _needToRepopulateTunnels = false;
         private ListViewColumnMap? _tunnelsGridColumnMap;
@@ -37,6 +38,20 @@ namespace NetTunnel.UI.Forms
             Shown += (object? sender, EventArgs e) =>
             {
                 ChangeConnection();
+            };
+
+            FormClosed += (object? sender, FormClosedEventArgs e) =>
+            {
+                _formClosing = true;
+
+                _timer?.Stop();
+
+                var client = _client;
+                _client = null;
+
+                Exceptions.Ignore(() =>
+                    new Thread(() => client?.Disconnect()
+                    ).Start());
             };
 
             _timer = new System.Windows.Forms.Timer()
@@ -126,6 +141,11 @@ namespace NetTunnel.UI.Forms
 
         private void ChangeConnection()
         {
+            if (_formClosing)
+            {
+                return;
+            }
+
             try
             {
                 using var form = new FormLogin();
@@ -136,6 +156,10 @@ namespace NetTunnel.UI.Forms
 
                     _client.OnDisconnected += (RmContext context) =>
                     {
+                        if (_formClosing)
+                        {
+                            return;
+                        }
                         _client = null;
                         Invoke(new Action(ChangeConnection));
                     };

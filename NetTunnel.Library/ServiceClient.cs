@@ -144,6 +144,7 @@ namespace NetTunnel.Library
             var login = Client.Query(new QueryLogin(_userName, _passwordHash)).Result;
             if (login.Successful == false)
             {
+                Exceptions.Ignore(() => Client.Disconnect());
                 throw new Exception("Login failed.");
             }
             else
