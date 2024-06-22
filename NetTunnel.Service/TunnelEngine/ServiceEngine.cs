@@ -12,7 +12,7 @@ namespace NetTunnel.Service.TunnelEngine
     internal class ServiceEngine : IServiceEngine
     {
         /// <summary>
-        /// Contains a list of the connections that have been made TO the local service and the connection state info.
+        /// Contains a list of the connections that have been made TO the local service and their connection state info.
         /// </summary>
         public Dictionary<Guid, ServiceConnectionState> ServiceConnectionStates { get; private set; } = new();
 

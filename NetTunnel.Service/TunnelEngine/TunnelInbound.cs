@@ -11,6 +11,9 @@ namespace NetTunnel.Service.TunnelEngine
     /// </summary>
     internal class TunnelInbound : TunnelBase, ITunnel
     {
+        /// <summary>
+        /// The ID of the RmServer connection.This is also stored in the ServiceEngine.ServiceConnectionState.
+        /// </summary>
         public Guid ConnectionId { get; private set; }
 
         public override NtDirection Direction { get => NtDirection.Inbound; }
