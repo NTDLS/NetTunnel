@@ -20,7 +20,6 @@ namespace NetTunnel.Library
         private readonly int _port;
         private readonly string _userName;
         private readonly string _passwordHash;
-
         public string Address { get { return _address; } }
 
         /// <summary>
@@ -30,6 +29,7 @@ namespace NetTunnel.Library
         public RmClient Client { get; private set; }
         public bool IsLoggedIn { get; private set; } = false;
         public ILogger _logger;
+
 
         public ServiceClient(ILogger logger, ServiceConfiguration configuration, RmClient client, string address, int port, string userName, string passwordHash)
         {

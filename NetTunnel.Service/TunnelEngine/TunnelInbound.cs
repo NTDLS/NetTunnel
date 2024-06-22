@@ -35,6 +35,16 @@ namespace NetTunnel.Service.TunnelEngine
 
         #region Interface: ITunnel.
 
+        public void IncrementBytesSent(int bytes)
+        {
+            BytesSent += (ulong)bytes;
+        }
+
+        public void IncrementBytesReceived(int bytes)
+        {
+            BytesReceived += (ulong)bytes;
+        }
+
         public QueryUpsertEndpointReply PeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpoint)
             => ServiceEngine.PeerQueryUpsertEndpoint(ConnectionId, tunnelKey, endpoint);
 

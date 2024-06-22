@@ -1,4 +1,5 @@
-﻿using NTDLS.NASCCL;
+﻿using NetTunnel.Library.Interfaces;
+using NTDLS.NASCCL;
 using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Service.ReliableMessages
@@ -16,6 +17,11 @@ namespace NetTunnel.Service.ReliableMessages
         {
             lock (_streamCryptography)
             {
+                if (context.Endpoint.Parameter is ITunnel tunnel)
+                {
+                    tunnel.IncrementBytesReceived(encryptedPayload.Length);
+                }
+
                 _streamCryptography.Cipher(ref encryptedPayload);
                 _streamCryptography.ResetStream();
             }
@@ -26,6 +32,11 @@ namespace NetTunnel.Service.ReliableMessages
         {
             lock (_streamCryptography)
             {
+                if (context.Endpoint.Parameter is ITunnel tunnel)
+                {
+                    tunnel.IncrementBytesSent(payload.Length);
+                }
+
                 _streamCryptography.Cipher(ref payload);
                 _streamCryptography.ResetStream();
             }

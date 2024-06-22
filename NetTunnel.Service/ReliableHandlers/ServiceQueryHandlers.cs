@@ -1,4 +1,5 @@
-﻿using NetTunnel.Library.ReliablePayloads.Query;
+﻿using NetTunnel.Library.ReliablePayloads.Notification;
+using NetTunnel.Library.ReliablePayloads.Query;
 using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
@@ -162,7 +163,9 @@ namespace NetTunnel.Service.ReliableHandlers
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
-                Singletons.ServiceEngine.Tunnels.RegisterTunnel(context.ConnectionId, query.Configuration);
+                var tunnelKey = Singletons.ServiceEngine.Tunnels.RegisterTunnel(context.ConnectionId, query.Configuration);
+                connectionContext.AssociateTunnel(tunnelKey);
+
                 return new QueryRegisterTunnelReply();
             }
             catch (Exception ex)

@@ -39,6 +39,22 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         #endregion
 
+        public void IncrementBytesSent(DirectionalKey tunnelKey, int bytes)
+        {
+            Collection.Use((o) =>
+            {
+                o.Where(o => o.TunnelKey == tunnelKey).SingleOrDefault()?.IncrementBytesSent(bytes);
+            });
+        }
+
+        public void IncrementBytesReceived(DirectionalKey tunnelKey, int bytes)
+        {
+            Collection.Use((o) =>
+            {
+                o.Where(o => o.TunnelKey == tunnelKey).SingleOrDefault()?.IncrementBytesReceived(bytes);
+            });
+        }
+
         #region Create / Delete.
 
         /// <summary>
@@ -89,9 +105,9 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// A remote service is registering its outbound tunnel configuration with the local service.
         /// </summary>
         /// <param name="config"></param>
-        public void RegisterTunnel(Guid connectionId, TunnelConfiguration config)
+        public DirectionalKey RegisterTunnel(Guid connectionId, TunnelConfiguration config)
         {
-            Collection.Use((o) =>
+            return Collection.Use((o) =>
             {
                 var existingTunnel = o.OfType<TunnelInbound>()
                     .Where(o => o.Configuration.TunnelId == config.TunnelId).SingleOrDefault();
@@ -116,6 +132,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 o.Add(newTunnel.EnsureNotNull());
 
                 newTunnel.Start();
+
+                return newTunnel.TunnelKey;
             });
         }
 

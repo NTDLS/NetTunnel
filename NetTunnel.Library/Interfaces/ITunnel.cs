@@ -63,5 +63,8 @@ namespace NetTunnel.Library.Interfaces
         public void PeerNotifyOfTunnelDeletion(DirectionalKey tunnelKey);
         public void PeerNotifyOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId);
         public QueryUpsertEndpointReply PeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointId);
+
+        public void IncrementBytesSent(int bytes);
+        public void IncrementBytesReceived(int bytes);
     }
 }

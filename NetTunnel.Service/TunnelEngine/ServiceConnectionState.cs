@@ -1,4 +1,5 @@
 ﻿using NetTunnel.Library;
+using NetTunnel.Library.Payloads;
 using NTDLS.NASCCL;
 
 namespace NetTunnel.Service.TunnelEngine
@@ -13,10 +14,20 @@ namespace NetTunnel.Service.TunnelEngine
         public string ClientIpAddress { get; private set; }
         public DateTime LoginTime { get; private set; } = DateTime.UtcNow;
 
+        /// <summary>
+        /// If the Service Connection is associated with a tunnel connection, this will be set at tunnel registration.
+        /// </summary>
+        public DirectionalKey? TunnelKey { get; set; }
+
         public ServiceConnectionState(Guid connectionId, string clientIpAddress)
         {
             ConnectionId = connectionId;
             ClientIpAddress = clientIpAddress;
+        }
+
+        public void AssociateTunnel(DirectionalKey tunnelKey)
+        {
+            TunnelKey = tunnelKey;
         }
 
         public void InitializeCryptographyProvider(byte[] sharedSecret)

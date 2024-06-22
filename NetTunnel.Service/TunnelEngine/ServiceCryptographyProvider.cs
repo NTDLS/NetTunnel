@@ -1,4 +1,5 @@
-﻿using NTDLS.ReliableMessaging;
+﻿using NetTunnel.Library.Interfaces;
+using NTDLS.ReliableMessaging;
 
 namespace NetTunnel.Service.TunnelEngine
 {
@@ -15,6 +16,11 @@ namespace NetTunnel.Service.TunnelEngine
         {
             if (_serviceEngine.ServiceConnectionStates.TryGetValue(context.ConnectionId, out var connection))
             {
+                if (connection.TunnelKey != null)
+                {
+                    _serviceEngine.Tunnels.IncrementBytesReceived(connection.TunnelKey, encryptedPayload.Length);
+                }
+
                 if (connection.StreamCryptography != null && connection.SecureKeyExchangeIsComplete)
                 {
                     lock (connection.StreamCryptography)
@@ -31,6 +37,11 @@ namespace NetTunnel.Service.TunnelEngine
         {
             if (_serviceEngine.ServiceConnectionStates.TryGetValue(context.ConnectionId, out var connection))
             {
+                if (connection.TunnelKey != null)
+                {
+                    _serviceEngine.Tunnels.IncrementBytesSent(connection.TunnelKey, payload.Length);
+                }
+
                 if (connection.StreamCryptography != null && connection.SecureKeyExchangeIsComplete)
                 {
                     lock (connection.StreamCryptography)

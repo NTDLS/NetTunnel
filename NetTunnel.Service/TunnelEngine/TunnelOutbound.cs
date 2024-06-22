@@ -4,7 +4,6 @@ using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Query;
 using NetTunnel.Service.ReliableHandlers;
 using NTDLS.ReliableMessaging;
-using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
 
@@ -39,6 +38,16 @@ namespace NetTunnel.Service.TunnelEngine
         }
 
         #region Interface: ITunnel.
+
+        public void IncrementBytesSent(int bytes)
+        {
+            BytesSent += (ulong)bytes;
+        }
+
+        public void IncrementBytesReceived(int bytes)
+        {
+            BytesReceived += (ulong)bytes;
+        }
 
         public QueryUpsertEndpointReply PeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointId)
             => _client.PeerQueryUpsertEndpoint(tunnelKey, endpointId);
