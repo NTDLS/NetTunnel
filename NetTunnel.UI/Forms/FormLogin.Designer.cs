@@ -77,7 +77,7 @@
             textBoxUsername.Location = new Point(90, 90);
             textBoxUsername.Name = "textBoxUsername";
             textBoxUsername.Size = new Size(275, 23);
-            textBoxUsername.TabIndex = 6;
+            textBoxUsername.TabIndex = 5;
             // 
             // textBoxPassword
             // 
@@ -145,6 +145,7 @@
             buttonAbout.Name = "buttonAbout";
             buttonAbout.Size = new Size(75, 23);
             buttonAbout.TabIndex = 10;
+            buttonAbout.TabStop = false;
             buttonAbout.Text = "About";
             buttonAbout.UseVisualStyleBackColor = true;
             buttonAbout.Click += ButtonAbout_Click;

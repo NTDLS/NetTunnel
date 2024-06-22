@@ -2,6 +2,7 @@
 using NetTunnel.UI.Helpers;
 using NetTunnel.UI.Types;
 using NTDLS.Helpers;
+using NTDLS.ReliableMessaging;
 using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
 
@@ -35,7 +36,7 @@ namespace NetTunnel.UI.Forms
         {
             Shown += (object? sender, EventArgs e) =>
             {
-                if (!ChangeConnection()) Close();
+                ChangeConnection();
             };
 
             _timer = new System.Windows.Forms.Timer()
@@ -123,24 +124,33 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-        private bool ChangeConnection()
+        private void ChangeConnection()
         {
             try
             {
                 using var form = new FormLogin();
+                form.Owner = this;
                 if (form.ShowDialog() == DialogResult.OK)
                 {
                     _client = form.ResultingClient.EnsureNotNull();
+
+                    _client.OnDisconnected += (RmContext context) =>
+                    {
+                        _client = null;
+                        Invoke(new Action(ChangeConnection));
+                    };
+
                     Text = $"{FriendlyName} : {_client.Address}";
                     RepopulateTunnelsGrid();
-                    return true;
+                    return;
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
             }
-            return false;
+
+            Close();
         }
 
         private void Timer_Tick(object? sender, EventArgs e)
@@ -163,11 +173,23 @@ namespace NetTunnel.UI.Forms
                 _inTimerTick = true;
             }
 
+            if (_client == null)
+            {
+                return;
+            }
+
             new Thread(() =>
             {
                 try
                 {
-                    if (_client != null && _client.IsConnected)
+                    Thread.Sleep(100); //Hack to prevent meaningless race-condition.
+
+                    if (_client == null)
+                    {
+                        return;
+                    }
+
+                    if (_client.IsConnected)
                     {
                         var result = _client.QueryGetTunnelStatistics();
 
@@ -746,7 +768,7 @@ namespace NetTunnel.UI.Forms
 
         private void ConnectToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!ChangeConnection()) Close();
+            ChangeConnection();
         }
 
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)

@@ -30,6 +30,14 @@ namespace NetTunnel.Library
         public bool IsLoggedIn { get; private set; } = false;
         public ILogger _logger;
 
+        public event ExceptionEvent? OnException;
+        public delegate void ExceptionEvent(RmContext? context, Exception ex, IRmPayload? payload);
+
+        public event ConnectedEvent? OnConnected;
+        public delegate void ConnectedEvent(RmContext context);
+
+        public event DisconnectedEvent? OnDisconnected;
+        public delegate void DisconnectedEvent(RmContext context);
 
         public ServiceClient(ILogger logger, ServiceConfiguration configuration, RmClient client, string address, int port, string userName, string passwordHash)
         {
@@ -41,7 +49,25 @@ namespace NetTunnel.Library
             _userName = userName;
             _passwordHash = passwordHash;
             IsLoggedIn = false;
+
+            client.OnException += Client_OnException;
+            client.OnConnected += Client_OnConnected;
+            client.OnDisconnected += Client_OnDisconnected;
         }
+
+        private void Client_OnDisconnected(RmContext context)
+            => OnDisconnected?.Invoke(context);
+
+        private void Client_OnException(RmContext? context, Exception ex, IRmPayload? payload)
+        {
+            _logger.Exception($"RPC client exception: '{ex.Message}'"
+                + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
+
+            OnException?.Invoke(context, ex, payload);
+        }
+
+        private void Client_OnConnected(RmContext context)
+            => OnConnected?.Invoke(context);
 
         #region Factory.
 
@@ -71,12 +97,6 @@ namespace NetTunnel.Library
                 MaxReceiveBufferSize = configuration.MaxReceiveBufferSize,
                 ReceiveBufferGrowthRate = configuration.ReceiveBufferGrowthRate,
             });
-
-            client.OnException += (RmContext? context, Exception ex, IRmPayload? payload) =>
-            {
-                logger.Exception($"RPC client exception: '{ex.Message}'"
-                    + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
-            };
 
             return new ServiceClient(logger, configuration, client, address, port, userName, passwordHash);
         }
