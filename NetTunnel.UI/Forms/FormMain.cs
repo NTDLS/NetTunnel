@@ -190,16 +190,11 @@ namespace NetTunnel.UI.Forms
 
             lock (_timer)
             {
-                if (_gridPopulationScope != 0 || _inTimerTick)
+                if (_gridPopulationScope != 0 || _inTimerTick || _client == null)
                 {
                     return;
                 }
                 _inTimerTick = true;
-            }
-
-            if (_client == null)
-            {
-                return;
             }
 
             new Thread(() =>
