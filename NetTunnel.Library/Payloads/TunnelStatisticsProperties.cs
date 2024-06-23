@@ -10,9 +10,17 @@ namespace NetTunnel.Library.Payloads
         public string ClientIpAddress { get; set; } = string.Empty;
         public bool IsAuthenticated { get; set; }
         public DateTime LoginTime { get; set; }
-        public bool SecureKeyExchangeIsComplete { get; set; } 
+        public bool SecureKeyExchangeIsComplete { get; set; }
         public string UserName { get; set; } = string.Empty;
-
+        public string LoggedInUserName { get; set; } = string.Empty;
+        public Guid ServiceId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string OutboundAddress { get; set; } = string.Empty;
+        public int OutboundPort { get; set; }
+        public string OutboundUsername { get; set; } = string.Empty;
+        public string InboundAddress { get; set; } = string.Empty;
+        public int InboundPort { get; set; }
+        public string InboundUsername { get; set; } = string.Empty;
         public Guid ConnectionId { get; set; }
         public int KeyLength { get; set; }
         public string KeyHash { get; set; } = string.Empty;

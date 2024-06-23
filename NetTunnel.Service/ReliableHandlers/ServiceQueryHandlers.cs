@@ -371,9 +371,10 @@ namespace NetTunnel.Service.ReliableHandlers
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
-                Singletons.ServiceEngine.Tunnels.GetProperties(query.TunnelKey);
-
-                return new QueryGetTunnelPropertiesReply();
+                return new QueryGetTunnelPropertiesReply()
+                {
+                    Properties = Singletons.ServiceEngine.Tunnels.GetProperties(query.TunnelKey)
+                };
             }
             catch (Exception ex)
             {

@@ -29,6 +29,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Forms\FormTunnelProperties.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Forms\FormServiceConfiguration.cs" />
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>

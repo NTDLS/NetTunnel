@@ -36,7 +36,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             => Collection.Use((o) => o.ForEach((o) => o.Stop()));
 
 
-        public void GetProperties(DirectionalKey tunnelKey)
+        public TunnelStatisticsProperties GetProperties(DirectionalKey tunnelKey)
             => Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey).GetProperties());
 
         #endregion

@@ -576,12 +576,8 @@ namespace NetTunnel.UI.Forms
                     {
                         try
                         {
-                            _client.EnsureNotNull().QueryGetTunnelProperties(tTag.Tunnel.TunnelKey);
-
-                            Invoke(new Action(() =>
-                            {
-                                _needToRepopulateTunnels = true;
-                            }));
+                            using var form = new FormTunnelProperties(_client.EnsureNotNull(), tTag.Tunnel.TunnelKey);
+                            form.ShowDialog();
                         }
                         catch (Exception ex)
                         {

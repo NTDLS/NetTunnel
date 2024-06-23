@@ -77,7 +77,7 @@ namespace NetTunnel.Service.TunnelEngine
         void ITunnel.PeerNotifyOfEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
            => throw new NotImplementedException("This function should be overridden.");
 
-        public void GetProperties()
+        public TunnelStatisticsProperties GetProperties()
         {
             var serviceConnectionState = Singletons.ServiceEngine
                 .ServiceConnectionStates.SingleOrDefault(o => o.Value.TunnelKey?.Id == TunnelKey.Id).Value;
@@ -100,19 +100,31 @@ namespace NetTunnel.Service.TunnelEngine
                 KeepRunning = KeepRunning,
                 LoginTime = serviceConnectionState.LoginTime,
                 SecureKeyExchangeIsComplete = serviceConnectionState.SecureKeyExchangeIsComplete,
-                UserName = serviceConnectionState.UserName,
+                LoggedInUserName = serviceConnectionState.UserName,
+                ServiceId = Configuration.ServiceId,
+                Name = Configuration.Name
             };
 
             if (this is TunnelOutbound outboundTunnel)
             {
                 prop.IsLoggedIn = outboundTunnel.IsLoggedIn;
                 prop.ConnectionId = Guid.Empty; //Outbound tunnels use a dedicated connection and do not have connectionIds.
+
+                prop.OutboundAddress = Configuration.Address;
+                prop.OutboundPort = Configuration.ServicePort;
+                prop.OutboundUsername = Configuration.Username;
             }
             else if (this is TunnelInbound inboundTunnel)
             {
                 prop.IsLoggedIn = inboundTunnel.IsLoggedIn;
                 prop.ConnectionId = inboundTunnel.ConnectionId;
+
+                prop.InboundAddress = Configuration.Address;
+                prop.InboundPort = Configuration.ServicePort;
+                prop.InboundUsername = Configuration.Username;
             }
+
+            return prop;
         }
 
         #endregion
