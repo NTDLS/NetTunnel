@@ -35,7 +35,6 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         public void StopAll()
             => Collection.Use((o) => o.ForEach((o) => o.Stop()));
 
-
         public TunnelStatisticsProperties GetProperties(DirectionalKey tunnelKey)
             => Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey).GetProperties());
 
@@ -45,7 +44,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             Collection.Use((o) =>
             {
-                o.Where(o => o.TunnelKey == tunnelKey).SingleOrDefault()?.IncrementBytesSent(bytes);
+                o.SingleOrDefault(o => o.TunnelKey == tunnelKey)?.IncrementBytesSent(bytes);
             });
         }
 
@@ -53,7 +52,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             Collection.Use((o) =>
             {
-                o.Where(o => o.TunnelKey == tunnelKey).SingleOrDefault()?.IncrementBytesReceived(bytes);
+                o.SingleOrDefault(o => o.TunnelKey == tunnelKey)?.IncrementBytesReceived(bytes);
             });
         }
 
@@ -67,7 +66,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             Collection.Use((o) =>
             {
-                var existingTunnel = o.Where(o => o.Configuration.TunnelId == config.TunnelId).SingleOrDefault();
+                var existingTunnel = o.SingleOrDefault(o => o.Configuration.TunnelId == config.TunnelId);
                 if (existingTunnel != null)
                 {
                     existingTunnel.Stop();
@@ -87,7 +86,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             Collection.Use((o) =>
             {
-                var existingTunnel = o.Where(o => o.TunnelKey == tunnelKey).SingleOrDefault();
+                var existingTunnel = o.SingleOrDefault(o => o.TunnelKey == tunnelKey);
                 if (existingTunnel != null)
                 {
                     if (existingTunnel.IsLoggedIn)
@@ -112,7 +111,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             return Collection.Use((o) =>
             {
                 var existingTunnel = o.OfType<TunnelInbound>()
-                    .Where(o => o.Configuration.TunnelId == config.TunnelId).SingleOrDefault();
+                    .SingleOrDefault(o => o.Configuration.TunnelId == config.TunnelId);
                 if (existingTunnel != null)
                 {
                     if (config.ServiceId == Singletons.Configuration.ServiceId)
@@ -148,7 +147,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             Collection.Use((o) =>
             {
-                var existingTunnel = o.OfType<TunnelInbound>().Where(o => o.ConnectionId == connectionId).SingleOrDefault();
+                var existingTunnel = o.OfType<TunnelInbound>().SingleOrDefault(o => o.ConnectionId == connectionId);
                 if (existingTunnel != null)
                 {
                     existingTunnel.Stop();

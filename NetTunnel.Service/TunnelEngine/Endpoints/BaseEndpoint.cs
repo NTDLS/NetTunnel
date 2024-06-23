@@ -168,13 +168,13 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                             // and the direction is inbound/any and we have request rules.
                             (
                              this is EndpointInbound && Configuration.HttpHeaderRules
-                                .Where(o => o.Enabled && (new[] { NtHttpHeaderType.Request, NtHttpHeaderType.Any }).Contains(o.HeaderType)).Any()
+                                .Any(o => o.Enabled && (new[] { NtHttpHeaderType.Request, NtHttpHeaderType.Any }).Contains(o.HeaderType))
                             )
                             ||
                             (
                                 // or the direction is outbound/any and we have response rules.
                                 this is EndpointOutbound && Configuration.HttpHeaderRules
-                                    .Where(o => o.Enabled && (new[] { NtHttpHeaderType.Request, NtHttpHeaderType.Any }).Contains(o.HeaderType)).Any()
+                                    .Any(o => o.Enabled && (new[] { NtHttpHeaderType.Request, NtHttpHeaderType.Any }).Contains(o.HeaderType))
                             )
                          )
                      )

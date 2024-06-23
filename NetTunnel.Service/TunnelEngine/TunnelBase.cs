@@ -102,7 +102,8 @@ namespace NetTunnel.Service.TunnelEngine
                 SecureKeyExchangeIsComplete = serviceConnectionState.SecureKeyExchangeIsComplete,
                 LoggedInUserName = serviceConnectionState.UserName,
                 ServiceId = Configuration.ServiceId,
-                Name = Configuration.Name
+                Name = Configuration.Name,
+                Endpoints = Configuration.Endpoints.Count
             };
 
             if (this is TunnelOutbound outboundTunnel)
@@ -130,7 +131,7 @@ namespace NetTunnel.Service.TunnelEngine
         #endregion
 
         public IEndpoint? GetEndpointById(Guid pairId)
-            => Endpoints.Where(o => o.EndpointId == pairId).SingleOrDefault();
+            => Endpoints.SingleOrDefault(o => o.EndpointId == pairId);
 
         public TunnelConfiguration CloneConfiguration()
         {

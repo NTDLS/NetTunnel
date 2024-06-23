@@ -15,6 +15,7 @@ namespace NetTunnel.Library.Payloads
         public string LoggedInUserName { get; set; } = string.Empty;
         public Guid ServiceId { get; set; }
         public string Name { get; set; } = string.Empty;
+        public int Endpoints { get; set; }
         public string OutboundAddress { get; set; } = string.Empty;
         public int OutboundPort { get; set; }
         public string OutboundUsername { get; set; } = string.Empty;

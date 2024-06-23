@@ -38,9 +38,9 @@
             // 
             listViewProperties.Columns.AddRange(new ColumnHeader[] { columnHeaderProperty, columnHeaderValue });
             listViewProperties.FullRowSelect = true;
-            listViewProperties.Location = new Point(12, 12);
+            listViewProperties.Location = new Point(6, 6);
             listViewProperties.Name = "listViewProperties";
-            listViewProperties.Size = new Size(552, 442);
+            listViewProperties.Size = new Size(652, 454);
             listViewProperties.TabIndex = 0;
             listViewProperties.UseCompatibleStateImageBehavior = false;
             listViewProperties.View = View.Details;
@@ -48,18 +48,18 @@
             // columnHeaderProperty
             // 
             columnHeaderProperty.Text = "Property";
-            columnHeaderProperty.Width = 120;
+            columnHeaderProperty.Width = 150;
             // 
             // columnHeaderValue
             // 
             columnHeaderValue.Text = "Value";
-            columnHeaderValue.Width = 400;
+            columnHeaderValue.Width = 475;
             // 
             // FormTunnelProperties
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(579, 466);
+            ClientSize = new Size(664, 466);
             Controls.Add(listViewProperties);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");

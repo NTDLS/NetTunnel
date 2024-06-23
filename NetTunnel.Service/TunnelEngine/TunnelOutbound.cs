@@ -25,7 +25,7 @@ namespace NetTunnel.Service.TunnelEngine
                 Configuration.Address, Configuration.ServicePort, Configuration.Username, Configuration.PasswordHash, this);
 
             _client.Client.AddHandler(new TunnelOutboundNotificationHandlers());
-            //_client.AddHandler(new oldTunnelOutboundQueryHandlers());
+            //_client.AddHandler(new TunnelOutboundQueryHandlers());
 
             _client.Client.OnConnected += Client_OnConnected;
             _client.Client.OnDisconnected += Client_OnDisconnected;
