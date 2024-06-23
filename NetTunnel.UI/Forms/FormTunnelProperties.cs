@@ -36,7 +36,7 @@ namespace NetTunnel.UI.Forms
         {
             var menu = new ContextMenuStrip();
 
-            var selectedItem = listViewProperties.SelectedItems.Count == 0 ? listViewProperties.SelectedItems[0] : null;
+            var selectedItem = listViewProperties.SelectedItems.Count == 1 ? listViewProperties.SelectedItems[0] : null;
 
             if (selectedItem != null)
             {
@@ -51,8 +51,7 @@ namespace NetTunnel.UI.Forms
 
                 if (selectedItem != null && e.ClickedItem?.Text == "Copy to clipboard")
                 {
-                    Clipboard.SetText(selectedItem.SubItems[0].Text);
-
+                    Clipboard.SetText(selectedItem.SubItems[1].Text);
                 }
             };
         }
