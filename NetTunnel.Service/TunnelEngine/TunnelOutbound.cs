@@ -151,7 +151,7 @@ namespace NetTunnel.Service.TunnelEngine
                 {
                     if (_client.IsConnected == false)
                     {
-                        PingMs = null;
+                        PingTime = null;
                         previousPing = null;
                         Status = NtTunnelStatus.Connecting;
 
@@ -174,7 +174,7 @@ namespace NetTunnel.Service.TunnelEngine
                             previousPing = _client.Ping(TunnelKey, previousPing);
                             if (previousPing != null)
                             {
-                                PingMs = (double)previousPing;
+                                PingTime = (double)previousPing;
                                 Singletons.Logger.Debug($"Ping {previousPing:n2}");
                             }
                             lastPingDateTime = DateTime.UtcNow;

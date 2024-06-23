@@ -300,7 +300,7 @@ namespace NetTunnel.UI.Forms
                                 _tunnelsGridColumnMap.SubItem(item, "BytesSent").Text = $"{Formatters.FileSize((long)tunnelStats.BytesSent)}";
                                 _tunnelsGridColumnMap.SubItem(item, "BytesReceived").Text = $"{Formatters.FileSize((long)tunnelStats.BytesReceived)}";
                                 _tunnelsGridColumnMap.SubItem(item, "Status").Text = tunnelStats.Status.ToString();
-                                _tunnelsGridColumnMap.SubItem(item, "Ping").Text = $"{(tunnelStats.PingMs?.ToString("n2") ?? "∞")}ms";
+                                _tunnelsGridColumnMap.SubItem(item, "Ping").Text = $"{(tunnelStats.PingTime?.ToString("n2") ?? "∞")}ms";
 
                                 switch (tunnelStats.Status)
                                 {

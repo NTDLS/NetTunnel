@@ -156,12 +156,12 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-        public void UpdateLastPing(DirectionalKey tunnelKey, double pingMs)
+        public void UpdateLastPing(DirectionalKey tunnelKey, double pingTime)
         {
             Collection.Use((o) =>
             {
                 var tunnel = o.Single(o => o.TunnelKey == tunnelKey.SwapDirection());
-                tunnel.PingMs = pingMs;
+                tunnel.PingTime = pingTime;
             });
         }
 
@@ -354,7 +354,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                         CurrentConnections = tunnel.CurrentConnections,
                         TotalConnections = tunnel.TotalConnections,
                         ChangeHash = tunnel.GetHashCode(),
-                        PingMs = tunnel.PingMs
+                        PingTime = tunnel.PingTime
                     };
 
                     foreach (var endpoint in tunnel.Endpoints)

@@ -24,7 +24,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         #region Public Properties.
 
-        public double? PingMs { get; set; }
+        public double? PingTime { get; set; }
         public TunnelConfiguration Configuration { get; private set; }
         public NtTunnelStatus Status { get; set; }
         public ulong BytesReceived { get; set; }
@@ -90,7 +90,7 @@ namespace NetTunnel.Service.TunnelEngine
                 BytesSent = BytesSent,
                 CurrentConnections = CurrentConnections,
                 Direction = Direction,
-                PingMs = PingMs,
+                PingTime = PingTime,
                 Status = Status,
                 TotalConnections = TotalConnections,
                 TunnelKey = TunnelKey,
