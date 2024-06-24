@@ -66,6 +66,7 @@ namespace NetTunnel.Library.Interfaces
 
         public void IncrementBytesSent(int bytes);
         public void IncrementBytesReceived(int bytes);
-        public TunnelStatisticsProperties GetProperties();
+        public TunnelProperties GetProperties();
+        public EndpointProperties GetEndpointProperties(DirectionalKey endpointKey);
     }
 }

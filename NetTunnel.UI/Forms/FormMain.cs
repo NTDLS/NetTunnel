@@ -397,6 +397,8 @@ namespace NetTunnel.UI.Forms
                     {
                         menu.Items.Add(new ToolStripSeparator());
                         menu.Items.Add("Delete Endpoint");
+                        menu.Items.Add(new ToolStripSeparator());
+                        menu.Items.Add("Properties");
                     }
                 }
 
@@ -421,6 +423,20 @@ namespace NetTunnel.UI.Forms
                         {
                             RepopulateTunnelsGrid();
                         }
+                    }
+                    else if (eTag != null && e.ClickedItem?.Text == "Properties")
+                    {
+                        try
+                        {
+                            using var form = new FormEndpointProperties(_client.EnsureNotNull(), tTag.Tunnel.TunnelKey, eTag.Endpoint.EndpointKey);
+                            form.ShowDialog();
+                        }
+                        catch (Exception ex)
+                        {
+                            this.InvokeMessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        }
+
+                        listViewEndpoints.InvokeClearRows();
                     }
                     else if (eTag != null && e.ClickedItem?.Text == "Delete Endpoint")
                     {

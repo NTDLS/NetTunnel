@@ -1,10 +1,12 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
+using Newtonsoft.Json.Converters;
 using NTDLS.Helpers;
 using NTDLS.Semaphore;
 using System.Net.Sockets;
 using System.Text;
+using System.Xml.Linq;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Endpoints
@@ -252,6 +254,31 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
             Exceptions.Ignore(() =>
                 _tunnel.PeerNotifyOfEndpointDisconnect(_tunnel.TunnelKey.SwapDirection(), EndpointId, edgeConnection.EdgeId));
+        }
+
+        public EndpointProperties GetProperties()
+        {
+            var props = new EndpointProperties()
+            {
+
+                BytesReceived = BytesReceived,
+                BytesSent = BytesSent,
+                TotalConnections = TotalConnections,
+                CurrentConnections = CurrentConnections,
+                EndpointId = EndpointId,
+                KeepRunning = KeepRunning,
+                Direction = Configuration.Direction,
+                TunnelKey = _tunnel.TunnelKey,
+                EndpointKey = new(EndpointId, Configuration.Direction),
+                TrafficType = Configuration.TrafficType,
+                Name = Configuration.Name,
+                OutboundAddress = Configuration.OutboundAddress,
+                InboundPort = Configuration.InboundPort,
+                OutboundPort = Configuration.OutboundPort,
+                HttpHeaderRules = Configuration.HttpHeaderRules.Count
+            };
+
+            return props;
         }
     }
 }

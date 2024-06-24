@@ -6,32 +6,35 @@ using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms
 {
-    public partial class FormTunnelProperties : Form
+    public partial class FormEndpointProperties : Form
     {
         private readonly ServiceClient? _client;
         private readonly DirectionalKey _tunnelKey;
+        private readonly DirectionalKey _endpointKey;
         private bool _firstShown = true;
         private bool _formClosing = false;
         private bool _inTimerTick = false;
         private System.Windows.Forms.Timer? _timer;
 
-        public FormTunnelProperties()
+        public FormEndpointProperties()
         {
             InitializeComponent();
             _tunnelKey = new DirectionalKey();
+            _endpointKey = new DirectionalKey();
         }
 
-        public FormTunnelProperties(ServiceClient client, DirectionalKey tunnelKey)
+        public FormEndpointProperties(ServiceClient client, DirectionalKey tunnelKey, DirectionalKey endpointKey)
         {
             InitializeComponent();
 
             _client = client;
+            _endpointKey = endpointKey;
             _tunnelKey = tunnelKey;
 
-            Text = $"{FriendlyName} : Tunnel Properties";
+            Text = $"{FriendlyName} : Endpoint Properties";
 
-            Shown += FormTunnelProperties_Shown;
-            FormClosing += FormTunnelProperties_FormClosing;
+            Shown += FormEndpointProperties_Shown;
+            FormClosing += FormEndpointProperties_FormClosing;
 
             listViewProperties.MouseUp += ListViewProperties_MouseUp;
 
@@ -45,7 +48,7 @@ namespace NetTunnel.UI.Forms
             _timer.Start();
         }
 
-        private void FormTunnelProperties_FormClosing(object? sender, FormClosingEventArgs e)
+        private void FormEndpointProperties_FormClosing(object? sender, FormClosingEventArgs e)
         {
             if (_timer != null)
             {
@@ -88,7 +91,7 @@ namespace NetTunnel.UI.Forms
                 {
                     try
                     {
-                        var result = _client.EnsureNotNull().QueryGetTunnelProperties(_tunnelKey);
+                        var result = _client.EnsureNotNull().QueryGetEndpointProperties(_tunnelKey, _endpointKey);
                         listViewProperties.Invoke(PopulateListView, result.Properties);
                     }
                     catch
@@ -132,7 +135,7 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-        private void FormTunnelProperties_Shown(object? sender, EventArgs e)
+        private void FormEndpointProperties_Shown(object? sender, EventArgs e)
         {
             if (!_firstShown)
             {
@@ -146,7 +149,7 @@ namespace NetTunnel.UI.Forms
             {
                 try
                 {
-                    var result = _client.EnsureNotNull().QueryGetTunnelProperties(_tunnelKey);
+                    var result = _client.EnsureNotNull().QueryGetEndpointProperties(_tunnelKey, _endpointKey);
                     this.InvokeSetText($"{FriendlyName} : {result.Properties.Name} Properties");
 
                     listViewProperties.Invoke(PopulateListView, result.Properties);
@@ -172,7 +175,7 @@ namespace NetTunnel.UI.Forms
             listViewProperties.AutoResizeColumn(1, ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
-        public void PopulateListView(TunnelProperties props)
+        public void PopulateListView(EndpointProperties props)
         {
             listViewProperties.BeginUpdate();
 
@@ -183,7 +186,7 @@ namespace NetTunnel.UI.Forms
                 nameIndexes.Add(item.Text, item.Index);
             }
 
-            foreach (var property in typeof(TunnelProperties).GetProperties())
+            foreach (var property in typeof(EndpointProperties).GetProperties())
             {
                 string name = NTDLS.Helpers.Text.SeperateCamelCase(property.Name);
                 string value = property?.GetValue(props, null)?.ToString() ?? string.Empty;

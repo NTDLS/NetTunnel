@@ -373,7 +373,25 @@ namespace NetTunnel.Service.ReliableHandlers
 
                 return new QueryGetTunnelPropertiesReply()
                 {
-                    Properties = Singletons.ServiceEngine.Tunnels.GetProperties(query.TunnelKey)
+                    Properties = Singletons.ServiceEngine.Tunnels.GetTunnelProperties(query.TunnelKey)
+                };
+            }
+            catch (Exception ex)
+            {
+                Singletons.Logger.Exception(ex);
+                throw;
+            }
+        }
+
+        public QueryGetEndpointPropertiesReply OnQueryGetEndpointProperties(RmContext context, QueryGetEndpointProperties query)
+        {
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+                return new QueryGetEndpointPropertiesReply()
+                {
+                    Properties = Singletons.ServiceEngine.Tunnels.GetEndpointProperties(query.TunnelKey, query.EndpointKey)
                 };
             }
             catch (Exception ex)

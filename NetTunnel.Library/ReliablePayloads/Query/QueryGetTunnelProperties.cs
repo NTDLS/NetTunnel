@@ -20,7 +20,7 @@ namespace NetTunnel.Library.ReliablePayloads.Query
 
     public class QueryGetTunnelPropertiesReply : IRmQueryReply
     {
-        public TunnelStatisticsProperties Properties { get; set; } = new();
+        public TunnelProperties Properties { get; set; } = new();
 
         public QueryGetTunnelPropertiesReply()
         {
