@@ -1,4 +1,6 @@
-﻿namespace NetTunnel.UI.Forms
+﻿using NetTunnel.UI.Controls;
+
+namespace NetTunnel.UI.Forms
 {
     partial class FormMain
     {
@@ -29,7 +31,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
-            listViewTunnels = new ListView();
+            listViewTunnels = new DoubleBufferedListView();
             menuStripBody = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
             connectToolStripMenuItem = new ToolStripMenuItem();
@@ -225,7 +227,7 @@
 
         #endregion
 
-        private ListView listViewTunnels;
+        private DoubleBufferedListView listViewTunnels;
         private MenuStrip menuStripBody;
         private ToolStripMenuItem fileToolStripMenuItem;
         private ToolStripMenuItem connectToolStripMenuItem;

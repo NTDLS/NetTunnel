@@ -134,9 +134,7 @@ namespace NetTunnel.Service.TunnelEngine
             => Endpoints.SingleOrDefault(o => o.EndpointId == pairId);
 
         public TunnelConfiguration CloneConfiguration()
-        {
-            return Configuration.CloneConfiguration();
-        }
+            => Configuration.CloneConfiguration();
 
         public virtual void Start()
         {
@@ -167,9 +165,7 @@ namespace NetTunnel.Service.TunnelEngine
         }
 
         public void WriteEndpointEdgeData(Guid endpointId, Guid edgeId, byte[] bytes)
-        {
-            Endpoints.Single(o => o.EndpointId == endpointId).WriteEndpointEdgeData(edgeId, bytes);
-        }
+            => Endpoints.Single(o => o.EndpointId == endpointId).WriteEndpointEdgeData(edgeId, bytes);
 
         #region Add/Delete Endpoints.
 

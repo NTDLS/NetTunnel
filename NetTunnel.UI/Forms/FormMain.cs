@@ -18,8 +18,8 @@ namespace NetTunnel.UI.Forms
 
         private Library.ServiceClient? _client;
 
-        private bool _inTimerTick = false;
         private volatile int _gridPopulationScope = 0;
+        private bool _inTimerTick = false;
         private System.Windows.Forms.Timer? _timer;
         private ListViewItemComparer? _endpointsListViewItemComparer;
         private ListViewItemComparer? _tunnelsListViewItemComparer;
@@ -57,7 +57,7 @@ namespace NetTunnel.UI.Forms
             _timer = new System.Windows.Forms.Timer()
             {
                 Enabled = true,
-                Interval = 1000
+                Interval = 1000,
             };
 
             _timer.Tick += Timer_Tick;
@@ -201,8 +201,7 @@ namespace NetTunnel.UI.Forms
             {
                 try
                 {
-                    Thread.Sleep(100); //Hack to prevent meaningless race-condition.
-
+                    Thread.Sleep(100); //Hack to prevent meaningless race-condition by giving _client a chance to be NULL.
                     if (_client == null)
                     {
                         return;

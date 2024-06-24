@@ -1,4 +1,6 @@
-﻿namespace NetTunnel.UI.Forms
+﻿using NetTunnel.UI.Controls;
+
+namespace NetTunnel.UI.Forms
 {
     partial class FormTunnelProperties
     {
@@ -29,7 +31,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormTunnelProperties));
-            listViewProperties = new ListView();
+            listViewProperties = new DoubleBufferedListView();
             columnHeaderProperty = new ColumnHeader();
             columnHeaderValue = new ColumnHeader();
             SuspendLayout();
@@ -74,7 +76,7 @@
 
         #endregion
 
-        private ListView listViewProperties;
+        private DoubleBufferedListView listViewProperties;
         private ColumnHeader columnHeaderProperty;
         private ColumnHeader columnHeaderValue;
     }
