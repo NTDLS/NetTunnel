@@ -3,6 +3,7 @@ using NetTunnel.Library.Payloads;
 using NetTunnel.UI.Types;
 using NTDLS.Helpers;
 using NTDLS.WinFormsHelpers;
+using System.Windows.Forms.VisualStyles;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms
@@ -39,7 +40,6 @@ namespace NetTunnel.UI.Forms
 
             #region Setup listViewConnections.
 
-            //_endpointsListViewItemComparer = new ListViewItemComparer();
             listViewConnections.MouseUp += ListViewConnections_MouseUp;
 
             listViewConnections.Columns.Clear();
@@ -143,14 +143,13 @@ namespace NetTunnel.UI.Forms
         {
             if (e.Button == MouseButtons.Right)
             {
-                /*
                 var menu = new ContextMenuStrip();
 
                 var selectedItem = listViewConnections.SelectedItems.Count == 1 ? listViewConnections.SelectedItems[0] : null;
 
                 if (selectedItem != null)
                 {
-                    menu.Items.Add("Copy to clipboard");
+                    menu.Items.Add("Disconnect");
                 }
 
                 menu.Show(listViewConnections, new Point(e.X, e.Y));
@@ -159,12 +158,35 @@ namespace NetTunnel.UI.Forms
                 {
                     menu.Hide();
 
-                    if (selectedItem != null && e.ClickedItem?.Text == "Copy to clipboard")
+                    if (selectedItem != null && e.ClickedItem?.Text == "Disconnect")
                     {
+                        if (MessageBox.Show($"Disconnect the endpoint edge connection?",
+                            FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                        {
+                            return;
+                        }
+
+                        var progressForm = new ProgressForm(FriendlyName, "Terminating edge connection...");
+
+                        progressForm.Execute(() =>
+                        {
+                            try
+                            {
+                                if (selectedItem.Tag is EdgeState tag)
+                                {
+                                    _client.EnsureNotNull().NotifyTerminateEndpointEdgeConnection(tag.TunnelKey, tag.EndpointKey.Id, tag.EdgeId);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                progressForm.MessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                            }
+                        });
+
+
                         Clipboard.SetText(selectedItem.SubItems[1].Text);
                     }
                 };
-                */
             }
         }
 
@@ -225,7 +247,9 @@ namespace NetTunnel.UI.Forms
         class EdgeState
         {
             public EdgeStatus Status { get; set; }
-
+            public DirectionalKey TunnelKey { get; set; } = new();
+            public DirectionalKey EndpointKey { get; set; } = new();
+            public Guid EdgeId { get; set; }
         }
 
         public void PopulateListView(List<EndpointEdgeConnectionDisplay> connections)
@@ -297,7 +321,10 @@ namespace NetTunnel.UI.Forms
 
                     item.Tag = new EdgeState
                     {
-                        Status = EdgeStatus.New
+                        Status = EdgeStatus.New,
+                        EdgeId = connection.EdgeId,
+                        TunnelKey = connection.TunnelKey,
+                        EndpointKey = connection.EndpointKey
                     };
 
                     listViewConnections.Items.Add(item);

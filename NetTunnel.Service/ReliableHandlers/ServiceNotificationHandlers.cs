@@ -112,5 +112,20 @@ namespace NetTunnel.Service.ReliableHandlers
                 throw;
             }
         }
+
+        public void OnNotifyTerminateEndpointEdgeConnection(RmContext context, NotifyTerminateEndpointEdgeConnection notification)
+        {
+            try
+            {
+                var connectionContext = GetServiceConnectionContext(context);
+
+                Singletons.ServiceEngine.Tunnels.DisconnectEndpointEdge(notification.TunnelKey, notification.EndpointId, notification.EdgeId);
+            }
+            catch (Exception ex)
+            {
+                Singletons.Logger.Exception(ex);
+                throw;
+            }
+        }
     }
 }

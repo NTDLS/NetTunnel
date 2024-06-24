@@ -289,6 +289,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 {
                     var connection = new EndpointEdgeConnectionDisplay()
                     {
+                        TunnelKey = _tunnel.TunnelKey,
+                        EndpointKey = new DirectionalKey(Configuration.EndpointId, Configuration.Direction),
                         BytesReceived = edge.BytesReceived,
                         BytesSent = edge.BytesSent,
                         EdgeId = edge.EdgeId,

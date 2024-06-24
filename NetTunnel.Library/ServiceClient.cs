@@ -214,6 +214,9 @@ namespace NetTunnel.Library
         public QueryCreateUserReply QueryCreateUser(User user)
             => Client.Query(new QueryCreateUser(user)).Result;
 
+        public void NotifyTerminateEndpointEdgeConnection(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
+            => Client.Notify(new NotifyTerminateEndpointEdgeConnection(tunnelKey, endpointId, edgeId));
+
         public void NotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
             => Client.Notify(new NotificationEndpointConnect(tunnelKey, endpointId, edgeId));
 
