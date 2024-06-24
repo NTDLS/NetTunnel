@@ -13,7 +13,6 @@ namespace NetTunnel.UI.Forms
         private readonly DirectionalKey _tunnelKey;
         private readonly DirectionalKey _endpointKey;
         private bool _firstShown = true;
-        private bool _formClosing = false;
         private bool _inTimerTick = false;
         private System.Windows.Forms.Timer? _timer;
         private ListViewColumnMap? _connectionsGridColumnMap;
@@ -144,6 +143,7 @@ namespace NetTunnel.UI.Forms
         {
             if (e.Button == MouseButtons.Right)
             {
+                /*
                 var menu = new ContextMenuStrip();
 
                 var selectedItem = listViewConnections.SelectedItems.Count == 1 ? listViewConnections.SelectedItems[0] : null;
@@ -164,6 +164,7 @@ namespace NetTunnel.UI.Forms
                         Clipboard.SetText(selectedItem.SubItems[1].Text);
                     }
                 };
+                */
             }
         }
 
@@ -256,11 +257,6 @@ namespace NetTunnel.UI.Forms
                 }
             }
 
-            foreach (var expiredItem in expiredItems)
-            {
-                listViewConnections.Items.Remove(expiredItem);
-            }
-
             foreach (var connection in connections)
             {
                 if (idLookup.TryGetValue(connection.EdgeId, out var index))
@@ -272,8 +268,8 @@ namespace NetTunnel.UI.Forms
                     _connectionsGridColumnMap.SubItem(item, "AddressFamily").Text = connection.AddressFamily;
                     _connectionsGridColumnMap.SubItem(item, "Address").Text = connection.Address;
                     _connectionsGridColumnMap.SubItem(item, "Port").Text = $"{connection.Port}";
-                    _connectionsGridColumnMap.SubItem(item, "BytesReceived").Text = $"{connection.BytesReceived}";
-                    _connectionsGridColumnMap.SubItem(item, "BytesSent").Text = $"{connection.BytesSent}";
+                    _connectionsGridColumnMap.SubItem(item, "BytesReceived").Text = $"{Formatters.FileSize((long)connection.BytesReceived)}";
+                    _connectionsGridColumnMap.SubItem(item, "BytesSent").Text = $"{Formatters.FileSize((long)connection.BytesSent)}";
                     _connectionsGridColumnMap.SubItem(item, "StartDateTime").Text = $"{connection.StartDateTime}";
                     _connectionsGridColumnMap.SubItem(item, "LastActivityDateTime").Text = $"{connection.LastActivityDateTime}";
                     //_connectionsGridColumnMap.SubItem(item, "EdgeId").Text = $"{connection.EdgeId}";
@@ -289,8 +285,8 @@ namespace NetTunnel.UI.Forms
                     var item = new ListViewItem(connection.AddressFamily);
                     item.SubItems.Add(connection.Address);
                     item.SubItems.Add($"{connection.Port}");
-                    item.SubItems.Add($"{connection.BytesReceived}");
-                    item.SubItems.Add($"{connection.BytesSent}");
+                    item.SubItems.Add($"{Formatters.FileSize((long)connection.BytesReceived)}");
+                    item.SubItems.Add($"{Formatters.FileSize((long)connection.BytesSent)}");
                     item.SubItems.Add($"{connection.StartDateTime}");
                     item.SubItems.Add($"{connection.LastActivityDateTime}");
                     item.SubItems.Add($"{connection.EdgeId}");
@@ -306,6 +302,11 @@ namespace NetTunnel.UI.Forms
 
                     listViewConnections.Items.Add(item);
                 }
+            }
+
+            foreach (var expiredItem in expiredItems)
+            {
+                listViewConnections.Items.Remove(expiredItem);
             }
 
             listViewConnections.EndUpdate();

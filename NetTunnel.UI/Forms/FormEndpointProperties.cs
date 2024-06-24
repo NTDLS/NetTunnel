@@ -12,7 +12,6 @@ namespace NetTunnel.UI.Forms
         private readonly DirectionalKey _tunnelKey;
         private readonly DirectionalKey _endpointKey;
         private bool _firstShown = true;
-        private bool _formClosing = false;
         private bool _inTimerTick = false;
         private System.Windows.Forms.Timer? _timer;
 
