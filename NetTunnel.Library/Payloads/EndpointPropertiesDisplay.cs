@@ -3,7 +3,7 @@ using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library.Payloads
 {
-    public class EndpointProperties
+    public class EndpointPropertiesDisplay
     {
         public ulong BytesReceived { get; set; }
         public ulong BytesSent { get; set; }

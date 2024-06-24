@@ -400,5 +400,23 @@ namespace NetTunnel.Service.ReliableHandlers
                 throw;
             }
         }
+
+        public QueryGetEndpointEdgeConnectionsReply OnQueryGetEndpointEdgeConnections(RmContext context, QueryGetEndpointEdgeConnections query)
+        {
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+                return new QueryGetEndpointEdgeConnectionsReply()
+                {
+                    Collection = Singletons.ServiceEngine.Tunnels.GetEndpointEdgeConnections(query.TunnelKey, query.EndpointKey)
+                };
+            }
+            catch (Exception ex)
+            {
+                Singletons.Logger.Exception(ex);
+                throw;
+            }
+        }
     }
 }

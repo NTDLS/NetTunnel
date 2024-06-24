@@ -77,15 +77,18 @@ namespace NetTunnel.Service.TunnelEngine
         void ITunnel.PeerNotifyOfEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
            => throw new NotImplementedException("This function should be overridden.");
 
-        public EndpointProperties GetEndpointProperties(DirectionalKey endpointKey)
+        public EndpointPropertiesDisplay GetEndpointProperties(DirectionalKey endpointKey)
             => Endpoints.Single(o => o.EndpointKey == endpointKey).GetProperties();
 
-        public TunnelProperties GetProperties()
+        public List<EndpointEdgeConnectionDisplay> GetEndpointEdgeConnections(DirectionalKey endpointKey)
+            => Endpoints.Single(o => o.EndpointKey == endpointKey).GetEdgeConnections();
+
+        public TunnelPropertiesDisplay GetProperties()
         {
             var serviceConnectionState = Singletons.ServiceEngine
                 .ServiceConnectionStates.SingleOrDefault(o => o.Value.TunnelKey?.Id == TunnelKey.Id).Value;
 
-            var prop = new TunnelProperties()
+            var prop = new TunnelPropertiesDisplay()
             {
                 KeyHash = serviceConnectionState.KeyHash,
                 KeyLength = serviceConnectionState.KeyLength,

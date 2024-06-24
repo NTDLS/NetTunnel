@@ -9,7 +9,7 @@ namespace NetTunnel.Library.ReliablePayloads.Query
 
     public class QueryGetTunnelStatisticsReply : IRmQueryReply
     {
-        public List<TunnelStatistics> Statistics { get; set; } = new();
+        public List<TunnelStatisticsDisplay> Statistics { get; set; } = new();
 
         public int AllTunnelIdAndEndpointIdHashes()
         {

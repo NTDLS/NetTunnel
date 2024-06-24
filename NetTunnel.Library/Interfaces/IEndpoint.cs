@@ -1,5 +1,4 @@
 ﻿using NetTunnel.Library.Payloads;
-using System.Net;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library.Interfaces
@@ -25,6 +24,7 @@ namespace NetTunnel.Library.Interfaces
         /// Unique ID that takes the direction and the ID into account.
         /// </summary>
         public DirectionalKey EndpointKey { get; }
-        public EndpointProperties GetProperties();
+        public EndpointPropertiesDisplay GetProperties();
+        public List<EndpointEdgeConnectionDisplay> GetEdgeConnections();
     }
 }

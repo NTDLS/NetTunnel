@@ -224,7 +224,7 @@ namespace NetTunnel.UI.Forms
 
                     }
 
-                    void PopulateEndpointStatistics(List<TunnelStatistics> statistics)
+                    void PopulateEndpointStatistics(List<TunnelStatisticsDisplay> statistics)
                     {
                         #region Populate Endpoint Statistics.
 
@@ -277,7 +277,7 @@ namespace NetTunnel.UI.Forms
                         #endregion
                     }
 
-                    void PopulateTunnelStatistics(List<TunnelStatistics> statistics)
+                    void PopulateTunnelStatistics(List<TunnelStatisticsDisplay> statistics)
                     {
                         #region Populate Tunnel Statistics.
 
@@ -398,6 +398,7 @@ namespace NetTunnel.UI.Forms
                         menu.Items.Add(new ToolStripSeparator());
                         menu.Items.Add("Delete Endpoint");
                         menu.Items.Add(new ToolStripSeparator());
+                        menu.Items.Add("Edge Connections");
                         menu.Items.Add("Properties");
                     }
                 }
@@ -424,6 +425,21 @@ namespace NetTunnel.UI.Forms
                             RepopulateTunnelsGrid();
                         }
                     }
+                    else if (eTag != null && e.ClickedItem?.Text == "Edge Connections")
+                    {
+                        try
+                        {
+                            using var form = new FormEndpointEdgeConnections(_client.EnsureNotNull(), tTag.Tunnel.TunnelKey, eTag.Endpoint.EndpointKey);
+                            form.ShowDialog();
+                        }
+                        catch (Exception ex)
+                        {
+                            this.InvokeMessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        }
+
+                        listViewEndpoints.InvokeClearRows();
+                    }
+
                     else if (eTag != null && e.ClickedItem?.Text == "Properties")
                     {
                         try

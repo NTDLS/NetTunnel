@@ -1,12 +1,11 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
-using Newtonsoft.Json.Converters;
 using NTDLS.Helpers;
 using NTDLS.Semaphore;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Xml.Linq;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Endpoints
@@ -256,11 +255,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 _tunnel.PeerNotifyOfEndpointDisconnect(_tunnel.TunnelKey.SwapDirection(), EndpointId, edgeConnection.EdgeId));
         }
 
-        public EndpointProperties GetProperties()
+        public EndpointPropertiesDisplay GetProperties()
         {
-            var props = new EndpointProperties()
+            var props = new EndpointPropertiesDisplay()
             {
-
                 BytesReceived = BytesReceived,
                 BytesSent = BytesSent,
                 TotalConnections = TotalConnections,
@@ -279,6 +277,38 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             };
 
             return props;
+        }
+
+        public List<EndpointEdgeConnectionDisplay> GetEdgeConnections()
+        {
+            var connections = new List<EndpointEdgeConnectionDisplay>();
+
+            _edgeConnections.Use(o =>
+            {
+                foreach (var edge in o.Values)
+                {
+                    var connection = new EndpointEdgeConnectionDisplay()
+                    {
+                        BytesReceived = edge.BytesReceived,
+                        BytesSent = edge.BytesSent,
+                        EdgeId = edge.EdgeId,
+                        IsConnected = edge.IsConnected,
+                        LastActivityDateTime = edge.LastActivityDateTime,
+                        StartDateTime = edge.StartDateTime,
+                        ThreadId = edge.Thread.ManagedThreadId
+                    };
+
+                    if (edge.TcpClient.Client.RemoteEndPoint is IPEndPoint address)
+                    {
+                        connection.AddressFamily = address.AddressFamily.ToString();
+                        connection.Address = address.Address.ToString();
+                        connection.Port = address.Port;
+                    }
+
+                    connections.Add(connection);
+                }
+            });
+            return connections;
         }
     }
 }

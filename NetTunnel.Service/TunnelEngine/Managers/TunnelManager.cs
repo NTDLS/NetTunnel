@@ -35,11 +35,14 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         public void StopAll()
             => Collection.Use((o) => o.ForEach((o) => o.Stop()));
 
-        public TunnelProperties GetTunnelProperties(DirectionalKey tunnelKey)
+        public TunnelPropertiesDisplay GetTunnelProperties(DirectionalKey tunnelKey)
             => Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey).GetProperties());
 
-        public EndpointProperties GetEndpointProperties(DirectionalKey tunnelKey, DirectionalKey endpointKey)
+        public EndpointPropertiesDisplay GetEndpointProperties(DirectionalKey tunnelKey, DirectionalKey endpointKey)
             => Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey).GetEndpointProperties(endpointKey));
+
+        public List<EndpointEdgeConnectionDisplay> GetEndpointEdgeConnections(DirectionalKey tunnelKey, DirectionalKey endpointKey)
+            => Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey).GetEndpointEdgeConnections(endpointKey));
 
         #endregion
 
@@ -338,15 +341,15 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-        public List<TunnelStatistics> GetStatistics()
+        public List<TunnelStatisticsDisplay> GetStatistics()
         {
-            var result = new List<TunnelStatistics>();
+            var result = new List<TunnelStatisticsDisplay>();
 
             Collection.Use((o) =>
             {
                 foreach (var tunnel in o)
                 {
-                    var tunnelStats = new TunnelStatistics()
+                    var tunnelStats = new TunnelStatisticsDisplay()
                     {
                         TunnelKey = tunnel.TunnelKey,
                         Direction = tunnel is TunnelOutbound ? NtDirection.Outbound : NtDirection.Inbound,
@@ -362,7 +365,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
                     foreach (var endpoint in tunnel.Endpoints)
                     {
-                        var endpointStats = new EndpointStatistics()
+                        var endpointStats = new EndpointStatisticsDisplay()
                         {
                             EndpointKey = endpoint.EndpointKey,
                             Direction = endpoint.Configuration.Direction,

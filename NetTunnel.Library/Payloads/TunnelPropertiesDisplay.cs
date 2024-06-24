@@ -3,7 +3,7 @@ using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library.Payloads
 {
-    public class TunnelProperties
+    public class TunnelPropertiesDisplay
     {
         public bool IsLoggedIn { get; set; }
         public bool KeepRunning { get; set; }

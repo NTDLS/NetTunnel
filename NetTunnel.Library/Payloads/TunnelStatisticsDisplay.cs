@@ -3,14 +3,14 @@ using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library.Payloads
 {
-    public class TunnelStatistics
+    public class TunnelStatisticsDisplay
     {
         /// <summary>
         /// Used to determine if anything has changed.
         /// </summary>
         public int ChangeHash { get; set; }
         public double? PingTime { get; set; }
-        public List<EndpointStatistics> EndpointStatistics { get; set; } = new();
+        public List<EndpointStatisticsDisplay> EndpointStatistics { get; set; } = new();
         public NtTunnelStatus Status { get; set; }
         public ulong CurrentConnections { get; set; }
         public ulong TotalConnections { get; set; }

@@ -3,7 +3,7 @@ using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library.Payloads
 {
-    public class EndpointStatistics
+    public class EndpointStatisticsDisplay
     {
         /// <summary>
         /// Used to determine if anything has changed.

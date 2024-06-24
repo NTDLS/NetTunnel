@@ -175,7 +175,7 @@ namespace NetTunnel.UI.Forms
             listViewProperties.AutoResizeColumn(1, ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
-        public void PopulateListView(EndpointProperties props)
+        public void PopulateListView(EndpointPropertiesDisplay props)
         {
             listViewProperties.BeginUpdate();
 
@@ -186,7 +186,7 @@ namespace NetTunnel.UI.Forms
                 nameIndexes.Add(item.Text, item.Index);
             }
 
-            foreach (var property in typeof(EndpointProperties).GetProperties())
+            foreach (var property in typeof(EndpointPropertiesDisplay).GetProperties())
             {
                 string name = NTDLS.Helpers.Text.SeperateCamelCase(property.Name);
                 string value = property?.GetValue(props, null)?.ToString() ?? string.Empty;

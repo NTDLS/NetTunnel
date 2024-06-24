@@ -6,6 +6,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
     internal class EndpointEdgeConnection : IDisposable
     {
+        public ulong BytesReceived { get; internal set; }
+        public ulong BytesSent { get; internal set; }
         public DateTime StartDateTime { get; private set; } = DateTime.UtcNow;
         public DateTime LastActivityDateTime { get; private set; } = DateTime.UtcNow;
         public Guid EdgeId { get; private set; }
@@ -39,12 +41,14 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         public void Write(byte[] buffer)
         {
+            BytesSent += (ulong)buffer.Length;
             LastActivityDateTime = DateTime.UtcNow;
             _stream.Write(buffer);
         }
 
         public void Write(PumpBuffer buffer)
         {
+            BytesSent += (ulong)buffer.Length;
             LastActivityDateTime = DateTime.UtcNow;
             _stream.Write(buffer.Bytes, 0, buffer.Length);
         }
@@ -53,6 +57,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
             LastActivityDateTime = DateTime.UtcNow;
             buffer.Length = _stream.Read(buffer.Bytes, 0, buffer.Bytes.Length);
+            BytesReceived += (ulong)buffer.Length;
             return buffer.Length > 0;
         }
 

@@ -169,6 +169,9 @@ namespace NetTunnel.Library
         public QueryGetEndpointPropertiesReply QueryGetEndpointProperties(DirectionalKey tunnelKey, DirectionalKey endpointKey)
             => Client.Query(new QueryGetEndpointProperties(tunnelKey, endpointKey)).Result;
 
+        public QueryGetEndpointEdgeConnectionsReply QueryGetEndpointEdgeConnections(DirectionalKey tunnelKey, DirectionalKey endpointKey)
+            => Client.Query(new QueryGetEndpointEdgeConnections(tunnelKey, endpointKey)).Result;
+
         public QueryGetTunnelPropertiesReply QueryGetTunnelProperties(DirectionalKey tunnelKey)
             => Client.Query(new QueryGetTunnelProperties(tunnelKey)).Result;
 

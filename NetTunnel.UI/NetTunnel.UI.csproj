@@ -29,6 +29,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Forms\FormEndpointEdgeConnections.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Forms\FormEndpointProperties.cs">
       <SubType>Form</SubType>
     </Compile>
