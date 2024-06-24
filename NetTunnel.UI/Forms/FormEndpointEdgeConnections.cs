@@ -3,7 +3,6 @@ using NetTunnel.Library.Payloads;
 using NetTunnel.UI.Types;
 using NTDLS.Helpers;
 using NTDLS.WinFormsHelpers;
-using System.Windows.Forms.VisualStyles;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms
@@ -182,7 +181,6 @@ namespace NetTunnel.UI.Forms
                                 progressForm.MessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                             }
                         });
-
 
                         Clipboard.SetText(selectedItem.SubItems[1].Text);
                     }
