@@ -37,24 +37,25 @@
             textBoxUsername = new TextBox();
             textBoxPassword = new TextBox();
             textBoxConfirmPassword = new TextBox();
+            checkBoxAdministrator = new CheckBox();
             SuspendLayout();
             // 
             // buttonSave
             // 
-            buttonSave.Location = new Point(173, 191);
+            buttonSave.Location = new Point(181, 211);
             buttonSave.Name = "buttonSave";
             buttonSave.Size = new Size(75, 23);
-            buttonSave.TabIndex = 3;
+            buttonSave.TabIndex = 4;
             buttonSave.Text = "Save";
             buttonSave.UseVisualStyleBackColor = true;
             buttonSave.Click += ButtonSave_Click;
             // 
             // buttonCancel
             // 
-            buttonCancel.Location = new Point(92, 191);
+            buttonCancel.Location = new Point(100, 211);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(75, 23);
-            buttonCancel.TabIndex = 4;
+            buttonCancel.TabIndex = 5;
             buttonCancel.Text = "Cancel";
             buttonCancel.UseVisualStyleBackColor = true;
             buttonCancel.Click += ButtonCancel_Click;
@@ -109,11 +110,22 @@
             textBoxConfirmPassword.Size = new Size(232, 23);
             textBoxConfirmPassword.TabIndex = 2;
             // 
+            // checkBoxAdministrator
+            // 
+            checkBoxAdministrator.AutoSize = true;
+            checkBoxAdministrator.Location = new Point(16, 175);
+            checkBoxAdministrator.Name = "checkBoxAdministrator";
+            checkBoxAdministrator.Size = new Size(113, 19);
+            checkBoxAdministrator.TabIndex = 3;
+            checkBoxAdministrator.Text = "Is administrator?";
+            checkBoxAdministrator.UseVisualStyleBackColor = true;
+            // 
             // FormAddUser
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(268, 231);
+            ClientSize = new Size(268, 246);
+            Controls.Add(checkBoxAdministrator);
             Controls.Add(textBoxConfirmPassword);
             Controls.Add(textBoxPassword);
             Controls.Add(textBoxUsername);
@@ -144,5 +156,6 @@
         private TextBox textBoxUsername;
         private TextBox textBoxPassword;
         private TextBox textBoxConfirmPassword;
+        private CheckBox checkBoxAdministrator;
     }
 }

@@ -2,6 +2,7 @@
 using NetTunnel.Library.Payloads;
 using NTDLS.Helpers;
 using NTDLS.WinFormsHelpers;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms
 {
@@ -52,9 +53,9 @@ namespace NetTunnel.UI.Forms
                     throw new Exception("The password and confirm-passwords must match.");
                 }
 
-                var user = new User(username, password);
+                var user = new User(username, password, checkBoxAdministrator.Checked ? NtUserRole.Administrator : NtUserRole.Limited);
 
-                var progressForm = new ProgressForm(Constants.FriendlyName, "Creating user...");
+                var progressForm = new ProgressForm(FriendlyName, "Creating user...");
 
                 progressForm.Execute(() =>
                 {
@@ -66,7 +67,7 @@ namespace NetTunnel.UI.Forms
                     }
                     catch (Exception ex)
                     {
-                        progressForm.MessageBox(ex.Message, Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        progressForm.MessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     }
                 });
             }

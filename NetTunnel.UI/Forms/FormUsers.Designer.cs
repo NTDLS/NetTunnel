@@ -32,17 +32,18 @@
             listViewUsers = new ListView();
             columnHeaderUsername = new ColumnHeader();
             buttonAddUser = new Button();
+            columnHeaderRole = new ColumnHeader();
             SuspendLayout();
             // 
             // listViewUsers
             // 
-            listViewUsers.Columns.AddRange(new ColumnHeader[] { columnHeaderUsername });
+            listViewUsers.Columns.AddRange(new ColumnHeader[] { columnHeaderUsername, columnHeaderRole });
             listViewUsers.FullRowSelect = true;
             listViewUsers.GridLines = true;
             listViewUsers.HeaderStyle = ColumnHeaderStyle.Nonclickable;
             listViewUsers.Location = new Point(12, 12);
             listViewUsers.Name = "listViewUsers";
-            listViewUsers.Size = new Size(317, 312);
+            listViewUsers.Size = new Size(528, 233);
             listViewUsers.TabIndex = 0;
             listViewUsers.UseCompatibleStateImageBehavior = false;
             listViewUsers.View = View.Details;
@@ -50,11 +51,11 @@
             // columnHeaderUsername
             // 
             columnHeaderUsername.Text = "Username";
-            columnHeaderUsername.Width = 260;
+            columnHeaderUsername.Width = 300;
             // 
             // buttonAddUser
             // 
-            buttonAddUser.Location = new Point(12, 332);
+            buttonAddUser.Location = new Point(465, 257);
             buttonAddUser.Name = "buttonAddUser";
             buttonAddUser.Size = new Size(75, 23);
             buttonAddUser.TabIndex = 2;
@@ -62,11 +63,16 @@
             buttonAddUser.UseVisualStyleBackColor = true;
             buttonAddUser.Click += ButtonAddUser_Click;
             // 
+            // columnHeaderRole
+            // 
+            columnHeaderRole.Text = "Role";
+            columnHeaderRole.Width = 200;
+            // 
             // FormUsers
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(341, 367);
+            ClientSize = new Size(552, 292);
             Controls.Add(buttonAddUser);
             Controls.Add(listViewUsers);
             FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -85,5 +91,6 @@
         private ListView listViewUsers;
         private ColumnHeader columnHeaderUsername;
         private Button buttonAddUser;
+        private ColumnHeader columnHeaderRole;
     }
 }

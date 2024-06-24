@@ -2,6 +2,7 @@
 using NetTunnel.Library.Payloads;
 using NTDLS.Persistence;
 using NTDLS.Semaphore;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Managers
 {
@@ -18,8 +19,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             LoadFromDisk();
         }
 
-        public void Add(string username, string passwordHash)
-            => Add(new User(username, passwordHash));
+        public void Add(string username, string passwordHash, NtUserRole role)
+            => Add(new User(username, passwordHash, role));
 
         public void Add(User user) => _collection.Use((o)
             => o.Add(user));
@@ -27,12 +28,12 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         public void Delete(string username) => _collection.Use((o)
             => o.RemoveAll(t => t.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase)));
 
-        public void ChangePassword(string username, string passwordHash)
+        public void EditUser(User user)
         {
             _collection.Use((o) =>
             {
-                o.FirstOrDefault(t => t.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase))?
-                    .SetPasswordHash(passwordHash);
+                o.FirstOrDefault(t => t.Username.Equals(user.Username, StringComparison.CurrentCultureIgnoreCase))?
+                    .Modify(user);
             });
         }
 
@@ -73,9 +74,9 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 if (o.Count == 0)
                 {
 #if DEBUG
-                    Add("debug", Utility.ComputeSha256Hash("123456789"));
+                    Add("debug", Utility.ComputeSha256Hash("123456789"), NtUserRole.Administrator);
 #endif
-                    Add("root", Utility.ComputeSha256Hash(Environment.MachineName.ToLower()));
+                    Add("root", Utility.ComputeSha256Hash(Environment.MachineName.ToLower()), NtUserRole.Administrator);
                     SaveToDisk();
                 }
             });

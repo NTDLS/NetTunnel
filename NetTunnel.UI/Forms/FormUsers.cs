@@ -21,6 +21,7 @@ namespace NetTunnel.UI.Forms
             InitializeComponent();
             _client = client;
             listViewUsers.MouseUp += ListViewUsers_MouseUp;
+            listViewUsers.MouseDoubleClick += ListViewUsers_MouseDoubleClick;
             Shown += FormUsers_Shown;
 
             var cancelButton = new Button();
@@ -30,6 +31,29 @@ namespace NetTunnel.UI.Forms
             };
 
             CancelButton = cancelButton;
+        }
+
+        private void ListViewUsers_MouseDoubleClick(object? sender, MouseEventArgs e)
+        {
+            _client.EnsureNotNull();
+
+            if (e.Button == MouseButtons.Right)
+            {
+                listViewUsers.SelectedItems.Clear();
+
+                var itemUnderMouse = listViewUsers.GetItemAt(e.X, e.Y);
+                if (itemUnderMouse != null)
+                {
+                    itemUnderMouse.Selected = true;
+                }
+
+                var uTag = UserTag.FromItemOrDefault(itemUnderMouse);
+                if (uTag != null)
+                {
+                    using var form = new FormEditUser(_client, uTag.User);
+                    form.ShowDialog();
+                }
+            }
         }
 
         private void FormUsers_Shown(object? sender, EventArgs e)
@@ -44,7 +68,6 @@ namespace NetTunnel.UI.Forms
 
             progressForm.Execute(() =>
             {
-
                 try
                 {
                     var result = _client.EnsureNotNull().QueryGetUsers();
@@ -67,6 +90,7 @@ namespace NetTunnel.UI.Forms
             else
             {
                 var item = new ListViewItem(user.Username);
+                item.SubItems.Add(user.Role.ToString());
                 item.Tag = new UserTag(user);
                 listViewUsers.Items.Add(item);
             }
@@ -91,7 +115,7 @@ namespace NetTunnel.UI.Forms
 
                 if (uTag != null)
                 {
-                    menu.Items.Add("Change password");
+                    menu.Items.Add("Edit");
                     if (listViewUsers.Items.Count > 1)
                     {
                         menu.Items.Add("Delete");
@@ -118,9 +142,9 @@ namespace NetTunnel.UI.Forms
                             AddUserToGrid(form.CreatedUser.EnsureNotNull());
                         }
                     }
-                    else if (uTag != null && e.ClickedItem?.Text == "Change password")
+                    else if (uTag != null && e.ClickedItem?.Text == "Edit")
                     {
-                        using var form = new FormChangeUserPassword(_client, uTag.User);
+                        using var form = new FormEditUser(_client, uTag.User);
                         form.ShowDialog();
                     }
                     else if (uTag != null && e.ClickedItem?.Text == "Delete")

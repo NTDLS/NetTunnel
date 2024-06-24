@@ -72,12 +72,7 @@ namespace NetTunnel.Library
         #region Factory.
 
         public static ServiceClient CreateConnectAndLogin(ILogger logger, string address, int port, string userName, string passwordHash)
-        {
-            return CreateConnectAndLogin(logger, new ServiceConfiguration()
-            {
-                MessageQueryTimeoutMs = 1000
-            }, address, port, userName, passwordHash);
-        }
+            => CreateConnectAndLogin(logger, new ServiceConfiguration(), address, port, userName, passwordHash);
 
         public static ServiceClient CreateConnectAndLogin(ILogger logger, ServiceConfiguration configuration,
              string address, int port, string userName, string passwordHash)
@@ -202,8 +197,8 @@ namespace NetTunnel.Library
         public QueryPutServiceConfigurationReply QueryPutServiceConfiguration(ServiceConfiguration configuration)
             => Client.Query(new QueryPutServiceConfiguration(configuration)).Result;
 
-        public QueryChangeUserPasswordReply QueryChangeUserPassword(string username, string passwordHash)
-            => Client.Query(new QueryChangeUserPassword(username, passwordHash)).Result;
+        public QueryEditUserReply QueryEditUser(User user)
+            => Client.Query(new QueryEditUser(user)).Result;
 
         public QueryStopTunnelReply QueryStopTunnel(DirectionalKey tunnelKey)
             => Client.Query(new QueryStopTunnel(tunnelKey)).Result;

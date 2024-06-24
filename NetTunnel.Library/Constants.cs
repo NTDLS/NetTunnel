@@ -12,6 +12,12 @@
             Https
         }
 
+        public enum NtUserRole
+        {
+            Limited,
+            Administrator
+        }
+
         public enum NtHttpVerb
         {
             Any,

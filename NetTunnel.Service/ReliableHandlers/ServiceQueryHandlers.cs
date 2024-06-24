@@ -245,15 +245,15 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryChangeUserPasswordReply OnQueryChangeUserPassword(RmContext context, QueryChangeUserPassword query)
+        public QueryEditUserReply OnQueryEditUser(RmContext context, QueryEditUser query)
         {
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
-                Singletons.ServiceEngine.Users.ChangePassword(query.Username, query.PasswordHash);
+                Singletons.ServiceEngine.Users.EditUser(query.User);
 
-                return new QueryChangeUserPasswordReply();
+                return new QueryEditUserReply();
             }
             catch (Exception ex)
             {
