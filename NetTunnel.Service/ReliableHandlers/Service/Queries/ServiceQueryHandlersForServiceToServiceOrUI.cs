@@ -4,7 +4,7 @@ using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
 using static NetTunnel.Library.Constants;
 
-namespace NetTunnel.Service.ReliableHandlers.Service
+namespace NetTunnel.Service.ReliableHandlers.Service.Queries
 {
     /// <summary>
     /// The NetTunnel service shares one single instance of RmServer and therefor all inbound tunnels connect to it.

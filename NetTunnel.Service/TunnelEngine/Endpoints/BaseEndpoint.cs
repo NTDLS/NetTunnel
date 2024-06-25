@@ -145,7 +145,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 {
                     //SEARCH FOR: Process:Endpoint:Connect:001: If this is an inbound endpoint, then let the remote service
                     //  know that we just received a connection so that it came make the associated outbound connection.
-                    _tunnel.PeerNotifyOfEndpointConnect(_tunnel.TunnelKey, EndpointId, edgeConnection.EdgeId);
+                    _tunnel.S2SPeerNotificationEndpointConnect(_tunnel.TunnelKey, EndpointId, edgeConnection.EdgeId);
                 }
 
                 var httpHeaderBuilder = new StringBuilder();
@@ -191,7 +191,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                                 var httpHeaderBytes = Encoding.UTF8.GetBytes(httpHeaderBuilder.ToString());
 
-                                _tunnel.PeerNotifyOfEndpointDataExchange(
+                                _tunnel.S2SPeerNotificationEndpointDataExchange(
                                     _tunnel.TunnelKey, EndpointId, edgeConnection.EdgeId, httpHeaderBytes, httpHeaderBytes.Length);
 
                                 httpHeaderBuilder.Clear();
@@ -207,7 +207,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     //Send the data to the remote peer, along with all the IDs required to identify the tunnel,
                     //  endpoint and endpoint-edge-connection (edgeId). At the tunnel-peer, This data will be
                     //  sent to whatever is connected to the endpoint via a call to WriteEndpointEdgeData().
-                    _tunnel.PeerNotifyOfEndpointDataExchange(
+                    _tunnel.S2SPeerNotificationEndpointDataExchange(
                         _tunnel.TunnelKey, Configuration.EndpointId, edgeConnection.EdgeId, buffer.Bytes, buffer.Length);
 
                     buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);
@@ -252,7 +252,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             }
 
             Exceptions.Ignore(() =>
-                _tunnel.PeerNotifyOfEndpointDisconnect(_tunnel.TunnelKey.SwapDirection(), EndpointId, edgeConnection.EdgeId));
+                _tunnel.S2SPeerNotificationEndpointDisconnect(_tunnel.TunnelKey.SwapDirection(), EndpointId, edgeConnection.EdgeId));
         }
 
         public EndpointPropertiesDisplay GetProperties()

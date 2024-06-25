@@ -98,7 +98,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                     if (existingTunnel.IsLoggedIn)
                     {
                         //Let the other end of the tunnel know that we are deleting the tunnel.
-                        existingTunnel.PeerNotifyOfTunnelDeletion(tunnelKey.SwapDirection());
+                        existingTunnel.S2SPeerNotificationTunnelDeletion(tunnelKey.SwapDirection());
                     }
 
                     existingTunnel.Stop();
@@ -198,7 +198,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// </summary>
         /// <param name="tunnelId"></param>
         /// <param name="endpointConfiguration"></param>
-        public void DistributeUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointConfiguration)
+        public void UpsertEndpointAndDistribute(DirectionalKey tunnelKey, EndpointConfiguration endpointConfiguration)
         {
             var tunnel = Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey));
 
@@ -206,7 +206,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             UpsertEndpoint(tunnelKey, endpointConfiguration);
 
             //Apply the endpoint at the peer.
-            tunnel.PeerQueryUpsertEndpoint(tunnelKey.SwapDirection(), endpointConfiguration.SwapDirection());
+            tunnel.S2SPeerQueryUpsertEndpoint(tunnelKey.SwapDirection(), endpointConfiguration.SwapDirection());
         }
 
         /// <summary>
@@ -214,7 +214,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// </summary>
         /// <param name="tunnelId"></param>
         /// <param name="endpointId"></param>
-        public void DeleteEndpoint(DirectionalKey tunnelKey, Guid endpointId)
+        public void DeleteEndpointAndDistribute(DirectionalKey tunnelKey, Guid endpointId)
         {
             Collection.Use((o) =>
             {
@@ -223,7 +223,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 if (tunnel.IsLoggedIn)
                 {
                     //Let the other end of the tunnel know that we are deleting the endpoint.
-                    tunnel.PeerNotifyOfEndpointDeletion(tunnelKey.SwapDirection(), endpointId);
+                    tunnel.S2SPeerNotificationEndpointDeletion(tunnelKey.SwapDirection(), endpointId);
                 }
 
                 tunnel.DeleteEndpoint(endpointId);

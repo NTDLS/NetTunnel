@@ -1,14 +1,14 @@
 ﻿using NetTunnel.Library.Payloads;
 using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Library.ReliablePayloads.Notification
+namespace NetTunnel.Library.ReliablePayloads.Notification.ServiceToService
 {
-    public class NotificationEndpointDeletion : IRmNotification
+    public class S2SNotificationEndpointDeletion : IRmNotification
     {
         public DirectionalKey TunnelKey { get; set; }
         public Guid EndpointId { get; set; }
 
-        public NotificationEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
+        public S2SNotificationEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
         {
             TunnelKey = tunnelKey;
             EndpointId = endpointId;

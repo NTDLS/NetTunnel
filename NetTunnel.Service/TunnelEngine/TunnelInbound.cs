@@ -48,23 +48,23 @@ namespace NetTunnel.Service.TunnelEngine
             BytesReceived += (ulong)bytes;
         }
 
-        public S2SQueryUpsertEndpointReply PeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpoint)
-            => ServiceEngine.PeerQueryUpsertEndpoint(ConnectionId, tunnelKey, endpoint);
+        public S2SQueryUpsertEndpointReply S2SPeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpoint)
+            => ServiceEngine.S2SPeerQueryUpsertEndpoint(ConnectionId, tunnelKey, endpoint);
 
         /// <summary>
         /// Sends a notification to the remote tunnel service containing the data that was received
         ///     by an endpoint. This data is to be sent to the endpoint connection with the matching
-        ///     edgeId (which was originally sent to PeerNotifyOfEndpointConnect()
+        ///     edgeId (which was originally sent to S2SPeerNotificationEndpointConnect()
         /// </summary>
         /// <param name="tunnelKey">The id of the tunnel that owns the endpoint.</param>
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="edgeId">The id that will uniquely identity the associated endpoint connections at each service</param>
         /// <param name="bytes">Bytes to be sent to endpoint connection.</param>
         /// <param name="length">Number of bytes to be sent to the endpoint connection.</param>
-        public void PeerNotifyOfEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length)
+        public void S2SPeerNotificationEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length)
         {
             //Inbound tunnels communicate all data through the ServiceEngine._messageServer based on the ConnectionId.
-            ServiceEngine.PeerNotifyOfEndpointDataExchange(ConnectionId, tunnelKey, endpointId, edgeId, bytes, length);
+            ServiceEngine.S2SPeerNotificationEndpointDataExchange(ConnectionId, tunnelKey, endpointId, edgeId, bytes, length);
         }
 
         /// <summary>
@@ -77,28 +77,28 @@ namespace NetTunnel.Service.TunnelEngine
         /// <param name="tunnelKey">The id of the tunnel that owns the endpoint.</param>
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="edgeId">The id that will uniquely identity the associated endpoint connections at each service</param>
-        public void PeerNotifyOfEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
+        public void S2SPeerNotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
         {
             //Inbound tunnels communicate all data through the ServiceEngine._messageServer based on the ConnectionId.
-            ServiceEngine.PeerNotifyOfEndpointConnect(ConnectionId, tunnelKey, endpointId, edgeId);
+            ServiceEngine.S2SPeerNotificationEndpointConnect(ConnectionId, tunnelKey, endpointId, edgeId);
         }
 
-        public void PeerNotifyOfEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
+        public void S2SPeerNotificationEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
         {
             //Inbound tunnels communicate all data through the ServiceEngine._messageServer based on the ConnectionId.
-            ServiceEngine.PeerNotifyOfEndpointDisconnect(ConnectionId, tunnelKey, endpointId, edgeId);
+            ServiceEngine.S2SPeerNotificationEndpointDisconnect(ConnectionId, tunnelKey, endpointId, edgeId);
         }
 
-        public void PeerNotifyOfTunnelDeletion(DirectionalKey tunnelKey)
+        public void S2SPeerNotificationTunnelDeletion(DirectionalKey tunnelKey)
         {
             //Inbound tunnels communicate all data through the ServiceEngine._messageServer based on the ConnectionId.
-            ServiceEngine.PeerNotifyOfTunnelDeletion(ConnectionId, tunnelKey);
+            ServiceEngine.S2SPeerNotificationTunnelDeletion(ConnectionId, tunnelKey);
         }
 
-        public void PeerNotifyOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
+        public void S2SPeerNotificationEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
         {
             //Inbound tunnels communicate all data through the ServiceEngine._messageServer based on the ConnectionId.
-            ServiceEngine.PeerNotifyOfEndpointDeletion(ConnectionId, tunnelKey, endpointId);
+            ServiceEngine.S2SPeerNotificationEndpointDeletion(ConnectionId, tunnelKey, endpointId);
         }
 
         #endregion

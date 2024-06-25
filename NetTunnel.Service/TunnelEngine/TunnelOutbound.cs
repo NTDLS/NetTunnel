@@ -2,7 +2,7 @@
 using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
-using NetTunnel.Service.ReliableHandlers.ServiceClient;
+using NetTunnel.Service.ReliableHandlers.ServiceClient.Notifications;
 using NTDLS.ReliableMessaging;
 using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
@@ -25,7 +25,6 @@ namespace NetTunnel.Service.TunnelEngine
                 Configuration.Address, Configuration.ServicePort, Configuration.Username, Configuration.PasswordHash, this);
 
             _client.Client.AddHandler(new TunnelOutboundNotificationHandlers());
-            _client.Client.AddHandler(new TunnelOutboundQueryHandlers());
 
             _client.Client.OnConnected += Client_OnConnected;
             _client.Client.OnDisconnected += Client_OnDisconnected;
@@ -49,21 +48,21 @@ namespace NetTunnel.Service.TunnelEngine
             BytesReceived += (ulong)bytes;
         }
 
-        public S2SQueryUpsertEndpointReply PeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointId)
-            => _client.PeerQueryUpsertEndpoint(tunnelKey, endpointId);
+        public S2SQueryUpsertEndpointReply S2SPeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointId)
+            => _client.S2SPeerQueryUpsertEndpoint(tunnelKey, endpointId);
 
         /// <summary>
         /// Sends a notification to the remote tunnel service containing the data that was received
         ///     by an endpoint. This data is to be sent to the endpoint connection with the matching
-        ///     edgeId (which was originally sent to PeerNotifyOfEndpointConnect()
+        ///     edgeId (which was originally sent to S2SPeerNotificationEndpointConnect()
         /// </summary>
         /// <param name="tunnelKey">The id of the tunnel that owns the endpoint.</param>
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="edgeId">The id that will uniquely identity the associated endpoint connections at each service</param>
         /// <param name="bytes">Bytes to be sent to endpoint connection.</param>
         /// <param name="length">Number of bytes to be sent to the endpoint connection.</param>
-        public void PeerNotifyOfEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length)
-            => _client.NotificationEndpointExchange(tunnelKey, endpointId, edgeId, bytes, length);
+        public void S2SPeerNotificationEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length)
+            => _client.S2SNotificationEndpointExchange(tunnelKey, endpointId, edgeId, bytes, length);
 
         /// <summary>
         /// Sends a notification to the remote tunnel service to let it know to connect
@@ -72,17 +71,17 @@ namespace NetTunnel.Service.TunnelEngine
         /// <param name="tunnelKey">The id of the tunnel that owns the endpoint.</param>
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="edgeId">The id that will uniquely identity the associated endpoint connections at each service</param>
-        public void PeerNotifyOfEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
-            => _client.NotificationEndpointConnect(tunnelKey, endpointId, edgeId);
+        public void S2SPeerNotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
+            => _client.S2SNotificationEndpointConnect(tunnelKey, endpointId, edgeId);
 
-        public void PeerNotifyOfEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
-            => _client.PeerNotifyOfEndpointDisconnect(tunnelKey, endpointId, edgeId);
+        public void S2SPeerNotificationEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
+            => _client.S2SPeerNotificationEndpointDisconnect(tunnelKey, endpointId, edgeId);
 
-        public void PeerNotifyOfTunnelDeletion(DirectionalKey tunnelKey)
-            => _client.PeerNotifyOfTunnelDeletion(tunnelKey);
+        public void S2SPeerNotificationTunnelDeletion(DirectionalKey tunnelKey)
+            => _client.S2SPeerNotificationTunnelDeletion(tunnelKey);
 
-        public void PeerNotifyOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
-            => _client.PeerNotifyOfEndpointDeletion(tunnelKey, endpointId);
+        public void S2SPeerNotificationEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
+            => _client.S2SPeerNotificationEndpointDeletion(tunnelKey, endpointId);
 
         #endregion
 
@@ -171,7 +170,7 @@ namespace NetTunnel.Service.TunnelEngine
                             Singletons.Configuration.PingCadence > 0 &&
                             (DateTime.UtcNow - lastPingDateTime).TotalMilliseconds > Singletons.Configuration.PingCadence)
                         {
-                            previousPing = _client.Ping(TunnelKey, previousPing);
+                            previousPing = _client.S2SQueryPing(TunnelKey, previousPing);
                             if (previousPing != null)
                             {
                                 PingTime = (double)previousPing;

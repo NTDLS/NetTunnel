@@ -1,9 +1,8 @@
-﻿using NetTunnel.Library.ReliablePayloads.Notification;
-using NetTunnel.Service.ReliableMessages.Notification;
+﻿using NetTunnel.Library.ReliablePayloads.Notification.ServiceToService;
 using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Service.ReliableHandlers.ServiceClient
+namespace NetTunnel.Service.ReliableHandlers.ServiceClient.Notifications
 {
     /// <summary>
     /// Each outbound tunnel makes its own connection using an RmClient. These are the handlers for each outbound tunnel.
@@ -16,7 +15,7 @@ namespace NetTunnel.Service.ReliableHandlers.ServiceClient
         /// </summary>
         /// <param name="context"></param>
         /// <param name="notification"></param>
-        public void OnNotify(RmContext context, NotificationEndpointConnect notification)
+        public void OnNotify(RmContext context, S2SNotificationEndpointConnect notification)
         {
             try
             {
@@ -34,7 +33,13 @@ namespace NetTunnel.Service.ReliableHandlers.ServiceClient
             }
         }
 
-        public void OnNotify(RmContext context, NotificationEndpointDataExchange notification)
+        /// <summary>
+        /// The remote service is letting us know that edge data has been received on an endpoint and is giving
+        ///      it to the local service to that it can be delivered to the associated endpoint edge connection.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="notification"></param>
+        public void OnNotify(RmContext context, S2SNotificationEndpointDataExchange notification)
         {
             try
             {
@@ -49,7 +54,12 @@ namespace NetTunnel.Service.ReliableHandlers.ServiceClient
             }
         }
 
-        public void OnNotify(RmContext context, NotificationTunnelDeletion notification)
+        /// <summary>
+        /// The remote service is letting us know that it is deleting the given tunnel.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="notification"></param>
+        public void OnNotify(RmContext context, S2SNotificationTunnelDeletion notification)
         {
             try
             {
@@ -64,13 +74,18 @@ namespace NetTunnel.Service.ReliableHandlers.ServiceClient
             }
         }
 
-        public void OnNotify(RmContext context, NotificationEndpointDeletion notification)
+        /// <summary>
+        /// The remote service is letting us know that it is deleting the given endpoint.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="notification"></param>
+        public void OnNotify(RmContext context, S2SNotificationEndpointDeletion notification)
         {
             try
             {
                 var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
 
-                Singletons.ServiceEngine.Tunnels.DeleteEndpoint(notification.TunnelKey, notification.EndpointId);
+                Singletons.ServiceEngine.Tunnels.DeleteEndpointAndDistribute(notification.TunnelKey, notification.EndpointId);
             }
             catch (Exception ex)
             {
@@ -79,7 +94,12 @@ namespace NetTunnel.Service.ReliableHandlers.ServiceClient
             }
         }
 
-        public void OnNotify(RmContext context, NotificationEndpointDisconnect notification)
+        /// <summary>
+        /// The remote service is letting us know that an edge connection has been terminated to the given endpoint.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="notification"></param>
+        public void OnNotify(RmContext context, S2SNotificationEndpointDisconnect notification)
         {
             try
             {

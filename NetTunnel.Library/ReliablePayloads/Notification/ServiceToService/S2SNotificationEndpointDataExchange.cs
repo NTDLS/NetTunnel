@@ -1,16 +1,16 @@
 ﻿using NetTunnel.Library.Payloads;
 using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Library.ReliablePayloads.Notification
+namespace NetTunnel.Library.ReliablePayloads.Notification.ServiceToService
 {
-    public class NotificationEndpointDataExchange : IRmNotification
+    public class S2SNotificationEndpointDataExchange : IRmNotification
     {
         public Guid EdgeId { get; set; }
         public DirectionalKey TunnelKey { get; set; }
         public Guid EndpointId { get; set; }
         public byte[] Bytes { get; set; }
 
-        public NotificationEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length)
+        public S2SNotificationEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length)
         {
             EdgeId = edgeId;
             TunnelKey = tunnelKey;
@@ -20,7 +20,7 @@ namespace NetTunnel.Library.ReliablePayloads.Notification
             Array.Copy(bytes, Bytes, length);
         }
 
-        public NotificationEndpointDataExchange()
+        public S2SNotificationEndpointDataExchange()
         {
             Bytes = Array.Empty<byte>();
             TunnelKey = new DirectionalKey();

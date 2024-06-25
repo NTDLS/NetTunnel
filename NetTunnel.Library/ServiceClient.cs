@@ -1,11 +1,12 @@
 ﻿using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
-using NetTunnel.Library.ReliablePayloads.Notification;
+using NetTunnel.Library.ReliablePayloads.Notification.ServiceToService;
+using NetTunnel.Library.ReliablePayloads.Notification.UI;
+using NetTunnel.Library.ReliablePayloads.Notification.UIOrService;
 using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
 using NetTunnel.Library.ReliablePayloads.Query.UI;
 using NetTunnel.Library.ReliablePayloads.Query.UIOrService;
 using NetTunnel.Service.ReliableMessages;
-using NetTunnel.Service.ReliableMessages.Notification;
 using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
@@ -132,7 +133,7 @@ namespace NetTunnel.Library
                 $"Tunnel cryptography initialized to {compoundNegotiator.SharedSecret.Length * 8}bits. Hash {Utility.ComputeSha256Hash(compoundNegotiator.SharedSecret)}.");
 
             //Tell the server we are switching to encryption.
-            Client.Notify(new NotificationApplyCryptography());
+            Client.Notify(new UOSNotificationApplyCryptography());
             Client.SetCryptographyProvider(cryptographyProvider);
 
             _logger.Verbose("Tunnel cryptography provider has been applied.");
@@ -151,11 +152,38 @@ namespace NetTunnel.Library
             }
         }
 
-        public double Ping(DirectionalKey tunnelKey, double? previousPing)
+        #region Service-to-Service.
+
+        public double S2SQueryPing(DirectionalKey tunnelKey, double? previousPing)
         {
             var result = Client.Query(new S2SQueryPing(tunnelKey, previousPing)).Result;
             return (DateTime.UtcNow - result.OriginationTimestamp).TotalMilliseconds;
         }
+
+        public S2SQueryRegisterTunnelReply S2SQueryRegisterTunnel(TunnelConfiguration Collection)
+            => Client.Query(new S2SQueryRegisterTunnel(Collection)).Result;
+
+        public void S2SNotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
+            => Client.Notify(new S2SNotificationEndpointConnect(tunnelKey, endpointId, edgeId));
+
+        public void S2SPeerNotificationEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
+            => Client.Notify(new S2SNotificationEndpointDisconnect(tunnelKey, endpointId, edgeId));
+
+        public void S2SPeerNotificationTunnelDeletion(DirectionalKey tunnelKey)
+            => Client.Notify(new S2SNotificationTunnelDeletion(tunnelKey));
+
+        public void S2SPeerNotificationEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
+            => Client.Notify(new S2SNotificationEndpointDeletion(tunnelKey, endpointId));
+
+        public void S2SNotificationEndpointExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length)
+            => Client.Notify(new S2SNotificationEndpointDataExchange(tunnelKey, endpointId, edgeId, bytes, length));
+
+        public S2SQueryUpsertEndpointReply S2SPeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpoint)
+            => Client.Query(new S2SQueryUpsertEndpoint(tunnelKey, endpoint)).Result;
+
+        #endregion
+
+        #region User Interface (UI).
 
         public UIQueryGetTunnelStatisticsReply UIQueryGetTunnelStatistics()
             => Client.Query(new UIQueryGetTunnelStatistics()).Result;
@@ -180,9 +208,6 @@ namespace NetTunnel.Library
 
         public UIQueryGetTunnelsReply UIQueryGetTunnels()
             => Client.Query(new UIQueryGetTunnels()).Result;
-
-        public S2SQueryRegisterTunnelReply S2SQueryRegisterTunnel(TunnelConfiguration Collection)
-            => Client.Query(new S2SQueryRegisterTunnel(Collection)).Result;
 
         public UIQueryDistributeUpsertEndpointReply UIQueryDistributeUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration configuration)
             => Client.Query(new UIQueryDistributeUpsertEndpoint(tunnelKey, configuration)).Result;
@@ -211,25 +236,9 @@ namespace NetTunnel.Library
         public UIQueryCreateUserReply UIQueryCreateUser(User user)
             => Client.Query(new UIQueryCreateUser(user)).Result;
 
-        public void NotifyTerminateEndpointEdgeConnection(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
-            => Client.Notify(new NotifyTerminateEndpointEdgeConnection(tunnelKey, endpointId, edgeId));
+        public void UINotifyTerminateEndpointEdgeConnection(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
+            => Client.Notify(new UINotifyTerminateEndpointEdgeConnection(tunnelKey, endpointId, edgeId));
 
-        public void NotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
-            => Client.Notify(new NotificationEndpointConnect(tunnelKey, endpointId, edgeId));
-
-        public void PeerNotifyOfEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
-            => Client.Notify(new NotificationEndpointDisconnect(tunnelKey, endpointId, edgeId));
-
-        public void PeerNotifyOfTunnelDeletion(DirectionalKey tunnelKey)
-            => Client.Notify(new NotificationTunnelDeletion(tunnelKey));
-
-        public void PeerNotifyOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
-            => Client.Notify(new NotificationEndpointDeletion(tunnelKey, endpointId));
-
-        public void NotificationEndpointExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length)
-            => Client.Notify(new NotificationEndpointDataExchange(tunnelKey, endpointId, edgeId, bytes, length));
-
-        public S2SQueryUpsertEndpointReply PeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpoint)
-            => Client.Query(new S2SQueryUpsertEndpoint(tunnelKey, endpoint)).Result;
+        #endregion
     }
 }

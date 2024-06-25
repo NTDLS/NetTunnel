@@ -59,22 +59,22 @@ namespace NetTunnel.Service.TunnelEngine
         void ITunnel.IncrementBytesReceived(int bytes)
            => throw new NotImplementedException("This function should be overridden.");
 
-        S2SQueryUpsertEndpointReply ITunnel.PeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointId)
+        S2SQueryUpsertEndpointReply ITunnel.S2SPeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointId)
            => throw new NotImplementedException("This function should be overridden.");
 
-        void ITunnel.PeerNotifyOfEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length)
+        void ITunnel.S2SPeerNotificationEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length)
            => throw new NotImplementedException("This function should be overridden.");
 
-        void ITunnel.PeerNotifyOfEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
+        void ITunnel.S2SPeerNotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
            => throw new NotImplementedException("This function should be overridden.");
 
-        void ITunnel.PeerNotifyOfTunnelDeletion(DirectionalKey tunnelKey)
+        void ITunnel.S2SPeerNotificationTunnelDeletion(DirectionalKey tunnelKey)
            => throw new NotImplementedException("This function should be overridden.");
 
-        void ITunnel.PeerNotifyOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
+        void ITunnel.S2SPeerNotificationEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
            => throw new NotImplementedException("This function should be overridden.");
 
-        void ITunnel.PeerNotifyOfEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
+        void ITunnel.S2SPeerNotificationEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
            => throw new NotImplementedException("This function should be overridden.");
 
         public EndpointPropertiesDisplay GetEndpointProperties(DirectionalKey endpointKey)
@@ -136,9 +136,6 @@ namespace NetTunnel.Service.TunnelEngine
 
         #endregion
 
-        public IEndpoint? GetEndpointById(Guid pairId)
-            => Endpoints.SingleOrDefault(o => o.EndpointId == pairId);
-
         public TunnelConfiguration CloneConfiguration()
             => Configuration.CloneConfiguration();
 
@@ -177,7 +174,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         public IEndpoint UpsertEndpoint(EndpointConfiguration configuration)
         {
-            var existingEndpoint = GetEndpointById(configuration.EndpointId);
+            var existingEndpoint = Endpoints.SingleOrDefault(o => o.EndpointId == configuration.EndpointId);
             if (existingEndpoint != null)
             {
                 DeleteEndpoint(existingEndpoint.EndpointId);
@@ -206,7 +203,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         public void DeleteEndpoint(Guid endpointId)
         {
-            var endpoint = GetEndpointById(endpointId);
+            var endpoint = Endpoints.SingleOrDefault(o => o.EndpointId == endpointId);
             if (endpoint != null)
             {
                 endpoint.Stop();
@@ -221,7 +218,7 @@ namespace NetTunnel.Service.TunnelEngine
         /// Disconnect the endpoint edge from the external server, browser, etc.
         /// </summary>
         public void DisconnectEndpointEdge(Guid endpointId, Guid edgeId)
-            => GetEndpointById(endpointId)?.Disconnect(edgeId);
+            => Endpoints.SingleOrDefault(o => o.EndpointId == endpointId)?.Disconnect(edgeId);
 
         public override int GetHashCode()
         {

@@ -3,7 +3,7 @@ using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 
-namespace NetTunnel.Service.ReliableHandlers.Service
+namespace NetTunnel.Service.ReliableHandlers.Service.Queries
 {
     /// <summary>
     /// The NetTunnel service shares one single instance of RmServer and therefor all inbound tunnels connect to it.
@@ -36,6 +36,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             }
         }
 
+        /// <summary>
+        /// A user is asking the service to create a tunnel with the given configuration.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public UIQueryCreateTunnelReply OnQuery(RmContext context, UIQueryCreateTunnel query)
         {
             try
@@ -57,6 +63,13 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             }
         }
 
+        /// <summary>
+        /// A user is asking that a new endpoint be added to the local tunnel and also sent through the connected tunnel
+        ///     to the other service on the other end so that it can also add associated endpoint to its tunnel.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public UIQueryDistributeUpsertEndpointReply OnQuery(RmContext context, UIQueryDistributeUpsertEndpoint query)
         {
             try
@@ -67,7 +80,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service
                     throw new Exception("Unauthorized");
                 }
 
-                Singletons.ServiceEngine.Tunnels.DistributeUpsertEndpoint(query.TunnelKey, query.Configuration);
+                Singletons.ServiceEngine.Tunnels.UpsertEndpointAndDistribute(query.TunnelKey, query.Configuration);
 
                 return new UIQueryDistributeUpsertEndpointReply();
             }
@@ -78,6 +91,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             }
         }
 
+        /// <summary>
+        /// The UI is requesting general tunnel statistics.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public UIQueryGetTunnelStatisticsReply OnQuery(RmContext context, UIQueryGetTunnelStatistics query)
         {
             try
@@ -96,6 +115,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             }
         }
 
+        /// <summary>
+        /// The UI is requesting that a tunnel be deleted.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public UIQueryDeleteTunnelReply OnQuery(RmContext context, UIQueryDeleteTunnel query)
         {
             try
@@ -118,6 +143,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             }
         }
 
+        /// <summary>
+        /// The UI is requesting a list of all users.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public UIQueryGetUsersReply OnQuery(RmContext context, UIQueryGetUsers query)
         {
             try
@@ -140,6 +171,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             }
         }
 
+        /// <summary>
+        /// The UI is requesting to delete a given user.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public UIQueryDeleteUserReply OnQuery(RmContext context, UIQueryDeleteUser query)
         {
             try
@@ -161,6 +198,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             }
         }
 
+        /// <summary>
+        /// The UI is requesting that a user be altered with the given information (password, role, etc.)
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public UIQueryEditUserReply OnQuery(RmContext context, UIQueryEditUser query)
         {
             try
@@ -182,6 +225,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             }
         }
 
+        /// <summary>
+        /// The UI is requesting that a user be created with the given information.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public UIQueryCreateUserReply OnQuery(RmContext context, UIQueryCreateUser query)
         {
             try
@@ -203,6 +252,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             }
         }
 
+        /// <summary>
+        /// The UI is requesting the local service configuration.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public UIQueryGetServiceConfigurationReply OnQuery(RmContext context, UIQueryGetServiceConfiguration query)
         {
             try
@@ -225,6 +280,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             }
         }
 
+        /// <summary>
+        /// The UI is requesting that the local service configuration be changed.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public UIQueryPutServiceConfigurationReply OnQuery(RmContext context, UIQueryPutServiceConfiguration query)
         {
             try
@@ -246,6 +307,13 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             }
         }
 
+        /// <summary>
+        /// The UI is requesting that an endpoint be deleted and that we let the
+        ///     remote service connected to the tunnel know so it can do the same.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public UIQueryDeleteEndpointReply OnQuery(RmContext context, UIQueryDeleteEndpoint query)
         {
             try
@@ -256,7 +324,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service
                     throw new Exception("Unauthorized");
                 }
 
-                Singletons.ServiceEngine.Tunnels.DeleteEndpoint(query.TunnelKey, query.EndpointId);
+                Singletons.ServiceEngine.Tunnels.DeleteEndpointAndDistribute(query.TunnelKey, query.EndpointId);
 
                 return new UIQueryDeleteEndpointReply();
             }
@@ -267,6 +335,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             }
         }
 
+        /// <summary>
+        /// The UI is requesting that a tunnel be started.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public UIQueryStartTunnelReply OnQuery(RmContext context, UIQueryStartTunnel query)
         {
             try
@@ -288,6 +362,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             }
         }
 
+        /// <summary>
+        /// The UI is requesting that a tunnel be stopped.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public UIQueryStopTunnelReply OnQuery(RmContext context, UIQueryStopTunnel query)
         {
             try
@@ -309,6 +389,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             }
         }
 
+        /// <summary>
+        /// The UI is requesting general tunnel properties.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public UIQueryGetTunnelPropertiesReply OnQuery(RmContext context, UIQueryGetTunnelProperties query)
         {
             try
@@ -331,6 +417,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             }
         }
 
+        /// <summary>
+        /// The UI is requesting general endpoint properties.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public UIQueryGetEndpointPropertiesReply OnQuery(RmContext context, UIQueryGetEndpointProperties query)
         {
             try
@@ -349,6 +441,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             }
         }
 
+        /// <summary>
+        /// The UI is requesting a list of edge connections to a given endpoint.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public UIQueryGetEndpointEdgeConnectionsReply OnQuery(RmContext context, UIQueryGetEndpointEdgeConnections query)
         {
             try

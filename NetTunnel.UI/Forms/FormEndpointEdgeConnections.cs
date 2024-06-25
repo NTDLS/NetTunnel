@@ -173,7 +173,7 @@ namespace NetTunnel.UI.Forms
                             {
                                 if (selectedItem.Tag is EdgeState tag)
                                 {
-                                    _client.EnsureNotNull().NotifyTerminateEndpointEdgeConnection(tag.TunnelKey, tag.EndpointKey.Id, tag.EdgeId);
+                                    _client.EnsureNotNull().UINotifyTerminateEndpointEdgeConnection(tag.TunnelKey, tag.EndpointKey.Id, tag.EdgeId);
                                 }
                             }
                             catch (Exception ex)

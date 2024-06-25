@@ -42,14 +42,14 @@ namespace NetTunnel.Library.Interfaces
         /// <summary>
         /// Sends a notification to the remote tunnel service containing the data that was received
         ///     by an endpoint. This data is to be sent to the endpoint connection with the matching
-        ///     edgeId (which was originally sent to PeerNotifyOfEndpointConnect()
+        ///     edgeId (which was originally sent to S2SPeerNotificationEndpointConnect()
         /// </summary>
         /// <param name="tunnelKey">The id of the tunnel that owns the endpoint.</param>
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="edgeId">The id that will uniquely identity the associated endpoint connections at each service</param>
         /// <param name="bytes">Bytes to be sent to endpoint connection.</param>
         /// <param name="length">Number of bytes to be sent to the endpoint connection.</param>
-        public void PeerNotifyOfEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length);
+        public void S2SPeerNotificationEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length);
 
         /// <summary>
         /// Sends a notification to the remote tunnel service to let it know to connect
@@ -58,11 +58,11 @@ namespace NetTunnel.Library.Interfaces
         /// <param name="tunnelKey">The id of the tunnel that owns the endpoint.</param>
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="edgeId">The id that will uniquely identity the associated endpoint connections at each service</param>
-        public void PeerNotifyOfEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId);
-        public void PeerNotifyOfEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId);
-        public void PeerNotifyOfTunnelDeletion(DirectionalKey tunnelKey);
-        public void PeerNotifyOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId);
-        public S2SQueryUpsertEndpointReply PeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointId);
+        public void S2SPeerNotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId);
+        public void S2SPeerNotificationEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId);
+        public void S2SPeerNotificationTunnelDeletion(DirectionalKey tunnelKey);
+        public void S2SPeerNotificationEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId);
+        public S2SQueryUpsertEndpointReply S2SPeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointId);
 
         public void IncrementBytesSent(int bytes);
         public void IncrementBytesReceived(int bytes);

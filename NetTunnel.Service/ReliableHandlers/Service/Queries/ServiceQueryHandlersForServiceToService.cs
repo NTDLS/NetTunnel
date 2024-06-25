@@ -3,7 +3,7 @@ using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 
-namespace NetTunnel.Service.ReliableHandlers.Service
+namespace NetTunnel.Service.ReliableHandlers.Service.Queries
 {
     /// <summary>
     /// The NetTunnel service shares one single instance of RmServer and therefor all inbound tunnels connect to it.
@@ -13,6 +13,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service
     /// </summary>
     internal class ServiceQueryHandlersForServiceToService : ServiceHandlerBase, IRmMessageHandler
     {
+        /// <summary>
+        /// The remote service is requesting that this service respond to a ping request.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public S2SQueryPingReply OnQuery(RmContext context, S2SQueryPing query)
         {
             try
@@ -33,6 +39,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             }
         }
 
+        /// <summary>
+        /// The remote outbound service is asking this service to register the given tunnel and its endpoints.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public S2SQueryRegisterTunnelReply OnQuery(RmContext context, S2SQueryRegisterTunnel query)
         {
             try
@@ -55,6 +67,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             }
         }
 
+        /// <summary>
+        /// A new endpoint has been added to the remote service, so that remote service is asking this service to add the andpoint locally too.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public S2SQueryUpsertEndpointReply OnQuery(RmContext context, S2SQueryUpsertEndpoint query)
         {
             try
