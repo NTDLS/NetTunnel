@@ -13,7 +13,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         public byte[] Decrypt(RmContext context, byte[] encryptedPayload)
         {
-            if (_serviceEngine.ServiceConnectionStates.TryGetValue(context.ConnectionId, out var connection))
+            if (_serviceEngine.TryGetServiceConnectionState(context.ConnectionId, out var connection))
             {
                 if (connection.TunnelKey != null)
                 {
@@ -34,7 +34,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         public byte[] Encrypt(RmContext context, byte[] payload)
         {
-            if (_serviceEngine.ServiceConnectionStates.TryGetValue(context.ConnectionId, out var connection))
+            if (_serviceEngine.TryGetServiceConnectionState(context.ConnectionId, out var connection))
             {
                 if (connection.TunnelKey != null)
                 {

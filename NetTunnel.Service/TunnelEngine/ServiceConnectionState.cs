@@ -18,7 +18,6 @@ namespace NetTunnel.Service.TunnelEngine
         public string KeyHash { get; private set; } = string.Empty;
         public int KeyLength { get; private set; }
 
-
         /// <summary>
         /// If the Service Connection is associated with a tunnel connection, this will be set at tunnel registration.
         /// Remember that the UI also makes connections to the ServiceEngine, and those connections do not use a tunnel.

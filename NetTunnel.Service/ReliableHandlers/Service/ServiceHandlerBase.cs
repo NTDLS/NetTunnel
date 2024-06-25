@@ -62,7 +62,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service
         {
             try
             {
-                if (Singletons.ServiceEngine.ServiceConnectionStates.TryGetValue(context.ConnectionId, out var connection))
+                if (Singletons.ServiceEngine.TryGetServiceConnectionState(context.ConnectionId, out var connection))
                 {
                     if (connection.Validate($"{context.TcpClient.Client.RemoteEndPoint}"))
                     {

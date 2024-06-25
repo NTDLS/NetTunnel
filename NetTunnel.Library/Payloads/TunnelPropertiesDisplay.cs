@@ -25,7 +25,6 @@ namespace NetTunnel.Library.Payloads
         public Guid ConnectionId { get; set; }
         public int KeyLength { get; set; }
         public string KeyHash { get; set; } = string.Empty;
-        public string PeerIpAddress { get; set; } = string.Empty;
         public double? PingTime { get; set; }
         public NtTunnelStatus Status { get; set; }
         public ulong CurrentConnections { get; set; }

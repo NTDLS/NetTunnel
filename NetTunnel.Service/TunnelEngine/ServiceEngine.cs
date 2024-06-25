@@ -6,6 +6,8 @@ using NetTunnel.Service.ReliableHandlers.Service.Notifications;
 using NetTunnel.Service.ReliableHandlers.Service.Queries;
 using NetTunnel.Service.TunnelEngine.Managers;
 using NTDLS.ReliableMessaging;
+using NTDLS.Semaphore;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NetTunnel.Service.TunnelEngine
 {
@@ -14,7 +16,7 @@ namespace NetTunnel.Service.TunnelEngine
         /// <summary>
         /// Contains a list of the connections that have been made TO the local service and their connection state info.
         /// </summary>
-        public Dictionary<Guid, ServiceConnectionState> ServiceConnectionStates { get; private set; } = new();
+        public PessimisticCriticalResource<Dictionary<Guid, ServiceConnectionState>> ServiceConnectionStates { get; private set; } = new();
 
         /// <summary>
         /// Contains the information for all tunnels, inbound and outbound. Keep in mind that we only persist
@@ -62,6 +64,20 @@ namespace NetTunnel.Service.TunnelEngine
                     + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
             };
         }
+
+        public bool TryGetServiceConnectionState(Guid connectionId, [NotNullWhen(true)] out ServiceConnectionState? outState)
+        {
+            var state = ServiceConnectionStates.Use(o =>
+            {
+                o.TryGetValue(connectionId, out var connection);
+                return connection;
+            });
+
+            outState = state;
+
+            return state != null;
+        }
+
 
         #region Interface: IServiceEngine
 
@@ -118,14 +134,14 @@ namespace NetTunnel.Service.TunnelEngine
 
         private void ServiceEngine_OnConnected(RmContext context)
         {
-            ServiceConnectionStates.Add(context.ConnectionId,
-                new ServiceConnectionState(context.ConnectionId, $"{context.TcpClient.Client.RemoteEndPoint}"));
+            ServiceConnectionStates.Use(o => o.Add(context.ConnectionId,
+                new ServiceConnectionState(context.ConnectionId, $"{context.TcpClient.Client.RemoteEndPoint}")));
         }
 
         private void ServiceEngine_OnDisconnected(RmContext context)
         {
             Tunnels.DeregisterTunnel(context.ConnectionId);
-            ServiceConnectionStates.Remove(context.ConnectionId);
+            ServiceConnectionStates.Use(o => o.Remove(context.ConnectionId));
         }
 
         public void Start()
