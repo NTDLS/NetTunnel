@@ -166,8 +166,11 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             Collection.Use((o) =>
             {
-                var tunnel = o.Single(o => o.TunnelKey == tunnelKey.SwapDirection());
-                tunnel.PingTime = pingTime;
+                var tunnel = o.SingleOrDefault(o => o.TunnelKey == tunnelKey.SwapDirection());
+                if (tunnel != null)
+                {
+                    tunnel.PingTime = pingTime;
+                }
             });
         }
 

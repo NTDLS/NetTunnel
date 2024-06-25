@@ -93,6 +93,10 @@ namespace NetTunnel.Service.ReliableHandlers
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+                if (connectionContext.UserRole != NtUserRole.Administrator)
+                {
+                    throw new Exception("Unauthorized");
+                }
 
                 Singletons.ServiceEngine.Tunnels.UpsertTunnel(query.Configuration);
 
@@ -130,6 +134,10 @@ namespace NetTunnel.Service.ReliableHandlers
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+                if (connectionContext.UserRole != NtUserRole.Administrator)
+                {
+                    throw new Exception("Unauthorized");
+                }
 
                 Singletons.ServiceEngine.Tunnels.DistributeUpsertEndpoint(query.TunnelKey, query.Configuration);
 
@@ -147,6 +155,10 @@ namespace NetTunnel.Service.ReliableHandlers
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+                if (connectionContext.UserRole != NtUserRole.Administrator)
+                {
+                    throw new Exception("Unauthorized");
+                }
 
                 Singletons.ServiceEngine.Tunnels.UpsertEndpoint(query.TunnelKey, query.Configuration);
 
@@ -164,6 +176,11 @@ namespace NetTunnel.Service.ReliableHandlers
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+                if (connectionContext.UserRole != NtUserRole.Administrator)
+                {
+                    throw new Exception("Unauthorized");
+                }
+
                 var tunnelKey = Singletons.ServiceEngine.Tunnels.RegisterTunnel(context.ConnectionId, query.Configuration);
                 connectionContext.AssociateTunnel(tunnelKey);
 
@@ -199,6 +216,10 @@ namespace NetTunnel.Service.ReliableHandlers
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+                if (connectionContext.UserRole != NtUserRole.Administrator)
+                {
+                    throw new Exception("Unauthorized");
+                }
 
                 //We want to stop and delete the tunnel locally.
                 Singletons.ServiceEngine.Tunnels.DeleteTunnel(query.TunnelKey);
@@ -217,6 +238,10 @@ namespace NetTunnel.Service.ReliableHandlers
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+                if (connectionContext.UserRole != NtUserRole.Administrator)
+                {
+                    throw new Exception("Unauthorized");
+                }
 
                 return new QueryGetUsersReply()
                 {
@@ -235,6 +260,10 @@ namespace NetTunnel.Service.ReliableHandlers
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+                if (connectionContext.UserRole != NtUserRole.Administrator)
+                {
+                    throw new Exception("Unauthorized");
+                }
 
                 Singletons.ServiceEngine.Users.Delete(query.UserName);
 
@@ -252,6 +281,10 @@ namespace NetTunnel.Service.ReliableHandlers
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+                if (connectionContext.UserRole != NtUserRole.Administrator)
+                {
+                    throw new Exception("Unauthorized");
+                }
 
                 Singletons.ServiceEngine.Users.EditUser(query.User);
 
@@ -269,6 +302,10 @@ namespace NetTunnel.Service.ReliableHandlers
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+                if (connectionContext.UserRole != NtUserRole.Administrator)
+                {
+                    throw new Exception("Unauthorized");
+                }
 
                 Singletons.ServiceEngine.Users.Add(query.User);
 
@@ -286,6 +323,10 @@ namespace NetTunnel.Service.ReliableHandlers
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+                if (connectionContext.UserRole != NtUserRole.Administrator)
+                {
+                    throw new Exception("Unauthorized");
+                }
 
                 return new QueryGetServiceConfigurationReply()
                 {
@@ -304,6 +345,10 @@ namespace NetTunnel.Service.ReliableHandlers
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+                if (connectionContext.UserRole != NtUserRole.Administrator)
+                {
+                    throw new Exception("Unauthorized");
+                }
 
                 Singletons.UpdateConfiguration(query.Configuration);
 
@@ -321,6 +366,10 @@ namespace NetTunnel.Service.ReliableHandlers
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+                if (connectionContext.UserRole != NtUserRole.Administrator)
+                {
+                    throw new Exception("Unauthorized");
+                }
 
                 Singletons.ServiceEngine.Tunnels.DeleteEndpoint(query.TunnelKey, query.EndpointId);
 
@@ -338,6 +387,10 @@ namespace NetTunnel.Service.ReliableHandlers
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+                if (connectionContext.UserRole != NtUserRole.Administrator)
+                {
+                    throw new Exception("Unauthorized");
+                }
 
                 Singletons.ServiceEngine.Tunnels.Start(query.TunnelKey);
 
@@ -355,6 +408,10 @@ namespace NetTunnel.Service.ReliableHandlers
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+                if (connectionContext.UserRole != NtUserRole.Administrator)
+                {
+                    throw new Exception("Unauthorized");
+                }
 
                 Singletons.ServiceEngine.Tunnels.Stop(query.TunnelKey);
 
@@ -372,6 +429,10 @@ namespace NetTunnel.Service.ReliableHandlers
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+                if (connectionContext.UserRole != NtUserRole.Administrator)
+                {
+                    throw new Exception("Unauthorized");
+                }
 
                 return new QueryGetTunnelPropertiesReply()
                 {
