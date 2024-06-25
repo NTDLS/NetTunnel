@@ -1,8 +1,8 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
-using NetTunnel.Library.ReliablePayloads.Query;
-using NetTunnel.Service.ReliableHandlers;
+using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
+using NetTunnel.Service.ReliableHandlers.ServiceClient;
 using NTDLS.ReliableMessaging;
 using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
@@ -25,7 +25,7 @@ namespace NetTunnel.Service.TunnelEngine
                 Configuration.Address, Configuration.ServicePort, Configuration.Username, Configuration.PasswordHash, this);
 
             _client.Client.AddHandler(new TunnelOutboundNotificationHandlers());
-            //_client.AddHandler(new TunnelOutboundQueryHandlers());
+            _client.Client.AddHandler(new TunnelOutboundQueryHandlers());
 
             _client.Client.OnConnected += Client_OnConnected;
             _client.Client.OnDisconnected += Client_OnDisconnected;
@@ -49,7 +49,7 @@ namespace NetTunnel.Service.TunnelEngine
             BytesReceived += (ulong)bytes;
         }
 
-        public QueryUpsertEndpointReply PeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointId)
+        public S2SQueryUpsertEndpointReply PeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointId)
             => _client.PeerQueryUpsertEndpoint(tunnelKey, endpointId);
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace NetTunnel.Service.TunnelEngine
                         //Make the outbound connection to the remote tunnel service.
                         _client.ConnectAndLogin();
 
-                        _client.QueryRegisterTunnel(Configuration);
+                        _client.S2SQueryRegisterTunnel(Configuration);
 
                         Status = NtTunnelStatus.Established;
                     }

@@ -1,21 +1,21 @@
 ﻿using NetTunnel.Library.Payloads;
 using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Library.ReliablePayloads.Query
+namespace NetTunnel.Library.ReliablePayloads.Query.ServiceToService
 {
-    public class QueryPing : IRmQuery<QueryPingReply>
+    public class S2SQueryPing : IRmQuery<S2SQueryPingReply>
     {
         public DirectionalKey TunnelKey { get; set; }
         public DateTime OriginationTimestamp { get; set; }
         public double? PreviousPing { get; set; }
 
-        public QueryPing()
+        public S2SQueryPing()
         {
             TunnelKey = new DirectionalKey();
             OriginationTimestamp = DateTime.UtcNow;
         }
 
-        public QueryPing(DirectionalKey tunnelKey, double? previousPing)
+        public S2SQueryPing(DirectionalKey tunnelKey, double? previousPing)
         {
             OriginationTimestamp = DateTime.UtcNow;
             PreviousPing = previousPing;
@@ -23,16 +23,16 @@ namespace NetTunnel.Library.ReliablePayloads.Query
         }
     }
 
-    public class QueryPingReply : IRmQueryReply
+    public class S2SQueryPingReply : IRmQueryReply
     {
         public DateTime OriginationTimestamp { get; set; }
 
-        public QueryPingReply(DateTime originationTimestamp)
+        public S2SQueryPingReply(DateTime originationTimestamp)
         {
             OriginationTimestamp = originationTimestamp;
         }
 
-        public QueryPingReply()
+        public S2SQueryPingReply()
         {
         }
     }

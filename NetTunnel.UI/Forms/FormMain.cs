@@ -209,7 +209,7 @@ namespace NetTunnel.UI.Forms
 
                     if (_client.IsConnected)
                     {
-                        var result = _client.QueryGetTunnelStatistics();
+                        var result = _client.UIQueryGetTunnelStatistics();
 
                         int changeDetectionHash = result.AllTunnelIdAndEndpointIdHashes();
 
@@ -468,7 +468,7 @@ namespace NetTunnel.UI.Forms
                         {
                             try
                             {
-                                _client.EnsureNotNull().QueryDeleteEndpoint(eTag.Tunnel.TunnelKey, eTag.Endpoint.EndpointId);
+                                _client.EnsureNotNull().UIQueryDeleteEndpoint(eTag.Tunnel.TunnelKey, eTag.Endpoint.EndpointId);
 
                                 _needToRepopulateTunnels = true;
                                 listViewEndpoints.InvokeClearRows();
@@ -573,7 +573,7 @@ namespace NetTunnel.UI.Forms
                         {
                             try
                             {
-                                _client.EnsureNotNull().QueryStopTunnel(tTag.Tunnel.TunnelKey);
+                                _client.EnsureNotNull().UIQueryStopTunnel(tTag.Tunnel.TunnelKey);
 
                                 _needToRepopulateTunnels = true;
                                 listViewEndpoints.InvokeClearRows();
@@ -592,7 +592,7 @@ namespace NetTunnel.UI.Forms
                         {
                             try
                             {
-                                _client.EnsureNotNull().QueryStartTunnel(tTag.Tunnel.TunnelKey);
+                                _client.EnsureNotNull().UIQueryStartTunnel(tTag.Tunnel.TunnelKey);
 
                                 _needToRepopulateTunnels = true;
                                 listViewEndpoints.InvokeClearRows();
@@ -627,7 +627,7 @@ namespace NetTunnel.UI.Forms
 
                         try
                         {
-                            _client.EnsureNotNull().QueryDeleteTunnel(tTag.Tunnel.TunnelKey);
+                            _client.EnsureNotNull().UIQueryDeleteTunnel(tTag.Tunnel.TunnelKey);
 
                             Invoke(new Action(() =>
                             {
@@ -675,7 +675,7 @@ namespace NetTunnel.UI.Forms
 
             try
             {
-                var result = _client.QueryGetTunnels();
+                var result = _client.UIQueryGetTunnels();
                 result.Collection.ForEach(t => AddTunnelToGrid(t));
             }
             catch (Exception ex)

@@ -126,7 +126,7 @@ namespace NetTunnel.UI.Forms
             CancelButton = buttonCancel;
         }
 
-        private void buttonSave_Click(object sender, EventArgs e)
+        private void ButtonSave_Click(object sender, EventArgs e)
         {
             _client.EnsureNotNull();
             _tunnel.EnsureNotNull();
@@ -174,7 +174,7 @@ namespace NetTunnel.UI.Forms
                 {
                     try
                     {
-                        _client.QueryDistributeUpsertEndpoint(_tunnel.TunnelKey, endpoint);
+                        _client.UIQueryDistributeUpsertEndpoint(_tunnel.TunnelKey, endpoint);
                         this.InvokeClose(DialogResult.OK);
                     }
                     catch (Exception ex)

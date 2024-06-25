@@ -1,10 +1,9 @@
 ﻿using NetTunnel.Library.ReliablePayloads.Notification;
-using NetTunnel.Library.ReliablePayloads.Query;
 using NetTunnel.Service.ReliableMessages.Notification;
 using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Service.ReliableHandlers
+namespace NetTunnel.Service.ReliableHandlers.ServiceClient
 {
     /// <summary>
     /// Each outbound tunnel makes its own connection using an RmClient. These are the handlers for each outbound tunnel.
@@ -17,7 +16,7 @@ namespace NetTunnel.Service.ReliableHandlers
         /// </summary>
         /// <param name="context"></param>
         /// <param name="notification"></param>
-        public void OnNotificationEndpointConnect(RmContext context, NotificationEndpointConnect notification)
+        public void OnNotify(RmContext context, NotificationEndpointConnect notification)
         {
             try
             {
@@ -35,7 +34,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public void OnNotificationEndpointExchange(RmContext context, NotificationEndpointDataExchange notification)
+        public void OnNotify(RmContext context, NotificationEndpointDataExchange notification)
         {
             try
             {
@@ -50,7 +49,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public void OnNotificationTunnelDeletion(RmContext context, NotificationTunnelDeletion notification)
+        public void OnNotify(RmContext context, NotificationTunnelDeletion notification)
         {
             try
             {
@@ -65,7 +64,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public void OnNotificationEndpointDeletion(RmContext context, NotificationEndpointDeletion notification)
+        public void OnNotify(RmContext context, NotificationEndpointDeletion notification)
         {
             try
             {
@@ -80,41 +79,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryDistributeUpsertEndpointReply OnQueryUpsertEndpoint(RmContext context, QueryDistributeUpsertEndpoint query)
-        {
-            try
-            {
-                var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
-
-                Singletons.ServiceEngine.Tunnels.DistributeUpsertEndpoint(query.TunnelKey, query.Configuration);
-
-                return new QueryDistributeUpsertEndpointReply();
-            }
-            catch (Exception ex)
-            {
-                Singletons.Logger.Exception(ex);
-                throw;
-            }
-        }
-
-        public QueryUpsertEndpointReply OnQueryUpsertEndpoint(RmContext context, QueryUpsertEndpoint query)
-        {
-            try
-            {
-                var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
-
-                Singletons.ServiceEngine.Tunnels.UpsertEndpoint(query.TunnelKey, query.Configuration);
-
-                return new QueryUpsertEndpointReply();
-            }
-            catch (Exception ex)
-            {
-                Singletons.Logger.Exception(ex);
-                throw;
-            }
-        }
-
-        public void OnNotificationEndpointDisconnect(RmContext context, NotificationEndpointDisconnect notification)
+        public void OnNotify(RmContext context, NotificationEndpointDisconnect notification)
         {
             try
             {

@@ -1,33 +1,33 @@
 ﻿using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Library.ReliablePayloads.Query
+namespace NetTunnel.Library.ReliablePayloads.Query.UIOrService
 {
-    public class QueryRequestKeyExchange : IRmQuery<QueryReplyKeyExchangeReply>
+    public class UOSQueryRequestKeyExchange : IRmQuery<UOSQueryReplyKeyExchangeReply>
     {
         public byte[] NegotiationToken { get; set; }
 
-        public QueryRequestKeyExchange()
+        public UOSQueryRequestKeyExchange()
         {
             NegotiationToken = new byte[0];
         }
 
-        public QueryRequestKeyExchange(byte[] negotiationToken)
+        public UOSQueryRequestKeyExchange(byte[] negotiationToken)
         {
             NegotiationToken = negotiationToken;
         }
     }
 
-    public class QueryReplyKeyExchangeReply : IRmQueryReply
+    public class UOSQueryReplyKeyExchangeReply : IRmQueryReply
     {
         public Guid ConnectionId { get; set; }
         public byte[] NegotiationToken { get; set; }
 
-        public QueryReplyKeyExchangeReply()
+        public UOSQueryReplyKeyExchangeReply()
         {
             NegotiationToken = new byte[0];
         }
 
-        public QueryReplyKeyExchangeReply(Guid connectionId, byte[] negotiationToken)
+        public UOSQueryReplyKeyExchangeReply(Guid connectionId, byte[] negotiationToken)
         {
             ConnectionId = connectionId;
             NegotiationToken = negotiationToken;

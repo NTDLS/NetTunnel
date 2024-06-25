@@ -67,7 +67,7 @@ namespace NetTunnel.UI.Forms
             {
                 try
                 {
-                    var result = _client.EnsureNotNull().QueryGetUsers();
+                    var result = _client.EnsureNotNull().UIQueryGetUsers();
 
                     result.Collection.ForEach(u => AddUserToGrid(u));
                 }
@@ -158,7 +158,7 @@ namespace NetTunnel.UI.Forms
                         {
                             try
                             {
-                                _client.QueryDeleteUser(uTag.User.Username);
+                                _client.UIQueryDeleteUser(uTag.User.Username);
                                 listViewUsers.InvokeDeleteSelectedItems();
                             }
                             catch (Exception ex)

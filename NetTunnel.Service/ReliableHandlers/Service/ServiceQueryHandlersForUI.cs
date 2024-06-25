@@ -1,10 +1,9 @@
-﻿using NetTunnel.Library.ReliablePayloads.Query;
+﻿using NetTunnel.Library.ReliablePayloads.Query.UI;
 using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
-using NTDLS.SecureKeyExchange;
 using static NetTunnel.Library.Constants;
 
-namespace NetTunnel.Service.ReliableHandlers
+namespace NetTunnel.Service.ReliableHandlers.Service
 {
     /// <summary>
     /// The NetTunnel service shares one single instance of RmServer and therefor all inbound tunnels connect to it.
@@ -12,71 +11,20 @@ namespace NetTunnel.Service.ReliableHandlers
     /// All Client<->Server query communication (whether they be UI or other services with inbound tunnels)
     ///     must pass queries though these handlers.
     /// </summary>
-    internal class ServiceQueryHandlers : ServiceHandlerBase, IRmMessageHandler
+    internal class ServiceQueryHandlersForUI : ServiceHandlerBase, IRmMessageHandler
     {
         /// <summary>
-        /// The remote service has made an outgoing tunnel connection and has started the process of exchanging a key.
-        /// Here we need to apply the diffie–hellman negation token and reply with the diffie–hellman reply token
-        /// We will then "Initialize the Cryptography Provider" but will not use apply (use it) until the remote service
-        /// sends the NotificationApplyCryptography notification. This is because if we apply the cryptography now, then
-        /// the reply will be encrypted before the remote service has the data it needs to decrypt it.
+        /// A UI client is requesting a list of tunnels.
         /// </summary>
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public QueryReplyKeyExchangeReply OnQueryRequestKeyExchange(RmContext context, QueryRequestKeyExchange query)
-        {
-            try
-            {
-                var connectionContext = GetServiceConnectionContext(context);
-
-                var compoundNegotiator = new CompoundNegotiator();
-                var negotiationReplyToken = compoundNegotiator.ApplyNegotiationToken(query.NegotiationToken);
-                var negotiationReply = new QueryReplyKeyExchangeReply(context.ConnectionId, negotiationReplyToken);
-
-                connectionContext.InitializeCryptographyProvider(compoundNegotiator.SharedSecret);
-
-                return negotiationReply;
-            }
-            catch (Exception ex)
-            {
-                Singletons.Logger.Exception(ex);
-                throw;
-            }
-        }
-
-        public QueryLoginReply OnQueryLogin(RmContext context, QueryLogin query)
-        {
-            try
-            {
-                var connectionContext = EnforceCryptographyAndGetServiceConnectionContext(context);
-
-                var userRole = Singletons.ServiceEngine.Users.ValidateLoginAndGetRole(query.UserName, query.PasswordHash);
-                if (userRole != NtUserRole.Undefined)
-                {
-                    connectionContext.SetAuthenticated(query.UserName, userRole);
-
-                    return new QueryLoginReply(true)
-                    {
-                        ServiceId = Singletons.Configuration.ServiceId
-                    };
-                }
-
-                return new QueryLoginReply(false);
-            }
-            catch (Exception ex)
-            {
-                Singletons.Logger.Exception(ex);
-                throw;
-            }
-        }
-
-        public QueryGetTunnelsReply OnQueryGetTunnels(RmContext context, QueryGetTunnels query)
+        public UIQueryGetTunnelsReply OnQuery(RmContext context, UIQueryGetTunnels query)
         {
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
-                return new QueryGetTunnelsReply
+                return new UIQueryGetTunnelsReply
                 {
                     Collection = Singletons.ServiceEngine.Tunnels.GetForDisplay(),
                 };
@@ -88,7 +36,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryCreateTunnelReply OnQueryCreateTunnel(RmContext context, QueryCreateTunnel query)
+        public UIQueryCreateTunnelReply OnQuery(RmContext context, UIQueryCreateTunnel query)
         {
             try
             {
@@ -100,7 +48,7 @@ namespace NetTunnel.Service.ReliableHandlers
 
                 Singletons.ServiceEngine.Tunnels.UpsertTunnel(query.Configuration);
 
-                return new QueryCreateTunnelReply();
+                return new UIQueryCreateTunnelReply();
             }
             catch (Exception ex)
             {
@@ -109,27 +57,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryPingReply OnQueryPing(RmContext context, QueryPing query)
-        {
-            try
-            {
-                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
-
-                if (query.PreviousPing != null)
-                {
-                    Singletons.ServiceEngine.Tunnels.UpdateLastPing(query.TunnelKey, (double)query.PreviousPing);
-                }
-
-                return new QueryPingReply(query.OriginationTimestamp);
-            }
-            catch (Exception ex)
-            {
-                Singletons.Logger.Exception(ex);
-                throw;
-            }
-        }
-
-        public QueryDistributeUpsertEndpointReply OnQueryUpsertEndpoint(RmContext context, QueryDistributeUpsertEndpoint query)
+        public UIQueryDistributeUpsertEndpointReply OnQuery(RmContext context, UIQueryDistributeUpsertEndpoint query)
         {
             try
             {
@@ -141,7 +69,7 @@ namespace NetTunnel.Service.ReliableHandlers
 
                 Singletons.ServiceEngine.Tunnels.DistributeUpsertEndpoint(query.TunnelKey, query.Configuration);
 
-                return new QueryDistributeUpsertEndpointReply();
+                return new UIQueryDistributeUpsertEndpointReply();
             }
             catch (Exception ex)
             {
@@ -150,56 +78,13 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryUpsertEndpointReply OnQueryUpsertEndpoint(RmContext context, QueryUpsertEndpoint query)
-        {
-            try
-            {
-                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
-                if (connectionContext.UserRole != NtUserRole.Administrator)
-                {
-                    throw new Exception("Unauthorized");
-                }
-
-                Singletons.ServiceEngine.Tunnels.UpsertEndpoint(query.TunnelKey, query.Configuration);
-
-                return new QueryUpsertEndpointReply();
-            }
-            catch (Exception ex)
-            {
-                Singletons.Logger.Exception(ex);
-                throw;
-            }
-        }
-
-        public QueryRegisterTunnelReply OnQueryRegisterTunnel(RmContext context, QueryRegisterTunnel query)
-        {
-            try
-            {
-                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
-                if (connectionContext.UserRole != NtUserRole.Administrator)
-                {
-                    //throw new Exception("Unauthorized");
-                }
-
-                var tunnelKey = Singletons.ServiceEngine.Tunnels.RegisterTunnel(context.ConnectionId, query.Configuration);
-                connectionContext.AssociateTunnel(tunnelKey);
-
-                return new QueryRegisterTunnelReply();
-            }
-            catch (Exception ex)
-            {
-                Singletons.Logger.Exception(ex);
-                throw;
-            }
-        }
-
-        public QueryGetTunnelStatisticsReply OnQueryGetTunnelStatistics(RmContext context, QueryGetTunnelStatistics query)
+        public UIQueryGetTunnelStatisticsReply OnQuery(RmContext context, UIQueryGetTunnelStatistics query)
         {
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
-                return new QueryGetTunnelStatisticsReply()
+                return new UIQueryGetTunnelStatisticsReply()
                 {
                     Statistics = Singletons.ServiceEngine.Tunnels.GetStatistics()
                 };
@@ -211,7 +96,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryDeleteTunnelReply OnQueryDeleteTunnel(RmContext context, QueryDeleteTunnel query)
+        public UIQueryDeleteTunnelReply OnQuery(RmContext context, UIQueryDeleteTunnel query)
         {
             try
             {
@@ -224,7 +109,7 @@ namespace NetTunnel.Service.ReliableHandlers
                 //We want to stop and delete the tunnel locally.
                 Singletons.ServiceEngine.Tunnels.DeleteTunnel(query.TunnelKey);
 
-                return new QueryDeleteTunnelReply();
+                return new UIQueryDeleteTunnelReply();
             }
             catch (Exception ex)
             {
@@ -233,7 +118,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryGetUsersReply OnQueryGetUsers(RmContext context, QueryGetUsers query)
+        public UIQueryGetUsersReply OnQuery(RmContext context, UIQueryGetUsers query)
         {
             try
             {
@@ -243,7 +128,7 @@ namespace NetTunnel.Service.ReliableHandlers
                     throw new Exception("Unauthorized");
                 }
 
-                return new QueryGetUsersReply()
+                return new UIQueryGetUsersReply()
                 {
                     Collection = Singletons.ServiceEngine.Users.Clone()
                 };
@@ -255,7 +140,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryDeleteUserReply OnQueryDeleteUser(RmContext context, QueryDeleteUser query)
+        public UIQueryDeleteUserReply OnQuery(RmContext context, UIQueryDeleteUser query)
         {
             try
             {
@@ -267,7 +152,7 @@ namespace NetTunnel.Service.ReliableHandlers
 
                 Singletons.ServiceEngine.Users.Delete(query.UserName);
 
-                return new QueryDeleteUserReply();
+                return new UIQueryDeleteUserReply();
             }
             catch (Exception ex)
             {
@@ -276,7 +161,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryEditUserReply OnQueryEditUser(RmContext context, QueryEditUser query)
+        public UIQueryEditUserReply OnQuery(RmContext context, UIQueryEditUser query)
         {
             try
             {
@@ -288,7 +173,7 @@ namespace NetTunnel.Service.ReliableHandlers
 
                 Singletons.ServiceEngine.Users.EditUser(query.User);
 
-                return new QueryEditUserReply();
+                return new UIQueryEditUserReply();
             }
             catch (Exception ex)
             {
@@ -297,7 +182,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryCreateUserReply OnQueryCreateUser(RmContext context, QueryCreateUser query)
+        public UIQueryCreateUserReply OnQuery(RmContext context, UIQueryCreateUser query)
         {
             try
             {
@@ -309,7 +194,7 @@ namespace NetTunnel.Service.ReliableHandlers
 
                 Singletons.ServiceEngine.Users.Add(query.User);
 
-                return new QueryCreateUserReply();
+                return new UIQueryCreateUserReply();
             }
             catch (Exception ex)
             {
@@ -318,7 +203,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryGetServiceConfigurationReply OnQueryGetServiceConfiguration(RmContext context, QueryGetServiceConfiguration query)
+        public UIQueryGetServiceConfigurationReply OnQuery(RmContext context, UIQueryGetServiceConfiguration query)
         {
             try
             {
@@ -328,7 +213,7 @@ namespace NetTunnel.Service.ReliableHandlers
                     throw new Exception("Unauthorized");
                 }
 
-                return new QueryGetServiceConfigurationReply()
+                return new UIQueryGetServiceConfigurationReply()
                 {
                     Configuration = Singletons.Configuration
                 };
@@ -340,7 +225,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryPutServiceConfigurationReply OnQueryPutServiceConfiguration(RmContext context, QueryPutServiceConfiguration query)
+        public UIQueryPutServiceConfigurationReply OnQuery(RmContext context, UIQueryPutServiceConfiguration query)
         {
             try
             {
@@ -352,7 +237,7 @@ namespace NetTunnel.Service.ReliableHandlers
 
                 Singletons.UpdateConfiguration(query.Configuration);
 
-                return new QueryPutServiceConfigurationReply();
+                return new UIQueryPutServiceConfigurationReply();
             }
             catch (Exception ex)
             {
@@ -361,7 +246,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryDeleteEndpointReply OnQueryDeleteEndpoint(RmContext context, QueryDeleteEndpoint query)
+        public UIQueryDeleteEndpointReply OnQuery(RmContext context, UIQueryDeleteEndpoint query)
         {
             try
             {
@@ -373,7 +258,7 @@ namespace NetTunnel.Service.ReliableHandlers
 
                 Singletons.ServiceEngine.Tunnels.DeleteEndpoint(query.TunnelKey, query.EndpointId);
 
-                return new QueryDeleteEndpointReply();
+                return new UIQueryDeleteEndpointReply();
             }
             catch (Exception ex)
             {
@@ -382,7 +267,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryStartTunnelReply OnQueryStartTunnel(RmContext context, QueryStartTunnel query)
+        public UIQueryStartTunnelReply OnQuery(RmContext context, UIQueryStartTunnel query)
         {
             try
             {
@@ -394,7 +279,7 @@ namespace NetTunnel.Service.ReliableHandlers
 
                 Singletons.ServiceEngine.Tunnels.Start(query.TunnelKey);
 
-                return new QueryStartTunnelReply();
+                return new UIQueryStartTunnelReply();
             }
             catch (Exception ex)
             {
@@ -403,7 +288,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryStopTunnelReply OnQueryStopTunnel(RmContext context, QueryStopTunnel query)
+        public UIQueryStopTunnelReply OnQuery(RmContext context, UIQueryStopTunnel query)
         {
             try
             {
@@ -415,7 +300,7 @@ namespace NetTunnel.Service.ReliableHandlers
 
                 Singletons.ServiceEngine.Tunnels.Stop(query.TunnelKey);
 
-                return new QueryStopTunnelReply();
+                return new UIQueryStopTunnelReply();
             }
             catch (Exception ex)
             {
@@ -424,7 +309,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryGetTunnelPropertiesReply OnQueryGetTunnelProperties(RmContext context, QueryGetTunnelProperties query)
+        public UIQueryGetTunnelPropertiesReply OnQuery(RmContext context, UIQueryGetTunnelProperties query)
         {
             try
             {
@@ -434,7 +319,7 @@ namespace NetTunnel.Service.ReliableHandlers
                     throw new Exception("Unauthorized");
                 }
 
-                return new QueryGetTunnelPropertiesReply()
+                return new UIQueryGetTunnelPropertiesReply()
                 {
                     Properties = Singletons.ServiceEngine.Tunnels.GetTunnelProperties(query.TunnelKey)
                 };
@@ -446,13 +331,13 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryGetEndpointPropertiesReply OnQueryGetEndpointProperties(RmContext context, QueryGetEndpointProperties query)
+        public UIQueryGetEndpointPropertiesReply OnQuery(RmContext context, UIQueryGetEndpointProperties query)
         {
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
-                return new QueryGetEndpointPropertiesReply()
+                return new UIQueryGetEndpointPropertiesReply()
                 {
                     Properties = Singletons.ServiceEngine.Tunnels.GetEndpointProperties(query.TunnelKey, query.EndpointKey)
                 };
@@ -464,13 +349,13 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public QueryGetEndpointEdgeConnectionsReply OnQueryGetEndpointEdgeConnections(RmContext context, QueryGetEndpointEdgeConnections query)
+        public UIQueryGetEndpointEdgeConnectionsReply OnQuery(RmContext context, UIQueryGetEndpointEdgeConnections query)
         {
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
-                return new QueryGetEndpointEdgeConnectionsReply()
+                return new UIQueryGetEndpointEdgeConnectionsReply()
                 {
                     Collection = Singletons.ServiceEngine.Tunnels.GetEndpointEdgeConnections(query.TunnelKey, query.EndpointKey)
                 };

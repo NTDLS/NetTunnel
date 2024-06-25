@@ -1,31 +1,31 @@
 ﻿using NetTunnel.Library.Payloads;
 using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Library.ReliablePayloads.Query
+namespace NetTunnel.Library.ReliablePayloads.Query.UI
 {
-    public class QueryGetEndpointEdgeConnections : IRmQuery<QueryGetEndpointEdgeConnectionsReply>
+    public class UIQueryGetEndpointEdgeConnections : IRmQuery<UIQueryGetEndpointEdgeConnectionsReply>
     {
         public DirectionalKey TunnelKey { get; set; }
         public DirectionalKey EndpointKey { get; set; }
 
-        public QueryGetEndpointEdgeConnections(DirectionalKey tunnelKey, DirectionalKey endpointKey)
+        public UIQueryGetEndpointEdgeConnections(DirectionalKey tunnelKey, DirectionalKey endpointKey)
         {
             TunnelKey = tunnelKey;
             EndpointKey = endpointKey;
         }
 
-        public QueryGetEndpointEdgeConnections()
+        public UIQueryGetEndpointEdgeConnections()
         {
             TunnelKey = new();
             EndpointKey = new();
         }
     }
 
-    public class QueryGetEndpointEdgeConnectionsReply : IRmQueryReply
+    public class UIQueryGetEndpointEdgeConnectionsReply : IRmQueryReply
     {
         public List<EndpointEdgeConnectionDisplay> Collection { get; set; } = new();
 
-        public QueryGetEndpointEdgeConnectionsReply()
+        public UIQueryGetEndpointEdgeConnectionsReply()
         {
         }
     }

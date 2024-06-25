@@ -61,7 +61,7 @@ namespace NetTunnel.UI.Forms
                 {
                     try
                     {
-                        _client.QueryCreateUser(user);
+                        _client.UIQueryCreateUser(user);
                         CreatedUser = user;
                         this.InvokeClose(DialogResult.OK);
                     }

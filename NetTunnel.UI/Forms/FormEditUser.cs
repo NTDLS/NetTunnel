@@ -65,7 +65,7 @@ namespace NetTunnel.UI.Forms
                     try
                     {
                         var user = new User(username, password, checkBoxAdministrator.Checked ? NtUserRole.Administrator : NtUserRole.Limited);
-                        _client.QueryEditUser(user);
+                        _client.UIQueryEditUser(user);
                         return true;
                     }
                     catch (Exception ex)

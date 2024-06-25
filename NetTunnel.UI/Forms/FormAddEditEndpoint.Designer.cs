@@ -130,7 +130,7 @@
             buttonSave.TabIndex = 4;
             buttonSave.Text = "Save";
             buttonSave.UseVisualStyleBackColor = true;
-            buttonSave.Click += buttonSave_Click;
+            buttonSave.Click += ButtonSave_Click;
             // 
             // buttonCancel
             // 

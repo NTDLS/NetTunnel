@@ -87,7 +87,7 @@ namespace NetTunnel.UI.Forms
                 {
                     try
                     {
-                        var result = _client.EnsureNotNull().QueryGetTunnelProperties(_tunnelKey);
+                        var result = _client.EnsureNotNull().UIQueryGetTunnelProperties(_tunnelKey);
                         listViewProperties.Invoke(PopulateListView, result.Properties);
                     }
                     catch
@@ -145,7 +145,7 @@ namespace NetTunnel.UI.Forms
             {
                 try
                 {
-                    var result = _client.EnsureNotNull().QueryGetTunnelProperties(_tunnelKey);
+                    var result = _client.EnsureNotNull().UIQueryGetTunnelProperties(_tunnelKey);
                     this.InvokeSetText($"{FriendlyName} : {result.Properties.Name} Properties");
 
                     listViewProperties.Invoke(PopulateListView, result.Properties);

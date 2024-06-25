@@ -92,7 +92,7 @@ namespace NetTunnel.UI.Forms
                             var remoteClient = ServiceClient.CreateConnectAndLogin(_delegateLogger, tunnel.Address,
                                 tunnel.ServicePort, tunnel.Username, tunnel.PasswordHash);
 
-                            _client.QueryCreateTunnel(tunnel);
+                            _client.UIQueryCreateTunnel(tunnel);
 
                             this.InvokeClose(DialogResult.OK);
                         }
@@ -103,7 +103,7 @@ namespace NetTunnel.UI.Forms
                             {
                                 try
                                 {
-                                    _client.QueryCreateTunnel(tunnel);
+                                    _client.UIQueryCreateTunnel(tunnel);
                                 }
                                 catch (Exception ex2)
                                 {

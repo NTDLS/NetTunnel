@@ -76,7 +76,7 @@ namespace NetTunnel.UI.Forms
             {
                 try
                 {
-                    var result = _client.EnsureNotNull().QueryGetServiceConfiguration();
+                    var result = _client.EnsureNotNull().UIQueryGetServiceConfiguration();
 
                     SetFormConfigurationValues(result.Configuration);
                 }
@@ -150,7 +150,7 @@ namespace NetTunnel.UI.Forms
                 {
                     try
                     {
-                        _client.EnsureNotNull().QueryPutServiceConfiguration(configuration);
+                        _client.EnsureNotNull().UIQueryPutServiceConfiguration(configuration);
                         this.InvokeClose(DialogResult.OK);
                     }
                     catch (Exception ex)

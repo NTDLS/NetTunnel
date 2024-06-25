@@ -121,7 +121,7 @@ namespace NetTunnel.UI.Forms
                 {
                     try
                     {
-                        var result = _client.EnsureNotNull().QueryGetEndpointEdgeConnections(_tunnelKey, _endpointKey);
+                        var result = _client.EnsureNotNull().UIQueryGetEndpointEdgeConnections(_tunnelKey, _endpointKey);
                         listViewConnections.Invoke(PopulateListView, result.Collection);
                     }
                     catch
@@ -202,7 +202,7 @@ namespace NetTunnel.UI.Forms
             {
                 try
                 {
-                    var result = _client.EnsureNotNull().QueryGetEndpointEdgeConnections(_tunnelKey, _endpointKey);
+                    var result = _client.EnsureNotNull().UIQueryGetEndpointEdgeConnections(_tunnelKey, _endpointKey);
                     listViewConnections.Invoke(PopulateListView, result.Collection);
 
                     AutoResizeColumns();

@@ -1,13 +1,13 @@
 ﻿using NetTunnel.Library.Payloads;
 using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Library.ReliablePayloads.Query
+namespace NetTunnel.Library.ReliablePayloads.Query.UI
 {
-    public class QueryGetTunnelStatistics : IRmQuery<QueryGetTunnelStatisticsReply>
+    public class UIQueryGetTunnelStatistics : IRmQuery<UIQueryGetTunnelStatisticsReply>
     {
     }
 
-    public class QueryGetTunnelStatisticsReply : IRmQueryReply
+    public class UIQueryGetTunnelStatisticsReply : IRmQueryReply
     {
         public List<TunnelStatisticsDisplay> Statistics { get; set; } = new();
 
@@ -23,7 +23,7 @@ namespace NetTunnel.Library.ReliablePayloads.Query
             return combinedHash;
         }
 
-        public QueryGetTunnelStatisticsReply()
+        public UIQueryGetTunnelStatisticsReply()
         {
         }
     }

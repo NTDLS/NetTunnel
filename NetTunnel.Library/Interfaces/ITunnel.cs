@@ -1,5 +1,5 @@
 ﻿using NetTunnel.Library.Payloads;
-using NetTunnel.Library.ReliablePayloads.Query;
+using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library.Interfaces
@@ -62,7 +62,7 @@ namespace NetTunnel.Library.Interfaces
         public void PeerNotifyOfEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId);
         public void PeerNotifyOfTunnelDeletion(DirectionalKey tunnelKey);
         public void PeerNotifyOfEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId);
-        public QueryUpsertEndpointReply PeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointId);
+        public S2SQueryUpsertEndpointReply PeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointId);
 
         public void IncrementBytesSent(int bytes);
         public void IncrementBytesReceived(int bytes);

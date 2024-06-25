@@ -1,8 +1,8 @@
 ﻿using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Notification;
-using NetTunnel.Library.ReliablePayloads.Query;
-using NetTunnel.Service.ReliableHandlers;
+using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
+using NetTunnel.Service.ReliableHandlers.Service;
 using NetTunnel.Service.ReliableMessages.Notification;
 using NetTunnel.Service.TunnelEngine.Managers;
 using NTDLS.ReliableMessaging;
@@ -49,7 +49,9 @@ namespace NetTunnel.Service.TunnelEngine
             });
 
             _messageServer.AddHandler(new ServiceNotificationHandlers());
-            _messageServer.AddHandler(new ServiceQueryHandlers());
+            _messageServer.AddHandler(new ServiceQueryHandlersForUI());
+            _messageServer.AddHandler(new ServiceQueryHandlersForServiceToService());
+            _messageServer.AddHandler(new ServiceQueryHandlersForServiceToServiceOrUI());
 
             _messageServer.OnConnected += ServiceEngine_OnConnected;
             _messageServer.OnDisconnected += ServiceEngine_OnDisconnected;
@@ -63,8 +65,8 @@ namespace NetTunnel.Service.TunnelEngine
 
         #region Interface: IServiceEngine
 
-        public QueryUpsertEndpointReply PeerQueryUpsertEndpoint(Guid connectionId, DirectionalKey tunnelKey, EndpointConfiguration endpoint)
-            => _messageServer.Query(connectionId, new QueryUpsertEndpoint(tunnelKey, endpoint)).Result;
+        public S2SQueryUpsertEndpointReply PeerQueryUpsertEndpoint(Guid connectionId, DirectionalKey tunnelKey, EndpointConfiguration endpoint)
+            => _messageServer.Query(connectionId, new S2SQueryUpsertEndpoint(tunnelKey, endpoint)).Result;
 
         /// <summary>
         /// Sends a notification to the remote tunnel service to let it know to connect

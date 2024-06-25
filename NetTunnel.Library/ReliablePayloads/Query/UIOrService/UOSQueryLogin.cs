@@ -1,29 +1,29 @@
 ﻿using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Library.ReliablePayloads.Query
+namespace NetTunnel.Library.ReliablePayloads.Query.UIOrService
 {
-    public class QueryLogin : IRmQuery<QueryLoginReply>
+    public class UOSQueryLogin : IRmQuery<UOSQueryLoginReply>
     {
         public string UserName { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
 
-        public QueryLogin(string username, string passwordHash)
+        public UOSQueryLogin(string username, string passwordHash)
         {
             UserName = username;
             PasswordHash = passwordHash;
         }
     }
 
-    public class QueryLoginReply : IRmQueryReply
+    public class UOSQueryLoginReply : IRmQueryReply
     {
         public bool Successful { get; set; }
         public Guid? ServiceId { get; set; }
 
-        public QueryLoginReply()
+        public UOSQueryLoginReply()
         {
         }
 
-        public QueryLoginReply(bool successful)
+        public UOSQueryLoginReply(bool successful)
         {
             Successful = successful;
         }

@@ -3,7 +3,7 @@ using NetTunnel.Service.ReliableMessages.Notification;
 using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Service.ReliableHandlers
+namespace NetTunnel.Service.ReliableHandlers.Service
 {
     /// <summary>
     /// The NetTunnel service shares one single instance of RmServer and therefore all inbound tunnels connect to it.
@@ -19,7 +19,7 @@ namespace NetTunnel.Service.ReliableHandlers
         /// </summary>
         /// <param name="context"></param>
         /// <param name="notification"></param>
-        public void OnNotificationApplyCryptography(RmContext context, NotificationApplyCryptography notification)
+        public void OnNotify(RmContext context, NotificationApplyCryptography notification)
         {
             try
             {
@@ -34,7 +34,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public void OnNotificationEndpointConnect(RmContext context, NotificationEndpointConnect notification)
+        public void OnNotify(RmContext context, NotificationEndpointConnect notification)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public void OnNotificationEndpointExchange(RmContext context, NotificationEndpointDataExchange notification)
+        public void OnNotify(RmContext context, NotificationEndpointDataExchange notification)
         {
             try
             {
@@ -68,7 +68,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public void OnNotificationTunnelDeletion(RmContext context, NotificationTunnelDeletion notification)
+        public void OnNotify(RmContext context, NotificationTunnelDeletion notification)
         {
             try
             {
@@ -83,7 +83,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public void OnNotificationEndpointDeletion(RmContext context, NotificationEndpointDeletion notification)
+        public void OnNotify(RmContext context, NotificationEndpointDeletion notification)
         {
             try
             {
@@ -98,7 +98,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public void OnNotificationEndpointDisconnect(RmContext context, NotificationEndpointDisconnect notification)
+        public void OnNotify(RmContext context, NotificationEndpointDisconnect notification)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace NetTunnel.Service.ReliableHandlers
             }
         }
 
-        public void OnNotifyTerminateEndpointEdgeConnection(RmContext context, NotifyTerminateEndpointEdgeConnection notification)
+        public void OnNotify(RmContext context, NotifyTerminateEndpointEdgeConnection notification)
         {
             try
             {
