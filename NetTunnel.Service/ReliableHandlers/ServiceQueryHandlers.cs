@@ -2,6 +2,7 @@
 using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.ReliableHandlers
 {
@@ -50,9 +51,10 @@ namespace NetTunnel.Service.ReliableHandlers
             {
                 var connectionContext = EnforceCryptographyAndGetServiceConnectionContext(context);
 
-                if (Singletons.ServiceEngine.Users.ValidatePassword(query.UserName, query.PasswordHash))
+                var userRole = Singletons.ServiceEngine.Users.ValidateLoginAndGetRole(query.UserName, query.PasswordHash);
+                if (userRole != NtUserRole.Undefined)
                 {
-                    connectionContext.SetAuthenticated(query.UserName);
+                    connectionContext.SetAuthenticated(query.UserName, userRole);
 
                     return new QueryLoginReply(true)
                     {

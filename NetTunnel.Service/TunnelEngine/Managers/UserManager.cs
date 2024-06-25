@@ -37,20 +37,11 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-        public bool ValidateLogin(string username, string passwordHash)
+        public NtUserRole ValidateLoginAndGetRole(string username, string passwordHash)
         {
             return _collection.Use((o) =>
-                o.Where(u => u.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase)
-                && u.PasswordHash.Equals(passwordHash, StringComparison.CurrentCultureIgnoreCase)).Any());
-        }
-
-        public bool ValidatePassword(string username, string passwordHash)
-        {
-            if (_serviceEngine.Users.ValidateLogin(username, passwordHash))
-            {
-                return true;
-            }
-            return false;
+                o.SingleOrDefault(u => u.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase)
+                && u.PasswordHash.Equals(passwordHash, StringComparison.CurrentCultureIgnoreCase)))?.Role ?? NtUserRole.Undefined;
         }
 
         public List<User> Clone()

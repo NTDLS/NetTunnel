@@ -1,6 +1,7 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Payloads;
 using NTDLS.NASCCL;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine
 {
@@ -11,6 +12,7 @@ namespace NetTunnel.Service.TunnelEngine
         public bool SecureKeyExchangeIsComplete { get; private set; }
         public bool IsAuthenticated { get; private set; }
         public string UserName { get; private set; } = string.Empty;
+        public NtUserRole UserRole { get; set; } = NtUserRole.Undefined;
         public string ClientIpAddress { get; private set; }
         public DateTime LoginTime { get; private set; } = DateTime.UtcNow;
         public string KeyHash { get; private set; } = string.Empty;
@@ -57,9 +59,10 @@ namespace NetTunnel.Service.TunnelEngine
             SecureKeyExchangeIsComplete = true;
         }
 
-        public void SetAuthenticated(string userName)
+        public void SetAuthenticated(string userName, NtUserRole role)
         {
             UserName = userName.ToLower();
+            UserRole = role;
             IsAuthenticated = true;
         }
 

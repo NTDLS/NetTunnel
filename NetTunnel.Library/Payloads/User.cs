@@ -1,4 +1,5 @@
-﻿using static NetTunnel.Library.Constants;
+﻿using Newtonsoft.Json.Converters;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library.Payloads
 {
@@ -7,7 +8,8 @@ namespace NetTunnel.Library.Payloads
         public string Username { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
 
-        public NtUserRole Role { get; set; } = NtUserRole.Limited;
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+        public NtUserRole Role { get; set; } = NtUserRole.Undefined;
 
         public User(string username, string passwordHash, NtUserRole role)
         {

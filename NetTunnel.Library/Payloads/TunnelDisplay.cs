@@ -1,4 +1,5 @@
-﻿using static NetTunnel.Library.Constants;
+﻿using Newtonsoft.Json.Converters;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library.Payloads
 {
@@ -12,6 +13,8 @@ namespace NetTunnel.Library.Payloads
         public string Username { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
         public List<EndpointDisplay> Endpoints { get; set; } = new();
+
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public NtDirection Direction { get; set; }
         public bool IsLoggedIn { get; set; }
 

@@ -45,11 +45,8 @@ namespace NetTunnel.UI.Forms
                 if (itemUnderMouse != null)
                 {
                     itemUnderMouse.Selected = true;
-                }
 
-                var uTag = UserTag.FromItemOrDefault(itemUnderMouse);
-                if (uTag != null)
-                {
+                    var uTag = UserTag.FromItem(itemUnderMouse);
                     using var form = new FormEditUser(_client, uTag.User);
                     form.ShowDialog();
                 }

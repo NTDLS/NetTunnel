@@ -1,4 +1,5 @@
-﻿using static NetTunnel.Library.Constants;
+﻿using Newtonsoft.Json.Converters;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library.Payloads
 {
@@ -21,6 +22,7 @@ namespace NetTunnel.Library.Payloads
         /// <summary>
         /// Level of information to log to the file/console/etc.
         /// </summary>
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public NtLogSeverity LogLevel { get; set; } = NtLogSeverity.Verbose;
 
         /// <summary>

@@ -14,6 +14,7 @@
 
         public enum NtUserRole
         {
+            Undefined,
             Limited,
             Administrator
         }
