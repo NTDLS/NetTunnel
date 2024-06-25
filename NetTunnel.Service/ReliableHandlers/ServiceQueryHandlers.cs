@@ -178,7 +178,7 @@ namespace NetTunnel.Service.ReliableHandlers
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
                 if (connectionContext.UserRole != NtUserRole.Administrator)
                 {
-                    throw new Exception("Unauthorized");
+                    //throw new Exception("Unauthorized");
                 }
 
                 var tunnelKey = Singletons.ServiceEngine.Tunnels.RegisterTunnel(context.ConnectionId, query.Configuration);

@@ -101,14 +101,20 @@ namespace NetTunnel.UI.Forms
                             if (progressForm.MessageBox(ex.Message + "\r\n\r\n" + "Would you like to add the tunnel anyway?",
                                 FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                             {
-                                _client.QueryCreateTunnel(tunnel);
+                                try
+                                {
+                                    _client.QueryCreateTunnel(tunnel);
+                                }
+                                catch (Exception ex2)
+                                {
+                                    progressForm.MessageBox(ex2.Message, FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                                }
+
                                 this.InvokeClose(DialogResult.OK);
                                 return;
                             }
                         }
                     });
-
-                    //ConfigureTunnelPair(remoteClient, tunnel, inboundTunnel);
                 }
                 catch (Exception ex)
                 {
