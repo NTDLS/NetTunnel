@@ -10,7 +10,7 @@ namespace NetTunnel.Library.Payloads
         public string ClientIpAddress { get; set; } = string.Empty;
         public bool IsAuthenticated { get; set; }
         public DateTime LoginTime { get; set; }
-        public bool SecureKeyExchangeIsComplete { get; set; }
+        public bool IsKeyExchangeComplete { get; set; }
         public string UserName { get; set; } = string.Empty;
         public string LoggedInUserName { get; set; } = string.Empty;
         public Guid ServiceId { get; set; }

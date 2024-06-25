@@ -9,7 +9,7 @@ namespace NetTunnel.Service.TunnelEngine
     {
         public Guid ConnectionId { get; set; }
         public NASCCLStream? StreamCryptography { get; private set; }
-        public bool SecureKeyExchangeIsComplete { get; private set; }
+        public bool IsKeyExchangeComplete { get; private set; }
         public bool IsAuthenticated { get; private set; }
         public string UserName { get; private set; } = string.Empty;
         public NtUserRole UserRole { get; set; } = NtUserRole.Undefined;
@@ -55,7 +55,7 @@ namespace NetTunnel.Service.TunnelEngine
 
             Singletons.Logger.Verbose("Tunnel cryptography provider has been applied.");
 
-            SecureKeyExchangeIsComplete = true;
+            IsKeyExchangeComplete = true;
         }
 
         public void SetAuthenticated(string userName, NtUserRole role)

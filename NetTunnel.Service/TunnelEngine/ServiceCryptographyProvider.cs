@@ -20,7 +20,7 @@ namespace NetTunnel.Service.TunnelEngine
                     _serviceEngine.Tunnels.IncrementBytesReceived(connection.TunnelKey, encryptedPayload.Length);
                 }
 
-                if (connection.StreamCryptography != null && connection.SecureKeyExchangeIsComplete)
+                if (connection.StreamCryptography != null && connection.IsKeyExchangeComplete)
                 {
                     lock (connection.StreamCryptography)
                     {
@@ -41,7 +41,7 @@ namespace NetTunnel.Service.TunnelEngine
                     _serviceEngine.Tunnels.IncrementBytesSent(connection.TunnelKey, payload.Length);
                 }
 
-                if (connection.StreamCryptography != null && connection.SecureKeyExchangeIsComplete)
+                if (connection.StreamCryptography != null && connection.IsKeyExchangeComplete)
                 {
                     lock (connection.StreamCryptography)
                     {

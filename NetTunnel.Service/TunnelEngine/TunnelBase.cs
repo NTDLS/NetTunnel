@@ -104,7 +104,7 @@ namespace NetTunnel.Service.TunnelEngine
                 IsAuthenticated = serviceConnectionState.IsAuthenticated,
                 KeepRunning = KeepRunning,
                 LoginTime = serviceConnectionState.LoginTime,
-                SecureKeyExchangeIsComplete = serviceConnectionState.SecureKeyExchangeIsComplete,
+                IsKeyExchangeComplete = serviceConnectionState.IsKeyExchangeComplete,
                 LoggedInUserName = serviceConnectionState.UserName,
                 ServiceId = Configuration.ServiceId,
                 Name = Configuration.Name,

@@ -20,7 +20,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             {
                 var tunnelContext = GetServiceConnectionContext(context);
 
-                if (!tunnelContext.IsAuthenticated || !tunnelContext.SecureKeyExchangeIsComplete)
+                if (!tunnelContext.IsAuthenticated || !tunnelContext.IsKeyExchangeComplete)
                 {
                     throw new Exception("Cryptography has not fully initialized and applied.");
                 }
@@ -42,7 +42,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             {
                 var tunnelContext = GetServiceConnectionContext(context);
 
-                if (!tunnelContext.SecureKeyExchangeIsComplete)
+                if (!tunnelContext.IsKeyExchangeComplete)
                 {
                     throw new Exception("Cryptography has not fully initialized and applied.");
                 }
