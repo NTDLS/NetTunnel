@@ -107,7 +107,7 @@ namespace NetTunnel.Library
         public void Disconnect()
         {
             IsLoggedIn = false;
-            Exceptions.Ignore(Client.Disconnect);
+            Exceptions.Ignore(() => Client.Disconnect(false));
         }
 
         public void ConnectAndLogin()
