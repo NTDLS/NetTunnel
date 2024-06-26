@@ -2,6 +2,7 @@
 using NetTunnel.Library.Payloads;
 using NTDLS.Persistence;
 using NTDLS.Semaphore;
+using System.Net;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Managers
@@ -49,6 +50,25 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             var results = new List<User>();
             _collection.Use((o) => o.ForEach(u => results.Add(u)));
             return results;
+        }
+
+        public List<EndpointConfiguration> GetEndpoints(string username)
+        {
+            var clones = new List<EndpointConfiguration>();
+
+            _collection.Use((o) =>
+            {
+                var user = o.SingleOrDefault(u => u.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase));
+                if (user != null)
+                {
+                    foreach (var endpoint in user.Endpoints)
+                    {
+                        clones.Add(endpoint.CloneConfiguration());
+                    }
+                }
+            });
+
+            return clones;
         }
 
         public void SaveToDisk()

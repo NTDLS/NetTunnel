@@ -11,6 +11,8 @@ namespace NetTunnel.Library.Payloads
         [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public NtUserRole Role { get; set; } = NtUserRole.Undefined;
 
+        public List<EndpointConfiguration> Endpoints { get; set; } = new();
+
         public User(string username, string passwordHash, NtUserRole role)
         {
             Username = username.ToLower();

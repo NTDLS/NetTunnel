@@ -12,7 +12,10 @@
         public int ServicePort { get; set; }
         public string Username { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
-        public List<EndpointConfiguration> Endpoints { get; set; } = new();
+
+        //TODO: Convert:
+        //public List<EndpointConfiguration> Endpoints { get; set; } = new();
+
 
         public TunnelConfiguration()
         {
@@ -42,14 +45,19 @@
                 ServiceId = ServiceId,
             };
 
+            /*
+            //TODO: Convert:
             foreach (var endpoint in Endpoints)
             {
                 clone.Endpoints.Add(endpoint.CloneConfiguration());
             }
+            */
 
             return clone;
         }
 
+        /*
+        //TODO: Convert:
         public List<EndpointDisplay> GetEndpointsForDisplay()
         {
             var results = new List<EndpointDisplay>();
@@ -77,5 +85,6 @@
 
             return results;
         }
+        */
     }
 }

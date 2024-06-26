@@ -19,6 +19,7 @@ namespace NetTunnel.Library.ReliablePayloads.Query.ServiceToService
 
     public class S2SQueryRegisterTunnelReply : IRmQueryReply
     {
+        public List<EndpointConfiguration> Endpoints { get; set; } = new();
 
         public S2SQueryRegisterTunnelReply()
         {

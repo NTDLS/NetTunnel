@@ -36,22 +36,24 @@ namespace NetTunnel.Service.TunnelEngine
         public List<IEndpoint> Endpoints { get; private set; } = new();
         bool ITunnel.IsLoggedIn => throw new NotImplementedException("This function should be overridden.");
 
-
         #endregion
 
         public TunnelBase(ServiceEngine serviceEngine, TunnelConfiguration configuration)
         {
             ServiceEngine = serviceEngine;
             Configuration = configuration.CloneConfiguration();
-
-            Configuration.Endpoints.Where(o => o.Direction == NtDirection.Inbound)
-                .ToList().ForEach(o => Endpoints.Add(new EndpointInbound(ServiceEngine, this, o)));
-
-            Configuration.Endpoints.Where(o => o.Direction == NtDirection.Outbound)
-                .ToList().ForEach(o => Endpoints.Add(new EndpointOutbound(ServiceEngine, this, o)));
         }
 
         #region Interface: ITunnel.
+
+        public void LoadEndpoints(List<EndpointConfiguration> endpoints)
+        {
+            endpoints.Where(o => o.Direction == NtDirection.Inbound)
+                .ToList().ForEach(o => Endpoints.Add(new EndpointInbound(ServiceEngine, this, o)));
+
+            endpoints.Where(o => o.Direction == NtDirection.Outbound)
+                .ToList().ForEach(o => Endpoints.Add(new EndpointOutbound(ServiceEngine, this, o)));
+        }
 
         void ITunnel.IncrementBytesSent(int bytes)
            => throw new NotImplementedException("This function should be overridden.");
@@ -108,7 +110,8 @@ namespace NetTunnel.Service.TunnelEngine
                 LoggedInUserName = serviceConnectionState.UserName,
                 ServiceId = Configuration.ServiceId,
                 Name = Configuration.Name,
-                Endpoints = Configuration.Endpoints.Count
+                //TODO: Convert:
+                //Endpoints = Configuration.Endpoints.Count
             };
 
             if (this is TunnelOutbound outboundTunnel)
@@ -193,8 +196,8 @@ namespace NetTunnel.Service.TunnelEngine
             {
                 throw new Exception("Endpoint direction is not well defined.");
             }
-
-            Configuration.Endpoints.Add(configuration);
+            //TODO: Convert:
+            //Configuration.Endpoints.Add(configuration);
             Endpoints.Add(endpoint);
             endpoint.Start();
             return endpoint;
@@ -206,7 +209,8 @@ namespace NetTunnel.Service.TunnelEngine
             if (endpoint != null)
             {
                 endpoint.Stop();
-                Configuration.Endpoints.RemoveAll(o => o.EndpointId == endpointId);
+                //TODO: Convert:
+                //Configuration.Endpoints.RemoveAll(o => o.EndpointId == endpointId);
                 Endpoints.Remove(endpoint);
             }
         }

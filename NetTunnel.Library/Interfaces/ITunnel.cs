@@ -64,6 +64,7 @@ namespace NetTunnel.Library.Interfaces
         public void S2SPeerNotificationEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId);
         public S2SQueryUpsertEndpointReply S2SPeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointId);
 
+        public void LoadEndpoints(List<EndpointConfiguration> endpoints);
         public void IncrementBytesSent(int bytes);
         public void IncrementBytesReceived(int bytes);
         public TunnelPropertiesDisplay GetProperties();

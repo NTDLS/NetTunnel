@@ -1,4 +1,5 @@
-﻿using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
+﻿using NetTunnel.Library.Interfaces;
+using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
 using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
 using System.Net;
@@ -41,7 +42,8 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         }
 
         /// <summary>
-        /// The remote outbound service is asking this service to register the given tunnel and its endpoints.
+        /// The remote outbound service is asking this service to register the given tunnel.
+        /// The service will connect the tunnel and send back the endpoints for the logged in user.
         /// </summary>
         /// <param name="context"></param>
         /// <param name="query"></param>
@@ -65,10 +67,15 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
                     query.Configuration.ServicePort = address.Port; //Only used for UI for inbound tunnels.
                 }
 
-                var tunnelKey = Singletons.ServiceEngine.Tunnels.RegisterTunnel(context.ConnectionId, query.Configuration);
+                var endpoints = Singletons.ServiceEngine.Users.GetEndpoints(connectionContext.UserName);
+
+                var tunnelKey = Singletons.ServiceEngine.Tunnels.RegisterTunnel(context.ConnectionId, query.Configuration, endpoints);
                 connectionContext.AssociateTunnel(tunnelKey);
 
-                return new S2SQueryRegisterTunnelReply();
+                return new S2SQueryRegisterTunnelReply()
+                {
+                    Endpoints = endpoints
+                };
             }
             catch (Exception ex)
             {

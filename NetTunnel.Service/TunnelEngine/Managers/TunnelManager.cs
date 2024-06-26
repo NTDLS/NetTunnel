@@ -112,7 +112,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// A remote service is registering its outbound tunnel configuration with the local service.
         /// </summary>
         /// <param name="config"></param>
-        public DirectionalKey RegisterTunnel(Guid connectionId, TunnelConfiguration config)
+        public DirectionalKey RegisterTunnel(Guid connectionId, TunnelConfiguration config, List<EndpointConfiguration> endpoints)
         {
             return Collection.Use((o) =>
             {
@@ -129,14 +129,15 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                     o.Remove(existingTunnel);
                 }
 
-                foreach (var endpoint in config.Endpoints)
+                foreach (var endpoint in endpoints)
                 {
-                    //Since we are receiving the endpoints from the other service, we need to flip the direction of their configuration.
                     endpoint.Direction = SwapDirection(endpoint.Direction);
                 }
 
                 var newTunnel = new TunnelInbound(_serviceEngine, connectionId, config);
-                o.Add(newTunnel.EnsureNotNull());
+                newTunnel.LoadEndpoints(endpoints);
+
+                o.Add(newTunnel);
 
                 newTunnel.Start();
 
@@ -300,7 +301,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                     {
                         c.ServiceId = Singletons.Configuration.ServiceId; //Take ownership of tunnels if they are in the config file.
                         c.TunnelId = Guid.NewGuid(); //Tunnels get a new ID every time they are loaded. This makes it easy to copy configs to other machines.
-                        c.Endpoints.ForEach(e => e.EndpointId = Guid.NewGuid()); //Endpoints get a new ID every time they are loaded. This makes it easy to copy configs to other machines.
+                        //TODO: Convert:
+                        //c.Endpoints.ForEach(e => e.EndpointId = Guid.NewGuid()); //Endpoints get a new ID every time they are loaded. This makes it easy to copy configs to other machines.
                         o.Add(new TunnelOutbound(_serviceEngine, c));
                     });
             });
@@ -334,7 +336,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                         TunnelId = tunnel.Configuration.TunnelId,
                         Address = tunnel.Configuration.Address,
                         Direction = tunnel is TunnelOutbound ? NtDirection.Outbound : NtDirection.Inbound,
-                        Endpoints = tunnel.Configuration.GetEndpointsForDisplay(),
+                        //TODO: Convert:
+                        //Endpoints = tunnel.Configuration.GetEndpointsForDisplay(),
                         ServicePort = tunnel.Configuration.ServicePort,
                         Name = tunnel.Configuration.Name,
                         ServiceId = tunnel.Configuration.ServiceId,
