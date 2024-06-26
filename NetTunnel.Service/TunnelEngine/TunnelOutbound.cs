@@ -3,6 +3,7 @@ using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
 using NetTunnel.Service.ReliableHandlers.ServiceClient.Notifications;
+using NetTunnel.Service.ReliableHandlers.ServiceClient.Queries;
 using NTDLS.ReliableMessaging;
 using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
@@ -25,6 +26,7 @@ namespace NetTunnel.Service.TunnelEngine
                 Configuration.Address, Configuration.ServicePort, Configuration.Username, Configuration.PasswordHash, this);
 
             _client.Client.AddHandler(new TunnelOutboundNotificationHandlers());
+            _client.Client.AddHandler(new TunnelOutboundQueryHandlers());
 
             _client.Client.OnConnected += Client_OnConnected;
             _client.Client.OnDisconnected += Client_OnDisconnected;
@@ -162,7 +164,7 @@ namespace NetTunnel.Service.TunnelEngine
 
                         var registerResult = _client.S2SQueryRegisterTunnel(Configuration);
 
-                        this.LoadEndpoints(registerResult.Endpoints);
+                        LoadEndpoints(registerResult.Endpoints);
 
                         Status = NtTunnelStatus.Established;
                     }

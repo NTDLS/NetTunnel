@@ -48,11 +48,34 @@ namespace NetTunnel.Service.TunnelEngine
 
         public void LoadEndpoints(List<EndpointConfiguration> endpoints)
         {
+            var tunnelDirection = this is TunnelInbound ? NtDirection.Inbound : NtDirection.Outbound;
+
+            Singletons.Logger.Verbose($"Loading endpoints for {tunnelDirection} tunnel '{Configuration.Name}'.");
+
             endpoints.Where(o => o.Direction == NtDirection.Inbound)
                 .ToList().ForEach(o => Endpoints.Add(new EndpointInbound(ServiceEngine, this, o)));
 
             endpoints.Where(o => o.Direction == NtDirection.Outbound)
                 .ToList().ForEach(o => Endpoints.Add(new EndpointOutbound(ServiceEngine, this, o)));
+
+            Singletons.Logger.Verbose($"Starting endpoints for {tunnelDirection} tunnel '{Configuration.Name}'.");
+
+            foreach (var endpoint in Endpoints)
+            {
+                endpoint.Start();
+            }
+        }
+
+        public List<EndpointDisplay> GetEndpointsForDisplay()
+        {
+            var results = new List<EndpointDisplay>();
+
+            foreach (var endpoint in Endpoints)
+            {
+                results.Add(endpoint.GetForDisplay());
+            }
+
+            return results;
         }
 
         void ITunnel.IncrementBytesSent(int bytes)
@@ -110,8 +133,7 @@ namespace NetTunnel.Service.TunnelEngine
                 LoggedInUserName = serviceConnectionState.UserName,
                 ServiceId = Configuration.ServiceId,
                 Name = Configuration.Name,
-                //TODO: Convert:
-                //Endpoints = Configuration.Endpoints.Count
+                Endpoints = Endpoints.Count
             };
 
             if (this is TunnelOutbound outboundTunnel)
@@ -150,10 +172,6 @@ namespace NetTunnel.Service.TunnelEngine
             Singletons.Logger.Verbose($"Starting tunnel '{Configuration.Name}'.");
 
             KeepRunning = true;
-
-            Singletons.Logger.Verbose($"Starting endpoints for tunnel '{Configuration.Name}'.");
-
-            Endpoints.ForEach(x => x.Start());
         }
 
         public virtual void Stop()
@@ -174,12 +192,12 @@ namespace NetTunnel.Service.TunnelEngine
 
         #region Add/Delete Endpoints.
 
-        public IEndpoint UpsertEndpoint(EndpointConfiguration configuration)
+        public IEndpoint UpsertEndpoint(EndpointConfiguration configuration, string? username)
         {
             var existingEndpoint = Endpoints.SingleOrDefault(o => o.EndpointId == configuration.EndpointId);
             if (existingEndpoint != null)
             {
-                DeleteEndpoint(existingEndpoint.EndpointId);
+                DeleteEndpoint(existingEndpoint.EndpointId, null);
             }
 
             IEndpoint endpoint;
@@ -196,22 +214,25 @@ namespace NetTunnel.Service.TunnelEngine
             {
                 throw new Exception("Endpoint direction is not well defined.");
             }
-            //TODO: Convert:
-            //Configuration.Endpoints.Add(configuration);
+
             Endpoints.Add(endpoint);
             endpoint.Start();
             return endpoint;
         }
 
-        public void DeleteEndpoint(Guid endpointId)
+        public void DeleteEndpoint(Guid endpointId, string? username)
         {
             var endpoint = Endpoints.SingleOrDefault(o => o.EndpointId == endpointId);
             if (endpoint != null)
             {
                 endpoint.Stop();
-                //TODO: Convert:
-                //Configuration.Endpoints.RemoveAll(o => o.EndpointId == endpointId);
                 Endpoints.Remove(endpoint);
+
+                //The user record owns the endpoint, so if we have been supplied one - delete it from the config.
+                if (string.IsNullOrEmpty(username) == false)
+                {
+                    Singletons.ServiceEngine.Users.DeleteEndpoint(username, endpointId);
+                }
             }
         }
 

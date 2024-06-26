@@ -106,7 +106,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
             {
                 var connectionContext = GetServiceConnectionContext(context);
 
-                Singletons.ServiceEngine.Tunnels.DeleteEndpointAndDistribute(notification.TunnelKey, notification.EndpointId);
+                Singletons.ServiceEngine.Tunnels.DeleteEndpoint(notification.TunnelKey, notification.EndpointId, connectionContext.UserName);
             }
             catch (Exception ex)
             {

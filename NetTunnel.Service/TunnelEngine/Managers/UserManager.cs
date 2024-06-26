@@ -2,7 +2,6 @@
 using NetTunnel.Library.Payloads;
 using NTDLS.Persistence;
 using NTDLS.Semaphore;
-using System.Net;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Managers
@@ -71,8 +70,40 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             return clones;
         }
 
+        /// <summary>
+        /// Adds an endpoint to a user account
+        /// </summary>
+        public void UpsertEndpoint(string username, EndpointConfiguration endpoint)
+        {
+            _collection.Use((o) =>
+            {
+                var user = o.SingleOrDefault(u => u.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase));
+                if (user != null)
+                {
+                    user.Endpoints.Add(endpoint);
+                }
+                SaveToDisk();
+            });
+        }
+
+        /// <summary>
+        /// Adds an endpoint to a user account
+        /// </summary>
+        public void DeleteEndpoint(string username, Guid endpointId)
+        {
+            _collection.Use((o) =>
+            {
+                var user = o.SingleOrDefault(u => u.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase));
+                if (user != null)
+                {
+                    user.Endpoints.RemoveAll(o => o.EndpointId == endpointId);
+                }
+                SaveToDisk();
+            });
+        }
+
         public void SaveToDisk()
-            => _collection.Use((o) => CommonApplicationData.SaveToDisk(Constants.FriendlyName, o));
+            => _collection.Use((o) => CommonApplicationData.SaveToDisk(FriendlyName, o));
 
         private void LoadFromDisk()
         {
@@ -80,7 +111,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             {
                 o.Clear();
 
-                CommonApplicationData.LoadFromDisk(Constants.FriendlyName, new List<User>()).ForEach(o => Add(o));
+                CommonApplicationData.LoadFromDisk(FriendlyName, new List<User>()).ForEach(o => Add(o));
 
                 if (o.Count == 0)
                 {
@@ -89,6 +120,12 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 #endif
                     Add("root", Utility.ComputeSha256Hash(Environment.MachineName.ToLower()), NtUserRole.Administrator);
                     SaveToDisk();
+                }
+
+                foreach (var user in o)
+                {
+                    //Endpoints get a new ID every time they are loaded. This makes it easy to copy configs to other machines.
+                    user.Endpoints.ForEach(e => e.EndpointId = Guid.NewGuid());
                 }
             });
         }

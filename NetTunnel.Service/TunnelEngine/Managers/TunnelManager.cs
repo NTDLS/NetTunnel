@@ -129,11 +129,6 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                     o.Remove(existingTunnel);
                 }
 
-                foreach (var endpoint in endpoints)
-                {
-                    endpoint.Direction = SwapDirection(endpoint.Direction);
-                }
-
                 var newTunnel = new TunnelInbound(_serviceEngine, connectionId, config);
                 newTunnel.LoadEndpoints(endpoints);
 
@@ -180,17 +175,21 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// </summary>
         /// <param name="tunnelId"></param>
         /// <param name="endpointConfiguration"></param>
-        public void UpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointConfiguration)
+        /// <param name="username">If the endpoint needs to saved to a user, then supply the username</param>
+        public void UpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointConfiguration, string? username)
         {
             var tunnel = Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey));
 
             //Apply the endpoint here:
-            tunnel.UpsertEndpoint(endpointConfiguration);
+            tunnel.UpsertEndpoint(endpointConfiguration, username);
 
-            if (tunnelKey.Direction == NtDirection.Outbound)
+            if (tunnelKey.Direction == NtDirection.Inbound)
             {
                 //Outbound tunnels own the configuration, so save it.
-                SaveToDisk();
+                if (string.IsNullOrEmpty(username) == false)
+                {
+                    Singletons.ServiceEngine.Users.UpsertEndpoint(username, endpointConfiguration);
+                }
             }
         }
 
@@ -199,12 +198,13 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// </summary>
         /// <param name="tunnelId"></param>
         /// <param name="endpointConfiguration"></param>
-        public void UpsertEndpointAndDistribute(DirectionalKey tunnelKey, EndpointConfiguration endpointConfiguration)
+        /// <param name="username">If the endpoint needs to saved to a user, then supply the username</param>
+        public void UpsertEndpointAndDistribute(DirectionalKey tunnelKey, EndpointConfiguration endpointConfiguration, string? username)
         {
             var tunnel = Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey));
 
             //Apply the endpoint here:
-            UpsertEndpoint(tunnelKey, endpointConfiguration);
+            UpsertEndpoint(tunnelKey, endpointConfiguration, username);
 
             //Apply the endpoint at the peer.
             tunnel.S2SPeerQueryUpsertEndpoint(tunnelKey.SwapDirection(), endpointConfiguration.SwapDirection());
@@ -215,22 +215,24 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// </summary>
         /// <param name="tunnelId"></param>
         /// <param name="endpointId"></param>
-        public void DeleteEndpointAndDistribute(DirectionalKey tunnelKey, Guid endpointId)
+        public void DeleteEndpointAndDistribute(DirectionalKey tunnelKey, Guid endpointId, string? username)
         {
             Collection.Use((o) =>
             {
                 var tunnel = o.Single(o => o.TunnelKey == tunnelKey);
-
                 if (tunnel.IsLoggedIn)
                 {
                     //Let the other end of the tunnel know that we are deleting the endpoint.
                     tunnel.S2SPeerNotificationEndpointDeletion(tunnelKey.SwapDirection(), endpointId);
                 }
 
-                tunnel.DeleteEndpoint(endpointId);
-
-                SaveToDisk();
+                tunnel.DeleteEndpoint(endpointId, username);
             });
+        }
+
+        public void DeleteEndpoint(DirectionalKey tunnelKey, Guid endpointId, string? username)
+        {
+            Collection.Use((o) => o.SingleOrDefault(o => o.TunnelKey == tunnelKey)?.DeleteEndpoint(endpointId, username));
         }
 
         #endregion
@@ -301,8 +303,6 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                     {
                         c.ServiceId = Singletons.Configuration.ServiceId; //Take ownership of tunnels if they are in the config file.
                         c.TunnelId = Guid.NewGuid(); //Tunnels get a new ID every time they are loaded. This makes it easy to copy configs to other machines.
-                        //TODO: Convert:
-                        //c.Endpoints.ForEach(e => e.EndpointId = Guid.NewGuid()); //Endpoints get a new ID every time they are loaded. This makes it easy to copy configs to other machines.
                         o.Add(new TunnelOutbound(_serviceEngine, c));
                     });
             });
@@ -336,8 +336,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                         TunnelId = tunnel.Configuration.TunnelId,
                         Address = tunnel.Configuration.Address,
                         Direction = tunnel is TunnelOutbound ? NtDirection.Outbound : NtDirection.Inbound,
-                        //TODO: Convert:
-                        //Endpoints = tunnel.Configuration.GetEndpointsForDisplay(),
+                        Endpoints = tunnel.GetEndpointsForDisplay(),
                         ServicePort = tunnel.Configuration.ServicePort,
                         Name = tunnel.Configuration.Name,
                         ServiceId = tunnel.Configuration.ServiceId,

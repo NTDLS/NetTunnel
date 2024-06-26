@@ -1,5 +1,4 @@
-﻿using NetTunnel.Library.Interfaces;
-using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
+﻿using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
 using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
 using System.Net;
@@ -72,10 +71,18 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
                 var tunnelKey = Singletons.ServiceEngine.Tunnels.RegisterTunnel(context.ConnectionId, query.Configuration, endpoints);
                 connectionContext.AssociateTunnel(tunnelKey);
 
-                return new S2SQueryRegisterTunnelReply()
+                var result = new S2SQueryRegisterTunnelReply();
+
+                foreach (var endpoint in endpoints)
                 {
-                    Endpoints = endpoints
-                };
+                    var clone = endpoint.CloneConfiguration();
+
+                    //Since we are sending the endpoints to the other service, we need to flip the direction of their configuration.
+                    clone.Direction = SwapDirection(clone.Direction);
+                    result.Endpoints.Add(clone);
+                }
+
+                return result;
             }
             catch (Exception ex)
             {
@@ -100,7 +107,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
                     throw new Exception("Unauthorized");
                 }
 
-                Singletons.ServiceEngine.Tunnels.UpsertEndpoint(query.TunnelKey, query.Configuration);
+                Singletons.ServiceEngine.Tunnels.UpsertEndpoint(query.TunnelKey, query.Configuration, connectionContext.UserName);
 
                 return new S2SQueryUpsertEndpointReply();
             }

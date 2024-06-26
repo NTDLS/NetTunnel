@@ -25,6 +25,7 @@ namespace NetTunnel.Library.Interfaces
         /// </summary>
         public DirectionalKey EndpointKey { get; }
         public EndpointPropertiesDisplay GetProperties();
+        public EndpointDisplay GetForDisplay();
         public List<EndpointEdgeConnectionDisplay> GetEdgeConnections();
     }
 }

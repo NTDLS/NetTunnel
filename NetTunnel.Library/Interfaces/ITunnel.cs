@@ -29,12 +29,12 @@ namespace NetTunnel.Library.Interfaces
         public void Start();
         public void Stop();
 
-        public IEndpoint UpsertEndpoint(EndpointConfiguration configuration);
+        public IEndpoint UpsertEndpoint(EndpointConfiguration configuration, string? username);
 
         /// <summary>
         /// Disconnect the endpoint edge from the external server, browser, etc.
         /// </summary>
-        public void DeleteEndpoint(Guid endpointId);
+        public void DeleteEndpoint(Guid endpointId, string? username);
         public void DisconnectEndpointEdge(Guid endpointId, Guid edgeId);
 
         public TunnelConfiguration CloneConfiguration();
@@ -70,5 +70,6 @@ namespace NetTunnel.Library.Interfaces
         public TunnelPropertiesDisplay GetProperties();
         public EndpointPropertiesDisplay GetEndpointProperties(DirectionalKey endpointKey);
         public List<EndpointEdgeConnectionDisplay> GetEndpointEdgeConnections(DirectionalKey endpointKey);
+        public List<EndpointDisplay> GetEndpointsForDisplay();
     }
 }

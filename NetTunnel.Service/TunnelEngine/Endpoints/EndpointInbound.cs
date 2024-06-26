@@ -113,5 +113,26 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 }
             }
         }
+
+        public EndpointDisplay GetForDisplay()
+        {
+            var result = new EndpointDisplay
+            {
+                EndpointId = EndpointId,
+                Direction = Direction,
+                Name = Configuration.Name,
+                OutboundAddress = Configuration.OutboundAddress,
+                InboundPort = Configuration.InboundPort,
+                OutboundPort = Configuration.OutboundPort,
+                TrafficType = Configuration.TrafficType,
+            };
+
+            foreach (var rule in Configuration.HttpHeaderRules)
+            {
+                result.HttpHeaderRules.Add(rule.CloneConfiguration());
+            }
+
+            return result;
+        }
     }
 }

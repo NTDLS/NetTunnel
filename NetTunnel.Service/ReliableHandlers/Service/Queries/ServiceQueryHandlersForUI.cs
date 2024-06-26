@@ -80,7 +80,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
                     throw new Exception("Unauthorized");
                 }
 
-                Singletons.ServiceEngine.Tunnels.UpsertEndpointAndDistribute(query.TunnelKey, query.Configuration);
+                Singletons.ServiceEngine.Tunnels.UpsertEndpointAndDistribute(query.TunnelKey, query.Configuration, connectionContext.UserName);
 
                 return new UIQueryDistributeUpsertEndpointReply();
             }
@@ -324,7 +324,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
                     throw new Exception("Unauthorized");
                 }
 
-                Singletons.ServiceEngine.Tunnels.DeleteEndpointAndDistribute(query.TunnelKey, query.EndpointId);
+                Singletons.ServiceEngine.Tunnels.DeleteEndpointAndDistribute(query.TunnelKey, query.EndpointId, connectionContext.UserName);
 
                 return new UIQueryDeleteEndpointReply();
             }
