@@ -31,19 +31,20 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormUsers));
             listViewUsers = new ListView();
             columnHeaderUsername = new ColumnHeader();
-            buttonAddUser = new Button();
             columnHeaderRole = new ColumnHeader();
+            columnHeaderEndpoints = new ColumnHeader();
+            buttonCreateUser = new Button();
             SuspendLayout();
             // 
             // listViewUsers
             // 
-            listViewUsers.Columns.AddRange(new ColumnHeader[] { columnHeaderUsername, columnHeaderRole });
+            listViewUsers.Columns.AddRange(new ColumnHeader[] { columnHeaderUsername, columnHeaderRole, columnHeaderEndpoints });
             listViewUsers.FullRowSelect = true;
             listViewUsers.GridLines = true;
             listViewUsers.HeaderStyle = ColumnHeaderStyle.Nonclickable;
             listViewUsers.Location = new Point(12, 12);
             listViewUsers.Name = "listViewUsers";
-            listViewUsers.Size = new Size(528, 233);
+            listViewUsers.Size = new Size(615, 233);
             listViewUsers.TabIndex = 0;
             listViewUsers.UseCompatibleStateImageBehavior = false;
             listViewUsers.View = View.Details;
@@ -53,27 +54,32 @@
             columnHeaderUsername.Text = "Username";
             columnHeaderUsername.Width = 300;
             // 
-            // buttonAddUser
-            // 
-            buttonAddUser.Location = new Point(465, 257);
-            buttonAddUser.Name = "buttonAddUser";
-            buttonAddUser.Size = new Size(75, 23);
-            buttonAddUser.TabIndex = 2;
-            buttonAddUser.Text = "Add User";
-            buttonAddUser.UseVisualStyleBackColor = true;
-            buttonAddUser.Click += ButtonAddUser_Click;
-            // 
             // columnHeaderRole
             // 
             columnHeaderRole.Text = "Role";
             columnHeaderRole.Width = 200;
             // 
+            // columnHeaderEndpoints
+            // 
+            columnHeaderEndpoints.Text = "Endpoints";
+            columnHeaderEndpoints.Width = 90;
+            // 
+            // buttonCreateUser
+            // 
+            buttonCreateUser.Location = new Point(539, 251);
+            buttonCreateUser.Name = "buttonCreateUser";
+            buttonCreateUser.Size = new Size(87, 23);
+            buttonCreateUser.TabIndex = 2;
+            buttonCreateUser.Text = "Create User";
+            buttonCreateUser.UseVisualStyleBackColor = true;
+            buttonCreateUser.Click += ButtonCreateUser_Click;
+            // 
             // FormUsers
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(552, 292);
-            Controls.Add(buttonAddUser);
+            ClientSize = new Size(638, 284);
+            Controls.Add(buttonCreateUser);
             Controls.Add(listViewUsers);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -90,7 +96,8 @@
 
         private ListView listViewUsers;
         private ColumnHeader columnHeaderUsername;
-        private Button buttonAddUser;
+        private Button buttonCreateUser;
         private ColumnHeader columnHeaderRole;
+        private ColumnHeader columnHeaderEndpoints;
     }
 }

@@ -82,5 +82,10 @@ namespace NetTunnel.UI.Forms
             DialogResult = DialogResult.Cancel;
             Close();
         }
+
+        private void linkLabelEditEndpoints_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+
+        }
     }
 }

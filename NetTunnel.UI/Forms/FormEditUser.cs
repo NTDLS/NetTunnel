@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Payloads;
+using NetTunnel.UI.Types;
 using NTDLS.Helpers;
 using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
@@ -39,8 +40,51 @@ namespace NetTunnel.UI.Forms
             textBoxUsername.Text = user.Username;
             checkBoxAdministrator.Checked = user.Role == NtUserRole.Administrator;
 
+            listViewEndpoints.MouseDoubleClick += ListViewEndpoint_MouseDoubleClick;
+
+            foreach (var endpoint in user.Endpoints)
+            {
+                var item = new ListViewItem(endpoint.Name)
+                {
+                    Tag = new EndpointTag(endpoint)
+                };
+                item.SubItems.Add($"{endpoint.Direction}");
+
+                if (endpoint.Direction == NtDirection.Inbound)
+                {
+                    item.SubItems.Add($"*:{endpoint.InboundPort}");
+                }
+                else
+                {
+                    item.SubItems.Add($"{endpoint.OutboundAddress}:{endpoint.OutboundPort}");
+                }
+
+                listViewEndpoints.Items.Add(item);
+            }
+
             AcceptButton = buttonSave;
             CancelButton = buttonCancel;
+        }
+
+        private void ListViewEndpoint_MouseDoubleClick(object? sender, MouseEventArgs e)
+        {
+            _client.EnsureNotNull();
+
+            if (e.Button == MouseButtons.Left)
+            {
+                listViewEndpoints.SelectedItems.Clear();
+
+                var itemUnderMouse = listViewEndpoints.GetItemAt(e.X, e.Y);
+                if (itemUnderMouse != null)
+                {
+                    itemUnderMouse.Selected = true;
+
+                    var eTag = EndpointTag.FromItem(itemUnderMouse);
+
+                    using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), eTag.Endpoint);
+                    form.ShowDialog();
+                }
+            }
         }
 
         private void ButtonSave_Click(object sender, EventArgs e)
@@ -66,6 +110,28 @@ namespace NetTunnel.UI.Forms
                     {
                         var user = new User(username, password, checkBoxAdministrator.Checked ? NtUserRole.Administrator : NtUserRole.Limited);
                         _client.UIQueryEditUser(user);
+
+                        /* //Add endpoints, make this a list and add them all at once.
+                        if (string.IsNullOrEmpty(_username) == false)
+                        {
+                            //If _tunnel is != null, then we are editing an endpoint for a user..
+
+                            progressForm.Execute(() =>
+                            {
+                                try
+                                {
+                                    _client.UIQueryUpsertUserEndpoint(_username, endpoint);
+                                    this.InvokeClose(DialogResult.OK);
+                                }
+                                catch (Exception ex)
+                                {
+                                    progressForm.MessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                }
+                            });
+                        }
+                        */
+
+
                         return true;
                     }
                     catch (Exception ex)
@@ -93,6 +159,41 @@ namespace NetTunnel.UI.Forms
         {
             DialogResult = DialogResult.Cancel;
             Close();
+        }
+
+        private void linkLabelEditEndpoints_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+
+        }
+
+        private void buttonAddInbound_Click(object sender, EventArgs e)
+        {
+            using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), NtDirection.Inbound);
+            form.ShowDialog();
+        }
+
+        private void buttonAddOutbound_Click(object sender, EventArgs e)
+        {
+            using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), NtDirection.Outbound);
+            form.ShowDialog();
+        }
+
+        private void buttonDelete_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void buttonEdit_Click(object sender, EventArgs e)
+        {
+            _client.EnsureNotNull();
+
+            var selectedItem = listViewEndpoints.SelectedItems.Count == 1 ? listViewEndpoints.SelectedItems[0] : null;
+            if (selectedItem != null)
+            {
+                var eTag = EndpointTag.FromItem(selectedItem);
+                using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), eTag.Endpoint);
+                form.ShowDialog();
+            }
         }
     }
 }

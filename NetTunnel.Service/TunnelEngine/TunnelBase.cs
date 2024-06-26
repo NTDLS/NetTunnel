@@ -66,9 +66,9 @@ namespace NetTunnel.Service.TunnelEngine
             }
         }
 
-        public List<EndpointDisplay> GetEndpointsForDisplay()
+        public List<EndpointConfiguration> GetEndpointsForDisplay()
         {
-            var results = new List<EndpointDisplay>();
+            var results = new List<EndpointConfiguration>();
 
             foreach (var endpoint in Endpoints)
             {

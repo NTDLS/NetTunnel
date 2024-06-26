@@ -23,6 +23,7 @@ namespace NetTunnel.UI.Forms
             listViewUsers.MouseUp += ListViewUsers_MouseUp;
             listViewUsers.MouseDoubleClick += ListViewUsers_MouseDoubleClick;
             Shown += FormUsers_Shown;
+            listViewUsers.FullRowSelect = true;
 
             var cancelButton = new Button();
             cancelButton.Click += (object? sender, EventArgs e) =>
@@ -37,7 +38,7 @@ namespace NetTunnel.UI.Forms
         {
             _client.EnsureNotNull();
 
-            if (e.Button == MouseButtons.Right)
+            if (e.Button == MouseButtons.Left)
             {
                 listViewUsers.SelectedItems.Clear();
 
@@ -87,7 +88,8 @@ namespace NetTunnel.UI.Forms
             else
             {
                 var item = new ListViewItem(user.Username);
-                item.SubItems.Add(user.Role.ToString());
+                var subitem = item.SubItems.Add(user.Role.ToString());
+                item.SubItems.Add($"{user.Endpoints.Count}");
                 item.Tag = new UserTag(user);
                 listViewUsers.Items.Add(item);
             }
@@ -171,7 +173,7 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-        private void ButtonAddUser_Click(object sender, EventArgs e)
+        private void ButtonCreateUser_Click(object sender, EventArgs e)
         {
             _client.EnsureNotNull();
 

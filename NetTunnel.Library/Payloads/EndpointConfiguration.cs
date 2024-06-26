@@ -22,6 +22,7 @@ namespace NetTunnel.Library.Payloads
         [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public NtTrafficType TrafficType { get; set; } = NtTrafficType.Raw;
         public List<HttpHeaderRule> HttpHeaderRules { get; set; } = new();
+        public DirectionalKey EndpointKey => new(EndpointId, Direction);
 
         public EndpointConfiguration SwapDirection()
         {

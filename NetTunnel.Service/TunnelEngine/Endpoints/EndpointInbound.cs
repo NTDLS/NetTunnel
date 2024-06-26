@@ -114,9 +114,9 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             }
         }
 
-        public EndpointDisplay GetForDisplay()
+        public EndpointConfiguration GetForDisplay()
         {
-            var result = new EndpointDisplay
+            var result = new EndpointConfiguration
             {
                 EndpointId = EndpointId,
                 Direction = Direction,

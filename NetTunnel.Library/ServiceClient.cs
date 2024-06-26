@@ -212,6 +212,9 @@ namespace NetTunnel.Library
         public UIQueryDistributeUpsertEndpointReply UIQueryDistributeUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration configuration)
             => Client.Query(new UIQueryDistributeUpsertEndpoint(tunnelKey, configuration)).Result;
 
+        public UIQueryUpsertUserEndpointReply UIQueryUpsertUserEndpoint(string username, EndpointConfiguration configuration)
+            => Client.Query(new UIQueryUpsertUserEndpoint(username, configuration)).Result;
+
         public UIQueryGetUsersReply UIQueryGetUsers()
             => Client.Query(new UIQueryGetUsers()).Result;
 

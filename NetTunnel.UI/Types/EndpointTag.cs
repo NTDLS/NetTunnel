@@ -5,12 +5,10 @@ namespace NetTunnel.UI.Types
 {
     public class EndpointTag
     {
-        public TunnelDisplay Tunnel { get; set; }
-        public EndpointDisplay Endpoint { get; set; }
+        public EndpointConfiguration Endpoint { get; set; }
 
-        public EndpointTag(TunnelDisplay tunnel, EndpointDisplay endpoint)
+        public EndpointTag(EndpointConfiguration endpoint)
         {
-            Tunnel = tunnel;
             Endpoint = endpoint;
         }
 

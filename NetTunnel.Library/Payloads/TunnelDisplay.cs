@@ -12,7 +12,7 @@ namespace NetTunnel.Library.Payloads
         public int ServicePort { get; set; }
         public string Username { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
-        public List<EndpointDisplay> Endpoints { get; set; } = new();
+        public List<EndpointConfiguration> Endpoints { get; set; } = new();
 
         [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public NtDirection Direction { get; set; }

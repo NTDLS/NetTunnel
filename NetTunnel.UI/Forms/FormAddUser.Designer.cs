@@ -42,7 +42,7 @@
             // 
             // buttonSave
             // 
-            buttonSave.Location = new Point(181, 211);
+            buttonSave.Location = new Point(181, 207);
             buttonSave.Name = "buttonSave";
             buttonSave.Size = new Size(75, 23);
             buttonSave.TabIndex = 4;
@@ -52,7 +52,7 @@
             // 
             // buttonCancel
             // 
-            buttonCancel.Location = new Point(100, 211);
+            buttonCancel.Location = new Point(100, 207);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(75, 23);
             buttonCancel.TabIndex = 5;
@@ -113,7 +113,7 @@
             // checkBoxAdministrator
             // 
             checkBoxAdministrator.AutoSize = true;
-            checkBoxAdministrator.Location = new Point(16, 175);
+            checkBoxAdministrator.Location = new Point(16, 178);
             checkBoxAdministrator.Name = "checkBoxAdministrator";
             checkBoxAdministrator.Size = new Size(113, 19);
             checkBoxAdministrator.TabIndex = 3;
@@ -124,7 +124,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(268, 246);
+            ClientSize = new Size(268, 242);
             Controls.Add(checkBoxAdministrator);
             Controls.Add(textBoxConfirmPassword);
             Controls.Add(textBoxPassword);

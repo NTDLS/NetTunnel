@@ -11,12 +11,12 @@ namespace NetTunnel.UI.Forms
         private readonly ServiceClient? _client;
         private readonly TunnelDisplay? _tunnel;
         private readonly NtDirection _direction = NtDirection.Undefined;
-        private readonly EndpointDisplay? _existingEndpoint;
+        private readonly EndpointConfiguration? _existingEndpoint;
 
         /// <summary>
-        /// Creates a form for a editing an existing endpoint.
+        /// Creates a form adding a new or editing an existing endpoint for a connected tunnel.
         /// </summary>
-        public FormAddEditEndpoint(ServiceClient client, TunnelDisplay tunnel, EndpointDisplay existingEndpoint)
+        public FormAddEditEndpoint(ServiceClient client, TunnelDisplay tunnel, EndpointConfiguration existingEndpoint)
         {
             InitializeComponent();
 
@@ -26,6 +26,37 @@ namespace NetTunnel.UI.Forms
             _tunnel = tunnel;
             _existingEndpoint = existingEndpoint;
             _direction = existingEndpoint.Direction;
+
+            PopulateForm();
+        }
+
+        /// <summary>
+        /// Creates a form adding a new or editing an existing endpoint for a user account tunnel.
+        /// </summary>
+        public FormAddEditEndpoint(ServiceClient client, EndpointConfiguration existingEndpoint)
+        {
+            InitializeComponent();
+
+            dataGridViewHTTPHeaders.DataError += DataGridViewHTTPHeaders_DataError;
+
+            _client = client;
+            _existingEndpoint = existingEndpoint;
+            _direction = existingEndpoint.Direction;
+
+            PopulateForm();
+        }
+
+        /// <summary>
+        /// Creates a form adding a new or editing an existing endpoint for a user account tunnel.
+        /// </summary>
+        public FormAddEditEndpoint(ServiceClient client, NtDirection direction)
+        {
+            InitializeComponent();
+
+            dataGridViewHTTPHeaders.DataError += DataGridViewHTTPHeaders_DataError;
+
+            _client = client;
+            _direction = direction;
 
             PopulateForm();
         }
@@ -129,7 +160,6 @@ namespace NetTunnel.UI.Forms
         private void ButtonSave_Click(object sender, EventArgs e)
         {
             _client.EnsureNotNull();
-            _tunnel.EnsureNotNull();
 
             try
             {
@@ -170,18 +200,23 @@ namespace NetTunnel.UI.Forms
 
                 var progressForm = new ProgressForm(FriendlyName, "Saving endpoint...");
 
-                progressForm.Execute(() =>
+                if (_tunnel != null)
                 {
-                    try
+                    //If _tunnel is != null, then we are editing an endpoint for a connected tunnel.
+
+                    progressForm.Execute(() =>
                     {
-                        _client.UIQueryDistributeUpsertEndpoint(_tunnel.TunnelKey, endpoint);
-                        this.InvokeClose(DialogResult.OK);
-                    }
-                    catch (Exception ex)
-                    {
-                        progressForm.MessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                    }
-                });
+                        try
+                        {
+                            _client.UIQueryDistributeUpsertEndpoint(_tunnel.TunnelKey, endpoint);
+                            this.InvokeClose(DialogResult.OK);
+                        }
+                        catch (Exception ex)
+                        {
+                            progressForm.MessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        }
+                    });
+                }
             }
             catch (Exception ex)
             {

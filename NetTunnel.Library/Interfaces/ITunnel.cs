@@ -70,6 +70,6 @@ namespace NetTunnel.Library.Interfaces
         public TunnelPropertiesDisplay GetProperties();
         public EndpointPropertiesDisplay GetEndpointProperties(DirectionalKey endpointKey);
         public List<EndpointEdgeConnectionDisplay> GetEndpointEdgeConnections(DirectionalKey endpointKey);
-        public List<EndpointDisplay> GetEndpointsForDisplay();
+        public List<EndpointConfiguration> GetEndpointsForDisplay();
     }
 }

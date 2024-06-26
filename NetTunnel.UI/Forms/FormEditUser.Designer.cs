@@ -38,11 +38,25 @@
             textBoxPassword = new TextBox();
             textBoxConfirmPassword = new TextBox();
             checkBoxAdministrator = new CheckBox();
+            tabControl1 = new TabControl();
+            tabPageAccount = new TabPage();
+            tabPageEndpoints = new TabPage();
+            buttonEdit = new Button();
+            buttonAddOutbound = new Button();
+            buttonDelete = new Button();
+            listViewEndpoints = new ListView();
+            columnHeaderName = new ColumnHeader();
+            columnHeaderDirection = new ColumnHeader();
+            columnHeaderPort = new ColumnHeader();
+            buttonAddInbound = new Button();
+            tabControl1.SuspendLayout();
+            tabPageAccount.SuspendLayout();
+            tabPageEndpoints.SuspendLayout();
             SuspendLayout();
             // 
             // buttonSave
             // 
-            buttonSave.Location = new Point(181, 211);
+            buttonSave.Location = new Point(483, 326);
             buttonSave.Name = "buttonSave";
             buttonSave.Size = new Size(75, 23);
             buttonSave.TabIndex = 2;
@@ -52,7 +66,7 @@
             // 
             // buttonCancel
             // 
-            buttonCancel.Location = new Point(100, 211);
+            buttonCancel.Location = new Point(402, 326);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(75, 23);
             buttonCancel.TabIndex = 3;
@@ -63,7 +77,7 @@
             // labelUsername
             // 
             labelUsername.AutoSize = true;
-            labelUsername.Location = new Point(16, 13);
+            labelUsername.Location = new Point(10, 7);
             labelUsername.Name = "labelUsername";
             labelUsername.Size = new Size(60, 15);
             labelUsername.TabIndex = 2;
@@ -72,7 +86,7 @@
             // labelPassword
             // 
             labelPassword.AutoSize = true;
-            labelPassword.Location = new Point(16, 80);
+            labelPassword.Location = new Point(10, 74);
             labelPassword.Name = "labelPassword";
             labelPassword.Size = new Size(57, 15);
             labelPassword.TabIndex = 3;
@@ -81,7 +95,7 @@
             // labelConfirmPassword
             // 
             labelConfirmPassword.AutoSize = true;
-            labelConfirmPassword.Location = new Point(16, 128);
+            labelConfirmPassword.Location = new Point(10, 122);
             labelConfirmPassword.Name = "labelConfirmPassword";
             labelConfirmPassword.Size = new Size(104, 15);
             labelConfirmPassword.TabIndex = 4;
@@ -90,7 +104,7 @@
             // textBoxUsername
             // 
             textBoxUsername.Enabled = false;
-            textBoxUsername.Location = new Point(16, 31);
+            textBoxUsername.Location = new Point(10, 25);
             textBoxUsername.Name = "textBoxUsername";
             textBoxUsername.ReadOnly = true;
             textBoxUsername.Size = new Size(232, 23);
@@ -98,7 +112,7 @@
             // 
             // textBoxPassword
             // 
-            textBoxPassword.Location = new Point(16, 98);
+            textBoxPassword.Location = new Point(10, 92);
             textBoxPassword.Name = "textBoxPassword";
             textBoxPassword.PasswordChar = '*';
             textBoxPassword.Size = new Size(232, 23);
@@ -106,7 +120,7 @@
             // 
             // textBoxConfirmPassword
             // 
-            textBoxConfirmPassword.Location = new Point(16, 146);
+            textBoxConfirmPassword.Location = new Point(10, 140);
             textBoxConfirmPassword.Name = "textBoxConfirmPassword";
             textBoxConfirmPassword.PasswordChar = '*';
             textBoxConfirmPassword.Size = new Size(232, 23);
@@ -115,25 +129,127 @@
             // checkBoxAdministrator
             // 
             checkBoxAdministrator.AutoSize = true;
-            checkBoxAdministrator.Location = new Point(16, 175);
+            checkBoxAdministrator.Location = new Point(10, 179);
             checkBoxAdministrator.Name = "checkBoxAdministrator";
             checkBoxAdministrator.Size = new Size(113, 19);
             checkBoxAdministrator.TabIndex = 11;
             checkBoxAdministrator.Text = "Is administrator?";
             checkBoxAdministrator.UseVisualStyleBackColor = true;
             // 
+            // tabControl1
+            // 
+            tabControl1.Controls.Add(tabPageAccount);
+            tabControl1.Controls.Add(tabPageEndpoints);
+            tabControl1.Location = new Point(12, 12);
+            tabControl1.Name = "tabControl1";
+            tabControl1.SelectedIndex = 0;
+            tabControl1.Size = new Size(550, 308);
+            tabControl1.TabIndex = 12;
+            // 
+            // tabPageAccount
+            // 
+            tabPageAccount.Controls.Add(labelUsername);
+            tabPageAccount.Controls.Add(checkBoxAdministrator);
+            tabPageAccount.Controls.Add(textBoxConfirmPassword);
+            tabPageAccount.Controls.Add(textBoxPassword);
+            tabPageAccount.Controls.Add(labelPassword);
+            tabPageAccount.Controls.Add(textBoxUsername);
+            tabPageAccount.Controls.Add(labelConfirmPassword);
+            tabPageAccount.Location = new Point(4, 24);
+            tabPageAccount.Name = "tabPageAccount";
+            tabPageAccount.Padding = new Padding(3);
+            tabPageAccount.Size = new Size(542, 280);
+            tabPageAccount.TabIndex = 0;
+            tabPageAccount.Text = "Account";
+            tabPageAccount.UseVisualStyleBackColor = true;
+            // 
+            // tabPageEndpoints
+            // 
+            tabPageEndpoints.Controls.Add(buttonEdit);
+            tabPageEndpoints.Controls.Add(buttonAddOutbound);
+            tabPageEndpoints.Controls.Add(buttonDelete);
+            tabPageEndpoints.Controls.Add(listViewEndpoints);
+            tabPageEndpoints.Controls.Add(buttonAddInbound);
+            tabPageEndpoints.Location = new Point(4, 24);
+            tabPageEndpoints.Name = "tabPageEndpoints";
+            tabPageEndpoints.Padding = new Padding(3);
+            tabPageEndpoints.Size = new Size(542, 280);
+            tabPageEndpoints.TabIndex = 1;
+            tabPageEndpoints.Text = "Endpoints";
+            tabPageEndpoints.UseVisualStyleBackColor = true;
+            // 
+            // buttonEdit
+            // 
+            buttonEdit.Location = new Point(418, 131);
+            buttonEdit.Name = "buttonEdit";
+            buttonEdit.Size = new Size(114, 23);
+            buttonEdit.TabIndex = 16;
+            buttonEdit.Text = "Edit";
+            buttonEdit.UseVisualStyleBackColor = true;
+            buttonEdit.Click += buttonEdit_Click;
+            // 
+            // buttonAddOutbound
+            // 
+            buttonAddOutbound.Location = new Point(418, 35);
+            buttonAddOutbound.Name = "buttonAddOutbound";
+            buttonAddOutbound.Size = new Size(114, 23);
+            buttonAddOutbound.TabIndex = 15;
+            buttonAddOutbound.Text = "Add Outbound";
+            buttonAddOutbound.UseVisualStyleBackColor = true;
+            buttonAddOutbound.Click += buttonAddOutbound_Click;
+            // 
+            // buttonDelete
+            // 
+            buttonDelete.Location = new Point(418, 251);
+            buttonDelete.Name = "buttonDelete";
+            buttonDelete.Size = new Size(114, 23);
+            buttonDelete.TabIndex = 14;
+            buttonDelete.Text = "Delete";
+            buttonDelete.UseVisualStyleBackColor = true;
+            buttonDelete.Click += buttonDelete_Click;
+            // 
+            // listViewEndpoints
+            // 
+            listViewEndpoints.Columns.AddRange(new ColumnHeader[] { columnHeaderName, columnHeaderDirection, columnHeaderPort });
+            listViewEndpoints.FullRowSelect = true;
+            listViewEndpoints.GridLines = true;
+            listViewEndpoints.Location = new Point(6, 6);
+            listViewEndpoints.Name = "listViewEndpoints";
+            listViewEndpoints.Size = new Size(406, 268);
+            listViewEndpoints.TabIndex = 0;
+            listViewEndpoints.UseCompatibleStateImageBehavior = false;
+            listViewEndpoints.View = View.Details;
+            // 
+            // columnHeaderName
+            // 
+            columnHeaderName.Text = "Name";
+            columnHeaderName.Width = 200;
+            // 
+            // columnHeaderDirection
+            // 
+            columnHeaderDirection.Text = "Direction";
+            columnHeaderDirection.Width = 100;
+            // 
+            // columnHeaderPort
+            // 
+            columnHeaderPort.Text = "Port";
+            // 
+            // buttonAddInbound
+            // 
+            buttonAddInbound.Location = new Point(418, 6);
+            buttonAddInbound.Name = "buttonAddInbound";
+            buttonAddInbound.Size = new Size(114, 23);
+            buttonAddInbound.TabIndex = 13;
+            buttonAddInbound.Text = "Add Inbound";
+            buttonAddInbound.UseVisualStyleBackColor = true;
+            buttonAddInbound.Click += buttonAddInbound_Click;
+            // 
             // FormEditUser
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(268, 246);
-            Controls.Add(checkBoxAdministrator);
-            Controls.Add(textBoxConfirmPassword);
-            Controls.Add(textBoxPassword);
-            Controls.Add(textBoxUsername);
-            Controls.Add(labelConfirmPassword);
-            Controls.Add(labelPassword);
-            Controls.Add(labelUsername);
+            ClientSize = new Size(570, 358);
+            Controls.Add(tabControl1);
             Controls.Add(buttonCancel);
             Controls.Add(buttonSave);
             FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -144,8 +260,11 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
             Text = "NetTunnel : Edit User";
+            tabControl1.ResumeLayout(false);
+            tabPageAccount.ResumeLayout(false);
+            tabPageAccount.PerformLayout();
+            tabPageEndpoints.ResumeLayout(false);
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
@@ -159,5 +278,16 @@
         private TextBox textBoxPassword;
         private TextBox textBoxConfirmPassword;
         private CheckBox checkBoxAdministrator;
+        private TabControl tabControl1;
+        private TabPage tabPageAccount;
+        private TabPage tabPageEndpoints;
+        private Button buttonDelete;
+        private ListView listViewEndpoints;
+        private Button buttonAddInbound;
+        private Button buttonAddOutbound;
+        private ColumnHeader columnHeaderName;
+        private ColumnHeader columnHeaderDirection;
+        private ColumnHeader columnHeaderPort;
+        private Button buttonEdit;
     }
 }

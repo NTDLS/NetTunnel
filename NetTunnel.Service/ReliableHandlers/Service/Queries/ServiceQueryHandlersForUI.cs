@@ -92,6 +92,33 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         }
 
         /// <summary>
+        /// A user is asking the service to upsert an endpoint associated with a user.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public UIQueryDistributeUpsertEndpointReply OnQuery(RmContext context, UIQueryUpsertUserEndpoint query)
+        {
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+                if (connectionContext.UserRole != NtUserRole.Administrator)
+                {
+                    throw new Exception("Unauthorized");
+                }
+
+                Singletons.ServiceEngine.Users.UpsertEndpoint(query.Username, query.Configuration);
+
+                return new UIQueryDistributeUpsertEndpointReply();
+            }
+            catch (Exception ex)
+            {
+                Singletons.Logger.Exception(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
         /// The UI is requesting general tunnel statistics.
         /// </summary>
         /// <param name="context"></param>
