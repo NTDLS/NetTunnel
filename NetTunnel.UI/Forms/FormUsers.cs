@@ -48,7 +48,7 @@ namespace NetTunnel.UI.Forms
                     itemUnderMouse.Selected = true;
 
                     var uTag = UserTag.FromItem(itemUnderMouse);
-                    using var form = new FormEditUser(_client, uTag.User);
+                    using var form = new FormAddEditUser(_client, uTag.User);
                     form.ShowDialog();
                 }
             }
@@ -135,15 +135,15 @@ namespace NetTunnel.UI.Forms
                     {
                         _client.EnsureNotNull();
 
-                        using var form = new FormAddUser(_client);
+                        using var form = new FormAddEditUser(_client);
                         if (form.ShowDialog() == DialogResult.OK)
                         {
-                            AddUserToGrid(form.CreatedUser.EnsureNotNull());
+                            AddUserToGrid(form.User.EnsureNotNull());
                         }
                     }
                     else if (uTag != null && e.ClickedItem?.Text == "Edit")
                     {
-                        using var form = new FormEditUser(_client, uTag.User);
+                        using var form = new FormAddEditUser(_client, uTag.User);
                         form.ShowDialog();
                     }
                     else if (uTag != null && e.ClickedItem?.Text == "Delete")
@@ -177,10 +177,10 @@ namespace NetTunnel.UI.Forms
         {
             _client.EnsureNotNull();
 
-            using var form = new FormAddUser(_client);
+            using var form = new FormAddEditUser(_client);
             if (form.ShowDialog() == DialogResult.OK)
             {
-                AddUserToGrid(form.CreatedUser.EnsureNotNull());
+                AddUserToGrid(form.User.EnsureNotNull());
             }
         }
 

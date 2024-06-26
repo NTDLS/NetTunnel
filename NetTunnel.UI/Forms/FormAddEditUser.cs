@@ -7,21 +7,23 @@ using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms
 {
-    public partial class FormEditUser : Form
+    public partial class FormAddEditUser : Form
     {
         private readonly ServiceClient? _client;
         public User? User { get; private set; }
+        private readonly bool _isCreatingNewUser;
 
-        public FormEditUser()
+        public FormAddEditUser()
         {
             InitializeComponent();
         }
 
-        public FormEditUser(ServiceClient? client, User user)
+        public FormAddEditUser(ServiceClient? client, User? user = null)
         {
             InitializeComponent();
 
             _client = client;
+            _isCreatingNewUser = user == null;
 
             #region Set Tool-tips.
 
@@ -35,14 +37,17 @@ namespace NetTunnel.UI.Forms
 
             #endregion
 
-            User = user;
+            User = user ?? new User();
 
-            textBoxUsername.Text = user.Username;
-            checkBoxAdministrator.Checked = user.Role == NtUserRole.Administrator;
+            textBoxUsername.Text = User.Username;
+            textBoxUsername.Enabled = !_isCreatingNewUser;
+            checkBoxAdministrator.Checked = User.Role == NtUserRole.Administrator;
+
+            Text = _isCreatingNewUser ? $"{FriendlyName} : Create User" : $"{FriendlyName} : Edit User";
 
             listViewEndpoints.MouseDoubleClick += ListViewEndpoint_MouseDoubleClick;
 
-            foreach (var endpoint in user.Endpoints)
+            foreach (var endpoint in User.Endpoints)
             {
                 var item = new ListViewItem(endpoint.Name)
                 {
@@ -82,7 +87,10 @@ namespace NetTunnel.UI.Forms
                     var eTag = EndpointTag.FromItem(itemUnderMouse);
 
                     using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), eTag.Endpoint);
-                    form.ShowDialog();
+                    if (form.ShowDialog() == DialogResult.OK)
+                    {
+                        eTag.Endpoint = form.Endpoint;
+                    }
                 }
             }
         }
@@ -94,22 +102,40 @@ namespace NetTunnel.UI.Forms
             try
             {
                 string username = textBoxUsername.GetAndValidateText("You must specify a username.");
-                string password = Utility.ComputeSha256Hash(textBoxPassword.GetAndValidateText("You must specify a password."));
-                string passwordConfirm = Utility.ComputeSha256Hash(textBoxConfirmPassword.GetAndValidateText("You must specify a confirm-password."));
 
-                if (password != passwordConfirm)
+                string plainTextPassword = textBoxPassword.Text.Trim();
+                string? passwordHash = null;
+
+                if (string.IsNullOrEmpty(plainTextPassword))
                 {
-                    throw new Exception("The password and confirm-passwords must match.");
+                    passwordHash = null;
+                }
+                else
+                {
+                    if (plainTextPassword != textBoxConfirmPassword.Text)
+                    {
+                        throw new Exception("The password and confirm-passwords must match.");
+                    }
+
+                    passwordHash = Utility.ComputeSha256Hash(plainTextPassword);
                 }
 
-                var progressForm = new ProgressForm(Constants.FriendlyName, "Saving user...");
+                var progressForm = new ProgressForm(FriendlyName, "Saving user...");
 
-                var result = progressForm.Execute(() =>
+                progressForm.Execute(() =>
                 {
                     try
                     {
-                        var user = new User(username, password, checkBoxAdministrator.Checked ? NtUserRole.Administrator : NtUserRole.Limited);
-                        _client.UIQueryEditUser(user);
+                        User = new User(username, passwordHash, checkBoxAdministrator.Checked ? NtUserRole.Administrator : NtUserRole.Limited);
+
+                        if (_isCreatingNewUser)
+                        {
+                            _client.UIQueryCreateUser(User);
+                        }
+                        else
+                        {
+                            _client.UIQueryEditUser(User);
+                        }
 
                         /* //Add endpoints, make this a list and add them all at once.
                         if (string.IsNullOrEmpty(_username) == false)
@@ -131,23 +157,13 @@ namespace NetTunnel.UI.Forms
                         }
                         */
 
-
-                        return true;
+                        this.InvokeClose(DialogResult.OK);
                     }
                     catch (Exception ex)
                     {
-                        progressForm.MessageBox(ex.Message, Constants.FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        progressForm.MessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     }
-                    return false;
                 });
-
-                if (result)
-                {
-                    this.InvokeMessageBox("The password has been changed.",
-                        FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    Close();
-                }
             }
             catch (Exception ex)
             {
@@ -161,29 +177,25 @@ namespace NetTunnel.UI.Forms
             Close();
         }
 
-        private void linkLabelEditEndpoints_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-
-        }
-
-        private void buttonAddInbound_Click(object sender, EventArgs e)
+        private void ButtonAddInbound_Click(object sender, EventArgs e)
         {
             using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), NtDirection.Inbound);
             form.ShowDialog();
         }
 
-        private void buttonAddOutbound_Click(object sender, EventArgs e)
+        private void ButtonAddOutbound_Click(object sender, EventArgs e)
         {
             using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), NtDirection.Outbound);
             form.ShowDialog();
         }
 
-        private void buttonDelete_Click(object sender, EventArgs e)
+        private void ButtonDelete_Click(object sender, EventArgs e)
         {
-
+            //TODO:
+            throw new NotImplementedException();
         }
 
-        private void buttonEdit_Click(object sender, EventArgs e)
+        private void ButtonEdit_Click(object sender, EventArgs e)
         {
             _client.EnsureNotNull();
 
@@ -192,7 +204,10 @@ namespace NetTunnel.UI.Forms
             {
                 var eTag = EndpointTag.FromItem(selectedItem);
                 using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), eTag.Endpoint);
-                form.ShowDialog();
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    eTag.Endpoint = form.Endpoint;
+                }
             }
         }
     }

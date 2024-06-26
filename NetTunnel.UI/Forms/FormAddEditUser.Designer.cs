@@ -1,6 +1,6 @@
 ﻿namespace NetTunnel.UI.Forms
 {
-    partial class FormEditUser
+    partial class FormAddEditUser
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEditUser));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormAddEditUser));
             buttonSave = new Button();
             buttonCancel = new Button();
             labelUsername = new Label();
@@ -59,7 +59,7 @@
             buttonSave.Location = new Point(483, 326);
             buttonSave.Name = "buttonSave";
             buttonSave.Size = new Size(75, 23);
-            buttonSave.TabIndex = 2;
+            buttonSave.TabIndex = 100;
             buttonSave.Text = "Save";
             buttonSave.UseVisualStyleBackColor = true;
             buttonSave.Click += ButtonSave_Click;
@@ -69,7 +69,7 @@
             buttonCancel.Location = new Point(402, 326);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(75, 23);
-            buttonCancel.TabIndex = 3;
+            buttonCancel.TabIndex = 101;
             buttonCancel.Text = "Cancel";
             buttonCancel.UseVisualStyleBackColor = true;
             buttonCancel.Click += ButtonCancel_Click;
@@ -183,30 +183,30 @@
             buttonEdit.Location = new Point(418, 131);
             buttonEdit.Name = "buttonEdit";
             buttonEdit.Size = new Size(114, 23);
-            buttonEdit.TabIndex = 16;
+            buttonEdit.TabIndex = 3;
             buttonEdit.Text = "Edit";
             buttonEdit.UseVisualStyleBackColor = true;
-            buttonEdit.Click += buttonEdit_Click;
+            buttonEdit.Click += ButtonEdit_Click;
             // 
             // buttonAddOutbound
             // 
             buttonAddOutbound.Location = new Point(418, 35);
             buttonAddOutbound.Name = "buttonAddOutbound";
             buttonAddOutbound.Size = new Size(114, 23);
-            buttonAddOutbound.TabIndex = 15;
+            buttonAddOutbound.TabIndex = 2;
             buttonAddOutbound.Text = "Add Outbound";
             buttonAddOutbound.UseVisualStyleBackColor = true;
-            buttonAddOutbound.Click += buttonAddOutbound_Click;
+            buttonAddOutbound.Click += ButtonAddOutbound_Click;
             // 
             // buttonDelete
             // 
             buttonDelete.Location = new Point(418, 251);
             buttonDelete.Name = "buttonDelete";
             buttonDelete.Size = new Size(114, 23);
-            buttonDelete.TabIndex = 14;
+            buttonDelete.TabIndex = 4;
             buttonDelete.Text = "Delete";
             buttonDelete.UseVisualStyleBackColor = true;
-            buttonDelete.Click += buttonDelete_Click;
+            buttonDelete.Click += ButtonDelete_Click;
             // 
             // listViewEndpoints
             // 
@@ -239,10 +239,10 @@
             buttonAddInbound.Location = new Point(418, 6);
             buttonAddInbound.Name = "buttonAddInbound";
             buttonAddInbound.Size = new Size(114, 23);
-            buttonAddInbound.TabIndex = 13;
+            buttonAddInbound.TabIndex = 1;
             buttonAddInbound.Text = "Add Inbound";
             buttonAddInbound.UseVisualStyleBackColor = true;
-            buttonAddInbound.Click += buttonAddInbound_Click;
+            buttonAddInbound.Click += ButtonAddInbound_Click;
             // 
             // FormEditUser
             // 
@@ -259,7 +259,7 @@
             Name = "FormEditUser";
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
-            Text = "NetTunnel : Edit User";
+            Text = "NetTunnel : Add/Edit User";
             tabControl1.ResumeLayout(false);
             tabPageAccount.ResumeLayout(false);
             tabPageAccount.PerformLayout();

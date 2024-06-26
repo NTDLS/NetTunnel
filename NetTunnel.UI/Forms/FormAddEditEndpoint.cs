@@ -13,6 +13,8 @@ namespace NetTunnel.UI.Forms
         private readonly NtDirection _direction = NtDirection.Undefined;
         private readonly EndpointConfiguration? _existingEndpoint;
 
+        public EndpointConfiguration Endpoint { get; private set; } = new();
+
         /// <summary>
         /// Creates a form adding a new or editing an existing endpoint for a connected tunnel.
         /// </summary>
@@ -188,7 +190,7 @@ namespace NetTunnel.UI.Forms
                     }
                 }
 
-                var endpoint = new EndpointConfiguration(
+                Endpoint = new EndpointConfiguration(
                     _existingEndpoint?.EndpointId ?? Guid.NewGuid(),
                     _direction,
                     textBoxName.Text,
@@ -203,12 +205,11 @@ namespace NetTunnel.UI.Forms
                 if (_tunnel != null)
                 {
                     //If _tunnel is != null, then we are editing an endpoint for a connected tunnel.
-
                     progressForm.Execute(() =>
                     {
                         try
                         {
-                            _client.UIQueryDistributeUpsertEndpoint(_tunnel.TunnelKey, endpoint);
+                            _client.UIQueryDistributeUpsertEndpoint(_tunnel.TunnelKey, Endpoint);
                             this.InvokeClose(DialogResult.OK);
                         }
                         catch (Exception ex)
@@ -216,6 +217,11 @@ namespace NetTunnel.UI.Forms
                             progressForm.MessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                         }
                     });
+                }
+                else
+                {
+                    DialogResult = DialogResult.OK;
+                    Close();
                 }
             }
             catch (Exception ex)
