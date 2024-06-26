@@ -32,16 +32,19 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             _collection.Use((o) =>
             {
-                o.FirstOrDefault(t => t.Username.Equals(user.Username, StringComparison.CurrentCultureIgnoreCase))?
-                    .Modify(user);
+                o.FirstOrDefault(t => t.Username.Equals(user.Username, StringComparison.CurrentCultureIgnoreCase))
+                    ?.Modify(user);
             });
         }
 
         public NtUserRole ValidateLoginAndGetRole(string username, string passwordHash)
         {
             return _collection.Use((o) =>
-                o.SingleOrDefault(u => u.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase)
-                && u.PasswordHash.Equals(passwordHash, StringComparison.CurrentCultureIgnoreCase)))?.Role ?? NtUserRole.Undefined;
+                o.SingleOrDefault(u =>
+                    u.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase)
+                    && u.PasswordHash != null
+                    && u.PasswordHash.Equals(passwordHash, StringComparison.CurrentCultureIgnoreCase))
+                )?.Role ?? NtUserRole.Undefined;
         }
 
         public List<User> Clone()
@@ -78,10 +81,10 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             _collection.Use((o) =>
             {
                 var user = o.SingleOrDefault(u => u.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase));
-                if (user != null)
-                {
-                    user.Endpoints.Add(endpoint);
-                }
+
+                user?.Endpoints.RemoveAll(o => o.EndpointId == endpoint.EndpointId);
+                user?.Endpoints.Add(endpoint);
+
                 SaveToDisk();
             });
         }
@@ -94,10 +97,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             _collection.Use((o) =>
             {
                 var user = o.SingleOrDefault(u => u.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase));
-                if (user != null)
-                {
-                    user.Endpoints.RemoveAll(o => o.EndpointId == endpointId);
-                }
+                user?.Endpoints.RemoveAll(o => o.EndpointId == endpointId);
                 SaveToDisk();
             });
         }

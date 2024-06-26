@@ -33,7 +33,7 @@ namespace NetTunnel.UI.Forms
         }
 
         /// <summary>
-        /// Creates a form adding a new or editing an existing endpoint for a user account tunnel.
+        /// Creates a form adding a new or editing an existing endpoint for a user account.
         /// </summary>
         public FormAddEditEndpoint(ServiceClient client, EndpointConfiguration existingEndpoint)
         {
@@ -49,7 +49,7 @@ namespace NetTunnel.UI.Forms
         }
 
         /// <summary>
-        /// Creates a form adding a new or editing an existing endpoint for a user account tunnel.
+        /// Creates a form adding a new or editing an existing endpoint for a user account.
         /// </summary>
         public FormAddEditEndpoint(ServiceClient client, NtDirection direction)
         {
@@ -133,7 +133,6 @@ namespace NetTunnel.UI.Forms
             else
             {
                 comboBoxTrafficType.SelectedValue = NtTrafficType.Raw;
-
 #if DEBUG
 
                 textBoxName.Text = "Website Redirector Endpoint";

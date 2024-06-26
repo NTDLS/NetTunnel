@@ -42,12 +42,12 @@ namespace NetTunnel.UI.Forms
             {
                 listViewUsers.SelectedItems.Clear();
 
-                var itemUnderMouse = listViewUsers.GetItemAt(e.X, e.Y);
-                if (itemUnderMouse != null)
+                var selectedItem = listViewUsers.GetItemAt(e.X, e.Y);
+                if (selectedItem != null)
                 {
-                    itemUnderMouse.Selected = true;
+                    selectedItem.Selected = true;
 
-                    var uTag = UserTag.FromItem(itemUnderMouse);
+                    var uTag = UserTag.FromItem(selectedItem);
                     using var form = new FormAddEditUser(_client, uTag.User);
                     form.ShowDialog();
                 }
@@ -103,19 +103,19 @@ namespace NetTunnel.UI.Forms
             {
                 listViewUsers.SelectedItems.Clear();
 
-                var itemUnderMouse = listViewUsers.GetItemAt(e.X, e.Y);
-                if (itemUnderMouse != null)
+                var selectedItem = listViewUsers.GetItemAt(e.X, e.Y);
+                if (selectedItem != null)
                 {
-                    itemUnderMouse.Selected = true;
+                    selectedItem.Selected = true;
                 }
 
-                var uTag = UserTag.FromItemOrDefault(itemUnderMouse);
+                var uTag = UserTag.FromItemOrDefault(selectedItem);
                 var menu = new ContextMenuStrip();
 
                 if (uTag != null)
                 {
                     menu.Items.Add("Edit");
-                    if (listViewUsers.Items.Count > 1)
+                    if (selectedItem != null)
                     {
                         menu.Items.Add("Delete");
                     }
@@ -184,7 +184,7 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-        private void buttonClose_Click(object sender, EventArgs e)
+        private void ButtonClose_Click(object sender, EventArgs e)
         {
             Close();
         }

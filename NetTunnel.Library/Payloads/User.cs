@@ -35,6 +35,7 @@ namespace NetTunnel.Library.Payloads
                 PasswordHash = user.PasswordHash;
             }
             Role = user.Role;
+            Endpoints = user.Endpoints;
         }
 
         public User Clone()

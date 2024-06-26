@@ -46,6 +46,7 @@ namespace NetTunnel.UI.Forms
             Text = _isCreatingNewUser ? $"{FriendlyName} : Create User" : $"{FriendlyName} : Edit User";
 
             listViewEndpoints.MouseDoubleClick += ListViewEndpoint_MouseDoubleClick;
+            listViewEndpoints.MouseUp += ListViewEndpoints_MouseUp;
 
             foreach (var endpoint in User.Endpoints)
             {
@@ -71,6 +72,77 @@ namespace NetTunnel.UI.Forms
             CancelButton = buttonCancel;
         }
 
+        private void ListViewEndpoints_MouseUp(object? sender, MouseEventArgs e)
+        {
+            _client.EnsureNotNull();
+
+            if (e.Button == MouseButtons.Right)
+            {
+                listViewEndpoints.SelectedItems.Clear();
+
+                var selectedItem = listViewEndpoints.GetItemAt(e.X, e.Y);
+                if (selectedItem != null)
+                {
+                    selectedItem.Selected = true;
+                }
+
+                var eTag = EndpointTag.FromItemOrDefault(selectedItem);
+                var menu = new ContextMenuStrip();
+
+                if (eTag != null)
+                {
+                    menu.Items.Add("Edit");
+                    if (selectedItem != null)
+                    {
+                        menu.Items.Add("Delete");
+                    }
+                }
+                else
+                {
+                    menu.Items.Add("Add inbound endpoint");
+                    menu.Items.Add("Add outbound endpoint");
+                }
+
+                menu.Show(listViewEndpoints, new Point(e.X, e.Y));
+
+                menu.ItemClicked += (object? sender, ToolStripItemClickedEventArgs e) =>
+                {
+                    menu.Hide();
+
+                    if (e.ClickedItem?.Text == "Add inbound endpoint")
+                    {
+                        using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), NtDirection.Inbound);
+                        if (form.ShowDialog() == DialogResult.OK)
+                        {
+                            User.EnsureNotNull().Endpoints.Add(form.Endpoint);
+                        }
+                    }
+                    else if (e.ClickedItem?.Text == "Add outbound endpoint")
+                    {
+                        using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), NtDirection.Outbound);
+                        if (form.ShowDialog() == DialogResult.OK)
+                        {
+                            User.EnsureNotNull().Endpoints.Add(form.Endpoint);
+                        }
+                    }
+                    else if (eTag != null && e.ClickedItem?.Text == "Edit")
+                    {
+                        using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), eTag.Endpoint);
+                        if (form.ShowDialog() == DialogResult.OK)
+                        {
+                            eTag.Endpoint = form.Endpoint;
+                        }
+                    }
+                    else if (selectedItem != null && eTag != null && e.ClickedItem?.Text == "Delete")
+                    {
+                        listViewEndpoints.Items.Remove(selectedItem);
+                        User.EnsureNotNull().Endpoints.RemoveAll(o => o.EndpointId == eTag.Endpoint.EndpointId);
+                    }
+                };
+            }
+        }
+
+
         private void ListViewEndpoint_MouseDoubleClick(object? sender, MouseEventArgs e)
         {
             _client.EnsureNotNull();
@@ -79,12 +151,12 @@ namespace NetTunnel.UI.Forms
             {
                 listViewEndpoints.SelectedItems.Clear();
 
-                var itemUnderMouse = listViewEndpoints.GetItemAt(e.X, e.Y);
-                if (itemUnderMouse != null)
+                var selectedItem = listViewEndpoints.GetItemAt(e.X, e.Y);
+                if (selectedItem != null)
                 {
-                    itemUnderMouse.Selected = true;
+                    selectedItem.Selected = true;
 
-                    var eTag = EndpointTag.FromItem(itemUnderMouse);
+                    var eTag = EndpointTag.FromItem(selectedItem);
 
                     using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), eTag.Endpoint);
                     if (form.ShowDialog() == DialogResult.OK)
@@ -137,26 +209,6 @@ namespace NetTunnel.UI.Forms
                             _client.UIQueryEditUser(User);
                         }
 
-                        /* //Add endpoints, make this a list and add them all at once.
-                        if (string.IsNullOrEmpty(_username) == false)
-                        {
-                            //If _tunnel is != null, then we are editing an endpoint for a user..
-
-                            progressForm.Execute(() =>
-                            {
-                                try
-                                {
-                                    _client.UIQueryUpsertUserEndpoint(_username, endpoint);
-                                    this.InvokeClose(DialogResult.OK);
-                                }
-                                catch (Exception ex)
-                                {
-                                    progressForm.MessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                                }
-                            });
-                        }
-                        */
-
                         this.InvokeClose(DialogResult.OK);
                     }
                     catch (Exception ex)
@@ -180,19 +232,30 @@ namespace NetTunnel.UI.Forms
         private void ButtonAddInbound_Click(object sender, EventArgs e)
         {
             using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), NtDirection.Inbound);
-            form.ShowDialog();
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                User.EnsureNotNull().Endpoints.Add(form.Endpoint);
+            }
         }
 
         private void ButtonAddOutbound_Click(object sender, EventArgs e)
         {
             using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), NtDirection.Outbound);
-            form.ShowDialog();
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                User.EnsureNotNull().Endpoints.Add(form.Endpoint);
+            }
         }
 
         private void ButtonDelete_Click(object sender, EventArgs e)
         {
-            //TODO:
-            throw new NotImplementedException();
+            var selectedItem = listViewEndpoints.SelectedItems.Count == 1 ? listViewEndpoints.SelectedItems[0] : null;
+            if (selectedItem != null)
+            {
+                var eTag = EndpointTag.FromItem(selectedItem);
+                listViewEndpoints.Items.Remove(selectedItem);
+                User.EnsureNotNull().Endpoints.RemoveAll(o => o.EndpointId == eTag.Endpoint.EndpointId);
+            }
         }
 
         private void ButtonEdit_Click(object sender, EventArgs e)
