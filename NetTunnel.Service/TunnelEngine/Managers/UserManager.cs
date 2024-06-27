@@ -34,6 +34,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             {
                 o.FirstOrDefault(t => t.Username.Equals(user.Username, StringComparison.CurrentCultureIgnoreCase))
                     ?.Modify(user);
+
+                SaveToDisk();
             });
         }
 
