@@ -62,6 +62,13 @@ namespace NetTunnel.UI.Forms
             }
             _firstShown = false;
 
+            RepopulateUsersGrid();
+        }
+
+        private void RepopulateUsersGrid()
+        {
+            listViewUsers.Items.Clear();
+
             var progressForm = new ProgressForm(Constants.FriendlyName, "Getting users...");
 
             progressForm.Execute(() =>
@@ -144,7 +151,11 @@ namespace NetTunnel.UI.Forms
                     else if (uTag != null && e.ClickedItem?.Text == "Edit")
                     {
                         using var form = new FormAddEditUser(_client, uTag.User);
-                        form.ShowDialog();
+                        if (form.ShowDialog() == DialogResult.OK)
+                        {
+                            listViewUsers.InvokeDeleteSelectedItems();
+                            AddUserToGrid(form.User.EnsureNotNull());
+                        }
                     }
                     else if (uTag != null && e.ClickedItem?.Text == "Delete")
                     {

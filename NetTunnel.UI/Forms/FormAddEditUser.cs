@@ -50,26 +50,32 @@ namespace NetTunnel.UI.Forms
 
             foreach (var endpoint in User.Endpoints)
             {
-                var item = new ListViewItem(endpoint.Name)
-                {
-                    Tag = new EndpointTag(endpoint)
-                };
-                item.SubItems.Add($"{endpoint.Direction}");
-
-                if (endpoint.Direction == NtDirection.Inbound)
-                {
-                    item.SubItems.Add($"*:{endpoint.InboundPort}");
-                }
-                else
-                {
-                    item.SubItems.Add($"{endpoint.OutboundAddress}:{endpoint.OutboundPort}");
-                }
-
-                listViewEndpoints.Items.Add(item);
+                AddEndpointToGrid(endpoint);
             }
 
             AcceptButton = buttonSave;
             CancelButton = buttonCancel;
+        }
+
+
+        public void AddEndpointToGrid(EndpointConfiguration endpoint)
+        {
+            var item = new ListViewItem(endpoint.Name)
+            {
+                Tag = new EndpointTag(endpoint)
+            };
+            item.SubItems.Add($"{endpoint.Direction}");
+
+            if (endpoint.Direction == NtDirection.Inbound)
+            {
+                item.SubItems.Add($"*:{endpoint.InboundPort}");
+            }
+            else
+            {
+                item.SubItems.Add($"{endpoint.OutboundAddress}:{endpoint.OutboundPort}");
+            }
+
+            listViewEndpoints.Items.Add(item);
         }
 
         private void ListViewEndpoints_MouseUp(object? sender, MouseEventArgs e)
@@ -114,6 +120,7 @@ namespace NetTunnel.UI.Forms
                         using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), NtDirection.Inbound);
                         if (form.ShowDialog() == DialogResult.OK)
                         {
+                            AddEndpointToGrid(form.Endpoint);
                             User.EnsureNotNull().Endpoints.Add(form.Endpoint);
                         }
                     }
@@ -122,6 +129,7 @@ namespace NetTunnel.UI.Forms
                         using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), NtDirection.Outbound);
                         if (form.ShowDialog() == DialogResult.OK)
                         {
+                            AddEndpointToGrid(form.Endpoint);
                             User.EnsureNotNull().Endpoints.Add(form.Endpoint);
                         }
                     }
@@ -130,7 +138,8 @@ namespace NetTunnel.UI.Forms
                         using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), eTag.Endpoint);
                         if (form.ShowDialog() == DialogResult.OK)
                         {
-                            eTag.Endpoint = form.Endpoint;
+                            listViewEndpoints.Items.Remove(selectedItem.EnsureNotNull());
+                            AddEndpointToGrid(form.Endpoint);
                         }
                     }
                     else if (selectedItem != null && eTag != null && e.ClickedItem?.Text == "Delete")
@@ -198,7 +207,10 @@ namespace NetTunnel.UI.Forms
                 {
                     try
                     {
-                        User = new User(username, passwordHash, checkBoxAdministrator.Checked ? NtUserRole.Administrator : NtUserRole.Limited);
+                        User = new User(username, passwordHash, checkBoxAdministrator.Checked ? NtUserRole.Administrator : NtUserRole.Limited)
+                        {
+                            Endpoints = User.EnsureNotNull().Endpoints
+                        };
 
                         if (_isCreatingNewUser)
                         {
@@ -235,6 +247,7 @@ namespace NetTunnel.UI.Forms
             if (form.ShowDialog() == DialogResult.OK)
             {
                 User.EnsureNotNull().Endpoints.Add(form.Endpoint);
+                AddEndpointToGrid(form.Endpoint);
             }
         }
 
@@ -244,6 +257,7 @@ namespace NetTunnel.UI.Forms
             if (form.ShowDialog() == DialogResult.OK)
             {
                 User.EnsureNotNull().Endpoints.Add(form.Endpoint);
+                AddEndpointToGrid(form.Endpoint);
             }
         }
 
@@ -269,7 +283,8 @@ namespace NetTunnel.UI.Forms
                 using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), eTag.Endpoint);
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    eTag.Endpoint = form.Endpoint;
+                    listViewEndpoints.Items.Remove(selectedItem);
+                    AddEndpointToGrid(form.Endpoint);
                 }
             }
         }
