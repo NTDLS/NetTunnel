@@ -143,6 +143,30 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         }
 
         /// <summary>
+        /// The UI is requesting that a tunnel be disconnected, but not deleted from the associated remote service.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public UIQueryDisconnectTunnelReply OnQuery(RmContext context, UIQueryDisconnectTunnel query)
+        {
+            try
+            {
+                var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+                //We want to stop and delete the tunnel locally.
+                Singletons.ServiceEngine.Tunnels.DisconnectAndRemoveTunnel(query.TunnelKey);
+
+                return new UIQueryDisconnectTunnelReply();
+            }
+            catch (Exception ex)
+            {
+                Singletons.Logger.Exception(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
         /// The UI is requesting that a tunnel be deleted.
         /// </summary>
         /// <param name="context"></param>
@@ -159,7 +183,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
                 }
 
                 //We want to stop and delete the tunnel locally.
-                Singletons.ServiceEngine.Tunnels.DeleteTunnel(query.TunnelKey);
+                Singletons.ServiceEngine.Tunnels.DeleteBothEndsOfTunnel(query.TunnelKey);
 
                 return new UIQueryDeleteTunnelReply();
             }
@@ -373,11 +397,6 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
-                if (connectionContext.UserRole != NtUserRole.Administrator)
-                {
-                    throw new Exception("Unauthorized");
-                }
-
                 Singletons.ServiceEngine.Tunnels.Start(query.TunnelKey);
 
                 return new UIQueryStartTunnelReply();
@@ -400,11 +419,6 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
-                if (connectionContext.UserRole != NtUserRole.Administrator)
-                {
-                    throw new Exception("Unauthorized");
-                }
-
                 Singletons.ServiceEngine.Tunnels.Stop(query.TunnelKey);
 
                 return new UIQueryStopTunnelReply();
@@ -427,10 +441,6 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
-                if (connectionContext.UserRole != NtUserRole.Administrator)
-                {
-                    throw new Exception("Unauthorized");
-                }
 
                 return new UIQueryGetTunnelPropertiesReply()
                 {

@@ -88,7 +88,21 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-        public void DeleteTunnel(DirectionalKey tunnelKey)
+        public void DisconnectAndRemoveTunnel(DirectionalKey tunnelKey)
+        {
+            Collection.Use((o) =>
+            {
+                var existingTunnel = o.SingleOrDefault(o => o.TunnelKey == tunnelKey);
+                if (existingTunnel != null)
+                {
+                    existingTunnel.Stop();
+                    o.Remove(existingTunnel);
+                    SaveToDisk();
+                }
+            });
+        }
+
+        public void DeleteBothEndsOfTunnel(DirectionalKey tunnelKey)
         {
             Collection.Use((o) =>
             {

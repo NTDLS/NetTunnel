@@ -64,6 +64,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
 
                     return new UOSQueryLoginReply(true)
                     {
+                        UserRole = userRole,
                         ServiceId = Singletons.Configuration.ServiceId
                     };
                 }

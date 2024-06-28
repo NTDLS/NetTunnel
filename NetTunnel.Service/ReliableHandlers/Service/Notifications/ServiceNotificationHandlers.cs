@@ -86,7 +86,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
             {
                 var connectionContext = GetServiceConnectionContext(context);
 
-                Singletons.ServiceEngine.Tunnels.DeleteTunnel(notification.TunnelKey);
+                Singletons.ServiceEngine.Tunnels.DeleteBothEndsOfTunnel(notification.TunnelKey);
             }
             catch (Exception ex)
             {

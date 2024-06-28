@@ -39,7 +39,7 @@ namespace NetTunnel.UI.Forms
             exitToolStripMenuItem = new ToolStripMenuItem();
             securityToolStripMenuItem = new ToolStripMenuItem();
             usersToolStripMenuItem = new ToolStripMenuItem();
-            configurationToolStripMenuItem1 = new ToolStripMenuItem();
+            configurationToolStripMenuItem = new ToolStripMenuItem();
             helpToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
             statusStripBody = new StatusStrip();
@@ -104,7 +104,7 @@ namespace NetTunnel.UI.Forms
             // 
             // securityToolStripMenuItem
             // 
-            securityToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { usersToolStripMenuItem, configurationToolStripMenuItem1 });
+            securityToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { usersToolStripMenuItem, configurationToolStripMenuItem });
             securityToolStripMenuItem.Name = "securityToolStripMenuItem";
             securityToolStripMenuItem.Size = new Size(61, 20);
             securityToolStripMenuItem.Text = "Settings";
@@ -112,16 +112,16 @@ namespace NetTunnel.UI.Forms
             // usersToolStripMenuItem
             // 
             usersToolStripMenuItem.Name = "usersToolStripMenuItem";
-            usersToolStripMenuItem.Size = new Size(148, 22);
+            usersToolStripMenuItem.Size = new Size(180, 22);
             usersToolStripMenuItem.Text = "Users";
             usersToolStripMenuItem.Click += UsersToolStripMenuItem_Click;
             // 
-            // configurationToolStripMenuItem1
+            // configurationToolStripMenuItem
             // 
-            configurationToolStripMenuItem1.Name = "configurationToolStripMenuItem1";
-            configurationToolStripMenuItem1.Size = new Size(148, 22);
-            configurationToolStripMenuItem1.Text = "Configuration";
-            configurationToolStripMenuItem1.Click += ConfigurationToolStripMenuItem_Click;
+            configurationToolStripMenuItem.Name = "configurationToolStripMenuItem";
+            configurationToolStripMenuItem.Size = new Size(180, 22);
+            configurationToolStripMenuItem.Text = "Configuration";
+            configurationToolStripMenuItem.Click += ConfigurationToolStripMenuItem_Click;
             // 
             // helpToolStripMenuItem
             // 
@@ -241,7 +241,7 @@ namespace NetTunnel.UI.Forms
         private Label labelEndpoints;
         private ToolStripMenuItem helpToolStripMenuItem;
         private ToolStripMenuItem aboutToolStripMenuItem;
-        private ToolStripMenuItem configurationToolStripMenuItem1;
+        private ToolStripMenuItem configurationToolStripMenuItem;
         private ToolStripSeparator toolStripMenuItem1;
     }
 }

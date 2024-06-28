@@ -10,6 +10,8 @@ using NetTunnel.Service.ReliableMessages;
 using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
+using System.Data;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library
 {
@@ -23,6 +25,8 @@ namespace NetTunnel.Library
         private readonly int _port;
         private readonly string _userName;
         private readonly string _passwordHash;
+
+        public NtUserRole Role { get; private set; } = NtUserRole.Undefined;
 
         public string Address { get { return _address; } }
         /// <summary>
@@ -147,6 +151,7 @@ namespace NetTunnel.Library
             }
             else
             {
+                Role = login.UserRole;
                 ServiceId = login.ServiceId.EnsureNotNullOrEmpty();
                 IsLoggedIn = true;
             }
@@ -199,6 +204,9 @@ namespace NetTunnel.Library
 
         public UIQueryGetTunnelPropertiesReply UIQueryGetTunnelProperties(DirectionalKey tunnelKey)
             => Client.Query(new UIQueryGetTunnelProperties(tunnelKey)).Result;
+
+        public UIQueryDisconnectTunnelReply UIQueryDisconnectTunnel(DirectionalKey tunnelKey)
+            => Client.Query(new UIQueryDisconnectTunnel(tunnelKey)).Result;
 
         public UIQueryDeleteTunnelReply UIQueryDeleteTunnel(DirectionalKey tunnelKey)
             => Client.Query(new UIQueryDeleteTunnel(tunnelKey)).Result;

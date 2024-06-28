@@ -165,6 +165,10 @@ namespace NetTunnel.UI.Forms
                     };
 
                     Text = $"{FriendlyName} : {_client.Address}";
+
+                    configurationToolStripMenuItem.Enabled = IsAdministrator(_client);
+                    usersToolStripMenuItem.Enabled = IsAdministrator(_client);
+
                     RepopulateTunnelsGrid();
                     return;
                 }
@@ -221,7 +225,6 @@ namespace NetTunnel.UI.Forms
 
                         PopulateEndpointStatistics(result.Statistics);
                         PopulateTunnelStatistics(result.Statistics);
-
                     }
 
                     void PopulateEndpointStatistics(List<TunnelStatisticsDisplay> statistics)
@@ -387,19 +390,22 @@ namespace NetTunnel.UI.Forms
 
                 var menu = new ContextMenuStrip();
 
-                if (tTag.Tunnel.Direction == NtDirection.Outbound
-                    || (tTag.Tunnel.Direction == NtDirection.Inbound && tTag.Tunnel.IsLoggedIn))
+                if (_client != null)
                 {
-                    menu.Items.Add("Add Inbound Endpoint");
-                    menu.Items.Add("Add Outbound Endpoint");
-
-                    if (eTag != null)
+                    if (tTag.Tunnel.Direction == NtDirection.Outbound
+                        || (tTag.Tunnel.Direction == NtDirection.Inbound && tTag.Tunnel.IsLoggedIn))
                     {
-                        menu.Items.Add(new ToolStripSeparator());
-                        menu.Items.Add("Delete Endpoint");
-                        menu.Items.Add(new ToolStripSeparator());
-                        menu.Items.Add("Edge Connections");
-                        menu.Items.Add("Properties");
+                        menu.Items.Add("Add Inbound Endpoint").Enabled = IsAdministrator(_client);
+                        menu.Items.Add("Add Outbound Endpoint").Enabled = IsAdministrator(_client);
+
+                        if (eTag != null)
+                        {
+                            menu.Items.Add(new ToolStripSeparator());
+                            menu.Items.Add("Delete Endpoint").Enabled = IsAdministrator(_client);
+                            menu.Items.Add(new ToolStripSeparator());
+                            menu.Items.Add("Edge Connections");
+                            menu.Items.Add("Properties");
+                        }
                     }
                 }
 
@@ -501,12 +507,11 @@ namespace NetTunnel.UI.Forms
 
                 if (selectedRow != null && tTag != null)
                 {
-                    if (tTag.Tunnel.Direction == NtDirection.Outbound
-                        || (tTag.Tunnel.Direction == NtDirection.Inbound && tTag.Tunnel.IsLoggedIn))
+                    if (_client != null && tTag.Tunnel.IsLoggedIn)
                     {
                         menu.Items.Add(new ToolStripSeparator());
-                        menu.Items.Add("Add Inbound Endpoint");
-                        menu.Items.Add("Add Outbound Endpoint");
+                        menu.Items.Add("Add Inbound Endpoint").Enabled = IsAdministrator(_client);
+                        menu.Items.Add("Add Outbound Endpoint").Enabled = IsAdministrator(_client);
                     }
 
                     if (tTag.Tunnel.Direction == NtDirection.Outbound)
@@ -524,7 +529,8 @@ namespace NetTunnel.UI.Forms
                     }
 
                     menu.Items.Add(new ToolStripSeparator());
-                    menu.Items.Add("Delete Tunnel");
+                    menu.Items.Add("Delete Tunnel").Enabled = IsAdministrator(_client);
+                    menu.Items.Add("Disconnect Tunnel").Enabled = tTag.Tunnel.Direction == NtDirection.Outbound;
                     menu.Items.Add(new ToolStripSeparator());
                     menu.Items.Add("Properties");
                 }
@@ -617,6 +623,30 @@ namespace NetTunnel.UI.Forms
 
                         listViewEndpoints.InvokeClearRows();
                     }
+                    else if (tTag != null && e.ClickedItem?.Text == "Disconnect Tunnel")
+                    {
+                        if (MessageBox.Show($"Disconnect the tunnel '{tTag.Tunnel.Name}'?",
+                            FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                        {
+                            return;
+                        }
+
+                        try
+                        {
+                            _client.EnsureNotNull().UIQueryDeleteTunnel(tTag.Tunnel.TunnelKey);
+
+                            Invoke(new Action(() =>
+                            {
+                                _needToRepopulateTunnels = true;
+                            }));
+                        }
+                        catch (Exception ex)
+                        {
+                            this.InvokeMessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        }
+
+                        listViewEndpoints.InvokeClearRows();
+                    }
                     else if (tTag != null && e.ClickedItem?.Text == "Delete Tunnel")
                     {
                         if (MessageBox.Show($"Delete the tunnel '{tTag.Tunnel.Name}'?",
@@ -644,6 +674,17 @@ namespace NetTunnel.UI.Forms
                 };
             }
         }
+
+        public bool IsAdministrator(Library.ServiceClient? client)
+        {
+            if (_client == null)
+            {
+                return false;
+            }
+
+            return _client.Role == NtUserRole.Administrator;
+        }
+
 
         #region Populate Grids.
 

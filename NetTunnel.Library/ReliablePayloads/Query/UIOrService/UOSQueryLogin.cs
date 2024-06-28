@@ -1,4 +1,5 @@
 ﻿using NTDLS.ReliableMessaging;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library.ReliablePayloads.Query.UIOrService
 {
@@ -18,6 +19,7 @@ namespace NetTunnel.Library.ReliablePayloads.Query.UIOrService
     {
         public bool Successful { get; set; }
         public Guid? ServiceId { get; set; }
+        public NtUserRole UserRole { get; set; } = NtUserRole.Undefined;
 
         public UOSQueryLoginReply()
         {

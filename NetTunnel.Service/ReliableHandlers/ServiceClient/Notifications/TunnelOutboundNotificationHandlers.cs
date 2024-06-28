@@ -65,7 +65,7 @@ namespace NetTunnel.Service.ReliableHandlers.ServiceClient.Notifications
             {
                 var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
 
-                Singletons.ServiceEngine.Tunnels.DeleteTunnel(notification.TunnelKey);
+                Singletons.ServiceEngine.Tunnels.DeleteBothEndsOfTunnel(notification.TunnelKey);
             }
             catch (Exception ex)
             {
