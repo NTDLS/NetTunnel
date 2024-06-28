@@ -4,6 +4,9 @@ namespace NetTunnel.Library.Interfaces
 {
     public interface ILogger : IDisposable
     {
+        public delegate void OnLogDelegate(DateTime dateTime, NtLogSeverity severity, string message);
+        public event OnLogDelegate? OnLog;
+
         public void Verbose(string message);
         public void Debug(string message);
         public void Warning(string message);

@@ -23,6 +23,7 @@ namespace NetTunnel.UI.Forms
         private System.Windows.Forms.Timer? _timer;
         private ListViewItemComparer? _endpointsListViewItemComparer;
         private ListViewItemComparer? _tunnelsListViewItemComparer;
+        private readonly Stack<VisualLogEntry> _visualLogEntries = new();
 
         #region Constructor / Deconstructor.
 
@@ -139,6 +140,24 @@ namespace NetTunnel.UI.Forms
             }
         }
 
+        private void WriteVisualLog(DateTime dateTime, NtLogSeverity severity, string message)
+        {
+            Monitor.Enter(_visualLogEntries);
+            try
+            {
+                _visualLogEntries.Push(new VisualLogEntry
+                {
+                    DateTime = dateTime,
+                    Severity = severity,
+                    Message = message,
+                });
+            }
+            catch
+            {
+            }
+            Monitor.Exit(_visualLogEntries);
+        }
+
         private void ChangeConnection()
         {
             if (_formClosing)
@@ -148,7 +167,9 @@ namespace NetTunnel.UI.Forms
 
             try
             {
-                using var form = new FormLogin();
+                _visualLogEntries.Clear();
+
+                using var form = new FormLogin(WriteVisualLog);
                 form.Owner = this;
                 if (form.ShowDialog() == DialogResult.OK)
                 {
@@ -200,6 +221,33 @@ namespace NetTunnel.UI.Forms
                 }
                 _inTimerTick = true;
             }
+
+            if (Monitor.TryEnter(_visualLogEntries))
+            {
+                try
+                {
+                    int? lastItemIndex = null;
+
+                    while (_visualLogEntries.TryPop(out var logEntry))
+                    {
+                        var item = new ListViewItem($"{logEntry.DateTime}");
+                        item.SubItems.Add($"{logEntry.Severity}");
+                        item.SubItems.Add(logEntry.Message);
+                        lastItemIndex = listViewLogs.Items.Add(item).Index;
+                    }
+
+                    if (lastItemIndex != null)
+                    {
+                        listViewLogs.Items[(int)lastItemIndex].EnsureVisible();
+                    }
+                }
+                catch
+                {
+                }
+                Monitor.Exit(_visualLogEntries);
+            }
+
+            listViewLogs.EndUpdate();
 
             new Thread(() =>
             {
@@ -543,7 +591,7 @@ namespace NetTunnel.UI.Forms
 
                     if (e.ClickedItem?.Text == "Connect Tunnel")
                     {
-                        using var form = new FormConnectTunnel(_client.EnsureNotNull());
+                        using var form = new FormConnectTunnel(_client.EnsureNotNull(), WriteVisualLog);
                         if (form.ShowDialog() == DialogResult.OK)
                         {
                             RepopulateTunnelsGrid();
@@ -684,7 +732,6 @@ namespace NetTunnel.UI.Forms
 
             return _client.Role == NtUserRole.Administrator;
         }
-
 
         #region Populate Grids.
 

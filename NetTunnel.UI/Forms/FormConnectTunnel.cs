@@ -1,9 +1,12 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Payloads;
+using NetTunnel.Library.ReliablePayloads.Notification.UI;
 using NTDLS.Helpers;
 using NTDLS.Persistence;
+using NTDLS.ReliableMessaging;
 using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
+using static NetTunnel.Library.Utility;
 
 namespace NetTunnel.UI.Forms
 {
@@ -11,17 +14,14 @@ namespace NetTunnel.UI.Forms
     {
         private readonly ServiceClient? _client;
         private readonly DelegateLogger _delegateLogger = UIUtility.CreateActiveWindowMessageBoxLogger(NtLogSeverity.Exception);
+        private readonly Utility.ServiceLogDelegate _serviceLogDelegate;
 
-        public FormConnectTunnel()
-        {
-            InitializeComponent();
-        }
-
-        public FormConnectTunnel(ServiceClient client)
+        public FormConnectTunnel(ServiceClient client, ServiceLogDelegate serviceLogDelegate)
         {
             InitializeComponent();
 
             _client = client;
+            _serviceLogDelegate = serviceLogDelegate;
 
             #region Set Tool-tips.
 
@@ -89,8 +89,16 @@ namespace NetTunnel.UI.Forms
                     {
                         try
                         {
-                            var remoteClient = ServiceClient.CreateConnectAndLogin(_delegateLogger, tunnel.Address,
+                            var remoteClient = ServiceClient.UICreateConnectAndLogin(_delegateLogger, tunnel.Address,
                                 tunnel.ServicePort, tunnel.Username, tunnel.PasswordHash);
+
+                            remoteClient.Client.OnNotificationReceived += (RmContext context, IRmNotification payload) =>
+                            {
+                                if (payload is UILoggerNotification logger)
+                                {
+                                    _serviceLogDelegate?.Invoke(logger.Timestamp, logger.Severity, logger.Text);
+                                }
+                            };
 
                             _client.UIQueryCreateTunnel(tunnel);
 

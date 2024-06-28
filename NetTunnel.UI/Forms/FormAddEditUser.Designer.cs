@@ -106,7 +106,6 @@
             textBoxUsername.Enabled = false;
             textBoxUsername.Location = new Point(10, 25);
             textBoxUsername.Name = "textBoxUsername";
-            textBoxUsername.ReadOnly = true;
             textBoxUsername.Size = new Size(232, 23);
             textBoxUsername.TabIndex = 10;
             // 
@@ -244,7 +243,7 @@
             buttonAddInbound.UseVisualStyleBackColor = true;
             buttonAddInbound.Click += ButtonAddInbound_Click;
             // 
-            // FormEditUser
+            // FormAddEditUser
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -256,7 +255,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;
-            Name = "FormEditUser";
+            Name = "FormAddEditUser";
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
             Text = "NetTunnel : Add/Edit User";

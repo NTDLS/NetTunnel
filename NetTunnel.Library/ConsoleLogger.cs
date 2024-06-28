@@ -10,6 +10,8 @@ namespace NetTunnel.Library
         private readonly NtLogSeverity _logLevel;
         private StreamWriter? _fileStream;
 
+        public event ILogger.OnLogDelegate? OnLog;
+
         public ConsoleLogger(NtLogSeverity logLevel)
         {
             _logLevel = logLevel;
@@ -39,7 +41,7 @@ namespace NetTunnel.Library
                 return;
             }
 
-            DateTime dt = DateTime.Now;
+            var dateTime = DateTime.Now;
             lock (_lock)
             {
                 switch (severity)
@@ -58,7 +60,9 @@ namespace NetTunnel.Library
                         break;
                 }
 
-                var logText = $"{severity} ({dt.ToShortDateString()} {dt.ToShortTimeString()}): {text}";
+                var logText = $"{severity} ({dateTime.ToShortDateString()} {dateTime.ToShortTimeString()}): {text}";
+
+                OnLog?.Invoke(dateTime, severity, text);
 
                 Console.WriteLine(logText);
                 _fileStream?.WriteLine(logText);

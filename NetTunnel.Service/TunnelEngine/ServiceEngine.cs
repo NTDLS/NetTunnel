@@ -1,6 +1,7 @@
 ﻿using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Notification.ServiceToService;
+using NetTunnel.Library.ReliablePayloads.Notification.UI;
 using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
 using NetTunnel.Service.ReliableHandlers.Service.Notifications;
 using NetTunnel.Service.ReliableHandlers.Service.Queries;
@@ -8,6 +9,7 @@ using NetTunnel.Service.TunnelEngine.Managers;
 using NTDLS.ReliableMessaging;
 using NTDLS.Semaphore;
 using System.Diagnostics.CodeAnalysis;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine
 {
@@ -63,7 +65,22 @@ namespace NetTunnel.Service.TunnelEngine
                 Singletons.Logger.Exception($"RPC server exception: '{ex.Message}'"
                     + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
             };
+
+            Singletons.Logger.OnLog += (DateTime dateTime, NtLogSeverity severity, string message) =>
+            {
+                //Loop through all UI connections.
+                var uiConnectionIds = Singletons.ServiceEngine.ServiceConnectionStates.Use(o =>
+                    o.Where(o => o.Value.LoginType == NtLoginType.UI).Select(o => o.Value.ConnectionId).ToList());
+
+                foreach (var connectionId in uiConnectionIds)
+                {
+                    Singletons.ServiceEngine.UINotifyLog(connectionId, dateTime, severity, message);
+                }
+            };
         }
+
+
+
 
         public bool TryGetServiceConnectionState(Guid connectionId, [NotNullWhen(true)] out ServiceConnectionState? outState)
         {
@@ -80,6 +97,9 @@ namespace NetTunnel.Service.TunnelEngine
 
 
         #region Interface: IServiceEngine
+
+        public void UINotifyLog(Guid connectionId, DateTime timestamp, NtLogSeverity severity, string text)
+            => _messageServer.Notify(connectionId, new UILoggerNotification(timestamp, severity, text));
 
         public S2SQueryUpsertEndpointReply S2SPeerQueryUpsertEndpoint(Guid connectionId, DirectionalKey tunnelKey, EndpointConfiguration endpoint)
             => _messageServer.Query(connectionId, new S2SQueryUpsertEndpoint(tunnelKey, endpoint)).Result;

@@ -1,6 +1,8 @@
 ﻿using NetTunnel.Library;
+using NetTunnel.Library.ReliablePayloads.Notification.UI;
 using NTDLS.Helpers;
 using NTDLS.Persistence;
+using NTDLS.ReliableMessaging;
 using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
 
@@ -9,11 +11,14 @@ namespace NetTunnel.UI.Forms
     public partial class FormLogin : Form
     {
         public ServiceClient? ResultingClient { get; private set; } = null;
-        private readonly DelegateLogger _delegateLogger = UIUtility.CreateActiveWindowMessageBoxLogger(NtLogSeverity.Exception);
+        private readonly DelegateLogger _messageBoxHandler = UIUtility.CreateActiveWindowMessageBoxLogger(NtLogSeverity.Exception);
+        private readonly Utility.ServiceLogDelegate _serviceLogDelegate;
 
-        public FormLogin()
+        public FormLogin(Utility.ServiceLogDelegate serviceLogDelegate)
         {
             InitializeComponent();
+
+            _serviceLogDelegate = serviceLogDelegate;
 
             #region Set Tool-tips.
 
@@ -38,7 +43,7 @@ namespace NetTunnel.UI.Forms
 
             Exceptions.Ignore(() =>
             {
-                var preferences = LocalUserApplicationData.LoadFromDisk(Constants.FriendlyName, new UILoginPreferences());
+                var preferences = LocalUserApplicationData.LoadFromDisk(FriendlyName, new UILoginPreferences());
 
                 textBoxAddress.Text = preferences.Address;
                 textBoxPort.Text = preferences.Port;
@@ -66,7 +71,15 @@ namespace NetTunnel.UI.Forms
                 {
                     try
                     {
-                        var client = ServiceClient.CreateConnectAndLogin(_delegateLogger, address, port, username, passwordHash);
+                        var client = ServiceClient.UICreateConnectAndLogin(_messageBoxHandler, address, port, username, passwordHash);
+
+                        client.Client.OnNotificationReceived += (RmContext context, IRmNotification payload) =>
+                        {
+                            if (payload is UILoggerNotification logger)
+                            {
+                                _serviceLogDelegate?.Invoke(logger.Timestamp, logger.Severity, logger.Text);
+                            }
+                        };
 
                         var preferences = new UILoginPreferences()
                         {
@@ -75,7 +88,7 @@ namespace NetTunnel.UI.Forms
                             Username = textBoxUsername.Text,
                         };
 
-                        LocalUserApplicationData.SaveToDisk(Constants.FriendlyName, preferences);
+                        LocalUserApplicationData.SaveToDisk(FriendlyName, preferences);
 
                         ResultingClient = client;
                         this.InvokeClose(DialogResult.OK);

@@ -1,10 +1,13 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library
 {
     public static class Utility
     {
+        public delegate void ServiceLogDelegate(DateTime dateTime, NtLogSeverity severity, string message);
+
         public static int CombineHashes(int hash1, int hash2)
         {
             uint rol5 = ((uint)hash1 << 5) | ((uint)hash1 >> 27);
