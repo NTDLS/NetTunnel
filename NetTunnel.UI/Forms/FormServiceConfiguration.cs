@@ -124,7 +124,7 @@ namespace NetTunnel.UI.Forms
                 configuration.EndpointHeartbeatDelayMs = textBoxEndpointHeartbeatDelayMs.GetAndValidateNumeric(1000, 216000000,
                     "The tunnel and endpoint heartbeat (ms) must be an integer value between [min] and [max].");
 
-                configuration.TunnelCryptographyKeySize = textBoxTunnelCryptographyKeySize.GetAndValidateNumeric(1, 128,
+                configuration.TunnelCryptographyKeySize = textBoxTunnelCryptographyKeySize.GetAndValidateNumeric(128, 81920,
                     "The tunnel cryptography key-size must be an integer value between [min] and [max].");
 
                 configuration.StaleEndpointExpirationMs = textBoxStaleEndpointExpirationMs.GetAndValidateNumeric(0, 216000000,

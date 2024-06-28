@@ -1,6 +1,8 @@
 ﻿using NetTunnel.Library.ReliablePayloads.Query.UI;
 using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
+using ProtoBuf;
+using System.Reflection;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.ReliableHandlers.Service.Queries
@@ -19,7 +21,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public UIQueryGetTunnelsReply OnQuery(RmContext context, UIQueryGetTunnels query)
+        public UIQueryGetTunnelsReply UIQueryGetTunnels(RmContext context, UIQueryGetTunnels query)
         {
             try
             {
@@ -42,10 +44,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public UIQueryCreateTunnelReply OnQuery(RmContext context, UIQueryCreateTunnel query)
+        public UIQueryCreateTunnelReply UIQueryCreateTunnel(RmContext context, UIQueryCreateTunnel query)
         {
             try
             {
+                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
                 if (connectionContext.UserRole != NtUserRole.Administrator)
                 {
@@ -70,10 +74,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public UIQueryDistributeUpsertEndpointReply OnQuery(RmContext context, UIQueryDistributeUpsertEndpoint query)
+        public UIQueryDistributeUpsertEndpointReply UIQueryDistributeUpsertEndpoint(RmContext context, UIQueryDistributeUpsertEndpoint query)
         {
             try
             {
+                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
                 if (connectionContext.UserRole != NtUserRole.Administrator)
                 {
@@ -97,10 +103,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public UIQueryDistributeUpsertEndpointReply OnQuery(RmContext context, UIQueryUpsertUserEndpoint query)
+        public UIQueryUpsertUserEndpointReply UIQueryUpsertUserEndpoint(RmContext context, UIQueryUpsertUserEndpoint query)
         {
             try
             {
+                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
                 if (connectionContext.UserRole != NtUserRole.Administrator)
                 {
@@ -109,7 +117,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
 
                 Singletons.ServiceEngine.Users.UpsertEndpoint(query.Username, query.Configuration);
 
-                return new UIQueryDistributeUpsertEndpointReply();
+                return new UIQueryUpsertUserEndpointReply();
             }
             catch (Exception ex)
             {
@@ -124,10 +132,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public UIQueryGetTunnelStatisticsReply OnQuery(RmContext context, UIQueryGetTunnelStatistics query)
+        public UIQueryGetTunnelStatisticsReply UIQueryGetTunnelStatistics(RmContext context, UIQueryGetTunnelStatistics query)
         {
             try
             {
+                Singletons.Logger.Debug(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
                 return new UIQueryGetTunnelStatisticsReply()
@@ -148,10 +158,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public UIQueryDisconnectTunnelReply OnQuery(RmContext context, UIQueryDisconnectTunnel query)
+        public UIQueryDisconnectTunnelReply UIQueryDisconnectTunnel(RmContext context, UIQueryDisconnectTunnel query)
         {
             try
             {
+                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
                 //We want to stop and delete the tunnel locally.
@@ -172,10 +184,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public UIQueryDeleteTunnelReply OnQuery(RmContext context, UIQueryDeleteTunnel query)
+        public UIQueryDeleteTunnelReply UIQueryDeleteTunnel(RmContext context, UIQueryDeleteTunnel query)
         {
             try
             {
+                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
                 if (connectionContext.UserRole != NtUserRole.Administrator)
                 {
@@ -200,10 +214,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public UIQueryGetUsersReply OnQuery(RmContext context, UIQueryGetUsers query)
+        public UIQueryGetUsersReply UIQueryGetUsers(RmContext context, UIQueryGetUsers query)
         {
             try
             {
+                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
                 if (connectionContext.UserRole != NtUserRole.Administrator)
                 {
@@ -228,10 +244,12 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public UIQueryDeleteUserReply OnQuery(RmContext context, UIQueryDeleteUser query)
+        public UIQueryDeleteUserReply UIQueryDeleteUser(RmContext context, UIQueryDeleteUser query)
         {
             try
             {
+                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
                 if (connectionContext.UserRole != NtUserRole.Administrator)
                 {
@@ -255,8 +273,10 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public UIQueryEditUserReply OnQuery(RmContext context, UIQueryEditUser query)
+        public UIQueryEditUserReply UIQueryEditUser(RmContext context, UIQueryEditUser query)
         {
+            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
@@ -282,8 +302,10 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public UIQueryCreateUserReply OnQuery(RmContext context, UIQueryCreateUser query)
+        public UIQueryCreateUserReply UIQueryCreateUser(RmContext context, UIQueryCreateUser query)
         {
+            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
@@ -309,8 +331,10 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public UIQueryGetServiceConfigurationReply OnQuery(RmContext context, UIQueryGetServiceConfiguration query)
+        public UIQueryGetServiceConfigurationReply UIQueryGetServiceConfiguration(RmContext context, UIQueryGetServiceConfiguration query)
         {
+            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
@@ -337,8 +361,10 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public UIQueryPutServiceConfigurationReply OnQuery(RmContext context, UIQueryPutServiceConfiguration query)
+        public UIQueryPutServiceConfigurationReply UIQueryPutServiceConfiguration(RmContext context, UIQueryPutServiceConfiguration query)
         {
+            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
@@ -365,8 +391,10 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public UIQueryDeleteEndpointReply OnQuery(RmContext context, UIQueryDeleteEndpoint query)
+        public UIQueryDeleteEndpointReply UIQueryDeleteEndpoint(RmContext context, UIQueryDeleteEndpoint query)
         {
+            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
@@ -392,8 +420,10 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public UIQueryStartTunnelReply OnQuery(RmContext context, UIQueryStartTunnel query)
+        public UIQueryStartTunnelReply UIQueryStartTunnel(RmContext context, UIQueryStartTunnel query)
         {
+            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
@@ -414,8 +444,10 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public UIQueryStopTunnelReply OnQuery(RmContext context, UIQueryStopTunnel query)
+        public UIQueryStopTunnelReply UIQueryStopTunnel(RmContext context, UIQueryStopTunnel query)
         {
+            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
@@ -436,8 +468,10 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public UIQueryGetTunnelPropertiesReply OnQuery(RmContext context, UIQueryGetTunnelProperties query)
+        public UIQueryGetTunnelPropertiesReply UIQueryGetTunnelProperties(RmContext context, UIQueryGetTunnelProperties query)
         {
+            Singletons.Logger.Debug(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
@@ -460,8 +494,10 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public UIQueryGetEndpointPropertiesReply OnQuery(RmContext context, UIQueryGetEndpointProperties query)
+        public UIQueryGetEndpointPropertiesReply UIQueryGetEndpointProperties(RmContext context, UIQueryGetEndpointProperties query)
         {
+            Singletons.Logger.Debug(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
@@ -484,8 +520,10 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <param name="context"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public UIQueryGetEndpointEdgeConnectionsReply OnQuery(RmContext context, UIQueryGetEndpointEdgeConnections query)
+        public UIQueryGetEndpointEdgeConnectionsReply UIQueryGetEndpointEdgeConnections(RmContext context, UIQueryGetEndpointEdgeConnections query)
         {
+            Singletons.Logger.Debug(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+
             try
             {
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);

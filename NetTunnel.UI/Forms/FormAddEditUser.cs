@@ -40,7 +40,7 @@ namespace NetTunnel.UI.Forms
             User = user ?? new User();
 
             textBoxUsername.Text = User.Username;
-            textBoxUsername.Enabled = !_isCreatingNewUser;
+            textBoxUsername.Enabled = _isCreatingNewUser;
             checkBoxAdministrator.Checked = User.Role == NtUserRole.Administrator;
 
             Text = _isCreatingNewUser ? $"{FriendlyName} : Create User" : $"{FriendlyName} : Edit User";

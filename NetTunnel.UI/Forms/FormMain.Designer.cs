@@ -31,7 +31,6 @@ namespace NetTunnel.UI.Forms
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
-            listViewTunnels = new DoubleBufferedListView();
             menuStripBody = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
             connectToolStripMenuItem = new ToolStripMenuItem();
@@ -43,29 +42,26 @@ namespace NetTunnel.UI.Forms
             helpToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
             statusStripBody = new StatusStrip();
-            splitContainer1 = new SplitContainer();
+            splitContainerTunnelsAndEndpoints = new SplitContainer();
+            listViewTunnels = new DoubleBufferedListView();
             labelTunnels = new Label();
-            listViewEndpoints = new ListView();
+            listViewEndpoints = new DoubleBufferedListView();
             labelEndpoints = new Label();
+            splitContainerBody = new SplitContainer();
+            listViewLogs = new DoubleBufferedListView();
+            columnHeaderDateTime = new ColumnHeader();
+            columnHeaderSeverity = new ColumnHeader();
+            columnHeaderText = new ColumnHeader();
             menuStripBody.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
-            splitContainer1.Panel1.SuspendLayout();
-            splitContainer1.Panel2.SuspendLayout();
-            splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)splitContainerTunnelsAndEndpoints).BeginInit();
+            splitContainerTunnelsAndEndpoints.Panel1.SuspendLayout();
+            splitContainerTunnelsAndEndpoints.Panel2.SuspendLayout();
+            splitContainerTunnelsAndEndpoints.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)splitContainerBody).BeginInit();
+            splitContainerBody.Panel1.SuspendLayout();
+            splitContainerBody.Panel2.SuspendLayout();
+            splitContainerBody.SuspendLayout();
             SuspendLayout();
-            // 
-            // listViewTunnels
-            // 
-            listViewTunnels.Dock = DockStyle.Fill;
-            listViewTunnels.FullRowSelect = true;
-            listViewTunnels.GridLines = true;
-            listViewTunnels.Location = new Point(0, 15);
-            listViewTunnels.MultiSelect = false;
-            listViewTunnels.Name = "listViewTunnels";
-            listViewTunnels.Size = new Size(912, 243);
-            listViewTunnels.TabIndex = 0;
-            listViewTunnels.UseCompatibleStateImageBehavior = false;
-            listViewTunnels.View = View.Details;
             // 
             // menuStripBody
             // 
@@ -112,14 +108,14 @@ namespace NetTunnel.UI.Forms
             // usersToolStripMenuItem
             // 
             usersToolStripMenuItem.Name = "usersToolStripMenuItem";
-            usersToolStripMenuItem.Size = new Size(180, 22);
+            usersToolStripMenuItem.Size = new Size(148, 22);
             usersToolStripMenuItem.Text = "Users";
             usersToolStripMenuItem.Click += UsersToolStripMenuItem_Click;
             // 
             // configurationToolStripMenuItem
             // 
             configurationToolStripMenuItem.Name = "configurationToolStripMenuItem";
-            configurationToolStripMenuItem.Size = new Size(180, 22);
+            configurationToolStripMenuItem.Size = new Size(148, 22);
             configurationToolStripMenuItem.Text = "Configuration";
             configurationToolStripMenuItem.Click += ConfigurationToolStripMenuItem_Click;
             // 
@@ -145,25 +141,38 @@ namespace NetTunnel.UI.Forms
             statusStripBody.TabIndex = 2;
             statusStripBody.Text = "statusStrip1";
             // 
-            // splitContainer1
+            // splitContainerTunnelsAndEndpoints
             // 
-            splitContainer1.Dock = DockStyle.Fill;
-            splitContainer1.Location = new Point(0, 24);
-            splitContainer1.Name = "splitContainer1";
-            splitContainer1.Orientation = Orientation.Horizontal;
+            splitContainerTunnelsAndEndpoints.Dock = DockStyle.Fill;
+            splitContainerTunnelsAndEndpoints.Location = new Point(0, 0);
+            splitContainerTunnelsAndEndpoints.Name = "splitContainerTunnelsAndEndpoints";
+            splitContainerTunnelsAndEndpoints.Orientation = Orientation.Horizontal;
             // 
-            // splitContainer1.Panel1
+            // splitContainerTunnelsAndEndpoints.Panel1
             // 
-            splitContainer1.Panel1.Controls.Add(listViewTunnels);
-            splitContainer1.Panel1.Controls.Add(labelTunnels);
+            splitContainerTunnelsAndEndpoints.Panel1.Controls.Add(listViewTunnels);
+            splitContainerTunnelsAndEndpoints.Panel1.Controls.Add(labelTunnels);
             // 
-            // splitContainer1.Panel2
+            // splitContainerTunnelsAndEndpoints.Panel2
             // 
-            splitContainer1.Panel2.Controls.Add(listViewEndpoints);
-            splitContainer1.Panel2.Controls.Add(labelEndpoints);
-            splitContainer1.Size = new Size(912, 523);
-            splitContainer1.SplitterDistance = 258;
-            splitContainer1.TabIndex = 3;
+            splitContainerTunnelsAndEndpoints.Panel2.Controls.Add(listViewEndpoints);
+            splitContainerTunnelsAndEndpoints.Panel2.Controls.Add(labelEndpoints);
+            splitContainerTunnelsAndEndpoints.Size = new Size(912, 275);
+            splitContainerTunnelsAndEndpoints.SplitterDistance = 135;
+            splitContainerTunnelsAndEndpoints.TabIndex = 3;
+            // 
+            // listViewTunnels
+            // 
+            listViewTunnels.Dock = DockStyle.Fill;
+            listViewTunnels.FullRowSelect = true;
+            listViewTunnels.GridLines = true;
+            listViewTunnels.Location = new Point(0, 15);
+            listViewTunnels.MultiSelect = false;
+            listViewTunnels.Name = "listViewTunnels";
+            listViewTunnels.Size = new Size(912, 120);
+            listViewTunnels.TabIndex = 2;
+            listViewTunnels.UseCompatibleStateImageBehavior = false;
+            listViewTunnels.View = View.Details;
             // 
             // labelTunnels
             // 
@@ -183,7 +192,7 @@ namespace NetTunnel.UI.Forms
             listViewEndpoints.Location = new Point(0, 15);
             listViewEndpoints.MultiSelect = false;
             listViewEndpoints.Name = "listViewEndpoints";
-            listViewEndpoints.Size = new Size(912, 246);
+            listViewEndpoints.Size = new Size(912, 121);
             listViewEndpoints.TabIndex = 1;
             listViewEndpoints.UseCompatibleStateImageBehavior = false;
             listViewEndpoints.View = View.Details;
@@ -198,12 +207,56 @@ namespace NetTunnel.UI.Forms
             labelEndpoints.TabIndex = 2;
             labelEndpoints.Text = "Endpoints of (select a tunnel above)";
             // 
+            // splitContainerBody
+            // 
+            splitContainerBody.Dock = DockStyle.Fill;
+            splitContainerBody.Location = new Point(0, 24);
+            splitContainerBody.Name = "splitContainerBody";
+            splitContainerBody.Orientation = Orientation.Horizontal;
+            // 
+            // splitContainerBody.Panel1
+            // 
+            splitContainerBody.Panel1.Controls.Add(splitContainerTunnelsAndEndpoints);
+            // 
+            // splitContainerBody.Panel2
+            // 
+            splitContainerBody.Panel2.Controls.Add(listViewLogs);
+            splitContainerBody.Size = new Size(912, 523);
+            splitContainerBody.SplitterDistance = 275;
+            splitContainerBody.TabIndex = 4;
+            // 
+            // listViewLogs
+            // 
+            listViewLogs.Columns.AddRange(new ColumnHeader[] { columnHeaderDateTime, columnHeaderSeverity, columnHeaderText });
+            listViewLogs.Dock = DockStyle.Fill;
+            listViewLogs.Location = new Point(0, 0);
+            listViewLogs.Name = "listViewLogs";
+            listViewLogs.Size = new Size(912, 244);
+            listViewLogs.TabIndex = 0;
+            listViewLogs.UseCompatibleStateImageBehavior = false;
+            listViewLogs.View = View.Details;
+            // 
+            // columnHeaderDateTime
+            // 
+            columnHeaderDateTime.Text = "Date/Time";
+            columnHeaderDateTime.Width = 150;
+            // 
+            // columnHeaderSeverity
+            // 
+            columnHeaderSeverity.Text = "Severity";
+            columnHeaderSeverity.Width = 100;
+            // 
+            // columnHeaderText
+            // 
+            columnHeaderText.Text = "Text";
+            columnHeaderText.Width = 600;
+            // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(912, 569);
-            Controls.Add(splitContainer1);
+            Controls.Add(splitContainerBody);
             Controls.Add(menuStripBody);
             Controls.Add(statusStripBody);
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -215,19 +268,22 @@ namespace NetTunnel.UI.Forms
             Load += FormMain_Load;
             menuStripBody.ResumeLayout(false);
             menuStripBody.PerformLayout();
-            splitContainer1.Panel1.ResumeLayout(false);
-            splitContainer1.Panel1.PerformLayout();
-            splitContainer1.Panel2.ResumeLayout(false);
-            splitContainer1.Panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
-            splitContainer1.ResumeLayout(false);
+            splitContainerTunnelsAndEndpoints.Panel1.ResumeLayout(false);
+            splitContainerTunnelsAndEndpoints.Panel1.PerformLayout();
+            splitContainerTunnelsAndEndpoints.Panel2.ResumeLayout(false);
+            splitContainerTunnelsAndEndpoints.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)splitContainerTunnelsAndEndpoints).EndInit();
+            splitContainerTunnelsAndEndpoints.ResumeLayout(false);
+            splitContainerBody.Panel1.ResumeLayout(false);
+            splitContainerBody.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)splitContainerBody).EndInit();
+            splitContainerBody.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
 
-        private DoubleBufferedListView listViewTunnels;
         private MenuStrip menuStripBody;
         private ToolStripMenuItem fileToolStripMenuItem;
         private ToolStripMenuItem connectToolStripMenuItem;
@@ -235,13 +291,19 @@ namespace NetTunnel.UI.Forms
         private ToolStripMenuItem securityToolStripMenuItem;
         private ToolStripMenuItem usersToolStripMenuItem;
         private StatusStrip statusStripBody;
-        private SplitContainer splitContainer1;
+        private SplitContainer splitContainerTunnelsAndEndpoints;
         private Label labelTunnels;
-        private ListView listViewEndpoints;
+        private DoubleBufferedListView listViewEndpoints;
         private Label labelEndpoints;
         private ToolStripMenuItem helpToolStripMenuItem;
         private ToolStripMenuItem aboutToolStripMenuItem;
         private ToolStripMenuItem configurationToolStripMenuItem;
         private ToolStripSeparator toolStripMenuItem1;
+        private SplitContainer splitContainerBody;
+        private DoubleBufferedListView listViewLogs;
+        private ColumnHeader columnHeaderDateTime;
+        private ColumnHeader columnHeaderSeverity;
+        private ColumnHeader columnHeaderText;
+        private DoubleBufferedListView listViewTunnels;
     }
 }

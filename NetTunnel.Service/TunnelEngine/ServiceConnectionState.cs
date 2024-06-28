@@ -13,6 +13,7 @@ namespace NetTunnel.Service.TunnelEngine
         public bool IsAuthenticated { get; private set; }
         public string UserName { get; private set; } = string.Empty;
         public NtUserRole UserRole { get; set; } = NtUserRole.Undefined;
+        public NtLoginType LoginType { get; set; } = NtLoginType.Undefined;
         public string ClientIpAddress { get; private set; }
         public DateTime LoginTime { get; private set; } = DateTime.UtcNow;
         public string KeyHash { get; private set; } = string.Empty;
@@ -58,10 +59,11 @@ namespace NetTunnel.Service.TunnelEngine
             IsKeyExchangeComplete = true;
         }
 
-        public void SetAuthenticated(string userName, NtUserRole role)
+        public void SetAuthenticated(string userName, NtUserRole role, NtLoginType loginType)
         {
             UserName = userName.ToLower();
             UserRole = role;
+            LoginType = loginType;
             IsAuthenticated = true;
         }
 

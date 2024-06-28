@@ -139,6 +139,29 @@ namespace NetTunnel.UI.Forms
             }
         }
 
+        private void WriteVisualLog(DateTime dateTime, NtLogSeverity severity, string message)
+        {
+            if (listViewLogs.InvokeRequired)
+            {
+                listViewLogs.Invoke(WriteVisualLog, [dateTime, severity, message]);
+                return;
+            }
+            listViewLogs.BeginUpdate();
+
+            try
+            {
+                var item = new ListViewItem($"{dateTime}");
+                item.SubItems.Add($"{severity}");
+                item.SubItems.Add(message);
+                listViewLogs.Items.Add(item);
+            }
+            catch
+            {
+            }
+
+            listViewLogs.EndUpdate();
+        }
+
         private void ChangeConnection()
         {
             if (_formClosing)
@@ -148,7 +171,7 @@ namespace NetTunnel.UI.Forms
 
             try
             {
-                using var form = new FormLogin();
+                using var form = new FormLogin(WriteVisualLog);
                 form.Owner = this;
                 if (form.ShowDialog() == DialogResult.OK)
                 {
@@ -543,7 +566,7 @@ namespace NetTunnel.UI.Forms
 
                     if (e.ClickedItem?.Text == "Connect Tunnel")
                     {
-                        using var form = new FormConnectTunnel(_client.EnsureNotNull());
+                        using var form = new FormConnectTunnel(_client.EnsureNotNull(), WriteVisualLog);
                         if (form.ShowDialog() == DialogResult.OK)
                         {
                             RepopulateTunnelsGrid();

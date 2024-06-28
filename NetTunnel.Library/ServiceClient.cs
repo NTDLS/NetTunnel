@@ -76,16 +76,18 @@ namespace NetTunnel.Library
         private void Client_OnConnected(RmContext context)
             => OnConnected?.Invoke(context);
 
+
         #region Factory.
 
-        public static ServiceClient CreateConnectAndLogin(ILogger logger, string address, int port, string userName, string passwordHash)
-            => CreateConnectAndLogin(logger, new ServiceConfiguration(), address, port, userName, passwordHash);
+        public static ServiceClient UICreateConnectAndLogin(ILogger logger, string address, int port, string userName, string passwordHash)
+            => UICreateConnectAndLogin(logger, new ServiceConfiguration(), address, port, userName, passwordHash);
 
-        public static ServiceClient CreateConnectAndLogin(ILogger logger, ServiceConfiguration configuration,
-             string address, int port, string userName, string passwordHash)
+        public static ServiceClient UICreateConnectAndLogin(ILogger logger,
+            ServiceConfiguration configuration, string address, int port, string userName, string passwordHash)
         {
             var serviceClient = Create(logger, configuration, address, port, userName, passwordHash);
-            serviceClient.ConnectAndLogin();
+            serviceClient.Client.Parameter = serviceClient;
+            serviceClient.ConnectAndLogin(NtLoginType.UI);
             return serviceClient;
         }
 
@@ -114,7 +116,7 @@ namespace NetTunnel.Library
             Exceptions.Ignore(() => Client.Disconnect(false));
         }
 
-        public void ConnectAndLogin()
+        public void ConnectAndLogin(NtLoginType loginType)
         {
             Client.ClearCryptographyProvider();
 
@@ -143,7 +145,7 @@ namespace NetTunnel.Library
             _logger.Verbose("Tunnel cryptography provider has been applied.");
 
             //Login.
-            var login = Client.Query(new UOSQueryLogin(_userName, _passwordHash)).Result;
+            var login = Client.Query(new UOSQueryLogin(_userName, _passwordHash, loginType)).Result;
             if (login.Successful == false)
             {
                 Exceptions.Ignore(() => Client.Disconnect());

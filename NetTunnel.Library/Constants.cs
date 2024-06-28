@@ -12,6 +12,13 @@
             Https
         }
 
+        public enum NtLoginType
+        {
+            Undefined,
+            Service,
+            UI
+        }
+
         public enum NtUserRole
         {
             Undefined,

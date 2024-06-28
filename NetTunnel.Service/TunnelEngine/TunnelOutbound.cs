@@ -160,7 +160,7 @@ namespace NetTunnel.Service.TunnelEngine
                             $"Tunnel '{Configuration.Name}' connecting to service at {Configuration.Address}:{Configuration.ServicePort}.");
 
                         //Make the outbound connection to the remote tunnel service.
-                        _client.ConnectAndLogin();
+                        _client.ConnectAndLogin(NtLoginType.Service);
 
                         var registerResult = _client.S2SQueryRegisterTunnel(Configuration);
 

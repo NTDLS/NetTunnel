@@ -5,10 +5,10 @@ namespace NetTunnel.Library
 {
     public class DelegateLogger : ILogger
     {
-        private readonly NtLogSeverity _logLevel;
-
         public delegate void MessageWritten(NtLogSeverity severity, string message);
+        public event ILogger.OnLogDelegate? OnLog;
 
+        private readonly NtLogSeverity _logLevel;
         private readonly MessageWritten _onMessageWritten;
 
         public DelegateLogger(NtLogSeverity logLevel, MessageWritten onMessageWritten)
@@ -30,6 +30,8 @@ namespace NetTunnel.Library
             {
                 return;
             }
+
+            OnLog?.Invoke(DateTime.Now, severity, text);
 
             _onMessageWritten(severity, text);
         }

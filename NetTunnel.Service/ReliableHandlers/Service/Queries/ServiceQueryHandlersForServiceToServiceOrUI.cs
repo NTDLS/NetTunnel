@@ -55,12 +55,13 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         {
             try
             {
+               
                 var connectionContext = EnforceCryptographyAndGetServiceConnectionContext(context);
 
                 var userRole = Singletons.ServiceEngine.Users.ValidateLoginAndGetRole(query.UserName, query.PasswordHash);
                 if (userRole != NtUserRole.Undefined)
                 {
-                    connectionContext.SetAuthenticated(query.UserName, userRole);
+                    connectionContext.SetAuthenticated(query.UserName, userRole, query.LoginType);
 
                     return new UOSQueryLoginReply(true)
                     {

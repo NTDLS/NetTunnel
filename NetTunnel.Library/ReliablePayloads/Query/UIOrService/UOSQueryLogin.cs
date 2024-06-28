@@ -5,13 +5,15 @@ namespace NetTunnel.Library.ReliablePayloads.Query.UIOrService
 {
     public class UOSQueryLogin : IRmQuery<UOSQueryLoginReply>
     {
+        public NtLoginType LoginType { get; set; }
         public string UserName { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
 
-        public UOSQueryLogin(string username, string passwordHash)
+        public UOSQueryLogin(string username, string passwordHash, NtLoginType loginType)
         {
             UserName = username;
             PasswordHash = passwordHash;
+            LoginType = loginType;
         }
     }
 

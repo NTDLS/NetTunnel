@@ -1,3 +1,4 @@
+using NetTunnel.Service.TunnelEngine;
 using System.Diagnostics;
 using Topshelf;
 
@@ -8,6 +9,8 @@ namespace NetTunnel.Service
         public static void Main()
         {
             //NTDLS.Semaphore.ThreadOwnershipTracking.Enable();
+
+            Singletons.Logger.Verbose("Starting...");
 
             HostFactory.Run(x =>
             {
