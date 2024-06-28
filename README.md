@@ -24,3 +24,4 @@ If you are in a situation where both endpoints are behind firewalls, you can get
 * All data exchanged though the tunnel encrypted using the [NASCCL](https://github.com/NTDLS/NTDLS.NASCCL) symmetric cipher.
 * All data exchanged though the tunnel is compressed using the deflate algorithm.
 * The UI connects to standard tunnel service provider and inherits all the same encryption and compression benefits.
+* All endpoint configuration is stored to the NetTunnel user account so you can configure settings for others and limit their access.
