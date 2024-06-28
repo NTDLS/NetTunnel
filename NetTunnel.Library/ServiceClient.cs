@@ -10,7 +10,6 @@ using NetTunnel.Service.ReliableMessages;
 using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
-using System.Data;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Library

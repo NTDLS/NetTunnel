@@ -55,7 +55,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         {
             try
             {
-               
+
                 var connectionContext = EnforceCryptographyAndGetServiceConnectionContext(context);
 
                 var userRole = Singletons.ServiceEngine.Users.ValidateLoginAndGetRole(query.UserName, query.PasswordHash);

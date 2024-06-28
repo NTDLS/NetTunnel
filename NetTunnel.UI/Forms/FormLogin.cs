@@ -1,12 +1,10 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.ReliablePayloads.Notification.UI;
-using NetTunnel.UI.ReliableHandlers.Notifications;
 using NTDLS.Helpers;
 using NTDLS.Persistence;
 using NTDLS.ReliableMessaging;
 using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
-using static NetTunnel.Library.ServiceClient;
 
 namespace NetTunnel.UI.Forms
 {

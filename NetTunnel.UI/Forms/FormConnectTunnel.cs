@@ -1,7 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Notification.UI;
-using NetTunnel.UI.ReliableHandlers.Notifications;
 using NTDLS.Helpers;
 using NTDLS.Persistence;
 using NTDLS.ReliableMessaging;
