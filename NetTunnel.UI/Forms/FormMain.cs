@@ -64,6 +64,8 @@ namespace NetTunnel.UI.Forms
             _timer.Tick += Timer_Tick;
             _timer.Start();
 
+            listViewLogs.MouseUp += ListViewLogs_MouseUp;
+
             #region Setup listViewTunnels.
 
             _tunnelsListViewItemComparer = new ListViewItemComparer();
@@ -115,6 +117,26 @@ namespace NetTunnel.UI.Forms
                     Width = width
                 });
             }
+        }
+
+        private void ListViewLogs_MouseUp(object? sender, MouseEventArgs e)
+        {
+
+            var menu = new ContextMenuStrip();
+
+            menu.Items.Add("Clear");
+
+            menu.Show(listViewLogs, new Point(e.X, e.Y));
+
+            menu.ItemClicked += (object? sender, ToolStripItemClickedEventArgs e) =>
+            {
+                menu.Hide();
+
+                if (e.ClickedItem?.Text == "Clear")
+                {
+                    listViewLogs.Items.Clear();
+                }
+            };
         }
 
         private void ListViewEndpoints_MouseDoubleClick(object? sender, MouseEventArgs e)
