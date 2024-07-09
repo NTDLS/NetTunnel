@@ -6,11 +6,11 @@ namespace NetTunnel.Service.ReliableMessages
 {
     public class ClientCryptographyProvider : IRmCryptographyProvider
     {
-        private readonly NASCCLStream _streamCryptography;
+        private readonly CryptoStream _streamCryptography;
 
         public ClientCryptographyProvider(byte[] cryptographyKey)
         {
-            _streamCryptography = new NASCCLStream(cryptographyKey);
+            _streamCryptography = new CryptoStream(cryptographyKey);
         }
 
         public byte[] Decrypt(RmContext context, byte[] encryptedPayload)

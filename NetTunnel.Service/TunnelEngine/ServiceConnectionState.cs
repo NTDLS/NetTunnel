@@ -8,7 +8,7 @@ namespace NetTunnel.Service.TunnelEngine
     public class ServiceConnectionState
     {
         public Guid ConnectionId { get; set; }
-        public NASCCLStream? StreamCryptography { get; private set; }
+        public CryptoStream? StreamCryptography { get; private set; }
         public bool IsKeyExchangeComplete { get; private set; }
         public bool IsAuthenticated { get; private set; }
         public string UserName { get; private set; } = string.Empty;
@@ -38,7 +38,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         public void InitializeCryptographyProvider(byte[] sharedSecret)
         {
-            StreamCryptography = new NASCCLStream(sharedSecret);
+            StreamCryptography = new CryptoStream(sharedSecret);
 
             KeyHash = Utility.ComputeSha256Hash(sharedSecret);
             KeyLength = sharedSecret.Length;
