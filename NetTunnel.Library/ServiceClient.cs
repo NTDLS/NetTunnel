@@ -126,7 +126,7 @@ namespace NetTunnel.Library
 
             //The first thing we do when we get a connection is start a new key exchange process.
             var queryRequestKeyExchangeReply = Client.Query(
-                new UOSQueryRequestKeyExchange(negotiationToken), _configuration.MessageQueryTimeoutMs).Result;
+                new UOSQueryRequestKeyExchange(negotiationToken), TimeSpan.FromMilliseconds(_configuration.MessageQueryTimeoutMs)).Result;
 
             //We received a reply to the secure key exchange, apply it.
             compoundNegotiator.ApplyNegotiationResponseToken(queryRequestKeyExchangeReply.NegotiationToken);

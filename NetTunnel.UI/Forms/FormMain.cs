@@ -419,12 +419,7 @@ namespace NetTunnel.UI.Forms
 
                 if (selectedRow.Tag is TunnelTag tTag)
                 {
-                    if (tTag.Tunnel.ServiceId == _client.ServiceId)
-                    {
-                        labelEndpoints.Text += "outbound tunnel ";
-                    }
-
-                    labelEndpoints.Text += $"'{tTag.Tunnel.Name}'";
+                    labelEndpoints.Text += $"{selectedRow.SubItems[1].Text.ToLower()} tunnel '{tTag.Tunnel.Name}'";
 
                     lock (listViewEndpoints)
                     {
