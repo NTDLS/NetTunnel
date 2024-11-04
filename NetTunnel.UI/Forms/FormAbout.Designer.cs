@@ -95,7 +95,7 @@
             linkWebsite.TabIndex = 9;
             linkWebsite.TabStop = true;
             linkWebsite.Text = "www.NetworkDLS.com";
-            linkWebsite.LinkClicked += linkWebsite_LinkClicked;
+            linkWebsite.LinkClicked += LinkWebsite_LinkClicked;
             // 
             // FormAbout
             // 

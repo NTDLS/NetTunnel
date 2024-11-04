@@ -15,9 +15,7 @@ namespace NetTunnel.Service.TunnelEngine
         /// The ID of the RmServer connection.This is also stored in the ServiceEngine.ServiceConnectionState.
         /// </summary>
         public Guid ConnectionId { get; private set; }
-
         public override NtDirection Direction { get => NtDirection.Inbound; }
-
         public bool IsLoggedIn => true; //The existence of a TunnelInbound means that is is connected. 
 
         /// <summary>

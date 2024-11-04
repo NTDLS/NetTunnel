@@ -9,19 +9,12 @@ namespace NetTunnel.Service
 {
     public static class HttpUtility
     {
-        public static readonly List<string> HttpVerbStrings = new()
-        {
-            "connect","delete","get","head","options","patch","post","put","trace"
-        };
+        public static readonly List<string> HttpVerbStrings =
+        [
+            "connect", "delete", "get", "head", "options", "patch", "post", "put", "trace"
+        ];
 
-        public enum HTTPHeaderResult
-        {
-            WaitOnData,
-            Present,
-            NotPresent
-        }
-
-        public static HTTPHeaderResult Process(ref StringBuilder httpHeaderBuilder, EndpointConfiguration endpointConfig, PumpBuffer buffer)
+        public static NtHTTPHeaderResult Process(ref StringBuilder httpHeaderBuilder, EndpointConfiguration endpointConfig, PumpBuffer buffer)
         {
             try
             {
@@ -56,7 +49,7 @@ namespace NetTunnel.Service
                         var endOfHeaderIndex = GetHttpHeaderEnd(httpHeaderBuilder.ToString(), out headerDelimiter);
                         if (endOfHeaderIndex < 0)
                         {
-                            return HTTPHeaderResult.WaitOnData; //We have a HTTP header but its a fragment. Wait on the remaining header.
+                            return NtHTTPHeaderResult.WaitOnData; //We have a HTTP header but its a fragment. Wait on the remaining header.
                         }
                         else
                         {
@@ -93,7 +86,7 @@ namespace NetTunnel.Service
                         httpHeaderBuilder = new StringBuilder(
                             ApplyHttpHeaderRules(endpointConfig, httpHeaderBuilder.ToString(), headerType, requestVerb, headerDelimiter));
 
-                        return HTTPHeaderResult.Present;
+                        return NtHTTPHeaderResult.Present;
                     }
                 }
             }
@@ -103,8 +96,9 @@ namespace NetTunnel.Service
                 Singletons.Logger.Exception(ex, "An error occurred while parsing the HTTP request header.");
             }
 
-            return HTTPHeaderResult.NotPresent;
+            return NtHTTPHeaderResult.NotPresent;
         }
+
         public static int FindDelimiterIndexInByteArray(byte[] buffer, int bufferLength, string delimiter)
         {
             for (int bufIdx = 0; bufIdx <= bufferLength - delimiter.Length; bufIdx++)
@@ -188,7 +182,7 @@ namespace NetTunnel.Service
 
         public static string? GetNextHeaderToken(string str, ref int position)
         {
-            int spacePos = str.IndexOfAny(new char[] { ' ', '\n' }, position);
+            int spacePos = str.IndexOfAny([' ', '\n'], position);
             if (spacePos >= position)
             {
                 string token = str.Substring(position, spacePos - position).Trim();
@@ -241,7 +235,7 @@ namespace NetTunnel.Service
                 {
                     //Not much to do...
                 }
-                else if (httpHeader.StartsWith("Http/"))
+                else if (httpHeader.StartsWith("Http/", StringComparison.InvariantCultureIgnoreCase))
                 {
                     //Is response header.
                     verb = string.Empty;
@@ -262,7 +256,7 @@ namespace NetTunnel.Service
                             return NtHttpHeaderType.None;
                         }
 
-                        if (token.ToUpper().StartsWith("HTTP/"))
+                        if (token.StartsWith("HTTP/", StringComparison.InvariantCultureIgnoreCase))
                         {
                             //Is request header
                             return NtHttpHeaderType.Request;

@@ -60,10 +60,10 @@ namespace NetTunnel.UI.Forms
         {
             try
             {
-                int port = textBoxPort.GetAndValidateNumeric(1, 65535, "A port number between [min] and [max] is required.");
-                string username = textBoxUsername.GetAndValidateText("A username is required.");
-                string passwordHash = Utility.ComputeSha256Hash(textBoxPassword.Text);
-                string address = textBoxAddress.GetAndValidateText("A hostname or IP address is required.");
+                var port = textBoxPort.GetAndValidateNumeric(1, 65535, "A port number between [min] and [max] is required.");
+                var username = textBoxUsername.GetAndValidateText("A username is required.");
+                var passwordHash = Utility.ComputeSha256Hash(textBoxPassword.Text);
+                var address = textBoxAddress.GetAndValidateText("A hostname or IP address is required.");
 
                 var progressForm = new ProgressForm(FriendlyName, "Logging in...");
 

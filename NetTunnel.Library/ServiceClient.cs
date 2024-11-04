@@ -19,31 +19,27 @@ namespace NetTunnel.Library
     /// </summary>
     public class ServiceClient
     {
+        private readonly ILogger _logger;
+        private readonly int _port;
         private readonly ServiceConfiguration _configuration;
         private readonly string _address;
-        private readonly int _port;
-        private readonly string _userName;
         private readonly string _passwordHash;
+        private readonly string _userName;
 
-        public NtUserRole Role { get; private set; } = NtUserRole.Undefined;
-
-        public string Address { get { return _address; } }
+        public bool IsLoggedIn { get; private set; } = false;
+        public delegate void ConnectedEvent(RmContext context);
+        public delegate void DisconnectedEvent(RmContext context);
+        public delegate void ExceptionEvent(RmContext? context, Exception ex, IRmPayload? payload);
+        public event ConnectedEvent? OnConnected;
+        public event DisconnectedEvent? OnDisconnected;
+        public event ExceptionEvent? OnException;
         /// <summary>
         /// The id of the service that we are logged into.
         /// </summary>
         public Guid ServiceId { get; private set; }
+        public NtUserRole Role { get; private set; } = NtUserRole.Undefined;
         public RmClient Client { get; private set; }
-        public bool IsLoggedIn { get; private set; } = false;
-        public ILogger _logger;
-
-        public event ExceptionEvent? OnException;
-        public delegate void ExceptionEvent(RmContext? context, Exception ex, IRmPayload? payload);
-
-        public event ConnectedEvent? OnConnected;
-        public delegate void ConnectedEvent(RmContext context);
-
-        public event DisconnectedEvent? OnDisconnected;
-        public delegate void DisconnectedEvent(RmContext context);
+        public string Address { get { return _address; } }
 
         public ServiceClient(ILogger logger, ServiceConfiguration configuration, RmClient client, string address, int port, string userName, string passwordHash)
         {

@@ -8,8 +8,8 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormUsers : Form
     {
-        private readonly ServiceClient? _client;
         private bool _firstShown = true;
+        private readonly ServiceClient? _client;
 
         public FormUsers()
         {

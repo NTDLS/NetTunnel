@@ -328,7 +328,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             return Collection.Use((o) =>
             {
-                List<TunnelConfiguration> clones = new();
+                var clones = new List<TunnelConfiguration>();
                 foreach (var tunnel in o.OfType<TunnelOutbound>())
                 {
                     clones.Add(tunnel.CloneConfiguration());
@@ -341,7 +341,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             return Collection.Use((o) =>
             {
-                List<TunnelDisplay> results = new();
+                var results = new List<TunnelDisplay>();
                 foreach (var tunnel in o)
                 {
                     results.Add(new TunnelDisplay

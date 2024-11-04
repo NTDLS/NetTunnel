@@ -9,9 +9,10 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormAddEditUser : Form
     {
-        private readonly ServiceClient? _client;
-        public User? User { get; private set; }
         private readonly bool _isCreatingNewUser;
+        private readonly ServiceClient? _client;
+
+        public User? User { get; private set; }
 
         public FormAddEditUser()
         {

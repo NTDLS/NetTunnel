@@ -12,19 +12,15 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
     /// </summary>
     internal class EndpointInbound : BaseEndpoint, IEndpoint
     {
-        private Thread? _inboundConnectionThread;
-
         private TcpListener? _listener;
-
-        public NtDirection Direction { get => NtDirection.Inbound; }
+        private Thread? _inboundConnectionThread;
 
         /// <summary>
         /// Unique ID that takes the direction and the ID into account.
         /// </summary>
         public DirectionalKey EndpointKey => new(this);
-
-        public override int GetHashCode()
-            => Configuration.GetHashCode();
+        public NtDirection Direction { get => NtDirection.Inbound; }
+        public override int GetHashCode() => Configuration.GetHashCode();
 
         public EndpointInbound(IServiceEngine serviceEngine, ITunnel tunnel, EndpointConfiguration configuration)
             : base(serviceEngine, tunnel, configuration.EndpointId, configuration)

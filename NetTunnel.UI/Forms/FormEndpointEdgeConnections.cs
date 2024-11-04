@@ -9,13 +9,13 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormEndpointEdgeConnections : Form
     {
-        private readonly ServiceClient? _client;
-        private readonly DirectionalKey _tunnelKey;
-        private readonly DirectionalKey _endpointKey;
         private bool _firstShown = true;
         private bool _inTimerTick = false;
-        private System.Windows.Forms.Timer? _timer;
         private ListViewColumnMap? _connectionsGridColumnMap;
+        private readonly DirectionalKey _endpointKey;
+        private readonly DirectionalKey _tunnelKey;
+        private readonly ServiceClient? _client;
+        private System.Windows.Forms.Timer? _timer;
 
         public FormEndpointEdgeConnections()
         {
@@ -171,7 +171,7 @@ namespace NetTunnel.UI.Forms
                         {
                             try
                             {
-                                if (selectedItem.Tag is EdgeState tag)
+                                if (selectedItem.Tag is NtEdgeState tag)
                                 {
                                     _client.EnsureNotNull().UINotifyTerminateEndpointEdgeConnection(tag.TunnelKey, tag.EndpointKey.Id, tag.EdgeId);
                                 }
@@ -234,22 +234,6 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-
-        enum EdgeStatus
-        {
-            Normal, //This is a persistent connection.
-            New, //This is a new connection.
-            Expire //The connection is gone.
-        }
-
-        class EdgeState
-        {
-            public EdgeStatus Status { get; set; }
-            public DirectionalKey TunnelKey { get; set; } = new();
-            public DirectionalKey EndpointKey { get; set; } = new();
-            public Guid EdgeId { get; set; }
-        }
-
         public void PopulateListView(List<EndpointEdgeConnectionDisplay> connections)
         {
             _connectionsGridColumnMap.EnsureNotNull();
@@ -262,12 +246,12 @@ namespace NetTunnel.UI.Forms
 
             foreach (ListViewItem item in listViewConnections.Items)
             {
-                var tag = (EdgeState)item.Tag.EnsureNotNull();
+                var tag = (NtEdgeState)item.Tag.EnsureNotNull();
 
                 var edgeId = Guid.Parse(_connectionsGridColumnMap.SubItem(item, "EdgeId").Text);
                 idLookup.Add(edgeId, item.Index);
 
-                if (tag.Status == EdgeStatus.Expire)
+                if (tag.Status == NtEdgeStatus.Expire)
                 {
                     expiredItems.Add(item);
                 }
@@ -275,7 +259,7 @@ namespace NetTunnel.UI.Forms
                 if (connections.Any(o => o.EdgeId == edgeId) == false)
                 {
                     item.BackColor = Color.FromArgb(255, 200, 200);
-                    tag.Status = EdgeStatus.Expire;
+                    tag.Status = NtEdgeStatus.Expire;
                 }
             }
 
@@ -285,7 +269,7 @@ namespace NetTunnel.UI.Forms
                 {
                     var item = listViewConnections.Items[index];
 
-                    var tag = (EdgeState)item.Tag.EnsureNotNull();
+                    var tag = (NtEdgeState)item.Tag.EnsureNotNull();
 
                     _connectionsGridColumnMap.SubItem(item, "AddressFamily").Text = connection.AddressFamily;
                     _connectionsGridColumnMap.SubItem(item, "Address").Text = connection.Address;
@@ -300,7 +284,7 @@ namespace NetTunnel.UI.Forms
 
                     item.BackColor = Color.Transparent;
 
-                    tag.Status = EdgeStatus.Normal;
+                    tag.Status = NtEdgeStatus.Normal;
                 }
                 else
                 {
@@ -317,9 +301,9 @@ namespace NetTunnel.UI.Forms
 
                     item.BackColor = Color.FromArgb(200, 255, 200);
 
-                    item.Tag = new EdgeState
+                    item.Tag = new NtEdgeState
                     {
-                        Status = EdgeStatus.New,
+                        Status = NtEdgeStatus.New,
                         EdgeId = connection.EdgeId,
                         TunnelKey = connection.TunnelKey,
                         EndpointKey = connection.EndpointKey

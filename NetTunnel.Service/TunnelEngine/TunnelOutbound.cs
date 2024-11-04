@@ -16,7 +16,6 @@ namespace NetTunnel.Service.TunnelEngine
         private Thread? _establishConnectionThread;
 
         public override NtDirection Direction { get => NtDirection.Outbound; }
-
         public bool IsLoggedIn => _client.IsLoggedIn;
 
         public TunnelOutbound(ServiceEngine serviceEngine, TunnelConfiguration configuration)

@@ -33,7 +33,7 @@ namespace NetTunnel.Service.TunnelEngine
         public static void UpdateConfiguration(ServiceConfiguration configuration)
         {
             _configuration = configuration;
-            CommonApplicationData.SaveToDisk(Library.Constants.FriendlyName, _configuration);
+            CommonApplicationData.SaveToDisk(Constants.FriendlyName, _configuration);
         }
 
         private static ServiceConfiguration? _configuration = null;
@@ -43,13 +43,13 @@ namespace NetTunnel.Service.TunnelEngine
             {
                 if (_configuration == null)
                 {
-                    _configuration = CommonApplicationData.LoadFromDisk<ServiceConfiguration>(Library.Constants.FriendlyName);
+                    _configuration = CommonApplicationData.LoadFromDisk<ServiceConfiguration>(Constants.FriendlyName);
 
                     if (_configuration == null)
                     {
                         //We didn't find a config file, create one with default values.
                         _configuration = new ServiceConfiguration();
-                        CommonApplicationData.SaveToDisk(Library.Constants.FriendlyName, _configuration);
+                        CommonApplicationData.SaveToDisk(Constants.FriendlyName, _configuration);
                     }
 
                     if (_configuration == null)

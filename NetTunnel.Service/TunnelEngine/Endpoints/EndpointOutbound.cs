@@ -11,15 +11,12 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
     /// </summary>
     internal class EndpointOutbound : BaseEndpoint, IEndpoint
     {
-        public override int GetHashCode()
-            => Configuration.GetHashCode();
-
-        public NtDirection Direction { get => NtDirection.Outbound; }
-
         /// <summary>
         /// Unique ID that takes the direction and the ID into account.
         /// </summary>
         public DirectionalKey EndpointKey => new(this);
+        public NtDirection Direction { get => NtDirection.Outbound; }
+        public override int GetHashCode() => Configuration.GetHashCode();
 
         public EndpointOutbound(IServiceEngine serviceEngine, ITunnel tunnel, EndpointConfiguration configuration)
             : base(serviceEngine, tunnel, configuration.EndpointId, configuration)

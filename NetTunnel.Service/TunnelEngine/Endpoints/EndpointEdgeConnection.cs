@@ -6,16 +6,16 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
     internal class EndpointEdgeConnection : IDisposable
     {
-        public ulong BytesReceived { get; internal set; }
-        public ulong BytesSent { get; internal set; }
-        public DateTime StartDateTime { get; private set; } = DateTime.UtcNow;
+        private readonly NetworkStream _stream;
+
+        public bool IsConnected { get; private set; }
         public DateTime LastActivityDateTime { get; private set; } = DateTime.UtcNow;
+        public DateTime StartDateTime { get; private set; } = DateTime.UtcNow;
         public Guid EdgeId { get; private set; }
         public TcpClient TcpClient { get; private set; }
         public Thread Thread { get; private set; }
-        public bool IsConnected { get; private set; }
-
-        private readonly NetworkStream _stream;
+        public ulong BytesReceived { get; internal set; }
+        public ulong BytesSent { get; internal set; }
 
         public double ActivityAgeInMilliseconds
             => (DateTime.UtcNow - LastActivityDateTime).TotalMilliseconds;

@@ -8,7 +8,7 @@ namespace NetTunnel.Library.ReliablePayloads.Query.UIOrService
 
         public UOSQueryRequestKeyExchange()
         {
-            NegotiationToken = new byte[0];
+            NegotiationToken = Array.Empty<byte>();
         }
 
         public UOSQueryRequestKeyExchange(byte[] negotiationToken)
@@ -24,7 +24,7 @@ namespace NetTunnel.Library.ReliablePayloads.Query.UIOrService
 
         public UOSQueryReplyKeyExchangeReply()
         {
-            NegotiationToken = new byte[0];
+            NegotiationToken = Array.Empty<byte>();
         }
 
         public UOSQueryReplyKeyExchangeReply(Guid connectionId, byte[] negotiationToken)

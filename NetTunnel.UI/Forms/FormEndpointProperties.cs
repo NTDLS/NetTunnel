@@ -8,11 +8,11 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormEndpointProperties : Form
     {
-        private readonly ServiceClient? _client;
-        private readonly DirectionalKey _tunnelKey;
-        private readonly DirectionalKey _endpointKey;
         private bool _firstShown = true;
         private bool _inTimerTick = false;
+        private readonly DirectionalKey _endpointKey;
+        private readonly DirectionalKey _tunnelKey;
+        private readonly ServiceClient? _client;
         private System.Windows.Forms.Timer? _timer;
 
         public FormEndpointProperties()

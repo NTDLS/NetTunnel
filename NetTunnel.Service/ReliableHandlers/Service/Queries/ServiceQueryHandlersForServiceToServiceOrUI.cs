@@ -21,9 +21,6 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// sends the NotificationApplyCryptography notification. This is because if we apply the cryptography now, then
         /// the reply will be encrypted before the remote service has the data it needs to decrypt it.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="query"></param>
-        /// <returns></returns>
         public UOSQueryReplyKeyExchangeReply OnQuery(RmContext context, UOSQueryRequestKeyExchange query)
         {
             try
@@ -48,9 +45,6 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <summary>
         /// A UI client or remote service is requesting to login.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="query"></param>
-        /// <returns></returns>
         public UOSQueryLoginReply OnQuery(RmContext context, UOSQueryLogin query)
         {
             try

@@ -12,9 +12,9 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormConnectTunnel : Form
     {
-        private readonly ServiceClient? _client;
         private readonly DelegateLogger _delegateLogger = UIUtility.CreateActiveWindowMessageBoxLogger(NtLogSeverity.Exception);
-        private readonly Utility.ServiceLogDelegate _serviceLogDelegate;
+        private readonly ServiceClient? _client;
+        private readonly ServiceLogDelegate _serviceLogDelegate;
 
         public FormConnectTunnel(ServiceClient client, ServiceLogDelegate serviceLogDelegate)
         {

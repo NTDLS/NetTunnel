@@ -18,8 +18,6 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
         /// The remote service is letting us know that they are about to start using the cryptography provider,
         /// so we need to apply the one that we have ready on this end.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="notification"></param>
         public void OnNotify(RmContext context, UOSNotificationApplyCryptography notification)
         {
             try
@@ -57,8 +55,6 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
         /// The remote service is letting us know that edge data has been received on an endpoint and is giving
         ///      it to the local service to that it can be delivered to the associated endpoint edge connection.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="notification"></param>
         public void OnNotify(RmContext context, S2SNotificationEndpointDataExchange notification)
         {
             try
@@ -78,8 +74,6 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
         /// <summary>
         /// The remote service is letting us know that it is deleting the given tunnel.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="notification"></param>
         public void OnNotify(RmContext context, S2SNotificationTunnelDeletion notification)
         {
             try
@@ -98,8 +92,6 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
         /// <summary>
         /// The remote service is letting us know that it is deleting the given endpoint.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="notification"></param>
         public void OnNotify(RmContext context, S2SNotificationEndpointDeletion notification)
         {
             try
@@ -118,8 +110,6 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
         /// <summary>
         /// The remote service is letting us know that an edge connection has been terminated to the given endpoint.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="notification"></param>
         public void OnNotify(RmContext context, S2SNotificationEndpointDisconnect notification)
         {
             try
@@ -138,8 +128,6 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
         /// <summary>
         /// The UI is requesting that the local service disconnect the given endpoint edge connection.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="notification"></param>
         public void OnNotify(RmContext context, UINotifyTerminateEndpointEdgeConnection notification)
         {
             try

@@ -12,23 +12,20 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
     internal class BaseEndpoint
     {
+        private readonly Thread _heartbeatThread;
         private readonly object _statisticsLock = new();
 
+        internal readonly PessimisticCriticalResource<Dictionary<Guid, EndpointEdgeConnection>> _edgeConnections = new();
+        internal readonly ITunnel _tunnel;
+        internal readonly IServiceEngine _serviceEngine;
+
+        public bool KeepRunning { get; internal set; } = false;
+        public EndpointConfiguration Configuration { get; private set; }
+        public Guid EndpointId { get; private set; }
         public ulong BytesReceived { get; internal set; }
         public ulong BytesSent { get; internal set; }
-        public ulong TotalConnections { get; internal set; }
         public ulong CurrentConnections { get; internal set; }
-        public Guid EndpointId { get; private set; }
-
-        internal readonly IServiceEngine _serviceEngine;
-        internal readonly ITunnel _tunnel;
-        public bool KeepRunning { get; internal set; } = false;
-
-        private readonly Thread _heartbeatThread;
-
-        internal readonly PessimisticCriticalResource<Dictionary<Guid, EndpointEdgeConnection>> _edgeConnections = new();
-
-        public EndpointConfiguration Configuration { get; private set; }
+        public ulong TotalConnections { get; internal set; }
 
         public BaseEndpoint(IServiceEngine serviceEngine, ITunnel tunnel,
             Guid endpointId, EndpointConfiguration configuration)

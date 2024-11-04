@@ -17,9 +17,6 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <summary>
         /// The remote service is requesting that this service respond to a ping request.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="query"></param>
-        /// <returns></returns>
         public S2SQueryPingReply OnQuery(RmContext context, S2SQueryPing query)
         {
             try
@@ -44,9 +41,6 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// The remote outbound service is asking this service to register the given tunnel.
         /// The service will connect the tunnel and send back the endpoints for the logged in user.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="query"></param>
-        /// <returns></returns>
         public S2SQueryRegisterTunnelReply OnQuery(RmContext context, S2SQueryRegisterTunnel query)
         {
             try
@@ -94,9 +88,6 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// <summary>
         /// A new endpoint has been added to the remote service, so that remote service is asking this service to add the endpoint locally too.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="query"></param>
-        /// <returns></returns>
         public S2SQueryUpsertEndpointReply OnQuery(RmContext context, S2SQueryUpsertEndpoint query)
         {
             try

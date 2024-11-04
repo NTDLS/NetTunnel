@@ -18,8 +18,8 @@ namespace NetTunnel.Service.TunnelEngine
         public virtual NtDirection Direction { get => throw new NotImplementedException("This function should be overridden."); }
         public DirectionalKey TunnelKey => new(Configuration.TunnelId, Direction);
 
-        public int ChangeHash
-            => Configuration.TunnelId.GetHashCode()
+        public int ChangeHash =>
+            Configuration.TunnelId.GetHashCode()
             + Configuration.Name.GetHashCode();
 
         #region Public Properties.

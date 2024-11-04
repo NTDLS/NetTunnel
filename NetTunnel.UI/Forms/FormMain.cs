@@ -11,28 +11,23 @@ namespace NetTunnel.UI.Forms
     public partial class FormMain : Form
     {
         private bool _formClosing = false;
-        private int _changeDetectionHash = -1;
         private bool _needToRepopulateTunnels = false;
-        private ListViewColumnMap? _tunnelsGridColumnMap;
+        private int _changeDetectionHash = -1;
         private ListViewColumnMap? _endpointsGridColumnMap;
+        private ListViewColumnMap? _tunnelsGridColumnMap;
 
-        private Library.ServiceClient? _client;
-
-        private volatile int _gridPopulationScope = 0;
         private bool _inTimerTick = false;
-        private System.Windows.Forms.Timer? _timer;
+        private Library.ServiceClient? _client;
         private ListViewItemComparer? _endpointsListViewItemComparer;
         private ListViewItemComparer? _tunnelsListViewItemComparer;
         private readonly Stack<VisualLogEntry> _visualLogEntries = new();
-
-        #region Constructor / Deconstructor.
+        private System.Windows.Forms.Timer? _timer;
+        private volatile int _gridPopulationScope = 0;
 
         public FormMain()
         {
             InitializeComponent();
         }
-
-        #endregion
 
         private void FormMain_Load(object sender, EventArgs e)
         {
@@ -209,8 +204,8 @@ namespace NetTunnel.UI.Forms
 
                     Text = $"{FriendlyName} : {_client.Address}";
 
-                    configurationToolStripMenuItem.Enabled = IsAdministrator(_client);
-                    usersToolStripMenuItem.Enabled = IsAdministrator(_client);
+                    configurationToolStripMenuItem.Enabled = IsAdministrator();
+                    usersToolStripMenuItem.Enabled = IsAdministrator();
 
                     RepopulateTunnelsGrid();
                     return;
@@ -407,6 +402,7 @@ namespace NetTunnel.UI.Forms
                 }
             }).Start();
         }
+
         private void ListViewTunnels_SelectedIndexChanged(object? sender, EventArgs e)
         {
             _client.EnsureNotNull();
@@ -460,13 +456,13 @@ namespace NetTunnel.UI.Forms
                     if (tTag.Tunnel.Direction == NtDirection.Outbound
                         || (tTag.Tunnel.Direction == NtDirection.Inbound && tTag.Tunnel.IsLoggedIn))
                     {
-                        menu.Items.Add("Add Inbound Endpoint").Enabled = IsAdministrator(_client);
-                        menu.Items.Add("Add Outbound Endpoint").Enabled = IsAdministrator(_client);
+                        menu.Items.Add("Add Inbound Endpoint").Enabled = IsAdministrator();
+                        menu.Items.Add("Add Outbound Endpoint").Enabled = IsAdministrator();
 
                         if (eTag != null)
                         {
                             menu.Items.Add(new ToolStripSeparator());
-                            menu.Items.Add("Delete Endpoint").Enabled = IsAdministrator(_client);
+                            menu.Items.Add("Delete Endpoint").Enabled = IsAdministrator();
                             menu.Items.Add(new ToolStripSeparator());
                             menu.Items.Add("Edge Connections");
                             menu.Items.Add("Properties");
@@ -575,8 +571,8 @@ namespace NetTunnel.UI.Forms
                     if (_client != null && tTag.Tunnel.IsLoggedIn)
                     {
                         menu.Items.Add(new ToolStripSeparator());
-                        menu.Items.Add("Add Inbound Endpoint").Enabled = IsAdministrator(_client);
-                        menu.Items.Add("Add Outbound Endpoint").Enabled = IsAdministrator(_client);
+                        menu.Items.Add("Add Inbound Endpoint").Enabled = IsAdministrator();
+                        menu.Items.Add("Add Outbound Endpoint").Enabled = IsAdministrator();
                     }
 
                     if (tTag.Tunnel.Direction == NtDirection.Outbound)
@@ -594,7 +590,7 @@ namespace NetTunnel.UI.Forms
                     }
 
                     menu.Items.Add(new ToolStripSeparator());
-                    menu.Items.Add("Delete Tunnel").Enabled = IsAdministrator(_client);
+                    menu.Items.Add("Delete Tunnel").Enabled = IsAdministrator();
                     menu.Items.Add("Disconnect Tunnel").Enabled = tTag.Tunnel.Direction == NtDirection.Outbound;
                     menu.Items.Add(new ToolStripSeparator());
                     menu.Items.Add("Properties");
@@ -740,7 +736,7 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-        public bool IsAdministrator(Library.ServiceClient? client)
+        public bool IsAdministrator()
         {
             if (_client == null)
             {
@@ -896,9 +892,13 @@ namespace NetTunnel.UI.Forms
             if (e.Column == _tunnelsListViewItemComparer.SortColumn)
             {
                 if (_tunnelsListViewItemComparer.SortOrder == SortOrder.Ascending)
+                {
                     _tunnelsListViewItemComparer.SortOrder = SortOrder.Descending;
+                }
                 else
+                {
                     _tunnelsListViewItemComparer.SortOrder = SortOrder.Ascending;
+                }
             }
             else
             {
@@ -919,9 +919,13 @@ namespace NetTunnel.UI.Forms
             if (e.Column == _endpointsListViewItemComparer.SortColumn)
             {
                 if (_endpointsListViewItemComparer.SortOrder == SortOrder.Ascending)
+                {
                     _endpointsListViewItemComparer.SortOrder = SortOrder.Descending;
+                }
                 else
+                {
                     _endpointsListViewItemComparer.SortOrder = SortOrder.Ascending;
+                }
             }
             else
             {

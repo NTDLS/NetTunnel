@@ -68,7 +68,7 @@ namespace NetTunnel.UI.Forms
 
                 if (componentAssembly.Version != null && companyName?.ToLower()?.Contains("networkdls") == true)
                 {
-                    listViewVersions.Items.Add(new ListViewItem(new string[] { componentAssembly.Name ?? "", componentAssembly.Version.ToString() }));
+                    listViewVersions.Items.Add(new ListViewItem([componentAssembly.Name ?? "", componentAssembly.Version.ToString()]));
                 }
             }
             catch
@@ -76,7 +76,7 @@ namespace NetTunnel.UI.Forms
             }
         }
 
-        private void linkWebsite_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void LinkWebsite_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             try
             {

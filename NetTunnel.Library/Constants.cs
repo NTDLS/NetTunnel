@@ -1,9 +1,33 @@
-﻿namespace NetTunnel.Library
+﻿using NetTunnel.Library.Payloads;
+
+namespace NetTunnel.Library
 {
     public static class Constants
     {
         public const string FriendlyName = "NetTunnel";
         public const string EventSourceName = "NetTunnel";
+
+        public enum NtHTTPHeaderResult
+        {
+            WaitOnData,
+            Present,
+            NotPresent
+        }
+
+        public enum NtEdgeStatus
+        {
+            Normal, //This is a persistent connection.
+            New, //This is a new connection.
+            Expire //The connection is gone.
+        }
+
+        public class NtEdgeState
+        {
+            public NtEdgeStatus Status { get; set; }
+            public DirectionalKey TunnelKey { get; set; } = new();
+            public DirectionalKey EndpointKey { get; set; } = new();
+            public Guid EdgeId { get; set; }
+        }
 
         public enum NtTrafficType
         {

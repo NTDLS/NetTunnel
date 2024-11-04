@@ -8,10 +8,10 @@ namespace NetTunnel.UI.Forms
 {
     public partial class FormAddEditEndpoint : Form
     {
+        private readonly EndpointConfiguration? _existingEndpoint;
+        private readonly NtDirection _direction = NtDirection.Undefined;
         private readonly ServiceClient? _client;
         private readonly TunnelDisplay? _tunnel;
-        private readonly NtDirection _direction = NtDirection.Undefined;
-        private readonly EndpointConfiguration? _existingEndpoint;
 
         public EndpointConfiguration Endpoint { get; private set; } = new();
 

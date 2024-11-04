@@ -16,6 +16,11 @@ namespace NetTunnel.Service.TunnelEngine
     internal class ServiceEngine : IServiceEngine
     {
         /// <summary>
+        /// The message server that accepts all inbound tunnel connections and sends/receives all messages for all tunnels.
+        /// </summary>
+        private readonly RmServer _messageServer;
+
+        /// <summary>
         /// Contains a list of the connections that have been made TO the local service and their connection state info.
         /// </summary>
         public PessimisticCriticalResource<Dictionary<Guid, ServiceConnectionState>> ServiceConnectionStates { get; private set; } = new();
@@ -30,11 +35,6 @@ namespace NetTunnel.Service.TunnelEngine
         /// Contains a list of users and their password hashes.
         /// </summary>
         public UserManager Users { get; private set; }
-
-        /// <summary>
-        /// The message server that accepts all inbound tunnel connections and sends/receives all messages for all tunnels.
-        /// </summary>
-        private readonly RmServer _messageServer;
 
         public ServiceEngine()
         {
@@ -79,9 +79,6 @@ namespace NetTunnel.Service.TunnelEngine
             };
         }
 
-
-
-
         public bool TryGetServiceConnectionState(Guid connectionId, [NotNullWhen(true)] out ServiceConnectionState? outState)
         {
             var state = ServiceConnectionStates.Use(o =>
@@ -94,7 +91,6 @@ namespace NetTunnel.Service.TunnelEngine
 
             return state != null;
         }
-
 
         #region Interface: IServiceEngine
 
