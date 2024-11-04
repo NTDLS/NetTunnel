@@ -179,10 +179,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     {
                         switch (HttpUtility.Process(ref httpHeaderBuilder, Configuration, buffer))
                         {
-                            case HttpUtility.HTTPHeaderResult.WaitOnData:
+                            case NtHTTPHeaderResult.WaitOnData:
                                 //We received a partial HTTP header, wait on more data.
                                 continue;
-                            case HttpUtility.HTTPHeaderResult.Present:
+                            case NtHTTPHeaderResult.Present:
                                 //Found an HTTP header, send it to the peer. There may be bytes remaining
                                 //  in the buffer if buffer.Length > 0 so follow though to WriteBytesToPeer.
 
@@ -193,7 +193,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                                 httpHeaderBuilder.Clear();
                                 break;
-                            case HttpUtility.HTTPHeaderResult.NotPresent:
+                            case NtHTTPHeaderResult.NotPresent:
                                 //Didn't find an HTTP header.
                                 break;
                         }
