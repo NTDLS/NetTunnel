@@ -1,11 +1,11 @@
-﻿using NetTunnel.Library;
+﻿using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using NetTunnel.Library;
 using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
 using NTDLS.Helpers;
 using NTDLS.Semaphore;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Endpoints

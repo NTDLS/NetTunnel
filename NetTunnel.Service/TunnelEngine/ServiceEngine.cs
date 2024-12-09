@@ -1,4 +1,5 @@
-﻿using NetTunnel.Library.Interfaces;
+﻿using System.Diagnostics.CodeAnalysis;
+using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Notification.ServiceToService;
 using NetTunnel.Library.ReliablePayloads.Notification.UI;
@@ -8,7 +9,6 @@ using NetTunnel.Service.ReliableHandlers.Service.Queries;
 using NetTunnel.Service.TunnelEngine.Managers;
 using NTDLS.ReliableMessaging;
 using NTDLS.Semaphore;
-using System.Diagnostics.CodeAnalysis;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine

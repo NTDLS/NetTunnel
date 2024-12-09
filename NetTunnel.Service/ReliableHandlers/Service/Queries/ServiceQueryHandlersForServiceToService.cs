@@ -1,7 +1,7 @@
-﻿using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
+﻿using System.Net;
+using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
 using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
-using System.Net;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.ReliableHandlers.Service.Queries

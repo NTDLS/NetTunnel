@@ -19,6 +19,8 @@ namespace NetTunnel.Library
     /// </summary>
     public class ServiceClient
     {
+        public delegate void LoginStatus(byte[] sharedSecret, string userName, NtLoginType loginType, NtUserRole userRole);
+
         private readonly ILogger _logger;
         private readonly int _port;
         private readonly ServiceConfiguration _configuration;
@@ -71,7 +73,6 @@ namespace NetTunnel.Library
         private void Client_OnConnected(RmContext context)
             => OnConnected?.Invoke(context);
 
-
         #region Factory.
 
         public static ServiceClient UICreateConnectAndLogin(ILogger logger, string address, int port, string userName, string passwordHash)
@@ -111,7 +112,7 @@ namespace NetTunnel.Library
             Exceptions.Ignore(() => Client.Disconnect(false));
         }
 
-        public void ConnectAndLogin(NtLoginType loginType)
+        public void ConnectAndLogin(NtLoginType loginType, LoginStatus? loginStatusProc = null)
         {
             Client.ClearCryptographyProvider();
 
@@ -148,6 +149,8 @@ namespace NetTunnel.Library
             }
             else
             {
+                loginStatusProc?.Invoke(compoundNegotiator.SharedSecret, _userName, loginType, login.UserRole);
+
                 Role = login.UserRole;
                 ServiceId = login.ServiceId.EnsureNotNullOrEmpty();
                 IsLoggedIn = true;
@@ -162,8 +165,8 @@ namespace NetTunnel.Library
             return (DateTime.UtcNow - result.OriginationTimestamp).TotalMilliseconds;
         }
 
-        public S2SQueryRegisterTunnelReply S2SQueryRegisterTunnel(TunnelConfiguration Collection)
-            => Client.Query(new S2SQueryRegisterTunnel(Collection)).Result;
+        public S2SQueryRegisterTunnelReply S2SQueryRegisterTunnel(TunnelConfiguration configuration)
+            => Client.Query(new S2SQueryRegisterTunnel(configuration)).Result;
 
         public void S2SNotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
             => Client.Notify(new S2SNotificationEndpointConnect(tunnelKey, endpointId, edgeId));

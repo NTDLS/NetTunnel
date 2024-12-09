@@ -1,6 +1,6 @@
-﻿using NetTunnel.Library;
+﻿using System.Net.Sockets;
+using NetTunnel.Library;
 using NTDLS.Helpers;
-using System.Net.Sockets;
 
 namespace NetTunnel.Service.TunnelEngine.Endpoints
 {

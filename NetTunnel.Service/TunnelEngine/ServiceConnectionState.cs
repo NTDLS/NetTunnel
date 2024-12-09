@@ -5,6 +5,14 @@ using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine
 {
+    /// <summary>
+    /// This class serves a dual purpose, first and foremost it is used as the connection state for the inbound
+    /// tunnel - most importantly housing the StreamCryptography.
+    /// 
+    /// It is also used for general status information such as whether the key exchange is complete, the login type, role, etc.
+    /// This second purpose is used by both the inbound and bound services, but the outbound service only uses this information
+    /// for display puposes whereas the inbount services uses it for internal state (and display).
+    /// </summary>
     public class ServiceConnectionState
     {
         public bool IsAuthenticated { get; private set; }
@@ -39,6 +47,15 @@ namespace NetTunnel.Service.TunnelEngine
         {
             StreamCryptography = new CryptoStream(sharedSecret);
 
+            KeyHash = Utility.ComputeSha256Hash(sharedSecret);
+            KeyLength = sharedSecret.Length;
+
+            Singletons.Logger.Verbose(
+                    $"Tunnel cryptography initialized to {sharedSecret.Length * 8}bits. Hash {Utility.ComputeSha256Hash(sharedSecret)}.");
+        }
+
+        public void InformCryptographyProvider(byte[] sharedSecret)
+        {
             KeyHash = Utility.ComputeSha256Hash(sharedSecret);
             KeyLength = sharedSecret.Length;
 

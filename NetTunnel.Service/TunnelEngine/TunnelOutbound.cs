@@ -1,11 +1,11 @@
-﻿using NetTunnel.Library;
+﻿using System.Net.Sockets;
+using NetTunnel.Library;
 using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
 using NetTunnel.Service.ReliableHandlers.ServiceClient.Notifications;
 using NetTunnel.Service.ReliableHandlers.ServiceClient.Queries;
 using NTDLS.ReliableMessaging;
-using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine
@@ -15,12 +15,17 @@ namespace NetTunnel.Service.TunnelEngine
         private readonly ServiceClient _client;
         private Thread? _establishConnectionThread;
 
+        public Guid ConnectionId { get; private set; }
         public override NtDirection Direction { get => NtDirection.Outbound; }
         public bool IsLoggedIn => _client.IsLoggedIn;
+
+        new public ServiceEngine ServiceEngine { get; private set; }
 
         public TunnelOutbound(ServiceEngine serviceEngine, TunnelConfiguration configuration)
             : base(serviceEngine, configuration)
         {
+            ServiceEngine = serviceEngine;
+
             _client = ServiceClient.Create(Singletons.Logger, Singletons.Configuration,
                 Configuration.Address, Configuration.ServicePort, Configuration.Username, Configuration.PasswordHash, this);
 
@@ -92,6 +97,8 @@ namespace NetTunnel.Service.TunnelEngine
 
             CurrentConnections--;
 
+            ConnectionId = Guid.Empty;
+
             Singletons.Logger.Warning($"Tunnel '{Configuration.Name}' disconnected.");
         }
 
@@ -101,6 +108,14 @@ namespace NetTunnel.Service.TunnelEngine
 
             CurrentConnections++;
             TotalConnections++;
+
+            ConnectionId = context.ConnectionId;
+
+            var serviceConnectionState = new ServiceConnectionState(context.ConnectionId, $"{context.TcpClient.Client.RemoteEndPoint}")
+            {
+                TunnelKey = TunnelKey
+            };
+            Singletons.ServiceEngine.ServiceConnectionStates.Use(o => o.Add(context.ConnectionId, serviceConnectionState));
 
             Singletons.Logger.Verbose($"Tunnel '{Configuration.Name}' connection successful.");
         }
@@ -145,6 +160,15 @@ namespace NetTunnel.Service.TunnelEngine
             double? previousPing = null;
             DateTime lastPingDateTime = DateTime.UtcNow;
 
+            void LoginStatusHandler(byte[] sharedSecret, string userName, NtLoginType loginType, NtUserRole userRole)
+            {
+                var serviceConnectionState = ServiceEngine
+                    .ServiceConnectionStates.Use(o => o.SingleOrDefault(o => o.Value.TunnelKey?.Id == TunnelKey.Id).Value);
+
+                serviceConnectionState.SetAuthenticated(userName, userRole, loginType);
+                serviceConnectionState.InformCryptographyProvider(sharedSecret);
+            }
+
             while (KeepRunning)
             {
                 try
@@ -159,7 +183,7 @@ namespace NetTunnel.Service.TunnelEngine
                             $"Tunnel '{Configuration.Name}' connecting to service at {Configuration.Address}:{Configuration.ServicePort}.");
 
                         //Make the outbound connection to the remote tunnel service.
-                        _client.ConnectAndLogin(NtLoginType.Service);
+                        _client.ConnectAndLogin(NtLoginType.Service, LoginStatusHandler);
 
                         var registerResult = _client.S2SQueryRegisterTunnel(Configuration);
 

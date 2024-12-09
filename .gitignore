@@ -12,3 +12,5 @@ NetTunnel/NetTunnel.EndPoint/obj/
 NetTunnel.UI/NetTunnel.UI.csproj.user
 
 \@Installers/Output/
+
+*.user

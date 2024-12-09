@@ -139,7 +139,7 @@ namespace NetTunnel.Service.TunnelEngine
             if (this is TunnelOutbound outboundTunnel)
             {
                 prop.IsLoggedIn = outboundTunnel.IsLoggedIn;
-                prop.ConnectionId = Guid.Empty; //Outbound tunnels use a dedicated connection and do not have connectionIds.
+                prop.ConnectionId = outboundTunnel.ConnectionId; //Outbound tunnels use a dedicated connection and do not have connectionIds.
 
                 prop.OutboundAddress = Configuration.Address;
                 prop.OutboundPort = Configuration.ServicePort;
