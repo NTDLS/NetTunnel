@@ -575,7 +575,7 @@ namespace NetTunnel.UI.Forms
                         menu.Items.Add("Add Outbound Endpoint").Enabled = IsAdministrator();
                     }
 
-                    if (tTag.Tunnel.Direction == NtDirection.Outbound)
+                    if (IsAdministrator() && tTag.Tunnel.Direction == NtDirection.Outbound)
                     {
                         menu.Items.Add(new ToolStripSeparator());
 
@@ -587,10 +587,11 @@ namespace NetTunnel.UI.Forms
                         {
                             menu.Items.Add("Stop");
                         }
+
+                        menu.Items.Add(new ToolStripSeparator());
+                        menu.Items.Add("Delete Tunnel");
                     }
 
-                    menu.Items.Add(new ToolStripSeparator());
-                    menu.Items.Add("Delete Tunnel").Enabled = IsAdministrator() && tTag.Tunnel.Direction == NtDirection.Outbound;
                     menu.Items.Add(new ToolStripSeparator());
                     menu.Items.Add("Properties");
                 }
