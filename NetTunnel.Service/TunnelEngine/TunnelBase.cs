@@ -52,6 +52,8 @@ namespace NetTunnel.Service.TunnelEngine
 
             Singletons.Logger.Verbose($"Loading endpoints for {tunnelDirection} tunnel '{Configuration.Name}'.");
 
+            Endpoints.Clear();
+
             endpoints.Where(o => o.Direction == NtDirection.Inbound)
                 .ToList().ForEach(o => Endpoints.Add(new EndpointInbound(ServiceEngine, this, o)));
 

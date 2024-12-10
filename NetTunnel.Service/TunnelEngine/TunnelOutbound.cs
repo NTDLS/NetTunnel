@@ -98,6 +98,8 @@ namespace NetTunnel.Service.TunnelEngine
 
             CurrentConnections--;
 
+            ServiceEngine.ServiceConnectionStates.Use(o => o.Remove(context.ConnectionId));
+
             ConnectionId = Guid.Empty;
 
             Singletons.Logger.Warning($"Tunnel '{Configuration.Name}' disconnected.");
