@@ -51,7 +51,7 @@ namespace NetTunnel.UI.Forms
             });
 
 #if DEBUG
-            textBoxPassword.Text = "123456789";
+            textBoxPassword.Text = Environment.MachineName.ToLower();
 #endif
             textBoxPassword.Focus();
         }
