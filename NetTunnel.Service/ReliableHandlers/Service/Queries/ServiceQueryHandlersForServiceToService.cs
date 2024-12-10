@@ -53,11 +53,11 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
 
                 if (context.TcpClient.Client.RemoteEndPoint is IPEndPoint address)
                 {
-                    //The address is really on used by outbound tunnels to make an outgoing connection.
-                    //Since that ↑ is the case, we are going to relace it with the address of the connecting service
+                    //The address is really ony used by outbound tunnels to make an outgoing connection.
+                    //Since that ↑ is the case, we are going to replace it with the address of the connecting service
                     //  so that it shows in the UI.
-                    query.Configuration.Address = address.Address.ToString(); //Only used for UI for inbound tunnels.
-                    query.Configuration.ServicePort = address.Port; //Only used for UI for inbound tunnels.
+                    //query.Configuration.Address = address.Address.ToString(); //Only used for UI for inbound tunnels.
+                    //query.Configuration.ServicePort = address.Port; //Only used for UI for inbound tunnels.
                 }
 
                 var endpoints = Singletons.ServiceEngine.Users.GetEndpoints(connectionContext.UserName);
