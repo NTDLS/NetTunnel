@@ -43,7 +43,7 @@ namespace NetTunnel.UI.Forms
             listViewConnections.FullRowSelect = true;
             listViewConnections.Location = new Point(0, 0);
             listViewConnections.Name = "listViewConnections";
-            listViewConnections.Size = new Size(761, 337);
+            listViewConnections.Size = new Size(704, 381);
             listViewConnections.TabIndex = 0;
             listViewConnections.UseCompatibleStateImageBehavior = false;
             listViewConnections.View = View.Details;
@@ -62,7 +62,7 @@ namespace NetTunnel.UI.Forms
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(761, 337);
+            ClientSize = new Size(704, 381);
             Controls.Add(listViewConnections);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MinimizeBox = false;

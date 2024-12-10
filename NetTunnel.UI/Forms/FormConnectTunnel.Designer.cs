@@ -158,7 +158,7 @@
             groupBoxRemoteService.Location = new Point(12, 58);
             groupBoxRemoteService.Name = "groupBoxRemoteService";
             groupBoxRemoteService.Size = new Size(277, 208);
-            groupBoxRemoteService.TabIndex = 31;
+            groupBoxRemoteService.TabIndex = 1;
             groupBoxRemoteService.TabStop = false;
             groupBoxRemoteService.Text = "Remote Service";
             // 
