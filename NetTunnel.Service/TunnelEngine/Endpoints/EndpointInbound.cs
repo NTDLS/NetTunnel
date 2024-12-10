@@ -99,7 +99,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             }
             catch (Exception ex)
             {
-                Singletons.Logger.Exception($"InboundConnectionThreadProc: {ex.Message}");
+                if (ex.Message.Contains("blocking operation was interrupted", StringComparison.InvariantCultureIgnoreCase) == false)
+                {
+                    Singletons.Logger.Exception($"InboundConnectionThreadProc: {ex.Message}");
+                }
             }
             finally
             {
