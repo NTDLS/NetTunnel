@@ -564,7 +564,7 @@ namespace NetTunnel.UI.Forms
 
                 var menu = new ContextMenuStrip();
 
-                menu.Items.Add("Connect Tunnel");
+                menu.Items.Add("Create New Tunnel");
 
                 if (selectedRow != null && tTag != null)
                 {
@@ -602,7 +602,7 @@ namespace NetTunnel.UI.Forms
                 {
                     menu.Hide();
 
-                    if (e.ClickedItem?.Text == "Connect Tunnel")
+                    if (e.ClickedItem?.Text == "Create New Tunnel")
                     {
                         using var form = new FormConnectTunnel(_client.EnsureNotNull(), WriteVisualLog);
                         if (form.ShowDialog() == DialogResult.OK)
