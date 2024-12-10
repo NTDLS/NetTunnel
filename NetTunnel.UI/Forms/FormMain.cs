@@ -590,8 +590,7 @@ namespace NetTunnel.UI.Forms
                     }
 
                     menu.Items.Add(new ToolStripSeparator());
-                    menu.Items.Add("Delete Tunnel").Enabled = IsAdministrator();
-                    menu.Items.Add("Disconnect Tunnel").Enabled = tTag.Tunnel.Direction == NtDirection.Outbound;
+                    menu.Items.Add("Delete Tunnel").Enabled = IsAdministrator() && tTag.Tunnel.Direction == NtDirection.Outbound;
                     menu.Items.Add(new ToolStripSeparator());
                     menu.Items.Add("Properties");
                 }
@@ -676,30 +675,6 @@ namespace NetTunnel.UI.Forms
                         {
                             using var form = new FormTunnelProperties(_client.EnsureNotNull(), tTag.Tunnel.TunnelKey);
                             form.ShowDialog();
-                        }
-                        catch (Exception ex)
-                        {
-                            this.InvokeMessageBox(ex.Message, FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                        }
-
-                        listViewEndpoints.InvokeClearRows();
-                    }
-                    else if (tTag != null && e.ClickedItem?.Text == "Disconnect Tunnel")
-                    {
-                        if (MessageBox.Show($"Disconnect the tunnel '{tTag.Tunnel.Name}'?",
-                            FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
-                        {
-                            return;
-                        }
-
-                        try
-                        {
-                            _client.EnsureNotNull().UIQueryDeleteTunnel(tTag.Tunnel.TunnelKey);
-
-                            Invoke(new Action(() =>
-                            {
-                                _needToRepopulateTunnels = true;
-                            }));
                         }
                         catch (Exception ex)
                         {
