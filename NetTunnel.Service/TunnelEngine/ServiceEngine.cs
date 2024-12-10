@@ -7,6 +7,7 @@ using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
 using NetTunnel.Service.ReliableHandlers.Service.Notifications;
 using NetTunnel.Service.ReliableHandlers.Service.Queries;
 using NetTunnel.Service.TunnelEngine.Managers;
+using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
 using NTDLS.Semaphore;
 using static NetTunnel.Library.Constants;
@@ -151,7 +152,7 @@ namespace NetTunnel.Service.TunnelEngine
         private void ServiceEngine_OnConnected(RmContext context)
         {
             ServiceConnectionStates.Use(o => o.Add(context.ConnectionId,
-                new ServiceConnectionState(context.ConnectionId, $"{context.TcpClient.Client.RemoteEndPoint}")));
+                new ServiceConnectionState(context.ConnectionId, context.TcpClient.Client.RemoteEndPoint.EnsureNotNull())));
         }
 
         private void ServiceEngine_OnDisconnected(RmContext context)

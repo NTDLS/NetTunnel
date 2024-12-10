@@ -1,6 +1,7 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Payloads;
 using NTDLS.NASCCL;
+using System.Net;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine
@@ -11,7 +12,7 @@ namespace NetTunnel.Service.TunnelEngine
     /// 
     /// It is also used for general status information such as whether the key exchange is complete, the login type, role, etc.
     /// This second purpose is used by both the inbound and bound services, but the outbound service only uses this information
-    /// for display puposes whereas the inbount services uses it for internal state (and display).
+    /// for display purposes whereas the inbound services uses it for internal state (and display).
     /// </summary>
     public class ServiceConnectionState
     {
@@ -28,14 +29,31 @@ namespace NetTunnel.Service.TunnelEngine
         public int KeyLength { get; private set; }
         public NtLoginType LoginType { get; set; } = NtLoginType.Undefined;
         public NtUserRole UserRole { get; set; } = NtUserRole.Undefined;
-        public string ClientIpAddress { get; private set; }
+
+        /// <summary>
+        /// Used to test for IP spoofing.
+        /// </summary>
+        public string RemoteEndpointIdentifier { get; private set; }
+        public string RemoteClientAddress { get; private set; }
+        public int RemoteClientPort { get; private set; }
         public string KeyHash { get; private set; } = string.Empty;
         public string UserName { get; private set; } = string.Empty;
 
-        public ServiceConnectionState(Guid connectionId, string clientIpAddress)
+        public ServiceConnectionState(Guid connectionId, EndPoint nativeClientEndpoint)
         {
             ConnectionId = connectionId;
-            ClientIpAddress = clientIpAddress;
+
+            RemoteEndpointIdentifier = $"{nativeClientEndpoint}";
+
+            if (nativeClientEndpoint is IPEndPoint ipEndPoint)
+            {
+                RemoteClientAddress = $"{ipEndPoint.Address}";
+                RemoteClientPort = ipEndPoint.Port;
+            }
+            else
+            {
+                RemoteClientAddress = $"{nativeClientEndpoint}";
+            }
         }
 
         public void AssociateTunnel(DirectionalKey tunnelKey)
@@ -83,9 +101,9 @@ namespace NetTunnel.Service.TunnelEngine
             IsAuthenticated = true;
         }
 
-        public bool Validate(string? clientIpAddress)
+        public bool Validate(EndPoint? remoteEndpoint)
         {
-            if (ClientIpAddress != clientIpAddress)
+            if ($"{remoteEndpoint}" != RemoteEndpointIdentifier)
             {
                 throw new Exception("Session IP address mismatch.");
             }

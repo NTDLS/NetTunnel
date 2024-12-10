@@ -125,7 +125,7 @@ namespace NetTunnel.Service.TunnelEngine
                 Status = Status,
                 TotalConnections = TotalConnections,
                 TunnelKey = TunnelKey,
-                ClientIpAddress = serviceConnectionState.ClientIpAddress,
+                ClientIpAddress = serviceConnectionState.RemoteClientAddress,
                 IsAuthenticated = serviceConnectionState.IsAuthenticated,
                 KeepRunning = KeepRunning,
                 LoginTime = serviceConnectionState.LoginTime,
@@ -142,6 +142,7 @@ namespace NetTunnel.Service.TunnelEngine
                 prop.ConnectionId = outboundTunnel.ConnectionId; //Outbound tunnels use a dedicated connection and do not have connectionIds.
 
                 prop.OutboundAddress = Configuration.Address;
+                prop.InboundPort = serviceConnectionState.RemoteClientPort;
                 prop.OutboundPort = Configuration.ServicePort;
                 prop.OutboundUsername = Configuration.Username;
             }
@@ -152,6 +153,7 @@ namespace NetTunnel.Service.TunnelEngine
 
                 prop.InboundAddress = Configuration.Address;
                 prop.InboundPort = Configuration.ServicePort;
+                prop.OutboundPort = serviceConnectionState.RemoteClientPort;
                 prop.InboundUsername = Configuration.Username;
             }
 

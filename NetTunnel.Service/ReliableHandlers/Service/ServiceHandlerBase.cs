@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
+using System.Net;
 
 namespace NetTunnel.Service.ReliableHandlers.Service
 {
@@ -64,7 +65,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service
             {
                 if (Singletons.ServiceEngine.TryGetServiceConnectionState(context.ConnectionId, out var connection))
                 {
-                    if (connection.Validate($"{context.TcpClient.Client.RemoteEndPoint}"))
+                    if (connection.Validate(context.TcpClient.Client.RemoteEndPoint))
                     {
                         return connection;
                     }

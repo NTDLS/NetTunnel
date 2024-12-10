@@ -5,6 +5,7 @@ using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
 using NetTunnel.Service.ReliableHandlers.ServiceClient.Notifications;
 using NetTunnel.Service.ReliableHandlers.ServiceClient.Queries;
+using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
 using static NetTunnel.Library.Constants;
 
@@ -111,7 +112,7 @@ namespace NetTunnel.Service.TunnelEngine
 
             ConnectionId = context.ConnectionId;
 
-            var serviceConnectionState = new ServiceConnectionState(context.ConnectionId, $"{context.TcpClient.Client.RemoteEndPoint}")
+            var serviceConnectionState = new ServiceConnectionState(context.ConnectionId, context.TcpClient.Client.RemoteEndPoint.EnsureNotNull())
             {
                 TunnelKey = TunnelKey
             };
