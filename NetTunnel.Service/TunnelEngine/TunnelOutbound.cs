@@ -112,7 +112,7 @@ namespace NetTunnel.Service.TunnelEngine
 
             ConnectionId = context.ConnectionId;
 
-            var serviceConnectionState = new ServiceConnectionState(context.ConnectionId, context.TcpClient.Client.RemoteEndPoint.EnsureNotNull())
+            var serviceConnectionState = new ServiceConnectionState(context.ConnectionId, context.TcpClient.Client)
             {
                 TunnelKey = TunnelKey
             };

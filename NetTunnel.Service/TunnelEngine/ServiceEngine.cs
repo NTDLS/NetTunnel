@@ -152,7 +152,7 @@ namespace NetTunnel.Service.TunnelEngine
         private void ServiceEngine_OnConnected(RmContext context)
         {
             ServiceConnectionStates.Use(o => o.Add(context.ConnectionId,
-                new ServiceConnectionState(context.ConnectionId, context.TcpClient.Client.RemoteEndPoint.EnsureNotNull())));
+                new ServiceConnectionState(context.ConnectionId, context.TcpClient.Client)));
         }
 
         private void ServiceEngine_OnDisconnected(RmContext context)

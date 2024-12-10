@@ -125,7 +125,8 @@ namespace NetTunnel.Service.TunnelEngine
                 Status = Status,
                 TotalConnections = TotalConnections,
                 TunnelKey = TunnelKey,
-                ClientIpAddress = serviceConnectionState.RemoteClientAddress,
+                RemoteClientAddress = serviceConnectionState.RemoteClientAddress,
+                LocalClientAddress = serviceConnectionState.LocalClientAddress,
                 IsAuthenticated = serviceConnectionState.IsAuthenticated,
                 KeepRunning = KeepRunning,
                 LoginTime = serviceConnectionState.LoginTime,
@@ -133,28 +134,19 @@ namespace NetTunnel.Service.TunnelEngine
                 LoggedInUserName = serviceConnectionState.UserName,
                 ServiceId = Configuration.ServiceId,
                 Name = Configuration.Name,
-                Endpoints = Endpoints.Count
+                Endpoints = Endpoints.Count,
+                Username = Configuration.Username
             };
 
             if (this is TunnelOutbound outboundTunnel)
             {
                 prop.IsLoggedIn = outboundTunnel.IsLoggedIn;
                 prop.ConnectionId = outboundTunnel.ConnectionId; //Outbound tunnels use a dedicated connection and do not have connectionIds.
-
-                prop.OutboundAddress = Configuration.Address;
-                prop.InboundPort = serviceConnectionState.RemoteClientPort;
-                prop.OutboundPort = Configuration.ServicePort;
-                prop.OutboundUsername = Configuration.Username;
             }
             else if (this is TunnelInbound inboundTunnel)
             {
                 prop.IsLoggedIn = inboundTunnel.IsLoggedIn;
                 prop.ConnectionId = inboundTunnel.ConnectionId;
-
-                prop.InboundAddress = Configuration.Address;
-                prop.InboundPort = Configuration.ServicePort;
-                prop.OutboundPort = serviceConnectionState.RemoteClientPort;
-                prop.InboundUsername = Configuration.Username;
             }
 
             return prop;

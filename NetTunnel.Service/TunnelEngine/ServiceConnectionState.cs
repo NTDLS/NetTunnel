@@ -2,6 +2,7 @@
 using NetTunnel.Library.Payloads;
 using NTDLS.NASCCL;
 using System.Net;
+using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine
@@ -33,27 +34,35 @@ namespace NetTunnel.Service.TunnelEngine
         /// <summary>
         /// Used to test for IP spoofing.
         /// </summary>
-        public string RemoteEndpointIdentifier { get; private set; }
+        public string TunnelAddressIdentifier { get; private set; }
+        public string LocalClientAddress { get; private set; }
         public string RemoteClientAddress { get; private set; }
-        public int RemoteClientPort { get; private set; }
         public string KeyHash { get; private set; } = string.Empty;
         public string UserName { get; private set; } = string.Empty;
 
-        public ServiceConnectionState(Guid connectionId, EndPoint nativeClientEndpoint)
+        public ServiceConnectionState(Guid connectionId, Socket nativeSocket)
         {
             ConnectionId = connectionId;
 
-            RemoteEndpointIdentifier = $"{nativeClientEndpoint}";
-
-            if (nativeClientEndpoint is IPEndPoint ipEndPoint)
+            if (nativeSocket.LocalEndPoint is IPEndPoint localIpEndPoint)
             {
-                RemoteClientAddress = $"{ipEndPoint.Address}";
-                RemoteClientPort = ipEndPoint.Port;
+                LocalClientAddress = $"{localIpEndPoint.Address}:{localIpEndPoint.Port}";
             }
             else
             {
-                RemoteClientAddress = $"{nativeClientEndpoint}";
+                LocalClientAddress = $"{nativeSocket.LocalEndPoint}";
             }
+
+            if (nativeSocket.RemoteEndPoint is IPEndPoint remoteIpEndPoint)
+            {
+                RemoteClientAddress = $"{remoteIpEndPoint.Address}:{remoteIpEndPoint.Port}";
+            }
+            else
+            {
+                RemoteClientAddress = $"{nativeSocket.LocalEndPoint}";
+            }
+
+            TunnelAddressIdentifier = $"[{LocalClientAddress}]/[{RemoteClientAddress}]";
         }
 
         public void AssociateTunnel(DirectionalKey tunnelKey)
@@ -101,9 +110,27 @@ namespace NetTunnel.Service.TunnelEngine
             IsAuthenticated = true;
         }
 
-        public bool Validate(EndPoint? remoteEndpoint)
+        public bool Validate(Socket nativeSocket)
         {
-            if ($"{remoteEndpoint}" != RemoteEndpointIdentifier)
+            if (nativeSocket.LocalEndPoint is IPEndPoint localIpEndPoint)
+            {
+                LocalClientAddress = $"{localIpEndPoint.Address}:{localIpEndPoint.Port}";
+            }
+            else
+            {
+                LocalClientAddress = $"{nativeSocket.LocalEndPoint}";
+            }
+
+            if (nativeSocket.RemoteEndPoint is IPEndPoint remoteIpEndPoint)
+            {
+                RemoteClientAddress = $"{remoteIpEndPoint.Address}:{remoteIpEndPoint.Port}";
+            }
+            else
+            {
+                RemoteClientAddress = $"{nativeSocket.LocalEndPoint}";
+            }
+
+            if (!$"[{LocalClientAddress}]/[{RemoteClientAddress}]".Equals(TunnelAddressIdentifier, StringComparison.InvariantCultureIgnoreCase))
             {
                 throw new Exception("Session IP address mismatch.");
             }
