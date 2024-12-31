@@ -8,8 +8,8 @@
 
     <Company>NetworkDLS</Company>
     <Authors>NetworkDLS</Authors>
-    <Copyright>Copyright © 2024 NetworkDLS</Copyright>
-    <Version>4.2.5</Version>
+    <Copyright>Copyright © 2025 NetworkDLS</Copyright>
+    <Version>4.2.6</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +20,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NTDLS.Helpers" Version="1.3.10" />
     <PackageReference Include="NTDLS.NASCCL" Version="1.2.0" />
-    <PackageReference Include="NTDLS.ReliableMessaging" Version="1.10.18" />
+    <PackageReference Include="NTDLS.ReliableMessaging" Version="1.11.3" />
     <PackageReference Include="NTDLS.SecureKeyExchange" Version="3.0.1" />
   </ItemGroup>
 

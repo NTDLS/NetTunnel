@@ -1,11 +1,11 @@
-#define AppVersion "4.2.5"
+#define AppVersion "4.2.6"
 
 [Setup]
 ;-- Main Setup Information
  AppName                          = NetTunnel
  AppVersion                       = {#AppVersion}
  AppVerName                       = NetTunnel {#AppVersion}
- AppCopyright                     = Copyright © 1995-2024 NetworkDLS.
+ AppCopyright                     = Copyright © 1995-2025 NetworkDLS.
  DefaultDirName                   = {commonpf}\NetworkDLS\NetTunnel
  DefaultGroupName                 = NetworkDLS\NetTunnel
  UninstallDisplayIcon             = {app}\NetTunnel.UI.exe
