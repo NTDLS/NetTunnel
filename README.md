@@ -16,7 +16,7 @@ Once the tunnel is connected you can add/manage endpoints, which are nothing mor
 Note that in the diagram above, that we are routing to the remote server, but we do not have its IP address nor do we have any inbound firewall rules defined. All data exchanged between the INBOUND and OUTBOUND endpoints is routed through the encrypted and compressed tunnel to the corresponding endpoint. That tunnel was established as an outbound connection FROM the remote server.
 
 ## 3rd and subsequent endpoint hops
-If you are in a situation where both endpoints are behind firewalls, you can get creative and have both endpoint tunnels reach out to a 3rd (or 4th, or 5th....) location which can accept incoming connections from both sites.
+If you are in a situation where both endpoints are behind firewalls, you can get creative and have both endpoint tunnels reach out to a 3rd (or 4th, or 5th....) location which can accept incoming connections from both sites and pipe data between them.
 
 ## Notes
 * All configuration, handshakes and tunneling is completed through a single connection using [ReliableMessaging](https://github.com/NTDLS/NTDLS.ReliableMessaging).
