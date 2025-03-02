@@ -184,7 +184,7 @@ namespace NetTunnel.UI.Forms
 
             foreach (var property in typeof(TunnelPropertiesDisplay).GetProperties())
             {
-                string name = NTDLS.Helpers.Text.SeperateCamelCase(property.Name);
+                string name = NTDLS.Helpers.Text.SeparateCamelCase(property.Name);
                 string value = property?.GetValue(props, null)?.ToString() ?? string.Empty;
 
                 if (string.IsNullOrWhiteSpace(name) == false && string.IsNullOrWhiteSpace(value) == false)

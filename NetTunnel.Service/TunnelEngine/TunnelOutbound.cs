@@ -1,12 +1,11 @@
-﻿using System.Net.Sockets;
-using NetTunnel.Library;
+﻿using NetTunnel.Library;
 using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
 using NetTunnel.Service.ReliableHandlers.ServiceClient.Notifications;
 using NetTunnel.Service.ReliableHandlers.ServiceClient.Queries;
-using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
+using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine

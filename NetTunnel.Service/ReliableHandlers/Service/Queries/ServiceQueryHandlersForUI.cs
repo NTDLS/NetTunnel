@@ -1,7 +1,7 @@
-﻿using System.Reflection;
-using NetTunnel.Library.ReliablePayloads.Query.UI;
+﻿using NetTunnel.Library.ReliablePayloads.Query.UI;
 using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
+using System.Reflection;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.ReliableHandlers.Service.Queries
@@ -41,7 +41,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         {
             try
             {
-                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeparateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
 
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
                 if (connectionContext.UserRole != NtUserRole.Administrator)
@@ -68,7 +68,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         {
             try
             {
-                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeparateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
 
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
                 if (connectionContext.UserRole != NtUserRole.Administrator)
@@ -94,7 +94,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         {
             try
             {
-                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeparateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
 
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
                 if (connectionContext.UserRole != NtUserRole.Administrator)
@@ -120,7 +120,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         {
             try
             {
-                Singletons.Logger.Debug(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+                Singletons.Logger.Debug(NTDLS.Helpers.Text.SeparateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
 
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
@@ -143,7 +143,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         {
             try
             {
-                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeparateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
 
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
@@ -166,7 +166,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         {
             try
             {
-                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeparateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
 
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
                 if (connectionContext.UserRole != NtUserRole.Administrator)
@@ -193,7 +193,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         {
             try
             {
-                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeparateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
 
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
                 if (connectionContext.UserRole != NtUserRole.Administrator)
@@ -220,7 +220,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         {
             try
             {
-                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+                Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeparateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
 
                 var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
                 if (connectionContext.UserRole != NtUserRole.Administrator)
@@ -244,7 +244,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// </summary>
         public UIQueryEditUserReply UIQueryEditUser(RmContext context, UIQueryEditUser query)
         {
-            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeparateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
 
             try
             {
@@ -270,7 +270,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// </summary>
         public UIQueryCreateUserReply UIQueryCreateUser(RmContext context, UIQueryCreateUser query)
         {
-            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeparateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
 
             try
             {
@@ -296,7 +296,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// </summary>
         public UIQueryGetServiceConfigurationReply UIQueryGetServiceConfiguration(RmContext context, UIQueryGetServiceConfiguration query)
         {
-            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeparateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
 
             try
             {
@@ -323,7 +323,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// </summary>
         public UIQueryPutServiceConfigurationReply UIQueryPutServiceConfiguration(RmContext context, UIQueryPutServiceConfiguration query)
         {
-            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeparateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
 
             try
             {
@@ -350,7 +350,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// </summary>
         public UIQueryDeleteEndpointReply UIQueryDeleteEndpoint(RmContext context, UIQueryDeleteEndpoint query)
         {
-            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeparateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
 
             try
             {
@@ -376,7 +376,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// </summary>
         public UIQueryStartTunnelReply UIQueryStartTunnel(RmContext context, UIQueryStartTunnel query)
         {
-            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeparateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
 
             try
             {
@@ -397,7 +397,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// </summary>
         public UIQueryStopTunnelReply UIQueryStopTunnel(RmContext context, UIQueryStopTunnel query)
         {
-            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+            Singletons.Logger.Verbose(NTDLS.Helpers.Text.SeparateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
 
             try
             {
@@ -418,7 +418,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// </summary>
         public UIQueryGetTunnelPropertiesReply UIQueryGetTunnelProperties(RmContext context, UIQueryGetTunnelProperties query)
         {
-            Singletons.Logger.Debug(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+            Singletons.Logger.Debug(NTDLS.Helpers.Text.SeparateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
 
             try
             {
@@ -441,7 +441,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// </summary>
         public UIQueryGetEndpointPropertiesReply UIQueryGetEndpointProperties(RmContext context, UIQueryGetEndpointProperties query)
         {
-            Singletons.Logger.Debug(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+            Singletons.Logger.Debug(NTDLS.Helpers.Text.SeparateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
 
             try
             {
@@ -464,7 +464,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Queries
         /// </summary>
         public UIQueryGetEndpointEdgeConnectionsReply UIQueryGetEndpointEdgeConnections(RmContext context, UIQueryGetEndpointEdgeConnections query)
         {
-            Singletons.Logger.Debug(NTDLS.Helpers.Text.SeperateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
+            Singletons.Logger.Debug(NTDLS.Helpers.Text.SeparateCamelCase(MethodBase.GetCurrentMethod()?.Name ?? string.Empty));
 
             try
             {

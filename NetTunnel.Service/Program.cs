@@ -1,5 +1,5 @@
-using System.Diagnostics;
 using NetTunnel.Service.TunnelEngine;
+using System.Diagnostics;
 using Topshelf;
 
 namespace NetTunnel.Service

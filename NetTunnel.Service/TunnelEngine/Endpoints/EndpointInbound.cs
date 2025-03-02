@@ -1,8 +1,8 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using NetTunnel.Library.Interfaces;
+﻿using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
 using NTDLS.Helpers;
+using System.Net;
+using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Endpoints

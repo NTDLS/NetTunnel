@@ -1,6 +1,5 @@
 ﻿using NetTunnel.Service.TunnelEngine;
 using NTDLS.ReliableMessaging;
-using System.Net;
 
 namespace NetTunnel.Service.ReliableHandlers.Service
 {
