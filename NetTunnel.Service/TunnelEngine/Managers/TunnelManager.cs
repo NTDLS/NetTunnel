@@ -311,7 +311,6 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             Collection.Use((o) =>
             {
                 o.Clear();
-
                 CommonApplicationData.LoadFromDisk<List<TunnelConfiguration>>(FriendlyName)?
                     .ForEach(c =>
                     {

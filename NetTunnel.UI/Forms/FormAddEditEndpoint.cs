@@ -165,9 +165,9 @@ namespace NetTunnel.UI.Forms
             try
             {
                 textBoxName.GetAndValidateText("You must specify a name.");
-                textBoxListenPort.GetAndValidateNumeric(1, 65535, "You must specify a valid listen port between [min] and [max].");
+                var listenPort = textBoxListenPort.GetAndValidateNumeric(1, 65535, "You must specify a valid listen port between [min] and [max].");
                 textBoxTerminationAddress.GetAndValidateText("You must specify a termination address (ip, hostname or domain). ");
-                textBoxTerminationPort.GetAndValidateNumeric(1, 65535, "You must specify a valid termination port between [min] and [max].");
+                var terminationPort = textBoxTerminationPort.GetAndValidateNumeric(1, 65535, "You must specify a valid termination port between [min] and [max].");
 
                 var endpointHttpHeaderRules = new List<HttpHeaderRule>();
 
@@ -194,8 +194,8 @@ namespace NetTunnel.UI.Forms
                     _direction,
                     textBoxName.Text,
                     textBoxTerminationAddress.Text,
-                    textBoxListenPort.ValueAs<int>(),
-                    textBoxTerminationPort.ValueAs<int>(),
+                    listenPort,
+                    terminationPort,
                     endpointHttpHeaderRules,
                     Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"));
 

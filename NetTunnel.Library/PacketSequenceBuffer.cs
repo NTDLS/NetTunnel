@@ -8,6 +8,8 @@
 
         public void WriteToStream(Stream stream, long sequence, byte[] data)
         {
+            //stream.Write(data);
+
             lock (Buffer)
             {
                 //The next packet in the sequence is the next one that needs to be sent. Flush it to the stream.
