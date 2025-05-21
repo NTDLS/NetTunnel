@@ -56,7 +56,7 @@ namespace NetTunnel.UI.Forms
 #if DEBUG
             textBoxName.Text = "My First Tunnel";
 
-            textBoxAddress.Text = "10.20.1.120";
+            textBoxAddress.Text = "10.20.1.113";
 
             textBoxUsername.Text = "debug";
             textBoxPassword.Text = "123456789";

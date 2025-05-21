@@ -57,12 +57,13 @@ namespace NetTunnel.Service.TunnelEngine
         /// <param name="tunnelKey">The id of the tunnel that owns the endpoint.</param>
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="edgeId">The id that will uniquely identity the associated endpoint connections at each service</param>
+        /// <param name="packetSequence">The sequence number of the packet for outbound buffering and ordering outbound edge data.</param>
         /// <param name="bytes">Bytes to be sent to endpoint connection.</param>
         /// <param name="length">Number of bytes to be sent to the endpoint connection.</param>
-        public void S2SPeerNotificationEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length)
+        public void S2SPeerNotificationEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, long packetSequence, byte[] bytes, int length)
         {
             //Inbound tunnels communicate all data through the ServiceEngine._messageServer based on the ConnectionId.
-            ServiceEngine.S2SPeerNotificationEndpointDataExchange(ConnectionId, tunnelKey, endpointId, edgeId, bytes, length);
+            ServiceEngine.S2SPeerNotificationEndpointDataExchange(ConnectionId, tunnelKey, endpointId, edgeId, packetSequence, bytes, length);
         }
 
         /// <summary>

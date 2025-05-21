@@ -62,7 +62,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
                 var connectionContext = GetServiceConnectionContext(context);
 
                 Singletons.ServiceEngine.Tunnels.WriteEndpointEdgeData(
-                    notification.TunnelKey.SwapDirection(), notification.EndpointId, notification.EdgeId, notification.Bytes);
+                    notification.TunnelKey.SwapDirection(), notification.EndpointId, notification.EdgeId, notification.PacketSequence, notification.Bytes);
             }
             catch (Exception ex)
             {

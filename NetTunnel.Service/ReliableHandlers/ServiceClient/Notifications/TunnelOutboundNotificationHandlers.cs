@@ -41,7 +41,7 @@ namespace NetTunnel.Service.ReliableHandlers.ServiceClient.Notifications
             {
                 var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
 
-                tunnel.WriteEndpointEdgeData(notification.EndpointId, notification.EdgeId, notification.Bytes);
+                tunnel.WriteEndpointEdgeData(notification.EndpointId, notification.EdgeId, notification.PacketSequence, notification.Bytes);
             }
             catch (Exception ex)
             {

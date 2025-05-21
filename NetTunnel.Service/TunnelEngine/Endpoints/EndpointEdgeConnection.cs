@@ -16,6 +16,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         public Thread Thread { get; private set; }
         public ulong BytesReceived { get; internal set; }
         public ulong BytesSent { get; internal set; }
+        public PacketSequenceBuffer SequenceBuffer { get; internal set; } = new();
 
         public double ActivityAgeInMilliseconds
             => (DateTime.UtcNow - LastActivityDateTime).TotalMilliseconds;
@@ -39,11 +40,13 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             IsConnected = false;
         }
 
-        public void Write(byte[] buffer)
+        public void Write(long packetSequence, byte[] buffer)
         {
+            SequenceBuffer.WriteToStream(_stream, packetSequence, buffer);
+
             BytesSent += (ulong)buffer.Length;
             LastActivityDateTime = DateTime.UtcNow;
-            _stream.Write(buffer);
+            //_stream.Write(buffer);
         }
 
         public void Write(PumpBuffer buffer)

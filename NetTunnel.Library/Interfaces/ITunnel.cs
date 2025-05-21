@@ -47,9 +47,10 @@ namespace NetTunnel.Library.Interfaces
         /// <param name="tunnelKey">The id of the tunnel that owns the endpoint.</param>
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="edgeId">The id that will uniquely identity the associated endpoint connections at each service</param>
+        /// <param name="packetSequence">The sequence number of the packet for outbound buffering and ordering outbound edge data.</param>
         /// <param name="bytes">Bytes to be sent to endpoint connection.</param>
         /// <param name="length">Number of bytes to be sent to the endpoint connection.</param>
-        public void S2SPeerNotificationEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length);
+        public void S2SPeerNotificationEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, long packetSequence, byte[] bytes, int length);
 
         /// <summary>
         /// Sends a notification to the remote tunnel service to let it know to connect

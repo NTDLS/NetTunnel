@@ -13,7 +13,7 @@ namespace NetTunnel.Service.ReliableHandlers.ServiceClient
         {
             try
             {
-                var tunnel = (TunnelOutbound)context.Endpoint.Parameter.EnsureNotNull();
+                var tunnel = context.Messenger.Parameter.EnsureNotNull<TunnelOutbound>();
 
                 tunnel.EnforceLogin();
 

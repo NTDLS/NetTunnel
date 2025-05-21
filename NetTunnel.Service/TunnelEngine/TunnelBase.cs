@@ -89,7 +89,7 @@ namespace NetTunnel.Service.TunnelEngine
         S2SQueryUpsertEndpointReply ITunnel.S2SPeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointId)
            => throw new NotImplementedException("This function should be overridden.");
 
-        void ITunnel.S2SPeerNotificationEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length)
+        void ITunnel.S2SPeerNotificationEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, long sequence, byte[] bytes, int length)
            => throw new NotImplementedException("This function should be overridden.");
 
         void ITunnel.S2SPeerNotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
@@ -183,8 +183,8 @@ namespace NetTunnel.Service.TunnelEngine
             Singletons.Logger.Verbose($"Stopped tunnel '{Configuration.Name}'.");
         }
 
-        public void WriteEndpointEdgeData(Guid endpointId, Guid edgeId, byte[] bytes)
-            => Endpoints.Single(o => o.EndpointId == endpointId).WriteEndpointEdgeData(edgeId, bytes);
+        public void WriteEndpointEdgeData(Guid endpointId, Guid edgeId, long packetSequence, byte[] bytes)
+            => Endpoints.Single(o => o.EndpointId == endpointId).WriteEndpointEdgeData(edgeId, packetSequence, bytes);
 
         #region Add/Delete Endpoints.
 
