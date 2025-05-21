@@ -18,7 +18,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
         /// The remote service is letting us know that they are about to start using the cryptography provider,
         /// so we need to apply the one that we have ready on this end.
         /// </summary>
-        public void OnNotify(RmContext context, UOSNotificationApplyCryptography notification)
+        public UOSNotificationApplyCryptographyQueryReply OnNotify(RmContext context, UOSNotificationApplyCryptographyQuery notification)
         {
             try
             {
@@ -31,6 +31,8 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
                 Singletons.Logger.Exception(ex);
                 throw;
             }
+
+            return new UOSNotificationApplyCryptographyQueryReply();
         }
 
         public void OnNotify(RmContext context, S2SNotificationEndpointConnect notification)

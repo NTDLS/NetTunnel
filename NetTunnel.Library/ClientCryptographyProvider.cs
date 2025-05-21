@@ -22,7 +22,7 @@ namespace NetTunnel.Library
                     tunnel.IncrementBytesReceived(encryptedPayload.Length);
                 }
 
-                _streamCryptography.Cipher(encryptedPayload);
+                //_streamCryptography.Cipher(encryptedPayload);
             }
             return encryptedPayload;
         }

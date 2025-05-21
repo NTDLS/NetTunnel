@@ -24,7 +24,7 @@ namespace NetTunnel.Service.TunnelEngine
                 {
                     lock (connection.StreamCryptography)
                     {
-                        connection.StreamCryptography.Cipher(encryptedPayload);
+                        //connection.StreamCryptography.Cipher(encryptedPayload);
                     }
                 }
             }
@@ -44,7 +44,7 @@ namespace NetTunnel.Service.TunnelEngine
                 {
                     lock (connection.StreamCryptography)
                     {
-                        connection.StreamCryptography.Cipher(payload);
+                        //connection.StreamCryptography.Cipher(payload);
                     }
                 }
             }

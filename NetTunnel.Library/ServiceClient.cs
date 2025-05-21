@@ -135,8 +135,12 @@ namespace NetTunnel.Library
                 $"Tunnel cryptography initialized to {compoundNegotiator.SharedSecret.Length * 8}bits. Hash {Utility.ComputeSha256Hash(compoundNegotiator.SharedSecret)}.");
 
             //Tell the server we are switching to encryption.
-            Client.Notify(new UOSNotificationApplyCryptography());
-            Client.SetCryptographyProvider(cryptographyProvider);
+            Client.Query(new UOSNotificationApplyCryptographyQuery(),
+                () =>
+                {
+                    //Now that the query frame has been built (unencrypted), apply the cryptography provider.
+                    Client.SetCryptographyProvider(cryptographyProvider);
+                }).Wait();
 
             _logger.Verbose("Tunnel cryptography provider has been applied.");
 
