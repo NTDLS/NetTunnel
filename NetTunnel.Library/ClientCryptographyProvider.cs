@@ -22,7 +22,7 @@ namespace NetTunnel.Library
                     tunnel.IncrementBytesReceived(encryptedPayload.Length);
                 }
 
-                //_streamCryptography.Cipher(encryptedPayload);
+                _streamCryptography.Cipher(encryptedPayload);
             }
             return encryptedPayload;
         }
@@ -36,7 +36,7 @@ namespace NetTunnel.Library
                     tunnel.IncrementBytesSent(payload.Length);
                 }
 
-                //_streamCryptography.Cipher(payload);
+                _streamCryptography.Cipher(payload);
             }
             return payload;
         }
