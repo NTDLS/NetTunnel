@@ -136,7 +136,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 CurrentConnections++;
             }
 
-            long packetSequence = 0;
+            long packetSequence = -1;
 
             try
             {
@@ -153,6 +153,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                 while (KeepRunning && edgeConnection.IsConnected && edgeConnection.Read(ref buffer))
                 {
+                    packetSequence++;
+
                     lock (_statisticsLock)
                     {
                         BytesReceived += (ulong)buffer.Length;
@@ -209,9 +211,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     _tunnel.S2SPeerNotificationEndpointDataExchange(
                         _tunnel.TunnelKey, Configuration.EndpointId, edgeConnection.EdgeId, packetSequence, buffer.Bytes, buffer.Length);
 
-                    buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);
-
-                    packetSequence++;
+                    //buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);
                 }
             }
             catch (IOException ex)

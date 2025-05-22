@@ -35,7 +35,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
             return new UOSNotificationApplyCryptographyQueryReply();
         }
 
-        public void OnNotify(RmContext context, S2SNotificationEndpointConnect notification)
+        public S2SNotificationEndpointConnectQueryReply OnNotify(RmContext context, S2SNotificationEndpointConnectQuery notification)
         {
             try
             {
@@ -45,6 +45,8 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
 
                 Singletons.ServiceEngine.Tunnels.EstablishOutboundEndpointConnection(
                     notification.TunnelKey.SwapDirection(), notification.EndpointId, notification.EdgeId);
+
+                return new S2SNotificationEndpointConnectQueryReply();
             }
             catch (Exception ex)
             {

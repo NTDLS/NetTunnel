@@ -44,7 +44,6 @@ namespace NetTunnel.Service.TunnelEngine
             _messageServer = new RmServer(new RmConfiguration()
             {
                 Parameter = this,
-                //FrameDelimiter = Singletons.Configuration.FrameDelimiter,
                 InitialReceiveBufferSize = Singletons.Configuration.InitialReceiveBufferSize,
                 MaxReceiveBufferSize = Singletons.Configuration.MaxReceiveBufferSize,
                 ReceiveBufferGrowthRate = Singletons.Configuration.ReceiveBufferGrowthRate,
@@ -110,7 +109,7 @@ namespace NetTunnel.Service.TunnelEngine
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="edgeId">The id that will uniquely identity the associated endpoint connections at each service</param>
         public void S2SPeerNotificationEndpointConnect(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
-            => _messageServer.Notify(connectionId, new S2SNotificationEndpointConnect(tunnelKey, endpointId, edgeId));
+            => _messageServer.Query(connectionId, new S2SNotificationEndpointConnectQuery(tunnelKey, endpointId, edgeId));
 
         public void S2SPeerNotificationEndpointDisconnect(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
             => _messageServer.Notify(connectionId, new S2SNotificationEndpointDisconnect(tunnelKey, endpointId, edgeId));

@@ -7,14 +7,14 @@
 
         public PumpBuffer(int initialSize)
         {
-            Bytes = new byte[initialSize];
+            Bytes = new byte[1028];
         }
 
         public void AutoResize(int maxBufferSize)
         {
             if (Length == Bytes.Length && Bytes.Length < maxBufferSize)
             {
-                //If we read as much data as we could fit in the buffer, resize it a bit up to the maximum.
+                //If we read as much data as we could fit in the buffer, resize it a bit until it reached the maximum.
                 int newBufferSize = (int)(Bytes.Length + (Bytes.Length * 0.20));
                 if (newBufferSize > maxBufferSize)
                 {

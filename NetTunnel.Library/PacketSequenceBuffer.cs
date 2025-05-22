@@ -2,32 +2,31 @@
 {
     public class PacketSequenceBuffer
     {
-        public Dictionary<long, byte[]> Buffer { get; set; } = new();
+        private readonly Dictionary<long, byte[]> _buffer = new();
 
-        private long _lastConsumedPacketSequence = -1;
+        private long _lastConsumedSequence = -1;
 
         public void WriteToStream(Stream stream, long sequence, byte[] data)
         {
-            //stream.Write(data);
-
-            lock (Buffer)
+            lock (_buffer)
             {
                 //The next packet in the sequence is the next one that needs to be sent. Flush it to the stream.
-                if (_lastConsumedPacketSequence + 1 == sequence)
+                if (_lastConsumedSequence + 1 == sequence)
                 {
-                    _lastConsumedPacketSequence = sequence;
+                    _lastConsumedSequence = sequence;
                     stream.Write(data);
-                    return;
+                }
+                else
+                {
+                    //We received out-of-order packets. Store them in the buffer.
+                    _buffer.Add(sequence, data);
                 }
 
-                //We received out-of-order packets. Store them in the buffer.
-                Buffer.Add(sequence, data);
-
                 //Flush any packets that are now in order.
-                while (Buffer.TryGetValue(_lastConsumedPacketSequence + 1, out var bytes))
+                while (_buffer.TryGetValue(_lastConsumedSequence + 1, out var bytes))
                 {
-                    Buffer.Remove(_lastConsumedPacketSequence + 1);
-                    _lastConsumedPacketSequence++;
+                    _buffer.Remove(_lastConsumedSequence + 1);
+                    _lastConsumedSequence++;
                     stream.Write(bytes);
                 }
             }

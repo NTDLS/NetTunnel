@@ -46,14 +46,6 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
             BytesSent += (ulong)buffer.Length;
             LastActivityDateTime = DateTime.UtcNow;
-            //_stream.Write(buffer);
-        }
-
-        public void Write(PumpBuffer buffer)
-        {
-            BytesSent += (ulong)buffer.Length;
-            LastActivityDateTime = DateTime.UtcNow;
-            _stream.Write(buffer.Bytes, 0, buffer.Length);
         }
 
         public bool Read(ref PumpBuffer buffer)
