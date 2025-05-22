@@ -18,7 +18,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
         /// The remote service is letting us know that they are about to start using the cryptography provider,
         /// so we need to apply the one that we have ready on this end.
         /// </summary>
-        public void OnNotify(RmContext context, UOSNotificationApplyCryptography notification)
+        public UOSNotificationApplyCryptographyQueryReply OnNotify(RmContext context, UOSNotificationApplyCryptographyQuery notification)
         {
             try
             {
@@ -31,9 +31,11 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
                 Singletons.Logger.Exception(ex);
                 throw;
             }
+
+            return new UOSNotificationApplyCryptographyQueryReply();
         }
 
-        public void OnNotify(RmContext context, S2SNotificationEndpointConnect notification)
+        public S2SNotificationEndpointConnectQueryReply OnNotify(RmContext context, S2SNotificationEndpointConnectQuery notification)
         {
             try
             {
@@ -43,6 +45,8 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
 
                 Singletons.ServiceEngine.Tunnels.EstablishOutboundEndpointConnection(
                     notification.TunnelKey.SwapDirection(), notification.EndpointId, notification.EdgeId);
+
+                return new S2SNotificationEndpointConnectQueryReply();
             }
             catch (Exception ex)
             {
@@ -62,7 +66,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
                 var connectionContext = GetServiceConnectionContext(context);
 
                 Singletons.ServiceEngine.Tunnels.WriteEndpointEdgeData(
-                    notification.TunnelKey.SwapDirection(), notification.EndpointId, notification.EdgeId, notification.Bytes);
+                    notification.TunnelKey.SwapDirection(), notification.EndpointId, notification.EdgeId, notification.PacketSequence, notification.Bytes);
             }
             catch (Exception ex)
             {

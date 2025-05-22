@@ -13,7 +13,7 @@ namespace NetTunnel.Service.ReliableHandlers.ServiceClient.Notifications
         ///SEARCH FOR: Process:Endpoint:Connect:004: The remote service has communicated though the tunnel that we need to
         ///  establish an associated outbound endpoint connection.
         /// </summary>
-        public void OnNotify(RmContext context, S2SNotificationEndpointConnect notification)
+        public S2SNotificationEndpointConnectQueryReply OnNotify(RmContext context, S2SNotificationEndpointConnectQuery notification)
         {
             try
             {
@@ -23,6 +23,8 @@ namespace NetTunnel.Service.ReliableHandlers.ServiceClient.Notifications
 
                 Singletons.ServiceEngine.Tunnels.EstablishOutboundEndpointConnection(
                     notification.TunnelKey.SwapDirection(), notification.EndpointId, notification.EdgeId);
+
+                return new S2SNotificationEndpointConnectQueryReply();
             }
             catch (Exception ex)
             {
@@ -41,7 +43,7 @@ namespace NetTunnel.Service.ReliableHandlers.ServiceClient.Notifications
             {
                 var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
 
-                tunnel.WriteEndpointEdgeData(notification.EndpointId, notification.EdgeId, notification.Bytes);
+                tunnel.WriteEndpointEdgeData(notification.EndpointId, notification.EdgeId, notification.PacketSequence, notification.Bytes);
             }
             catch (Exception ex)
             {

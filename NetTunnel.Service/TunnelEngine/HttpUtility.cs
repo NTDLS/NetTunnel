@@ -14,7 +14,7 @@ namespace NetTunnel.Service
             "connect", "delete", "get", "head", "options", "patch", "post", "put", "trace"
         ];
 
-        public static NtHTTPHeaderResult Process(ref StringBuilder httpHeaderBuilder, EndpointConfiguration endpointConfig, PumpBuffer buffer)
+        public static NtHTTPHeaderResult Process(ref StringBuilder httpHeaderBuilder, EndpointConfiguration endpointConfig, ReceiveBuffer buffer)
         {
             try
             {

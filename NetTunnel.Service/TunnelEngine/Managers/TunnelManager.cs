@@ -282,14 +282,14 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
-        public void WriteEndpointEdgeData(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes)
+        public void WriteEndpointEdgeData(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, long packetSequence, byte[] bytes)
         {
             Collection.Use((o) =>
             {
                 var tunnel = o.Single(o => o.TunnelKey == tunnelKey);
                 var endpoint = tunnel.Endpoints.Single(o => o.EndpointId == endpointId);
 
-                endpoint.WriteEndpointEdgeData(edgeId, bytes);
+                endpoint.WriteEndpointEdgeData(edgeId, packetSequence, bytes);
             });
         }
 
@@ -311,7 +311,6 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             Collection.Use((o) =>
             {
                 o.Clear();
-
                 CommonApplicationData.LoadFromDisk<List<TunnelConfiguration>>(FriendlyName)?
                     .ForEach(c =>
                     {

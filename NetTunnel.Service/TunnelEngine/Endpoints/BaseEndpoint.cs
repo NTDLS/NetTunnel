@@ -104,7 +104,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             });
         }
 
-        public void WriteEndpointEdgeData(Guid edgeId, byte[] buffer)
+        public void WriteEndpointEdgeData(Guid edgeId, long packetSequence, byte[] buffer)
         {
             lock (_statisticsLock)
             {
@@ -117,7 +117,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 return edgeConnection;
             });
 
-            edgeConnection?.Write(buffer);
+            edgeConnection?.Write(packetSequence, buffer);
         }
 
         /// <summary>
@@ -136,6 +136,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 CurrentConnections++;
             }
 
+            long packetSequence = -1;
+
             try
             {
                 if (Configuration.Direction == NtDirection.Inbound)
@@ -147,10 +149,12 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                 var httpHeaderBuilder = new StringBuilder();
 
-                var buffer = new PumpBuffer(Singletons.Configuration.InitialReceiveBufferSize);
+                var buffer = new ReceiveBuffer(Singletons.Configuration.InitialReceiveBufferSize);
 
                 while (KeepRunning && edgeConnection.IsConnected && edgeConnection.Read(ref buffer))
                 {
+                    packetSequence++;
+
                     lock (_statisticsLock)
                     {
                         BytesReceived += (ulong)buffer.Length;
@@ -161,21 +165,19 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     if (
                          //Only parse HTTP headers if the traffic type is HTTP.
                          Configuration.TrafficType == NtTrafficType.Http
-                         &&
-                         (
+                         && (
                             // and the direction is inbound/any and we have request rules.
                             (
-                             this is EndpointInbound && Configuration.HttpHeaderRules
-                                .Any(o => o.Enabled && (new[] { NtHttpHeaderType.Request, NtHttpHeaderType.Any }).Contains(o.HeaderType))
+                                this is EndpointInbound && Configuration.HttpHeaderRules
+                                    .Any(o => o.Enabled && (new[] { NtHttpHeaderType.Request, NtHttpHeaderType.Any }).Contains(o.HeaderType))
                             )
-                            ||
-                            (
+                            || (
                                 // or the direction is outbound/any and we have response rules.
                                 this is EndpointOutbound && Configuration.HttpHeaderRules
                                     .Any(o => o.Enabled && (new[] { NtHttpHeaderType.Request, NtHttpHeaderType.Any }).Contains(o.HeaderType))
                             )
                          )
-                     )
+                    )
                     {
                         switch (HttpUtility.Process(ref httpHeaderBuilder, Configuration, buffer))
                         {
@@ -189,7 +191,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                                 var httpHeaderBytes = Encoding.UTF8.GetBytes(httpHeaderBuilder.ToString());
 
                                 _tunnel.S2SPeerNotificationEndpointDataExchange(
-                                    _tunnel.TunnelKey, EndpointId, edgeConnection.EdgeId, httpHeaderBytes, httpHeaderBytes.Length);
+                                    _tunnel.TunnelKey, EndpointId, edgeConnection.EdgeId, packetSequence, httpHeaderBytes, httpHeaderBytes.Length);
 
                                 httpHeaderBuilder.Clear();
                                 break;
@@ -205,7 +207,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     //  endpoint and endpoint-edge-connection (edgeId). At the tunnel-peer, This data will be
                     //  sent to whatever is connected to the endpoint via a call to WriteEndpointEdgeData().
                     _tunnel.S2SPeerNotificationEndpointDataExchange(
-                        _tunnel.TunnelKey, Configuration.EndpointId, edgeConnection.EdgeId, buffer.Bytes, buffer.Length);
+                        _tunnel.TunnelKey, Configuration.EndpointId, edgeConnection.EdgeId, packetSequence, buffer.Bytes, buffer.Length);
 
                     buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);
                 }
@@ -307,6 +309,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     connections.Add(connection);
                 }
             });
+
             return connections;
         }
     }

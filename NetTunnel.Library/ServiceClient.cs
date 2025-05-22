@@ -6,7 +6,6 @@ using NetTunnel.Library.ReliablePayloads.Notification.UIOrService;
 using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
 using NetTunnel.Library.ReliablePayloads.Query.UI;
 using NetTunnel.Library.ReliablePayloads.Query.UIOrService;
-using NetTunnel.Service.ReliableMessages;
 using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
 using NTDLS.SecureKeyExchange;
@@ -97,6 +96,7 @@ namespace NetTunnel.Library
                 MaxReceiveBufferSize = configuration.MaxReceiveBufferSize,
                 ReceiveBufferGrowthRate = configuration.ReceiveBufferGrowthRate,
             });
+            client.SetCompressionProvider(new RmDeflateCompressionProvider());
 
             return new ServiceClient(logger, configuration, client, address, port, userName, passwordHash);
         }
@@ -135,8 +135,12 @@ namespace NetTunnel.Library
                 $"Tunnel cryptography initialized to {compoundNegotiator.SharedSecret.Length * 8}bits. Hash {Utility.ComputeSha256Hash(compoundNegotiator.SharedSecret)}.");
 
             //Tell the server we are switching to encryption.
-            Client.Notify(new UOSNotificationApplyCryptography());
-            Client.SetCryptographyProvider(cryptographyProvider);
+            Client.Query(new UOSNotificationApplyCryptographyQuery(),
+                () =>
+                {
+                    //Now that the query frame has been built (unencrypted), apply the cryptography provider.
+                    Client.SetCryptographyProvider(cryptographyProvider);
+                }).Wait();
 
             _logger.Verbose("Tunnel cryptography provider has been applied.");
 
@@ -169,7 +173,7 @@ namespace NetTunnel.Library
             => Client.Query(new S2SQueryRegisterTunnel(configuration)).Result;
 
         public void S2SNotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
-            => Client.Notify(new S2SNotificationEndpointConnect(tunnelKey, endpointId, edgeId));
+            => Client.Query(new S2SNotificationEndpointConnectQuery(tunnelKey, endpointId, edgeId));
 
         public void S2SPeerNotificationEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
             => Client.Notify(new S2SNotificationEndpointDisconnect(tunnelKey, endpointId, edgeId));
@@ -180,8 +184,8 @@ namespace NetTunnel.Library
         public void S2SPeerNotificationEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
             => Client.Notify(new S2SNotificationEndpointDeletion(tunnelKey, endpointId));
 
-        public void S2SNotificationEndpointExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, byte[] bytes, int length)
-            => Client.Notify(new S2SNotificationEndpointDataExchange(tunnelKey, endpointId, edgeId, bytes, length));
+        public void S2SNotificationEndpointExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, long packetSequence, byte[] bytes, int length)
+            => Client.Notify(new S2SNotificationEndpointDataExchange(tunnelKey, endpointId, edgeId, packetSequence, bytes, length));
 
         public S2SQueryUpsertEndpointReply S2SPeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpoint)
             => Client.Query(new S2SQueryUpsertEndpoint(tunnelKey, endpoint)).Result;

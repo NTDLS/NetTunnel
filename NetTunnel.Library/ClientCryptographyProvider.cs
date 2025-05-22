@@ -1,29 +1,28 @@
 ﻿using NetTunnel.Library.Interfaces;
-using NTDLS.NASCCL;
+using NTDLS.Permafrost;
 using NTDLS.ReliableMessaging;
 
-namespace NetTunnel.Service.ReliableMessages
+namespace NetTunnel.Library
 {
     public class ClientCryptographyProvider : IRmCryptographyProvider
     {
-        private readonly CryptoStream _streamCryptography;
+        private readonly PermafrostCipher _streamCryptography;
 
         public ClientCryptographyProvider(byte[] cryptographyKey)
         {
-            _streamCryptography = new CryptoStream(cryptographyKey);
+            _streamCryptography = new PermafrostCipher(cryptographyKey, PermafrostMode.AutoReset);
         }
 
         public byte[] Decrypt(RmContext context, byte[] encryptedPayload)
         {
             lock (_streamCryptography)
             {
-                if (context.Endpoint.Parameter is ITunnel tunnel)
+                if (context.Messenger.Parameter is ITunnel tunnel)
                 {
                     tunnel.IncrementBytesReceived(encryptedPayload.Length);
                 }
 
-                _streamCryptography.Cipher(ref encryptedPayload);
-                _streamCryptography.ResetStream();
+                _streamCryptography.Cipher(encryptedPayload);
             }
             return encryptedPayload;
         }
@@ -32,13 +31,12 @@ namespace NetTunnel.Service.ReliableMessages
         {
             lock (_streamCryptography)
             {
-                if (context.Endpoint.Parameter is ITunnel tunnel)
+                if (context.Messenger.Parameter is ITunnel tunnel)
                 {
                     tunnel.IncrementBytesSent(payload.Length);
                 }
 
-                _streamCryptography.Cipher(ref payload);
-                _streamCryptography.ResetStream();
+                _streamCryptography.Cipher(payload);
             }
             return payload;
         }

@@ -56,7 +56,7 @@ namespace NetTunnel.UI.Forms
 #if DEBUG
             textBoxName.Text = "My First Tunnel";
 
-            textBoxAddress.Text = "10.20.1.120";
+            textBoxAddress.Text = "10.20.1.113";
 
             textBoxUsername.Text = "debug";
             textBoxPassword.Text = "123456789";
@@ -71,14 +71,14 @@ namespace NetTunnel.UI.Forms
             {
                 textBoxName.GetAndValidateText("You must specify a name. This is for your identification only.");
                 textBoxAddress.GetAndValidateText("You must specify a remote tunnel address.");
-                textBoxPort.GetAndValidateNumeric(1, 65535, "You must specify a valid remote tunnel management port between [min] and [max].");
+                var connectPort = textBoxPort.GetAndValidateNumeric(1, 65535, "You must specify a valid remote tunnel management port between [min] and [max].");
                 textBoxUsername.GetAndValidateText("You must specify a remote tunnel username.");
                 textBoxPassword.GetAndValidateText("You must specify a valid remote tunnel password.");
 
                 var tunnelId = Guid.NewGuid(); //The TunnelId is the same on both services.
 
                 var tunnel = new TunnelConfiguration(_client.ServiceId, tunnelId, textBoxName.Text,
-                    textBoxAddress.Text, textBoxPort.ValueAs<int>(),
+                    textBoxAddress.Text, connectPort,
                     textBoxUsername.Text, Utility.ComputeSha256Hash(textBoxPassword.Text));
 
                 var progressForm = new ProgressForm(FriendlyName, "Logging in to remote tunnel...");

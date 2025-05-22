@@ -1,6 +1,6 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Payloads;
-using NTDLS.NASCCL;
+using NTDLS.Permafrost;
 using System.Net;
 using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
@@ -19,7 +19,7 @@ namespace NetTunnel.Service.TunnelEngine
     {
         public bool IsAuthenticated { get; private set; }
         public bool IsKeyExchangeComplete { get; private set; }
-        public CryptoStream? StreamCryptography { get; private set; }
+        public PermafrostCipher? StreamCryptography { get; private set; }
         public DateTime LoginTime { get; private set; } = DateTime.UtcNow;
         /// <summary>
         /// If the Service Connection is associated with a tunnel connection, this will be set at tunnel registration.
@@ -72,7 +72,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         public void InitializeCryptographyProvider(byte[] sharedSecret)
         {
-            StreamCryptography = new CryptoStream(sharedSecret);
+            StreamCryptography = new PermafrostCipher(sharedSecret, PermafrostMode.AutoReset);
 
             KeyHash = Utility.ComputeSha256Hash(sharedSecret);
             KeyLength = sharedSecret.Length;
