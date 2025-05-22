@@ -50,7 +50,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             LastActivityDateTime = DateTime.UtcNow;
         }
 
-        public bool Read(ref PumpBuffer buffer)
+        public bool Read(ref ReceiveBuffer buffer)
         {
             LastActivityDateTime = DateTime.UtcNow;
             buffer.Length = _stream.Read(buffer.Bytes, 0, buffer.Bytes.Length);

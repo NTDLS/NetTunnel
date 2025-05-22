@@ -1,11 +1,11 @@
 ﻿namespace NetTunnel.Library
 {
-    public class PumpBuffer
+    public class ReceiveBuffer
     {
         public byte[] Bytes { get; set; }
         public int Length { get; set; }
 
-        public PumpBuffer(int initialSize)
+        public ReceiveBuffer(int initialSize)
         {
             Bytes = new byte[initialSize];
         }

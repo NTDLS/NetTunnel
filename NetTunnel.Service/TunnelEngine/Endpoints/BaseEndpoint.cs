@@ -149,7 +149,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                 var httpHeaderBuilder = new StringBuilder();
 
-                var buffer = new PumpBuffer(Singletons.Configuration.InitialReceiveBufferSize);
+                var buffer = new ReceiveBuffer(Singletons.Configuration.InitialReceiveBufferSize);
 
                 while (KeepRunning && edgeConnection.IsConnected && edgeConnection.Read(ref buffer))
                 {
@@ -165,21 +165,19 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     if (
                          //Only parse HTTP headers if the traffic type is HTTP.
                          Configuration.TrafficType == NtTrafficType.Http
-                         &&
-                         (
+                         && (
                             // and the direction is inbound/any and we have request rules.
                             (
-                             this is EndpointInbound && Configuration.HttpHeaderRules
-                                .Any(o => o.Enabled && (new[] { NtHttpHeaderType.Request, NtHttpHeaderType.Any }).Contains(o.HeaderType))
+                                this is EndpointInbound && Configuration.HttpHeaderRules
+                                    .Any(o => o.Enabled && (new[] { NtHttpHeaderType.Request, NtHttpHeaderType.Any }).Contains(o.HeaderType))
                             )
-                            ||
-                            (
+                            || (
                                 // or the direction is outbound/any and we have response rules.
                                 this is EndpointOutbound && Configuration.HttpHeaderRules
                                     .Any(o => o.Enabled && (new[] { NtHttpHeaderType.Request, NtHttpHeaderType.Any }).Contains(o.HeaderType))
                             )
                          )
-                     )
+                    )
                     {
                         switch (HttpUtility.Process(ref httpHeaderBuilder, Configuration, buffer))
                         {
@@ -311,6 +309,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     connections.Add(connection);
                 }
             });
+
             return connections;
         }
     }
