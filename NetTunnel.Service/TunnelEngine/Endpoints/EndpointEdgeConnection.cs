@@ -1,5 +1,6 @@
 ﻿using NetTunnel.Library;
 using NTDLS.Helpers;
+using NTDLS.ReliableMessaging;
 using System.Net.Sockets;
 
 namespace NetTunnel.Service.TunnelEngine.Endpoints
@@ -16,7 +17,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         public Thread Thread { get; private set; }
         public ulong BytesReceived { get; internal set; }
         public ulong BytesSent { get; internal set; }
-        public PacketSequenceBuffer SequenceBuffer { get; internal set; } = new();
+        public RmSequenceBuffer<byte[]> SequenceBuffer { get; internal set; } = new();
 
         public double ActivityAgeInMilliseconds
             => (DateTime.UtcNow - LastActivityDateTime).TotalMilliseconds;
@@ -42,7 +43,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         public void Write(long packetSequence, byte[] buffer)
         {
-            SequenceBuffer.Consume(_stream, packetSequence, buffer);
+            SequenceBuffer.Process(packetSequence, buffer,
+                (data) => _stream.Write(data));
 
             BytesSent += (ulong)buffer.Length;
             LastActivityDateTime = DateTime.UtcNow;
@@ -62,6 +64,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
             Exceptions.Ignore(_stream.Dispose);
             Exceptions.Ignore(TcpClient.Dispose);
+            Exceptions.Ignore(SequenceBuffer.Clear);
         }
     }
 }
