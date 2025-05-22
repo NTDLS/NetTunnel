@@ -211,7 +211,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     _tunnel.S2SPeerNotificationEndpointDataExchange(
                         _tunnel.TunnelKey, Configuration.EndpointId, edgeConnection.EdgeId, packetSequence, buffer.Bytes, buffer.Length);
 
-                    //buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);
+                    buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);
                 }
             }
             catch (IOException ex)

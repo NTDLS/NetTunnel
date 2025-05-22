@@ -7,7 +7,7 @@
 
         public PumpBuffer(int initialSize)
         {
-            Bytes = new byte[1028];
+            Bytes = new byte[initialSize];
         }
 
         public void AutoResize(int maxBufferSize)
