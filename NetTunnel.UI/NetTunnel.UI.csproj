@@ -11,7 +11,7 @@
     <Company>NetworkDLS</Company>
     <Authors>NetworkDLS</Authors>
     <Copyright>Copyright © 2025 NetworkDLS</Copyright>
-    <Version>4.3.0</Version>
+    <Version>4.3.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
