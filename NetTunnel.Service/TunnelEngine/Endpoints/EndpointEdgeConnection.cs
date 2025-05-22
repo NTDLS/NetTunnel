@@ -42,7 +42,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         public void Write(long packetSequence, byte[] buffer)
         {
-            SequenceBuffer.WriteToStream(_stream, packetSequence, buffer);
+            SequenceBuffer.Consume(_stream, packetSequence, buffer);
 
             BytesSent += (ulong)buffer.Length;
             LastActivityDateTime = DateTime.UtcNow;
