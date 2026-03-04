@@ -9,14 +9,15 @@
  DefaultDirName                   = {commonpf}\NetworkDLS\NetTunnel
  DefaultGroupName                 = NetworkDLS\NetTunnel
  UninstallDisplayIcon             = {app}\NetTunnel.UI.exe
- SetupIconFile                    = "..\Images\Multi.ico"
+ SetupIconFile                    = "..\..\Images\Multi.ico"
  PrivilegesRequired               = admin
  Uninstallable                    = Yes
  MinVersion                       = 0.0,7.0
  Compression                      = bZIP/9
  ChangesAssociations              = Yes
- OutputBaseFilename               = NetTunnel {#AppVersion}
- ArchitecturesInstallIn64BitMode  = x64
+ OutputDir                        = /../Output/
+ OutputBaseFilename               = NetTunnel.Full.Windows.x64
+ ArchitecturesInstallIn64BitMode  = x64Compatible
  AppPublisher                     = NetworkDLS
  AppPublisherURL                  = http://www.NetworkDLS.com/
  AppUpdatesURL                    = http://www.NetworkDLS.com/
@@ -28,14 +29,8 @@
 
 
 [Files]
- Source: "..\NetTunnel.Service\bin\Release\net8.0\runtimes\*.*"; DestDir: "{app}\runtimes";  Flags: IgnoreVersion recursesubdirs;  Components: Base\Management;
- Source: "..\NetTunnel.Service\bin\Release\net8.0\*.exe";        DestDir: "{app}";           Flags: IgnoreVersion;                 Components: Base\Management;
- Source: "..\NetTunnel.Service\bin\Release\net8.0\*.dll";        DestDir: "{app}";           Flags: IgnoreVersion;                 Components: Base\Management;
- Source: "..\NetTunnel.Service\bin\Release\net8.0\*.json";       DestDir: "{app}";           Flags: IgnoreVersion;                 Components: Base\Management;
-
- Source: "..\NetTunnel.UI\bin\Release\net8.0-windows\*.exe";     DestDir: "{app}";           Flags: IgnoreVersion;                 Components: Base\Service;
- Source: "..\NetTunnel.UI\bin\Release\net8.0-windows\*.dll";     DestDir: "{app}";           Flags: IgnoreVersion;                 Components: Base\Service;
- Source: "..\NetTunnel.UI\bin\Release\net8.0-windows\*.json";    DestDir: "{app}";           Flags: IgnoreVersion;                 Components: Base\Service;
+ Source: "..\Publish\Windows.x64\NetTunnel.UI\*.*";        DestDir: "{app}";           Flags: IgnoreVersion;                 Components: Base\Management;
+ Source: "..\Publish\Windows.x64\NetTunnel.Service\*.*";   DestDir: "{app}";           Flags: IgnoreVersion;                 Components: Base\Service;
   
 [Icons]
  Name: "{commondesktop}\NetTunnel Manager"; Filename: "{app}\NetTunnel.UI.exe";                                                    Components: Base\Management;
