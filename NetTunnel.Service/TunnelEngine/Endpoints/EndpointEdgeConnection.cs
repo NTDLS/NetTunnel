@@ -43,7 +43,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         public void Write(long packetSequence, byte[] buffer)
         {
-            SequenceBuffer.Process(packetSequence, buffer,
+            SequenceBuffer.Process(buffer, packetSequence,
                 (data) => _stream.Write(data));
 
             BytesSent += (ulong)buffer.Length;

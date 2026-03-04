@@ -38,9 +38,12 @@ namespace NetTunnel.UI.Forms
             // 
             // listViewProperties
             // 
+            listViewProperties.Activation = ItemActivation.OneClick;
             listViewProperties.Columns.AddRange(new ColumnHeader[] { columnHeaderProperty, columnHeaderValue });
             listViewProperties.Dock = DockStyle.Fill;
             listViewProperties.FullRowSelect = true;
+            listViewProperties.GridLines = true;
+            listViewProperties.HoverSelection = true;
             listViewProperties.Location = new Point(0, 0);
             listViewProperties.Name = "listViewProperties";
             listViewProperties.Size = new Size(704, 381);

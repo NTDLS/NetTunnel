@@ -88,19 +88,19 @@ namespace NetTunnel.UI.Forms
             var toolTips = ToolTipHelpers.CreateToolTipControl(this);
 
             toolTips.AddControls([labelName, textBoxName],
-                "name or description you want to use to identify this endpoint.");
+                "Name or description you want to use to identify this endpoint.");
 
             toolTips.AddControls([labelListenPort, textBoxListenPort],
-                "The port that will accept new connections at the inbound endpoint.");
+                "Port that will accept new connections at the inbound endpoint.");
 
             toolTips.AddControls([labelTerminationAddress, textBoxTerminationAddress],
-                "The host name, domain or IP address that the outbound endpoint will make a connection to.");
+                "Host name, domain or IP address that the outbound endpoint will make a connection to.");
 
             toolTips.AddControls([labelTerminationPort, textBoxTerminationPort],
-                "The host name, domain or IP address that the outbound endpoint will make a connection to.");
+                "Host name, domain or IP address that the outbound endpoint will make a connection to.");
 
             toolTips.AddControls([labelTrafficType, comboBoxTrafficType],
-                "The type of traffic that is expected be tunneled on this endpoint. Note that HTTP headers can only be manipulated if HTTP is selected (HTTPS is not supported for header manipulation). ");
+                "Type of traffic that is expected be tunneled on this endpoint. Note that HTTP headers can only be manipulated if HTTP is selected (HTTPS is not supported for header manipulation). ");
 
             #endregion
 

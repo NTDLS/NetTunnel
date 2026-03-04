@@ -31,10 +31,10 @@ namespace NetTunnel.UI.Forms
             var toolTips = ToolTipHelpers.CreateToolTipControl(this);
 
             toolTips.AddControls([labelUsername, textBoxUsername],
-                "The user name which the user will use when logging in to the NetTunnel service.");
+                "User name which the user will use when logging in to the NetTunnel service.");
 
             toolTips.AddControls([labelPassword, textBoxPassword, labelConfirmPassword, textBoxConfirmPassword],
-                "The password which the user will use when logging in to the NetTunnel service.");
+                "Password which the user will use when logging in to the NetTunnel service.");
 
             #endregion
 

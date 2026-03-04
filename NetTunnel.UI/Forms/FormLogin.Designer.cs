@@ -41,6 +41,7 @@
             textBoxAddress = new TextBox();
             labelAddress = new Label();
             buttonAbout = new Button();
+            checkBoxRememberPassword = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)pictureBoxLogin).BeginInit();
             SuspendLayout();
             // 
@@ -77,7 +78,7 @@
             textBoxUsername.Location = new Point(90, 90);
             textBoxUsername.Name = "textBoxUsername";
             textBoxUsername.Size = new Size(275, 23);
-            textBoxUsername.TabIndex = 5;
+            textBoxUsername.TabIndex = 2;
             // 
             // textBoxPassword
             // 
@@ -85,24 +86,24 @@
             textBoxPassword.Name = "textBoxPassword";
             textBoxPassword.PasswordChar = '*';
             textBoxPassword.Size = new Size(275, 23);
-            textBoxPassword.TabIndex = 0;
+            textBoxPassword.TabIndex = 3;
             // 
             // buttonCancel
             // 
-            buttonCancel.Location = new Point(209, 189);
+            buttonCancel.Location = new Point(209, 202);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(75, 23);
-            buttonCancel.TabIndex = 2;
+            buttonCancel.TabIndex = 6;
             buttonCancel.Text = "Cancel";
             buttonCancel.UseVisualStyleBackColor = true;
             buttonCancel.Click += ButtonCancel_Click;
             // 
             // buttonLogin
             // 
-            buttonLogin.Location = new Point(290, 189);
+            buttonLogin.Location = new Point(290, 202);
             buttonLogin.Name = "buttonLogin";
             buttonLogin.Size = new Size(75, 23);
-            buttonLogin.TabIndex = 1;
+            buttonLogin.TabIndex = 5;
             buttonLogin.Text = "Login";
             buttonLogin.UseVisualStyleBackColor = true;
             buttonLogin.Click += ButtonLogin_Click;
@@ -121,14 +122,14 @@
             textBoxPort.Location = new Point(294, 34);
             textBoxPort.Name = "textBoxPort";
             textBoxPort.Size = new Size(71, 23);
-            textBoxPort.TabIndex = 4;
+            textBoxPort.TabIndex = 1;
             // 
             // textBoxAddress
             // 
             textBoxAddress.Location = new Point(90, 34);
             textBoxAddress.Name = "textBoxAddress";
             textBoxAddress.Size = new Size(198, 23);
-            textBoxAddress.TabIndex = 3;
+            textBoxAddress.TabIndex = 0;
             // 
             // labelAddress
             // 
@@ -141,20 +142,31 @@
             // 
             // buttonAbout
             // 
-            buttonAbout.Location = new Point(19, 189);
+            buttonAbout.Location = new Point(23, 202);
             buttonAbout.Name = "buttonAbout";
             buttonAbout.Size = new Size(75, 23);
-            buttonAbout.TabIndex = 10;
+            buttonAbout.TabIndex = 7;
             buttonAbout.TabStop = false;
             buttonAbout.Text = "About";
             buttonAbout.UseVisualStyleBackColor = true;
             buttonAbout.Click += ButtonAbout_Click;
             // 
+            // checkBoxRememberPassword
+            // 
+            checkBoxRememberPassword.AutoSize = true;
+            checkBoxRememberPassword.Location = new Point(90, 170);
+            checkBoxRememberPassword.Name = "checkBoxRememberPassword";
+            checkBoxRememberPassword.Size = new Size(137, 19);
+            checkBoxRememberPassword.TabIndex = 4;
+            checkBoxRememberPassword.Text = "Remember Password";
+            checkBoxRememberPassword.UseVisualStyleBackColor = true;
+            // 
             // FormLogin
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(380, 227);
+            ClientSize = new Size(380, 237);
+            Controls.Add(checkBoxRememberPassword);
             Controls.Add(buttonAbout);
             Controls.Add(labelPort);
             Controls.Add(textBoxPort);
@@ -194,5 +206,6 @@
         private TextBox textBoxAddress;
         private Label labelAddress;
         private Button buttonAbout;
+        private CheckBox checkBoxRememberPassword;
     }
 }

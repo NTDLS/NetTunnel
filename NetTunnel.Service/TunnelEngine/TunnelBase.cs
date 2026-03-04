@@ -113,7 +113,7 @@ namespace NetTunnel.Service.TunnelEngine
         public TunnelPropertiesDisplay GetProperties()
         {
             var serviceConnectionState = Singletons.ServiceEngine
-                .ServiceConnectionStates.Use(o => o.SingleOrDefault(o => o.Value.TunnelKey?.Id == TunnelKey.Id).Value);
+                .ServiceConnectionStates.Use(o => o.SingleOrDefault(o => o.Value.TunnelKey == TunnelKey).Value);
 
             var prop = new TunnelPropertiesDisplay()
             {

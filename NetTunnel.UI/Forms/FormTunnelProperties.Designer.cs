@@ -41,9 +41,10 @@ namespace NetTunnel.UI.Forms
             listViewProperties.Columns.AddRange(new ColumnHeader[] { columnHeaderProperty, columnHeaderValue });
             listViewProperties.Dock = DockStyle.Fill;
             listViewProperties.FullRowSelect = true;
+            listViewProperties.GridLines = true;
             listViewProperties.Location = new Point(0, 0);
             listViewProperties.Name = "listViewProperties";
-            listViewProperties.Size = new Size(704, 381);
+            listViewProperties.Size = new Size(636, 501);
             listViewProperties.TabIndex = 0;
             listViewProperties.UseCompatibleStateImageBehavior = false;
             listViewProperties.View = View.Details;
@@ -62,7 +63,7 @@ namespace NetTunnel.UI.Forms
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(704, 381);
+            ClientSize = new Size(636, 501);
             Controls.Add(listViewProperties);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;

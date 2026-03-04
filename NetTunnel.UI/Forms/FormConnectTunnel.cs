@@ -28,19 +28,19 @@ namespace NetTunnel.UI.Forms
             var toolTips = ToolTipHelpers.CreateToolTipControl(this);
 
             toolTips.AddControls([textBoxName],
-                "The name or description you want to use to identify this tunnel.");
+                "Name or description you want to use to identify this tunnel.");
 
             toolTips.AddControls([labelAddress, textBoxAddress],
-                "The host name, domain or IP address of the remote NetTunnel service you want the new tunnel to connect to.");
+                "Host name, domain, or IP address of the remote NetTunnel service you want the new tunnel to connect to.");
 
             toolTips.AddControls([labelPort, textBoxPort],
-                "The port of the remote NetTunnel service you want the new tunnel to connect to.");
+                "Port of the remote NetTunnel service you want the new tunnel to connect to.");
 
             toolTips.AddControls([labelUsername, textBoxUsername],
-                "The username that will be used when connecting the tunnel to the remote NetTunnel service.");
+                "Username that will be used when connecting the tunnel to the remote NetTunnel service.");
 
             toolTips.AddControls([labelPassword, textBoxPassword],
-                "The password that will be used when connecting the tunnel to the remote NetTunnel service.");
+                "Password that will be used when connecting the tunnel to the remote NetTunnel service.");
 
             #endregion
 
