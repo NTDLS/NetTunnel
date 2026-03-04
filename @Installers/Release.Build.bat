@@ -17,7 +17,11 @@ del Publish\Windows.x64\NetTunnel.UI\*.pdb
 REM Compile service for Linux.x64.
 dotnet publish ..\NetTunnel.Service -c Release -o publish\Linux.x64\NetTunnel.Service --runtime linux-x64 --self-contained false
 del Publish\Linux.x64\NetTunnel.Service\*.pdb
+REM Compile service for Linux.Arm64.
+dotnet publish ..\NetTunnel.Service -c Release -o publish\Linux.Arm64\NetTunnel.Service --runtime linux-arm64 --self-contained false
+del Publish\Linux.Arm64\NetTunnel.Service\*.pdb
 
+7z.exe a -tzip -r -mx9 ".\Output\NetTunnel.Service.Linux.Arm64.zip" ".\publish\Linux.Arm64\NetTunnel.Service\*.*"
 7z.exe a -tzip -r -mx9 ".\Output\NetTunnel.Service.Linux.x64.zip" ".\publish\Linux.x64\NetTunnel.Service\*.*"
 
 iscc ./InnoScripts/NetTunnel.Full.Windows.x64.Iss
