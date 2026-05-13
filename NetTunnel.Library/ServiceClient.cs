@@ -69,7 +69,7 @@ namespace NetTunnel.Library
             OnException?.Invoke(context, ex, payload);
         }
 
-        private void Client_OnConnected(RmContext context)
+        private void Client_OnConnected(RmContext context, bool isReconnect)
             => OnConnected?.Invoke(context);
 
         #region Factory.
@@ -123,7 +123,7 @@ namespace NetTunnel.Library
 
             //The first thing we do when we get a connection is start a new key exchange process.
             var queryRequestKeyExchangeReply = Client.Query(
-                new UOSQueryRequestKeyExchange(negotiationToken), TimeSpan.FromMilliseconds(_configuration.MessageQueryTimeoutMs)).Result;
+                new UOSQueryRequestKeyExchange(negotiationToken), TimeSpan.FromMilliseconds(_configuration.MessageQueryTimeoutMs));
 
             //We received a reply to the secure key exchange, apply it.
             compoundNegotiator.ApplyNegotiationResponseToken(queryRequestKeyExchangeReply.NegotiationToken);
@@ -140,12 +140,12 @@ namespace NetTunnel.Library
                 {
                     //Now that the query frame has been built (unencrypted), apply the cryptography provider.
                     Client.SetCryptographyProvider(cryptographyProvider);
-                }).Wait();
+                });
 
             _logger.Verbose("Tunnel cryptography provider has been applied.");
 
             //Login.
-            var login = Client.Query(new UOSQueryLogin(_userName, _passwordHash, loginType)).Result;
+            var login = Client.Query(new UOSQueryLogin(_userName, _passwordHash, loginType));
             if (login.Successful == false)
             {
                 Exceptions.Ignore(() => Client.Disconnect());
@@ -165,12 +165,12 @@ namespace NetTunnel.Library
 
         public double S2SQueryPing(DirectionalKey tunnelKey, double? previousPing)
         {
-            var result = Client.Query(new S2SQueryPing(tunnelKey, previousPing)).Result;
+            var result = Client.Query(new S2SQueryPing(tunnelKey, previousPing));
             return (DateTime.UtcNow - result.OriginationTimestamp).TotalMilliseconds;
         }
 
         public S2SQueryRegisterTunnelReply S2SQueryRegisterTunnel(TunnelConfiguration configuration)
-            => Client.Query(new S2SQueryRegisterTunnel(configuration)).Result;
+            => Client.Query(new S2SQueryRegisterTunnel(configuration));
 
         public void S2SNotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
             => Client.Query(new S2SNotificationEndpointConnectQuery(tunnelKey, endpointId, edgeId));
@@ -188,68 +188,68 @@ namespace NetTunnel.Library
             => Client.Notify(new S2SNotificationEndpointDataExchange(tunnelKey, endpointId, edgeId, packetSequence, bytes, length));
 
         public S2SQueryUpsertEndpointReply S2SPeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpoint)
-            => Client.Query(new S2SQueryUpsertEndpoint(tunnelKey, endpoint)).Result;
+            => Client.Query(new S2SQueryUpsertEndpoint(tunnelKey, endpoint));
 
         #endregion
 
         #region User Interface (UI).
 
         public UIQueryGetTunnelStatisticsReply UIQueryGetTunnelStatistics()
-            => Client.Query(new UIQueryGetTunnelStatistics()).Result;
+            => Client.Query(new UIQueryGetTunnelStatistics());
 
         public UIQueryCreateTunnelReply UIQueryCreateTunnel(TunnelConfiguration configuration)
-            => Client.Query(new UIQueryCreateTunnel(configuration)).Result;
+            => Client.Query(new UIQueryCreateTunnel(configuration));
 
         public UIQueryGetEndpointPropertiesReply UIQueryGetEndpointProperties(DirectionalKey tunnelKey, DirectionalKey endpointKey)
-            => Client.Query(new UIQueryGetEndpointProperties(tunnelKey, endpointKey)).Result;
+            => Client.Query(new UIQueryGetEndpointProperties(tunnelKey, endpointKey));
 
         public UIQueryGetEndpointEdgeConnectionsReply UIQueryGetEndpointEdgeConnections(DirectionalKey tunnelKey, DirectionalKey endpointKey)
-            => Client.Query(new UIQueryGetEndpointEdgeConnections(tunnelKey, endpointKey)).Result;
+            => Client.Query(new UIQueryGetEndpointEdgeConnections(tunnelKey, endpointKey));
 
         public UIQueryGetTunnelPropertiesReply UIQueryGetTunnelProperties(DirectionalKey tunnelKey)
-            => Client.Query(new UIQueryGetTunnelProperties(tunnelKey)).Result;
+            => Client.Query(new UIQueryGetTunnelProperties(tunnelKey));
 
         public UIQueryDisconnectTunnelReply UIQueryDisconnectTunnel(DirectionalKey tunnelKey)
-            => Client.Query(new UIQueryDisconnectTunnel(tunnelKey)).Result;
+            => Client.Query(new UIQueryDisconnectTunnel(tunnelKey));
 
         public UIQueryDeleteTunnelReply UIQueryDeleteTunnel(DirectionalKey tunnelKey)
-            => Client.Query(new UIQueryDeleteTunnel(tunnelKey)).Result;
+            => Client.Query(new UIQueryDeleteTunnel(tunnelKey));
 
         public UIQueryDeleteEndpointReply UIQueryDeleteEndpoint(DirectionalKey tunnelKey, Guid endpointId)
-            => Client.Query(new UIQueryDeleteEndpoint(tunnelKey, endpointId)).Result;
+            => Client.Query(new UIQueryDeleteEndpoint(tunnelKey, endpointId));
 
         public UIQueryGetTunnelsReply UIQueryGetTunnels()
-            => Client.Query(new UIQueryGetTunnels()).Result;
+            => Client.Query(new UIQueryGetTunnels());
 
         public UIQueryDistributeUpsertEndpointReply UIQueryDistributeUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration configuration)
-            => Client.Query(new UIQueryDistributeUpsertEndpoint(tunnelKey, configuration)).Result;
+            => Client.Query(new UIQueryDistributeUpsertEndpoint(tunnelKey, configuration));
 
         public UIQueryUpsertUserEndpointReply UIQueryUpsertUserEndpoint(string username, EndpointConfiguration configuration)
-            => Client.Query(new UIQueryUpsertUserEndpoint(username, configuration)).Result;
+            => Client.Query(new UIQueryUpsertUserEndpoint(username, configuration));
 
         public UIQueryGetUsersReply UIQueryGetUsers()
-            => Client.Query(new UIQueryGetUsers()).Result;
+            => Client.Query(new UIQueryGetUsers());
 
         public UIQueryDeleteUserReply UIQueryDeleteUser(string userName)
-            => Client.Query(new UIQueryDeleteUser(userName)).Result;
+            => Client.Query(new UIQueryDeleteUser(userName));
 
         public UIQueryGetServiceConfigurationReply UIQueryGetServiceConfiguration()
-            => Client.Query(new UIQueryGetServiceConfiguration()).Result;
+            => Client.Query(new UIQueryGetServiceConfiguration());
 
         public UIQueryPutServiceConfigurationReply UIQueryPutServiceConfiguration(ServiceConfiguration configuration)
-            => Client.Query(new UIQueryPutServiceConfiguration(configuration)).Result;
+            => Client.Query(new UIQueryPutServiceConfiguration(configuration));
 
         public UIQueryEditUserReply UIQueryEditUser(User user)
-            => Client.Query(new UIQueryEditUser(user)).Result;
+            => Client.Query(new UIQueryEditUser(user));
 
         public UIQueryStopTunnelReply UIQueryStopTunnel(DirectionalKey tunnelKey)
-            => Client.Query(new UIQueryStopTunnel(tunnelKey)).Result;
+            => Client.Query(new UIQueryStopTunnel(tunnelKey));
 
         public UIQueryStartTunnelReply UIQueryStartTunnel(DirectionalKey tunnelKey)
-            => Client.Query(new UIQueryStartTunnel(tunnelKey)).Result;
+            => Client.Query(new UIQueryStartTunnel(tunnelKey));
 
         public UIQueryCreateUserReply UIQueryCreateUser(User user)
-            => Client.Query(new UIQueryCreateUser(user)).Result;
+            => Client.Query(new UIQueryCreateUser(user));
 
         public void UINotifyTerminateEndpointEdgeConnection(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
             => Client.Notify(new UINotifyTerminateEndpointEdgeConnection(tunnelKey, endpointId, edgeId));

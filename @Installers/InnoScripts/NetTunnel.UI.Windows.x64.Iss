@@ -1,4 +1,4 @@
-#define AppVersion "4.4.0"
+#define AppVersion "4.4.1"
 
 [Setup]
  AppName                          = NetTunnel

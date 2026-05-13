@@ -105,7 +105,7 @@ namespace NetTunnel.Service.TunnelEngine
             Singletons.Logger.Warning($"Tunnel '{Configuration.Name}' disconnected.");
         }
 
-        private void Client_OnConnected(RmContext context)
+        private void Client_OnConnected(RmContext context, bool isReconnect)
         {
             Status = NtTunnelStatus.Established;
 

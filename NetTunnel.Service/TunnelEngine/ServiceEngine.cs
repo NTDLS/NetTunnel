@@ -96,7 +96,7 @@ namespace NetTunnel.Service.TunnelEngine
             => _messageServer.Notify(connectionId, new UILoggerNotification(timestamp, severity, text));
 
         public S2SQueryUpsertEndpointReply S2SPeerQueryUpsertEndpoint(Guid connectionId, DirectionalKey tunnelKey, EndpointConfiguration endpoint)
-            => _messageServer.Query(connectionId, new S2SQueryUpsertEndpoint(tunnelKey, endpoint)).Result;
+            => _messageServer.Query(connectionId, new S2SQueryUpsertEndpoint(tunnelKey, endpoint));
 
         /// <summary>
         /// Sends a notification to the remote tunnel service to let it know to connect
