@@ -9,7 +9,7 @@
     <Company>NetworkDLS</Company>
     <Authors>NetworkDLS</Authors>
     <Copyright>Copyright © 2026 NetworkDLS</Copyright>
-    <Version>4.4.1</Version>
+    <Version>4.4.2</Version>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
