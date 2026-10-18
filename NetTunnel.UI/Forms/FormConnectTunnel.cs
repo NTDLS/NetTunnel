@@ -19,6 +19,7 @@ namespace NetTunnel.UI.Forms
         public FormConnectTunnel(ServiceClient client, ServiceLogDelegate serviceLogDelegate)
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
 
             _client = client;
             _serviceLogDelegate = serviceLogDelegate;

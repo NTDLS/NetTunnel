@@ -17,12 +17,15 @@ namespace NetTunnel.UI.Forms
         public FormTunnelProperties()
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
+
             _tunnelKey = new DirectionalKey();
         }
 
         public FormTunnelProperties(ServiceClient client, DirectionalKey tunnelKey)
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
 
             _client = client;
             _tunnelKey = tunnelKey;

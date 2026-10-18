@@ -20,6 +20,8 @@ namespace NetTunnel.UI.Forms
         public FormEndpointEdgeConnections()
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
+
             _tunnelKey = new DirectionalKey();
             _endpointKey = new DirectionalKey();
         }
@@ -27,6 +29,7 @@ namespace NetTunnel.UI.Forms
         public FormEndpointEdgeConnections(ServiceClient client, DirectionalKey tunnelKey, DirectionalKey endpointKey)
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
 
             _client = client;
             _endpointKey = endpointKey;
@@ -258,7 +261,7 @@ namespace NetTunnel.UI.Forms
 
                 if (connections.Any(o => o.EdgeId == edgeId) == false)
                 {
-                    item.BackColor = Color.FromArgb(255, 200, 200);
+                    item.BackColor = Theming.IsDarkMode ? Color.FromArgb(110, 40, 40) : Color.FromArgb(255, 200, 200);
                     tag.Status = NtEdgeStatus.Expire;
                 }
             }
@@ -282,7 +285,7 @@ namespace NetTunnel.UI.Forms
                     _connectionsGridColumnMap.SubItem(item, "ThreadId").Text = $"{connection.ThreadId}";
                     _connectionsGridColumnMap.SubItem(item, "IsConnected").Text = $"{connection.IsConnected}";
 
-                    item.BackColor = Color.Transparent;
+                    item.BackColor = listViewConnections.BackColor;
 
                     tag.Status = NtEdgeStatus.Normal;
                 }
@@ -299,7 +302,7 @@ namespace NetTunnel.UI.Forms
                     item.SubItems.Add($"{connection.ThreadId}");
                     item.SubItems.Add($"{connection.IsConnected}");
 
-                    item.BackColor = Color.FromArgb(200, 255, 200);
+                    item.BackColor = Theming.IsDarkMode ? Color.FromArgb(35, 95, 45) : Color.FromArgb(200, 255, 200);
 
                     item.Tag = new NtEdgeState
                     {

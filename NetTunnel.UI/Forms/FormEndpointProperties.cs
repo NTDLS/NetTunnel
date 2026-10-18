@@ -18,6 +18,8 @@ namespace NetTunnel.UI.Forms
         public FormEndpointProperties()
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
+
             _tunnelKey = new DirectionalKey();
             _endpointKey = new DirectionalKey();
         }
@@ -25,6 +27,7 @@ namespace NetTunnel.UI.Forms
         public FormEndpointProperties(ServiceClient client, DirectionalKey tunnelKey, DirectionalKey endpointKey)
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
 
             _client = client;
             _endpointKey = endpointKey;

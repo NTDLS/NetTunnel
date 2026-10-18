@@ -1,9 +1,11 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.ReliablePayloads.Notification.UI;
+using NetTunnel.UI.Properties;
 using NTDLS.Helpers;
 using NTDLS.Persistence;
 using NTDLS.ReliableMessaging;
 using NTDLS.WinFormsHelpers;
+using NTDLS.WinFormsHelpers.Forms;
 using System.Security.Cryptography;
 using System.Text;
 using static NetTunnel.Library.Constants;
@@ -20,6 +22,7 @@ namespace NetTunnel.UI.Forms
         public FormLogin(Utility.ServiceLogDelegate serviceLogDelegate)
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
 
             _serviceLogDelegate = serviceLogDelegate;
 
@@ -182,7 +185,7 @@ namespace NetTunnel.UI.Forms
 
         private void ButtonAbout_Click(object sender, EventArgs e)
         {
-            using var form = new FormAbout();
+            using var form = new FormAbout("NetTunnel", this.Icon, Resources.Logo128);
             form.ShowDialog();
         }
     }

@@ -21,6 +21,7 @@ namespace NetTunnel.UI.Forms
         public FormAddEditEndpoint(ServiceClient client, TunnelDisplay tunnel, EndpointConfiguration existingEndpoint)
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
 
             dataGridViewHTTPHeaders.DataError += DataGridViewHTTPHeaders_DataError;
 
@@ -38,6 +39,7 @@ namespace NetTunnel.UI.Forms
         public FormAddEditEndpoint(ServiceClient client, EndpointConfiguration existingEndpoint)
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
 
             dataGridViewHTTPHeaders.DataError += DataGridViewHTTPHeaders_DataError;
 
@@ -54,6 +56,7 @@ namespace NetTunnel.UI.Forms
         public FormAddEditEndpoint(ServiceClient client, NtDirection direction)
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
 
             dataGridViewHTTPHeaders.DataError += DataGridViewHTTPHeaders_DataError;
 
@@ -69,6 +72,7 @@ namespace NetTunnel.UI.Forms
         public FormAddEditEndpoint(ServiceClient client, TunnelDisplay tunnel, NtDirection direction)
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
 
             dataGridViewHTTPHeaders.DataError += DataGridViewHTTPHeaders_DataError;
 
@@ -150,6 +154,7 @@ namespace NetTunnel.UI.Forms
         public FormAddEditEndpoint()
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
         }
 
         private void FormAddEndpoint_Load(object sender, EventArgs e)

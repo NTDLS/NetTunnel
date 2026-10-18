@@ -13,11 +13,13 @@ namespace NetTunnel.UI.Forms
         public FormServiceConfiguration()
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
         }
 
         public FormServiceConfiguration(ServiceClient client)
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
 
             _client = client;
 

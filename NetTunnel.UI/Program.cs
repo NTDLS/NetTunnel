@@ -1,4 +1,5 @@
 using NetTunnel.UI.Forms;
+using NTDLS.WinFormsHelpers;
 
 namespace NetTunnel.UI
 {
@@ -8,6 +9,7 @@ namespace NetTunnel.UI
         static void Main()
         {
             ApplicationConfiguration.Initialize();
+            Theming.InitializeApplication();
             Application.Run(new FormMain());
         }
     }

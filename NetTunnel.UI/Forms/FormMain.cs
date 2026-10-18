@@ -1,9 +1,11 @@
 ﻿using NetTunnel.Library.Payloads;
 using NetTunnel.UI.Helpers;
+using NetTunnel.UI.Properties;
 using NetTunnel.UI.Types;
 using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
 using NTDLS.WinFormsHelpers;
+using NTDLS.WinFormsHelpers.Forms;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms
@@ -27,6 +29,7 @@ namespace NetTunnel.UI.Forms
         public FormMain()
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
         }
 
         private void FormMain_Load(object sender, EventArgs e)
@@ -369,22 +372,19 @@ namespace NetTunnel.UI.Forms
                                 _tunnelsGridColumnMap.SubItem(item, "Status").Text = tunnelStats.Status.ToString();
                                 _tunnelsGridColumnMap.SubItem(item, "Ping").Text = $"{(tunnelStats.PingTime?.ToString("n2") ?? "∞")}ms";
 
-                                switch (tunnelStats.Status)
+                                var isDark = Theming.IsDarkMode;
+
+                                item.BackColor = tunnelStats.Status switch
                                 {
-                                    case NtTunnelStatus.Connecting:
-                                    case NtTunnelStatus.Disconnected:
-                                        item.BackColor = Color.FromArgb(255, 200, 200);
-                                        break;
-                                    case NtTunnelStatus.Stopped:
-                                        item.BackColor = Color.FromArgb(255, 200, 0);
-                                        break;
-                                    case NtTunnelStatus.Established:
-                                        item.BackColor = Color.FromArgb(200, 255, 200);
-                                        break;
-                                    default:
-                                        item.BackColor = Color.FromArgb(255, 255, 255);
-                                        break;
-                                }
+                                    NtTunnelStatus.Connecting or NtTunnelStatus.Disconnected
+                                        => isDark ? Color.FromArgb(110, 40, 40) : Color.FromArgb(255, 200, 200),
+                                    NtTunnelStatus.Stopped
+                                        => isDark ? Color.FromArgb(125, 90, 0) : Color.FromArgb(255, 200, 0),
+                                    NtTunnelStatus.Established
+                                        => isDark ? Color.FromArgb(35, 95, 45) : Color.FromArgb(200, 255, 200),
+                                    _ => listViewTunnels.BackColor,
+                                };
+                                item.ForeColor = isDark ? Color.White : Color.Black;
                             }
                         }
 
@@ -940,7 +940,7 @@ namespace NetTunnel.UI.Forms
 
         private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using var form = new FormAbout();
+            using var form = new FormAbout("NetTunnel", this.Icon, Resources.Logo128);
             form.ShowDialog();
         }
 

@@ -17,11 +17,13 @@ namespace NetTunnel.UI.Forms
         public FormAddEditUser()
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
         }
 
         public FormAddEditUser(ServiceClient? client, User? user = null)
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
 
             _client = client;
             _isCreatingNewUser = user == null;

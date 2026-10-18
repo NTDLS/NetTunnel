@@ -14,11 +14,14 @@ namespace NetTunnel.UI.Forms
         public FormUsers()
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
         }
 
         public FormUsers(ServiceClient client)
         {
             InitializeComponent();
+            Theming.InitializeForm(this);
+
             _client = client;
             listViewUsers.MouseUp += ListViewUsers_MouseUp;
             listViewUsers.MouseDoubleClick += ListViewUsers_MouseDoubleClick;
