@@ -2,6 +2,7 @@
 using NetTunnel.Library.ReliablePayloads.Notification.UI;
 using NetTunnel.UI.Properties;
 using NTDLS.Helpers;
+using NTDLS.Localization;
 using NTDLS.Persistence;
 using NTDLS.ReliableMessaging;
 using NTDLS.WinFormsHelpers;
@@ -22,6 +23,7 @@ namespace NetTunnel.UI.Forms
         public FormLogin(Utility.ServiceLogDelegate serviceLogDelegate)
         {
             InitializeComponent();
+            FormLocalizer.Apply(this);
             Theming.InitializeForm(this);
 
             _serviceLogDelegate = serviceLogDelegate;
@@ -31,16 +33,16 @@ namespace NetTunnel.UI.Forms
             var toolTips = ToolTipHelpers.CreateToolTipControl(this);
 
             toolTips.AddControls([labelAddress, textBoxAddress],
-                "Host name, domain, or IP address of the NetTunnel service you want to connect to.");
+                Localize("Host name, domain, or IP address of the NetTunnel service you want to connect to."));
 
             toolTips.AddControls([labelPort, textBoxPort],
-                "Port of the NetTunnel service you want to connect to.");
+                Localize("Port of the NetTunnel service you want to connect to."));
 
             toolTips.AddControls([labelUsername, textBoxUsername],
-                "Username to use when connecting to the NetTunnel service.");
+                Localize("Username to use when connecting to the NetTunnel service."));
 
             toolTips.AddControls([labelPassword, textBoxPassword],
-                "Password for the user to use when connecting to the NetTunnel service.");
+                Localize("Password for the user to use when connecting to the NetTunnel service."));
 
             #endregion
 
@@ -107,9 +109,9 @@ namespace NetTunnel.UI.Forms
         {
             try
             {
-                var port = textBoxPort.GetAndValidateNumeric(1, 65535, "A port number between [min] and [max] is required.");
-                var username = textBoxUsername.GetAndValidateText("A username is required.");
-                var address = textBoxAddress.GetAndValidateText("A hostname, domain, or IP address is required.");
+                var port = textBoxPort.GetAndValidateNumeric(1, 65535, Localize("A port number between [min] and [max] is required."));
+                var username = textBoxUsername.GetAndValidateText(Localize("A username is required."));
+                var address = textBoxAddress.GetAndValidateText(Localize("A hostname, domain, or IP address is required."));
                 string? passwordHash;
 
                 if (_savedPasswordHash != null && textBoxPassword.Text == _savedPasswordHash)
@@ -123,7 +125,7 @@ namespace NetTunnel.UI.Forms
                     passwordHash = Utility.ComputeSha256Hash(textBoxPassword.Text);
                 }
 
-                var progressForm = new ProgressForm(FriendlyName, "Logging in...");
+                var progressForm = new ProgressForm(FriendlyName, Localize("Logging in..."));
 
                 progressForm.Execute(() =>
                 {

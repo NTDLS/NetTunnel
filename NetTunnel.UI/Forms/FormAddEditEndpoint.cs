@@ -1,6 +1,7 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Payloads;
 using NTDLS.Helpers;
+using NTDLS.Localization;
 using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
 
@@ -21,6 +22,7 @@ namespace NetTunnel.UI.Forms
         public FormAddEditEndpoint(ServiceClient client, TunnelDisplay tunnel, EndpointConfiguration existingEndpoint)
         {
             InitializeComponent();
+            FormLocalizer.Apply(this);
             Theming.InitializeForm(this);
 
             dataGridViewHTTPHeaders.DataError += DataGridViewHTTPHeaders_DataError;
@@ -39,6 +41,7 @@ namespace NetTunnel.UI.Forms
         public FormAddEditEndpoint(ServiceClient client, EndpointConfiguration existingEndpoint)
         {
             InitializeComponent();
+            FormLocalizer.Apply(this);
             Theming.InitializeForm(this);
 
             dataGridViewHTTPHeaders.DataError += DataGridViewHTTPHeaders_DataError;
@@ -56,6 +59,7 @@ namespace NetTunnel.UI.Forms
         public FormAddEditEndpoint(ServiceClient client, NtDirection direction)
         {
             InitializeComponent();
+            FormLocalizer.Apply(this);
             Theming.InitializeForm(this);
 
             dataGridViewHTTPHeaders.DataError += DataGridViewHTTPHeaders_DataError;
@@ -72,6 +76,7 @@ namespace NetTunnel.UI.Forms
         public FormAddEditEndpoint(ServiceClient client, TunnelDisplay tunnel, NtDirection direction)
         {
             InitializeComponent();
+            FormLocalizer.Apply(this);
             Theming.InitializeForm(this);
 
             dataGridViewHTTPHeaders.DataError += DataGridViewHTTPHeaders_DataError;
@@ -85,29 +90,31 @@ namespace NetTunnel.UI.Forms
 
         private void PopulateForm()
         {
-            Text = $"NetTunnel : {(_existingEndpoint == null ? "Add" : "Edit")} {_direction} Endpoint";
+            Text = _existingEndpoint == null
+                ? (_direction == NtDirection.Inbound ? Localize("NetTunnel : Add Inbound Endpoint") : Localize("NetTunnel : Add Outbound Endpoint"))
+                : (_direction == NtDirection.Inbound ? Localize("NetTunnel : Edit Inbound Endpoint") : Localize("NetTunnel : Edit Outbound Endpoint"));
 
             #region Set Tool-tips.
 
             var toolTips = ToolTipHelpers.CreateToolTipControl(this);
 
             toolTips.AddControls([labelName, textBoxName],
-                "Name or description you want to use to identify this endpoint.");
+                Localize("Name or description you want to use to identify this endpoint."));
 
             toolTips.AddControls([labelListenPort, textBoxListenPort],
-                "Port that will accept new connections at the inbound endpoint.");
+                Localize("Port that will accept new connections at the inbound endpoint."));
 
             toolTips.AddControls([labelTerminationAddress, textBoxTerminationAddress],
-                "Host name, domain or IP address that the outbound endpoint will make a connection to.");
+                Localize("Host name, domain or IP address that the outbound endpoint will make a connection to."));
 
             toolTips.AddControls([labelTerminationPort, textBoxTerminationPort],
-                "Host name, domain or IP address that the outbound endpoint will make a connection to.");
+                Localize("Host name, domain or IP address that the outbound endpoint will make a connection to."));
 
             toolTips.AddControls([labelOutboundTrafficType, comboBoxOutboundTrafficType],
-                "Type of traffic the outbound endpoint sends to the destination. HTTPS re-encrypts the connection to the destination server; HTTP and Raw send plain traffic.");
+                Localize("Type of traffic the outbound endpoint sends to the destination. HTTPS re-encrypts the connection to the destination server; HTTP and Raw send plain traffic."));
 
             toolTips.AddControls([labelInboundTrafficType, comboBoxInboundTrafficType],
-                "Type of traffic accepted by the inbound endpoint. HTTPS terminates TLS using the certificate on the TLS tab. HTTP header rules apply to HTTP and HTTPS.");
+                Localize("Type of traffic accepted by the inbound endpoint. HTTPS terminates TLS using the certificate on the TLS tab. HTTP header rules apply to HTTP and HTTPS."));
 
             #endregion
 
@@ -164,8 +171,8 @@ namespace NetTunnel.UI.Forms
         {
             using var dialog = new OpenFileDialog
             {
-                Title = "Select TLS certificate",
-                Filter = "PKCS#12 certificate (*.pfx;*.p12)|*.pfx;*.p12|All files (*.*)|*.*"
+                Title = Localize("Select TLS certificate"),
+                Filter = Localize("PKCS#12 certificate (*.pfx;*.p12)|*.pfx;*.p12|All files (*.*)|*.*")
             };
 
             if (dialog.ShowDialog(this) == DialogResult.OK)
@@ -181,6 +188,7 @@ namespace NetTunnel.UI.Forms
         public FormAddEditEndpoint()
         {
             InitializeComponent();
+            FormLocalizer.Apply(this);
             Theming.InitializeForm(this);
         }
 
@@ -196,10 +204,10 @@ namespace NetTunnel.UI.Forms
 
             try
             {
-                textBoxName.GetAndValidateText("You must specify a name.");
-                var listenPort = textBoxListenPort.GetAndValidateNumeric(1, 65535, "You must specify a valid listen port between [min] and [max].");
-                textBoxTerminationAddress.GetAndValidateText("You must specify a termination address (ip, hostname or domain). ");
-                var terminationPort = textBoxTerminationPort.GetAndValidateNumeric(1, 65535, "You must specify a valid termination port between [min] and [max].");
+                textBoxName.GetAndValidateText(Localize("You must specify a name."));
+                var listenPort = textBoxListenPort.GetAndValidateNumeric(1, 65535, Localize("You must specify a valid listen port between [min] and [max]."));
+                textBoxTerminationAddress.GetAndValidateText(Localize("You must specify a termination address (ip, hostname or domain). "));
+                var terminationPort = textBoxTerminationPort.GetAndValidateNumeric(1, 65535, Localize("You must specify a valid termination port between [min] and [max]."));
 
                 var endpointHttpHeaderRules = new List<HttpHeaderRule>();
 
@@ -215,7 +223,7 @@ namespace NetTunnel.UI.Forms
                             //A response does not carry the verb of the request it answers, so such a rule could never match.
                             tabControlBody.SelectedTab = tabPageHttpHeaders;
                             dataGridViewHTTPHeaders.CurrentCell = row.Cells[columnVerb.Index];
-                            throw new Exception($"The response header rule for '{row.Cells[columnHeader.Index].Value}' must use the verb 'Any'.");
+                            throw new Exception(Localize("The response header rule for '{0}' must use the verb 'Any'.", $"{row.Cells[columnHeader.Index].Value}"));
                         }
 
                         endpointHttpHeaderRules.Add(new HttpHeaderRule
@@ -250,10 +258,10 @@ namespace NetTunnel.UI.Forms
                     && string.IsNullOrWhiteSpace(Endpoint.TlsCertificatePath))
                 {
                     tabControlBody.SelectedTab = tabPageTls;
-                    throw new Exception("You must specify a certificate (PFX) path to terminate HTTPS traffic.");
+                    throw new Exception(Localize("You must specify a certificate (PFX) path to terminate HTTPS traffic."));
                 }
 
-                var progressForm = new ProgressForm(FriendlyName, "Saving endpoint...");
+                var progressForm = new ProgressForm(FriendlyName, Localize("Saving endpoint..."));
 
                 if (_tunnel != null)
                 {

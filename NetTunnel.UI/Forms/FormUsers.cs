@@ -2,6 +2,7 @@
 using NetTunnel.Library.Payloads;
 using NetTunnel.UI.Types;
 using NTDLS.Helpers;
+using NTDLS.Localization;
 using NTDLS.WinFormsHelpers;
 
 namespace NetTunnel.UI.Forms
@@ -14,12 +15,14 @@ namespace NetTunnel.UI.Forms
         public FormUsers()
         {
             InitializeComponent();
+            FormLocalizer.Apply(this);
             Theming.InitializeForm(this);
         }
 
         public FormUsers(ServiceClient client)
         {
             InitializeComponent();
+            FormLocalizer.Apply(this);
             Theming.InitializeForm(this);
 
             _client = client;
@@ -72,7 +75,7 @@ namespace NetTunnel.UI.Forms
         {
             listViewUsers.Items.Clear();
 
-            var progressForm = new ProgressForm(Constants.FriendlyName, "Getting users...");
+            var progressForm = new ProgressForm(Constants.FriendlyName, Localize("Getting users..."));
 
             progressForm.Execute(() =>
             {
@@ -124,15 +127,15 @@ namespace NetTunnel.UI.Forms
 
                 if (uTag != null)
                 {
-                    menu.Items.Add("Edit");
+                    UIUtility.AddMenuItem(menu, "Edit", Localize("Edit"));
                     if (selectedItem != null)
                     {
-                        menu.Items.Add("Delete");
+                        UIUtility.AddMenuItem(menu, "Delete", Localize("Delete"));
                     }
                 }
                 else
                 {
-                    menu.Items.Add("Add new user");
+                    UIUtility.AddMenuItem(menu, "Add new user", Localize("Add new user"));
                 }
 
                 menu.Show(listViewUsers, new Point(e.X, e.Y));
@@ -141,7 +144,7 @@ namespace NetTunnel.UI.Forms
                 {
                     menu.Hide();
 
-                    if (e.ClickedItem?.Text == "Add new user")
+                    if (e.ClickedItem?.Tag as string == "Add new user")
                     {
                         _client.EnsureNotNull();
 
@@ -151,7 +154,7 @@ namespace NetTunnel.UI.Forms
                             AddUserToGrid(form.User.EnsureNotNull());
                         }
                     }
-                    else if (uTag != null && e.ClickedItem?.Text == "Edit")
+                    else if (uTag != null && e.ClickedItem?.Tag as string == "Edit")
                     {
                         using var form = new FormAddEditUser(_client, uTag.User);
                         if (form.ShowDialog() == DialogResult.OK)
@@ -160,15 +163,15 @@ namespace NetTunnel.UI.Forms
                             AddUserToGrid(form.User.EnsureNotNull());
                         }
                     }
-                    else if (uTag != null && e.ClickedItem?.Text == "Delete")
+                    else if (uTag != null && e.ClickedItem?.Tag as string == "Delete")
                     {
-                        if (MessageBox.Show($"Delete the user '{uTag.User.Username}'?",
+                        if (MessageBox.Show(Localize("Delete the user '{0}'?", uTag.User.Username),
                             Constants.FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                         {
                             return;
                         }
 
-                        var progressForm = new ProgressForm(Constants.FriendlyName, "Deleting user...");
+                        var progressForm = new ProgressForm(Constants.FriendlyName, Localize("Deleting user..."));
 
                         progressForm.Execute(() =>
                         {

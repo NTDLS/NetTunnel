@@ -24,9 +24,9 @@ namespace LocalizerScan
 
         private static async Task<int> Main(string[] args)
         {
-            if (args.Length < 1)
+            if (args.Length < 2)
             {
-                Console.WriteLine("Usage: LocalizerScan <rootPath> [concurrency]");
+                Console.WriteLine("Usage: LocalizerScan <rootPath> <projectName> [concurrency]");
                 return 1;
             }
 
@@ -48,8 +48,8 @@ namespace LocalizerScan
             }
 
             var rootPath = args[0];
-            var translationDatabase = Path.Join(rootPath, "FinderSeeker", "Translations", "Translations.db");
-            var concurrency = args.Length > 1 && int.TryParse(args[1], out var requested) && requested > 0 ? requested : DefaultConcurrency;
+            var translationDatabase = Path.Join(rootPath, args[1], "Translations", "Translations.db");
+            var concurrency = args.Length > 2 && int.TryParse(args[2], out var requested) && requested > 0 ? requested : DefaultConcurrency;
 
             EnsureDatabase(translationDatabase);
             ScanSourceFilesAndAddMissingKeys(rootPath, translationDatabase);

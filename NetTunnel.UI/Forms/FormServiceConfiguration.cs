@@ -1,6 +1,7 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Payloads;
 using NTDLS.Helpers;
+using NTDLS.Localization;
 using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
 
@@ -15,12 +16,14 @@ namespace NetTunnel.UI.Forms
         public FormServiceConfiguration()
         {
             InitializeComponent();
+            FormLocalizer.Apply(this);
             Theming.InitializeForm(this);
         }
 
         public FormServiceConfiguration(ServiceClient client)
         {
             InitializeComponent();
+            FormLocalizer.Apply(this);
             Theming.InitializeForm(this);
 
             _client = client;
@@ -32,46 +35,46 @@ namespace NetTunnel.UI.Forms
             var toolTips = ToolTipHelpers.CreateToolTipControl(this);
 
             toolTips.AddControls([labelManagementPort, textBoxManagementPort],
-                $"Port is used by both the user-interface and a remote NetTunnel service to communicate configuration changes to this NetTunnel service. Default: {defaults.ServicePort:n0}");
+                Localize("Port is used by both the user-interface and a remote NetTunnel service to communicate configuration changes to this NetTunnel service. Default: {0}", defaults.ServicePort.ToString("n0")));
 
             toolTips.AddControls([labelMessageQueryTimeoutMs, textBoxMessageQueryTimeoutMs],
-                $"Duration in milliseconds to wait on message query operations. Default: {defaults.MessageQueryTimeoutMs:n0}");
+                Localize("Duration in milliseconds to wait on message query operations. Default: {0}", defaults.MessageQueryTimeoutMs.ToString("n0")));
 
             toolTips.AddControls([labelEndpointHeartbeatDelayMs, textBoxEndpointHeartbeatDelayMs],
-                $"Delay in milliseconds between tunnel heartbeats. Default: {defaults.EndpointHeartbeatDelayMs:n0}");
+                Localize("Delay in milliseconds between tunnel heartbeats. Default: {0}", defaults.EndpointHeartbeatDelayMs.ToString("n0")));
 
             toolTips.AddControls([labelTunnelCryptographyKeySize, textBoxTunnelCryptographyKeySize],
-                $"Number of encryption key bits to generate for tunnel cryptography. Default: {defaults.TunnelCryptographyKeySize:n0}.");
+                Localize("Number of encryption key bits to generate for tunnel cryptography. Default: {0}.", defaults.TunnelCryptographyKeySize.ToString("n0")));
 
             toolTips.AddControls([labelStaleEndpointExpirationMs, textBoxStaleEndpointExpirationMs],
-                $"Maximum number of milliseconds to allow an endpoint to remain connected without read/write activity. (0 = disabled). Default: {defaults.StaleEndpointExpirationMs:n0}");
+                Localize("Maximum number of milliseconds to allow an endpoint to remain connected without read/write activity. (0 = disabled). Default: {0}", defaults.StaleEndpointExpirationMs.ToString("n0")));
 
             toolTips.AddControls([labelInitialReceiveBufferSize, textBoxInitialReceiveBufferSize],
-                $"Initial size of the receive buffer. If the buffer ever gets full while receiving data it will be automatically resized up to MaxReceiveBufferSize. Default: {defaults.InitialReceiveBufferSize:n0}");
+                Localize("Initial size of the receive buffer. If the buffer ever gets full while receiving data it will be automatically resized up to MaxReceiveBufferSize. Default: {0}", defaults.InitialReceiveBufferSize.ToString("n0")));
 
             toolTips.AddControls([labelMaxReceiveBufferSize, textBoxMaxReceiveBufferSize],
-                $"Maximum size of the receive buffer. If the buffer ever gets full while receiving data it will be automatically resized up to MaxReceiveBufferSize. Default: {defaults.MaxReceiveBufferSize:n0}");
+                Localize("Maximum size of the receive buffer. If the buffer ever gets full while receiving data it will be automatically resized up to MaxReceiveBufferSize. Default: {0}", defaults.MaxReceiveBufferSize.ToString("n0")));
 
             toolTips.AddControls([labelReceiveBufferGrowthRate, textBoxReceiveBufferGrowthRate],
-                $"Growth rate for auto-resizing the receive buffer from its initial size to its maximum size. Default: {defaults.ReceiveBufferGrowthRate:n2}");
+                Localize("Growth rate for auto-resizing the receive buffer from its initial size to its maximum size. Default: {0}", defaults.ReceiveBufferGrowthRate.ToString("n2")));
 
             toolTips.AddControls([labelPingCadence, textBoxPingCadence],
-                $"Number of milliseconds to wait between pings to the remote service. (0 = disabled). Default: {defaults.PingCadence:n0}");
+                Localize("Number of milliseconds to wait between pings to the remote service. (0 = disabled). Default: {0}", defaults.PingCadence.ToString("n0")));
 
             toolTips.AddControls([labelLogLevel, comboBoxLogLevel],
-                $"Most detailed level of information to log. Takes effect immediately. Default: {defaults.LogLevel}");
+                Localize("Most detailed level of information to log. Takes effect immediately. Default: {0}", defaults.LogLevel.ToString()));
 
             toolTips.AddControls([labelLogPath, textBoxLogPath],
-                "File to write the log to, on the machine running the service. Relative paths are relative to the service's installation directory. Leave empty to disable file logging.");
+                Localize("File to write the log to, on the machine running the service. Relative paths are relative to the service's installation directory. Leave empty to disable file logging."));
 
             toolTips.AddControls([labelLogFileMaxSizeMB, textBoxLogFileMaxSizeMB],
-                $"The log file is rolled over (NetTunnel.log -> NetTunnel.1.log, etc.) once it reaches this size. Default: {defaults.LogFileMaxSizeMB:n0}");
+                Localize("The log file is rolled over (NetTunnel.log -> NetTunnel.1.log, etc.) once it reaches this size. Default: {0}", defaults.LogFileMaxSizeMB.ToString("n0")));
 
             toolTips.AddControls([labelLogFileRetainedCount, textBoxLogFileRetainedCount],
-                $"Number of rolled-over log files to keep in addition to the current one. Default: {defaults.LogFileRetainedCount:n0}");
+                Localize("Number of rolled-over log files to keep in addition to the current one. Default: {0}", defaults.LogFileRetainedCount.ToString("n0")));
 
             toolTips.AddControls([checkBoxLogToEventLog],
-                "Also write warnings and exceptions to the Windows Application event log.");
+                Localize("Also write warnings and exceptions to the Windows Application event log."));
 
             #endregion
 
@@ -91,7 +94,7 @@ namespace NetTunnel.UI.Forms
             }
             _firstShown = false;
 
-            var progressForm = new ProgressForm(Constants.FriendlyName, "Getting configuration...");
+            var progressForm = new ProgressForm(Constants.FriendlyName, Localize("Getting configuration..."));
 
             progressForm.Execute(() =>
             {
@@ -141,7 +144,7 @@ namespace NetTunnel.UI.Forms
             {
                 if (_loadedConfiguration == null)
                 {
-                    throw new Exception("The service configuration has not been loaded.");
+                    throw new Exception(Localize("The service configuration has not been loaded."));
                 }
 
                 //Start from what was loaded so that settings which are not on this form (e.g. the service id) are kept.
@@ -150,47 +153,47 @@ namespace NetTunnel.UI.Forms
                 #region Get and validate form values .
 
                 configuration.ServicePort = textBoxManagementPort.GetAndValidateNumeric(1, 65535,
-                    "Service port must be an integer value between [min] and [max].");
+                    Localize("Service port must be an integer value between [min] and [max]."));
 
                 configuration.MessageQueryTimeoutMs = textBoxMessageQueryTimeoutMs.GetAndValidateNumeric(1000, 3600000,
-                    "Message query timeout (ms) must be an integer value between [min] and [max].");
+                    Localize("Message query timeout (ms) must be an integer value between [min] and [max]."));
 
                 configuration.EndpointHeartbeatDelayMs = textBoxEndpointHeartbeatDelayMs.GetAndValidateNumeric(1000, 216000000,
-                    "Tunnel and endpoint heartbeat (ms) must be an integer value between [min] and [max].");
+                    Localize("Tunnel and endpoint heartbeat (ms) must be an integer value between [min] and [max]."));
 
                 configuration.TunnelCryptographyKeySize = textBoxTunnelCryptographyKeySize.GetAndValidateNumeric(128, 81920,
-                    "Tunnel cryptography key-size must be an integer value between [min] and [max].");
+                    Localize("Tunnel cryptography key-size must be an integer value between [min] and [max]."));
 
                 configuration.StaleEndpointExpirationMs = textBoxStaleEndpointExpirationMs.GetAndValidateNumeric(0, 216000000,
-                    "Stale endpoint expiration (ms) must be an integer value between [min] (infinite) and [max].");
+                    Localize("Stale endpoint expiration (ms) must be an integer value between [min] (infinite) and [max]."));
 
                 configuration.InitialReceiveBufferSize = textBoxInitialReceiveBufferSize.GetAndValidateNumeric(1024, 1073741824,
-                    "Initial buffer size (bytes) must be an integer value between [min] and [max].");
+                    Localize("Initial buffer size (bytes) must be an integer value between [min] and [max]."));
 
                 configuration.MaxReceiveBufferSize = textBoxMaxReceiveBufferSize.GetAndValidateNumeric(1024, 1073741824,
-                    "Maximum buffer size (bytes) must be an integer value between [min] and [max].");
+                    Localize("Maximum buffer size (bytes) must be an integer value between [min] and [max]."));
 
                 configuration.ReceiveBufferGrowthRate = textBoxReceiveBufferGrowthRate.GetAndValidateNumeric(0.01, 1.0,
-                    "Buffer growth rate (%) must be an decimal value between [min] and [max].");
+                    Localize("Buffer growth rate (%) must be an decimal value between [min] and [max]."));
 
                 configuration.PingCadence = textBoxPingCadence.GetAndValidateNumeric(0, 1073741824,
-                    "Ping cadence must be an decimal value between [min] (disabled) and [max].");
+                    Localize("Ping cadence must be an decimal value between [min] (disabled) and [max]."));
 
                 configuration.LogLevel = (NtLogSeverity)(comboBoxLogLevel.SelectedItem ?? NtLogSeverity.Verbose);
 
                 configuration.LogPath = textBoxLogPath.Text.Trim();
 
                 configuration.LogFileMaxSizeMB = textBoxLogFileMaxSizeMB.GetAndValidateNumeric(1, 10240,
-                    "Log file roll-over size (MB) must be an integer value between [min] and [max].");
+                    Localize("Log file roll-over size (MB) must be an integer value between [min] and [max]."));
 
                 configuration.LogFileRetainedCount = textBoxLogFileRetainedCount.GetAndValidateNumeric(0, 1000,
-                    "Rolled log files to keep must be an integer value between [min] and [max].");
+                    Localize("Rolled log files to keep must be an integer value between [min] and [max]."));
 
                 configuration.LogToEventLog = checkBoxLogToEventLog.Checked;
 
                 #endregion
 
-                var progressForm = new ProgressForm(Constants.FriendlyName, "Saving configuration...");
+                var progressForm = new ProgressForm(Constants.FriendlyName, Localize("Saving configuration..."));
 
                 progressForm.Execute(() =>
                 {
