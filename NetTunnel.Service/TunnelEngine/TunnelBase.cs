@@ -122,7 +122,7 @@ namespace NetTunnel.Service.TunnelEngine
         void ITunnel.S2SPeerNotificationEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, long sequence, byte[] bytes, int length)
            => throw new NotImplementedException("This function should be overridden.");
 
-        void ITunnel.S2SPeerNotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
+        void ITunnel.S2SPeerNotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, string? applicationProtocol)
            => throw new NotImplementedException("This function should be overridden.");
 
         void ITunnel.S2SPeerNotificationTunnelDeletion(DirectionalKey tunnelKey)

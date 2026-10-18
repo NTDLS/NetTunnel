@@ -1,6 +1,7 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
+using NetTunnel.Service.TunnelEngine.Http2;
 using NTDLS.Helpers;
 using NTDLS.Semaphore;
 using System.Net;
@@ -187,7 +188,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     //  This must complete before we notify the peer, otherwise it could write to us mid-handshake.
                     inTlsHandshake = true;
                     edgeConnection.AuthenticateAsTlsServer(inboundEndpoint.Certificate
-                        ?? throw new Exception($"No TLS certificate is loaded for endpoint '{Configuration.Name}'."));
+                        ?? throw new Exception($"No TLS certificate is loaded for endpoint '{Configuration.Name}'."), Configuration.AllowHttp2);
                     inTlsHandshake = false;
                 }
 
@@ -195,17 +196,20 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 {
                     //SEARCH FOR: Process:Endpoint:Connect:001: If this is an inbound endpoint, then let the remote service
                     //  know that we just received a connection so that it came make the associated outbound connection.
-                    _tunnel.S2SPeerNotificationEndpointConnect(_tunnel.TunnelKey, EndpointId, edgeConnection.EdgeId);
+                    _tunnel.S2SPeerNotificationEndpointConnect(_tunnel.TunnelKey, EndpointId, edgeConnection.EdgeId, edgeConnection.ApplicationProtocol);
                 }
 
                 //Only follow the HTTP stream if the traffic type is HTTP(S) and there are rules for what this end reads:
                 //  requests at the inbound endpoint and responses at the outbound endpoint.
-                var httpParser = (Configuration.TrafficType == NtTrafficType.Http || Configuration.TrafficType == NtTrafficType.Https)
+                IHttpStreamProcessor? httpParser = (Configuration.TrafficType == NtTrafficType.Http || Configuration.TrafficType == NtTrafficType.Https)
                     && Configuration.HttpHeaderRules.Any(o => o.Enabled
                         && (o.HeaderType == NtHttpHeaderType.Any
                             || (this is EndpointInbound && o.HeaderType == NtHttpHeaderType.Request)
                             || (this is EndpointOutbound && o.HeaderType == NtHttpHeaderType.Response)))
-                    ? new HttpStreamParser(Configuration) : null;
+                    ? (edgeConnection.ApplicationProtocol == "h2"
+                        ? new Http2StreamParser(Configuration, fromClient: this is EndpointInbound)
+                        : new HttpStreamParser(Configuration))
+                    : null;
 
                 var buffer = new ReceiveBuffer(Singletons.Configuration.InitialReceiveBufferSize);
 

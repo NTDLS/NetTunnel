@@ -57,7 +57,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 $"Stopped outbound endpoint '{Configuration.Name}' on port {Configuration.OutboundPort}.");
         }
 
-        public void EstablishOutboundEndpointConnection(Guid edgeId)
+        public void EstablishOutboundEndpointConnection(Guid edgeId, string? applicationProtocol = null)
         {
             if (KeepRunning == false)
             {
@@ -73,12 +73,12 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                 var dataExchangeThread = new Thread(EndpointEdgeConnectionDataPumpThreadProc);
                 //Keep track of the connection. ActiveEndpointConnection will handle closing and disposing of the client and its stream.
-                activeConnection = new EndpointEdgeConnection(dataExchangeThread, tcpClient, edgeId);
+                activeConnection = new EndpointEdgeConnection(dataExchangeThread, tcpClient, edgeId) { ApplicationProtocol = applicationProtocol };
 
                 if (Configuration.TrafficType == NtTrafficType.Https)
                 {
                     //Re-encrypt to the backend. Done before the connection is registered so peer data cannot arrive mid-handshake.
-                    activeConnection.AuthenticateAsTlsClient(Configuration.OutboundAddress, Configuration.TlsIgnoreBackendCertificateErrors);
+                    activeConnection.AuthenticateAsTlsClient(Configuration.OutboundAddress, Configuration.TlsIgnoreBackendCertificateErrors, applicationProtocol);
                 }
 
                 if (KeepRunning == false) //Check again, we may have been stopped while connecting.
@@ -122,6 +122,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 TlsCertificatePath = Configuration.TlsCertificatePath,
                 TlsCertificatePassword = Configuration.TlsCertificatePassword,
                 TlsIgnoreBackendCertificateErrors = Configuration.TlsIgnoreBackendCertificateErrors,
+                AllowHttp2 = Configuration.AllowHttp2,
             };
 
             foreach (var rule in Configuration.HttpHeaderRules)

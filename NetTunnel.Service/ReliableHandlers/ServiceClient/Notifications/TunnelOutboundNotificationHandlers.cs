@@ -22,7 +22,7 @@ namespace NetTunnel.Service.ReliableHandlers.ServiceClient.Notifications
                 Singletons.Logger.Verbose($"Received endpoint connection notification.");
 
                 Singletons.ServiceEngine.Tunnels.EstablishOutboundEndpointConnection(
-                    notification.TunnelKey.SwapDirection(), notification.EndpointId, notification.EdgeId);
+                    notification.TunnelKey.SwapDirection(), notification.EndpointId, notification.EdgeId, notification.ApplicationProtocol);
 
                 return new S2SNotificationEndpointConnectQueryReply();
             }

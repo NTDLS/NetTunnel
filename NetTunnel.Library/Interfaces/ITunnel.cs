@@ -62,7 +62,7 @@ namespace NetTunnel.Library.Interfaces
         /// <param name="tunnelKey">The id of the tunnel that owns the endpoint.</param>
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="edgeId">The id that will uniquely identity the associated endpoint connections at each service</param>
-        public void S2SPeerNotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId);
+        public void S2SPeerNotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, string? applicationProtocol = null);
         public void S2SPeerNotificationEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId);
         public void S2SPeerNotificationTunnelDeletion(DirectionalKey tunnelKey);
         public void S2SPeerNotificationEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId);

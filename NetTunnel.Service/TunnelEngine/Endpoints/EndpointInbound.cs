@@ -167,6 +167,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 TlsCertificatePath = Configuration.TlsCertificatePath,
                 TlsCertificatePassword = Configuration.TlsCertificatePassword,
                 TlsIgnoreBackendCertificateErrors = Configuration.TlsIgnoreBackendCertificateErrors,
+                AllowHttp2 = Configuration.AllowHttp2,
             };
 
             foreach (var rule in Configuration.HttpHeaderRules)

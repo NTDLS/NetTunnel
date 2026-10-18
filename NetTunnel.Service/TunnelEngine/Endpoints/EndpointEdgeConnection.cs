@@ -22,6 +22,12 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         public ulong BytesSent { get; internal set; }
         public RmSequenceBuffer<byte[]> SequenceBuffer { get; internal set; } = new();
 
+        /// <summary>
+        /// The application protocol (ALPN) used on this connection: "h2" or "http/1.1", or null when it was not negotiated.
+        ///     Inbound: what the client negotiated with us. Outbound: what the inbound end told us to ask the destination for.
+        /// </summary>
+        public string? ApplicationProtocol { get; internal set; }
+
         public double ActivityAgeInMilliseconds
             => (DateTime.UtcNow - LastActivityDateTime).TotalMilliseconds;
 
@@ -46,7 +52,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         /// <summary>
         /// Terminates TLS for a client that connected to us (e.g. a web-browser). Blocks until the handshake completes or times out.
         /// </summary>
-        public void AuthenticateAsTlsServer(X509Certificate2 certificate)
+        public void AuthenticateAsTlsServer(X509Certificate2 certificate, bool offerHttp2 = false)
         {
             var sslStream = new SslStream(_stream, false);
 
@@ -54,24 +60,30 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             sslStream.AuthenticateAsServerAsync(new SslServerAuthenticationOptions
             {
                 ServerCertificate = certificate,
+                ApplicationProtocols = offerHttp2
+                    ? [SslApplicationProtocol.Http2, SslApplicationProtocol.Http11]
+                    : [SslApplicationProtocol.Http11],
                 ClientCertificateRequired = false,
                 EnabledSslProtocols = SslProtocols.None, //Let the OS choose.
                 CertificateRevocationCheckMode = X509RevocationMode.NoCheck
             }, cts.Token).GetAwaiter().GetResult();
 
             _stream = sslStream;
+            ApplicationProtocol = ProtocolName(sslStream.NegotiatedApplicationProtocol);
         }
 
         /// <summary>
         /// Starts TLS to a server that we connected to (e.g. a web-server). Blocks until the handshake completes or times out.
         /// </summary>
-        public void AuthenticateAsTlsClient(string targetHost, bool ignoreCertificateErrors)
+        public void AuthenticateAsTlsClient(string targetHost, bool ignoreCertificateErrors, string? applicationProtocol = null)
         {
             var sslStream = new SslStream(_stream, false);
 
             var options = new SslClientAuthenticationOptions
             {
-                TargetHost = targetHost
+                TargetHost = targetHost,
+                ApplicationProtocols = applicationProtocol == null ? null
+                    : [applicationProtocol == "h2" ? SslApplicationProtocol.Http2 : SslApplicationProtocol.Http11]
             };
 
             if (ignoreCertificateErrors)
@@ -80,10 +92,29 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             }
 
             using var cts = new CancellationTokenSource(TlsHandshakeTimeout);
-            sslStream.AuthenticateAsClientAsync(options, cts.Token).GetAwaiter().GetResult();
+            try
+            {
+                sslStream.AuthenticateAsClientAsync(options, cts.Token).GetAwaiter().GetResult();
+            }
+            catch (AuthenticationException ex) when (applicationProtocol == "h2")
+            {
+                //A destination that does not do HTTP/2 refuses the handshake, with a message that does not say why.
+                throw new AuthenticationException($"The client is using HTTP/2 and the TLS handshake with '{targetHost}' failed. This usually means the"
+                    + $" destination does not support HTTP/2: turn off HTTP/2 on the endpoint, or enable it on the destination. ({ex.InnerException?.Message ?? ex.Message})", ex);
+            }
 
             _stream = sslStream;
+
+            var negotiated = ProtocolName(sslStream.NegotiatedApplicationProtocol);
+            if (applicationProtocol == "h2" && negotiated != "h2")
+            {
+                throw new AuthenticationException($"The client is using HTTP/2 but the destination '{targetHost}' did not agree to it"
+                    + " (it negotiated " + (negotiated ?? "nothing") + "). Turn off HTTP/2 on the endpoint, or enable it on the destination.");
+            }
         }
+
+        private static string? ProtocolName(SslApplicationProtocol protocol)
+            => protocol == SslApplicationProtocol.Http2 ? "h2" : protocol == SslApplicationProtocol.Http11 ? "http/1.1" : null;
 
         public void Disconnect()
         {

@@ -273,7 +273,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// <param name="endpointId"></param>
         /// <param name="edgeId"></param>
         /// <exception cref="Exception"></exception>
-        public void EstablishOutboundEndpointConnection(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
+        public void EstablishOutboundEndpointConnection(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, string? applicationProtocol = null)
         {
             var tunnel = GetTunnel(tunnelKey);
 
@@ -281,7 +281,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 ?? throw new Exception("The endpoint could not be converted to outbound.");
 
             //Connecting (and the TLS handshake) can take a long time, so this must not be done under the collection lock.
-            endpoint.EstablishOutboundEndpointConnection(edgeId);
+            endpoint.EstablishOutboundEndpointConnection(edgeId, applicationProtocol);
         }
 
         public void WriteEndpointEdgeData(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, long packetSequence, byte[] bytes)
@@ -296,29 +296,45 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         #region Disk Save/Load.
 
         /// <summary>
-        /// Saves locally owned tunnels to disk.
+        /// Saves locally owned tunnels to disk. The password hashes are written protected, see <see cref="SecretProtector"/>.
         /// </summary>
         private void SaveToDisk()
         {
             var ownedConfiguration = CloneOutbound()
                 .Where(o => o.ServiceId == Singletons.Configuration.ServiceId).ToList();
 
+            foreach (var configuration in ownedConfiguration)
+            {
+                configuration.PasswordHash = SecretProtector.Protect(configuration.PasswordHash) ?? string.Empty;
+            }
+
             CommonApplicationData.SaveToDisk(Constants.FriendlyName, ownedConfiguration);
         }
 
         private void LoadFromDisk()
         {
+            bool hasPlainTextSecrets = false;
+
             Collection.Use((o) =>
             {
                 o.Clear();
                 CommonApplicationData.LoadFromDisk<List<TunnelConfiguration>>(FriendlyName)?
                     .ForEach(c =>
                     {
+                        c.PasswordHash = SecretProtector.Unprotect(c.PasswordHash, $"the password of tunnel '{c.Name}'", out var plain) ?? string.Empty;
+                        hasPlainTextSecrets |= plain;
+
                         c.ServiceId = Singletons.Configuration.ServiceId; //Take ownership of tunnels if they are in the config file.
                         c.TunnelId = Guid.NewGuid(); //Tunnels get a new ID every time they are loaded. This makes it easy to copy configs to other machines.
                         o.Add(new TunnelOutbound(_serviceEngine, c));
                     });
             });
+
+            if (hasPlainTextSecrets)
+            {
+                //Files written by an older version (or typed in by hand) hold plain text secrets: save them protected.
+                SaveToDisk();
+            }
         }
 
         #endregion
