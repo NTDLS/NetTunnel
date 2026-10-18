@@ -19,6 +19,7 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="NTDLS.Helpers" Version="1.4.0" />
+    <PackageReference Include="NTDLS.Localization" Version="1.0.1" />
     <PackageReference Include="NTDLS.Permafrost" Version="2.2.0" />
     <PackageReference Include="NTDLS.ReliableMessaging" Version="3.4.7" />
     <PackageReference Include="NTDLS.SecureKeyExchange" Version="3.0.3" />

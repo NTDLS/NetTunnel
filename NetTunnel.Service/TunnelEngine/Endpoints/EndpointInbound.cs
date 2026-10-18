@@ -50,8 +50,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 catch (Exception ex)
                 {
                     //Don't listen at all: every connection would fail the TLS handshake anyway.
-                    Singletons.Logger.Exception($"Inbound endpoint '{Configuration.Name}' will not listen on port {Configuration.InboundPort}"
-                        + $" because the TLS certificate '{Configuration.TlsCertificatePath}' could not be loaded: {ex.Message}");
+                    Singletons.Logger.Exception(ex, $"Inbound endpoint '{Configuration.Name}' will not listen on port {Configuration.InboundPort}"
+                        + $" because the TLS certificate '{Configuration.TlsCertificatePath}' could not be loaded");
                     return;
                 }
             }
@@ -143,7 +143,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             {
                 if (KeepRunning) //Exceptions are expected when Stop() closes the listener.
                 {
-                    Singletons.Logger.Exception($"InboundConnectionThreadProc: {ex.Message}");
+                    Singletons.Logger.Exception(ex, "InboundConnectionThreadProc");
                 }
             }
             finally

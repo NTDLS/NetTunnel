@@ -7,6 +7,11 @@ namespace NetTunnel.Library.Interfaces
         public delegate void OnLogDelegate(DateTime dateTime, NtLogSeverity severity, string message);
         public event OnLogDelegate? OnLog;
 
+        /// <summary>
+        /// The most detailed severity that will be logged. Can be changed at any time.
+        /// </summary>
+        public NtLogSeverity LogLevel { get; set; }
+
         public void Verbose(string message);
         public void Debug(string message);
         public void Warning(string message);

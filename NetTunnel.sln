@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.3.11520.95 d18.3
+VisualStudioVersion = 18.3.11520.95
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetTunnel.Library", "NetTunnel.Library\NetTunnel.Library.csproj", "{7927C59E-4F47-48A0-A4BF-434C4FC6265F}"
 EndProject
@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "InnoScripts", "InnoScripts"
 		@Installers\InnoScripts\NetTunnel.UI.Windows.x64.Iss = @Installers\InnoScripts\NetTunnel.UI.Windows.x64.Iss
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalizerScan", "LocalizerScan\LocalizerScan.csproj", "{61E8CA5F-51F5-2F27-A389-32E6E7466167}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{1D602D6B-348B-41FE-ABC8-9A98FD6CD247}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D602D6B-348B-41FE-ABC8-9A98FD6CD247}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D602D6B-348B-41FE-ABC8-9A98FD6CD247}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61E8CA5F-51F5-2F27-A389-32E6E7466167}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61E8CA5F-51F5-2F27-A389-32E6E7466167}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61E8CA5F-51F5-2F27-A389-32E6E7466167}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61E8CA5F-51F5-2F27-A389-32E6E7466167}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

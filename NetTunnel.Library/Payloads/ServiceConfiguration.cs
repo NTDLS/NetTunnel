@@ -27,8 +27,24 @@ namespace NetTunnel.Library.Payloads
 
         /// <summary>
         /// The file path to log to. If the string is empty, the log will not be written to file.
+        /// Relative paths are relative to the service's installation directory.
         /// </summary>
         public string LogPath { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The log file is rolled over (NetTunnel.log -> NetTunnel.1.log, etc.) once it reaches this size.
+        /// </summary>
+        public int LogFileMaxSizeMB { get; set; } = 10;
+
+        /// <summary>
+        /// The number of rolled-over log files to keep in addition to the current one.
+        /// </summary>
+        public int LogFileRetainedCount { get; set; } = 5;
+
+        /// <summary>
+        /// Whether warnings and exceptions are also written to the Windows Application event log.
+        /// </summary>
+        public bool LogToEventLog { get; set; } = true;
 
         /// <summary>
         /// The duration in milliseconds to wait on message query operations.

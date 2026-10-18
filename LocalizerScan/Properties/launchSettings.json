@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "LocalizerScan": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\NTDLS\\FinderSeeker\" 16"
+    }
+  }
+}

@@ -2,6 +2,7 @@
 using NetTunnel.Library.Payloads;
 using NTDLS.Helpers;
 using NTDLS.WinFormsHelpers;
+using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.UI.Forms
 {
@@ -9,6 +10,7 @@ namespace NetTunnel.UI.Forms
     {
         private readonly ServiceClient? _client;
         private bool _firstShown = true;
+        private ServiceConfiguration? _loadedConfiguration;
 
         public FormServiceConfiguration()
         {
@@ -56,7 +58,24 @@ namespace NetTunnel.UI.Forms
             toolTips.AddControls([labelPingCadence, textBoxPingCadence],
                 $"Number of milliseconds to wait between pings to the remote service. (0 = disabled). Default: {defaults.PingCadence:n0}");
 
+            toolTips.AddControls([labelLogLevel, comboBoxLogLevel],
+                $"Most detailed level of information to log. Takes effect immediately. Default: {defaults.LogLevel}");
+
+            toolTips.AddControls([labelLogPath, textBoxLogPath],
+                "File to write the log to, on the machine running the service. Relative paths are relative to the service's installation directory. Leave empty to disable file logging.");
+
+            toolTips.AddControls([labelLogFileMaxSizeMB, textBoxLogFileMaxSizeMB],
+                $"The log file is rolled over (NetTunnel.log -> NetTunnel.1.log, etc.) once it reaches this size. Default: {defaults.LogFileMaxSizeMB:n0}");
+
+            toolTips.AddControls([labelLogFileRetainedCount, textBoxLogFileRetainedCount],
+                $"Number of rolled-over log files to keep in addition to the current one. Default: {defaults.LogFileRetainedCount:n0}");
+
+            toolTips.AddControls([checkBoxLogToEventLog],
+                "Also write warnings and exceptions to the Windows Application event log.");
+
             #endregion
+
+            comboBoxLogLevel.DataSource = Enum.GetValues<NtLogSeverity>();
 
             Shown += FormServiceConfiguration_Shown;
 
@@ -106,6 +125,13 @@ namespace NetTunnel.UI.Forms
                 textBoxMaxReceiveBufferSize.Text = $"{configuration.MaxReceiveBufferSize:n0}";
                 textBoxReceiveBufferGrowthRate.Text = $"{configuration.ReceiveBufferGrowthRate:n2}";
                 textBoxPingCadence.Text = $"{configuration.PingCadence:n0}";
+                comboBoxLogLevel.SelectedItem = configuration.LogLevel;
+                textBoxLogPath.Text = configuration.LogPath;
+                textBoxLogFileMaxSizeMB.Text = $"{configuration.LogFileMaxSizeMB:n0}";
+                textBoxLogFileRetainedCount.Text = $"{configuration.LogFileRetainedCount:n0}";
+                checkBoxLogToEventLog.Checked = configuration.LogToEventLog;
+
+                _loadedConfiguration = configuration;
             }
         }
 
@@ -113,7 +139,13 @@ namespace NetTunnel.UI.Forms
         {
             try
             {
-                var configuration = new ServiceConfiguration();
+                if (_loadedConfiguration == null)
+                {
+                    throw new Exception("The service configuration has not been loaded.");
+                }
+
+                //Start from what was loaded so that settings which are not on this form (e.g. the service id) are kept.
+                var configuration = _loadedConfiguration;
 
                 #region Get and validate form values .
 
@@ -143,6 +175,18 @@ namespace NetTunnel.UI.Forms
 
                 configuration.PingCadence = textBoxPingCadence.GetAndValidateNumeric(0, 1073741824,
                     "Ping cadence must be an decimal value between [min] (disabled) and [max].");
+
+                configuration.LogLevel = (NtLogSeverity)(comboBoxLogLevel.SelectedItem ?? NtLogSeverity.Verbose);
+
+                configuration.LogPath = textBoxLogPath.Text.Trim();
+
+                configuration.LogFileMaxSizeMB = textBoxLogFileMaxSizeMB.GetAndValidateNumeric(1, 10240,
+                    "Log file roll-over size (MB) must be an integer value between [min] and [max].");
+
+                configuration.LogFileRetainedCount = textBoxLogFileRetainedCount.GetAndValidateNumeric(0, 1000,
+                    "Rolled log files to keep must be an integer value between [min] and [max].");
+
+                configuration.LogToEventLog = checkBoxLogToEventLog.Checked;
 
                 #endregion
 

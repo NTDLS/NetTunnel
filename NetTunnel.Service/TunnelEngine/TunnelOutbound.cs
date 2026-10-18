@@ -38,8 +38,8 @@ namespace NetTunnel.Service.TunnelEngine
 
             _client.Client.OnException += (context, ex, payload) =>
             {
-                Singletons.Logger.Exception($"RPC client exception: '{ex.Message}'"
-                    + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
+                Singletons.Logger.Exception(ex, "RPC client exception"
+                    + (payload != null ? $" (payload: {payload.GetType().Name})" : string.Empty));
             };
         }
 

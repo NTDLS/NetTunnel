@@ -242,17 +242,17 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     }
                     else
                     {
-                        Singletons.Logger.Exception($"EndpointEdgeConnectionDataPumpThread: {ex.Message}");
+                        Singletons.Logger.Exception(ex, "EndpointEdgeConnectionDataPumpThread");
                     }
                 }
                 else
                 {
-                    Singletons.Logger.Exception($"EndpointEdgeConnectionDataPumpThread: {ex.Message}");
+                    Singletons.Logger.Exception(ex, "EndpointEdgeConnectionDataPumpThread");
                 }
             }
             catch (Exception ex)
             {
-                Singletons.Logger.Exception($"EndpointEdgeConnectionDataPumpThread: {ex.Message}");
+                Singletons.Logger.Exception(ex, "EndpointEdgeConnectionDataPumpThread");
             }
             finally
             {

@@ -59,6 +59,17 @@
             tabPageTunnels.SuspendLayout();
             groupBoxBuffering.SuspendLayout();
             tabPageEndpoints.SuspendLayout();
+            tabPageLogging = new TabPage();
+            labelLogLevel = new Label();
+            comboBoxLogLevel = new ComboBox();
+            labelLogPath = new Label();
+            textBoxLogPath = new TextBox();
+            labelLogFileMaxSizeMB = new Label();
+            textBoxLogFileMaxSizeMB = new TextBox();
+            labelLogFileRetainedCount = new Label();
+            textBoxLogFileRetainedCount = new TextBox();
+            checkBoxLogToEventLog = new CheckBox();
+            tabPageLogging.SuspendLayout();
             SuspendLayout();
             // 
             // buttonCancel
@@ -214,6 +225,7 @@
             tabControlBody.Controls.Add(tabPageManagement);
             tabControlBody.Controls.Add(tabPageTunnels);
             tabControlBody.Controls.Add(tabPageEndpoints);
+            tabControlBody.Controls.Add(tabPageLogging);
             tabControlBody.Location = new Point(12, 12);
             tabControlBody.Name = "tabControlBody";
             tabControlBody.SelectedIndex = 0;
@@ -292,7 +304,101 @@
             tabPageEndpoints.TabIndex = 2;
             tabPageEndpoints.Text = "Endpoints";
             tabPageEndpoints.UseVisualStyleBackColor = true;
-            // 
+            //
+            // tabPageLogging
+            //
+            tabPageLogging.Controls.Add(labelLogLevel);
+            tabPageLogging.Controls.Add(comboBoxLogLevel);
+            tabPageLogging.Controls.Add(labelLogPath);
+            tabPageLogging.Controls.Add(textBoxLogPath);
+            tabPageLogging.Controls.Add(labelLogFileMaxSizeMB);
+            tabPageLogging.Controls.Add(textBoxLogFileMaxSizeMB);
+            tabPageLogging.Controls.Add(labelLogFileRetainedCount);
+            tabPageLogging.Controls.Add(textBoxLogFileRetainedCount);
+            tabPageLogging.Controls.Add(checkBoxLogToEventLog);
+            tabPageLogging.Location = new Point(4, 24);
+            tabPageLogging.Name = "tabPageLogging";
+            tabPageLogging.Size = new Size(492, 382);
+            tabPageLogging.TabIndex = 3;
+            tabPageLogging.Text = "Logging";
+            tabPageLogging.UseVisualStyleBackColor = true;
+            //
+            // labelLogLevel
+            //
+            labelLogLevel.AutoSize = true;
+            labelLogLevel.Location = new Point(110, 23);
+            labelLogLevel.Name = "labelLogLevel";
+            labelLogLevel.Size = new Size(54, 15);
+            labelLogLevel.TabIndex = 0;
+            labelLogLevel.Text = "Log level";
+            //
+            // comboBoxLogLevel
+            //
+            comboBoxLogLevel.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBoxLogLevel.FormattingEnabled = true;
+            comboBoxLogLevel.Location = new Point(170, 20);
+            comboBoxLogLevel.Name = "comboBoxLogLevel";
+            comboBoxLogLevel.Size = new Size(140, 23);
+            comboBoxLogLevel.TabIndex = 1;
+            //
+            // labelLogPath
+            //
+            labelLogPath.AutoSize = true;
+            labelLogPath.Location = new Point(83, 52);
+            labelLogPath.Name = "labelLogPath";
+            labelLogPath.Size = new Size(81, 15);
+            labelLogPath.TabIndex = 2;
+            labelLogPath.Text = "Log file path";
+            //
+            // textBoxLogPath
+            //
+            textBoxLogPath.Location = new Point(170, 49);
+            textBoxLogPath.Name = "textBoxLogPath";
+            textBoxLogPath.Size = new Size(300, 23);
+            textBoxLogPath.TabIndex = 3;
+            //
+            // labelLogFileMaxSizeMB
+            //
+            labelLogFileMaxSizeMB.AutoSize = true;
+            labelLogFileMaxSizeMB.Location = new Point(25, 81);
+            labelLogFileMaxSizeMB.Name = "labelLogFileMaxSizeMB";
+            labelLogFileMaxSizeMB.Size = new Size(139, 15);
+            labelLogFileMaxSizeMB.TabIndex = 4;
+            labelLogFileMaxSizeMB.Text = "Roll log file at size (MB)";
+            //
+            // textBoxLogFileMaxSizeMB
+            //
+            textBoxLogFileMaxSizeMB.Location = new Point(170, 78);
+            textBoxLogFileMaxSizeMB.Name = "textBoxLogFileMaxSizeMB";
+            textBoxLogFileMaxSizeMB.Size = new Size(100, 23);
+            textBoxLogFileMaxSizeMB.TabIndex = 5;
+            //
+            // labelLogFileRetainedCount
+            //
+            labelLogFileRetainedCount.AutoSize = true;
+            labelLogFileRetainedCount.Location = new Point(40, 110);
+            labelLogFileRetainedCount.Name = "labelLogFileRetainedCount";
+            labelLogFileRetainedCount.Size = new Size(124, 15);
+            labelLogFileRetainedCount.TabIndex = 6;
+            labelLogFileRetainedCount.Text = "Rolled log files to keep";
+            //
+            // textBoxLogFileRetainedCount
+            //
+            textBoxLogFileRetainedCount.Location = new Point(170, 107);
+            textBoxLogFileRetainedCount.Name = "textBoxLogFileRetainedCount";
+            textBoxLogFileRetainedCount.Size = new Size(100, 23);
+            textBoxLogFileRetainedCount.TabIndex = 7;
+            //
+            // checkBoxLogToEventLog
+            //
+            checkBoxLogToEventLog.AutoSize = true;
+            checkBoxLogToEventLog.Location = new Point(170, 140);
+            checkBoxLogToEventLog.Name = "checkBoxLogToEventLog";
+            checkBoxLogToEventLog.Size = new Size(280, 19);
+            checkBoxLogToEventLog.TabIndex = 8;
+            checkBoxLogToEventLog.Text = "Write warnings and exceptions to the event log";
+            checkBoxLogToEventLog.UseVisualStyleBackColor = true;
+            //
             // FormServiceConfiguration
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -318,6 +424,8 @@
             groupBoxBuffering.PerformLayout();
             tabPageEndpoints.ResumeLayout(false);
             tabPageEndpoints.PerformLayout();
+            tabPageLogging.ResumeLayout(false);
+            tabPageLogging.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -344,6 +452,16 @@
         private TabPage tabPageManagement;
         private TabPage tabPageTunnels;
         private TabPage tabPageEndpoints;
+        private TabPage tabPageLogging;
+        private Label labelLogLevel;
+        private ComboBox comboBoxLogLevel;
+        private Label labelLogPath;
+        private TextBox textBoxLogPath;
+        private Label labelLogFileMaxSizeMB;
+        private TextBox textBoxLogFileMaxSizeMB;
+        private Label labelLogFileRetainedCount;
+        private TextBox textBoxLogFileRetainedCount;
+        private CheckBox checkBoxLogToEventLog;
         private GroupBox groupBoxBuffering;
         private TextBox textBoxPingCadence;
         private Label labelPingCadence;

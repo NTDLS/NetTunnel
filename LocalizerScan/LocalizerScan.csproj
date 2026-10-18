@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <Company>NetworkDLS</Company>
+	  <Copyright>Copyright © 2026 NetworkDLS</Copyright>
+	  <Version>1.0.0</Version>
+	  <Authors>NetworkDLS</Authors>
+	  <Product>LocalizerScan</Product>
+	  
+	  <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="EmbeddedText\SystemPrompt.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NTDLS.Localization" Version="1.0.1" />
+    <PackageReference Include="NTDLS.SqliteDapperWrapper" Version="1.4.5" />
+    <PackageReference Include="VPT.Einkr.Client" Version="2.1.0" />
+  </ItemGroup>
+
+</Project>

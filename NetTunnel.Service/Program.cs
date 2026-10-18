@@ -10,6 +10,19 @@ namespace NetTunnel.Service
         {
             //NTDLS.Semaphore.ThreadOwnershipTracking.Enable();
 
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+            {
+                //Make sure the cause of a crash reaches the log (and event log) before the process goes away.
+                if (e.ExceptionObject is Exception ex)
+                {
+                    Singletons.Logger.Exception(ex, "Unhandled exception");
+                }
+                if (e.IsTerminating)
+                {
+                    Singletons.ShutdownLogger();
+                }
+            };
+
             Singletons.Logger.Verbose("Starting...");
 
             HostFactory.Run(x =>
@@ -41,6 +54,8 @@ namespace NetTunnel.Service
                     }
                 });
             });
+
+            Singletons.ShutdownLogger(); //Write out anything still queued.
         }
     }
 }
