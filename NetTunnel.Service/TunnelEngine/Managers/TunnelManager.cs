@@ -23,44 +23,48 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         #region Start / Stop.
 
+        //NOTE: Tunnels are looked up while holding the collection lock, but they are started, stopped and
+        //  used outside of it. Stopping a tunnel waits on its connection threads, and those threads (as well
+        //  as every message handler) need the collection lock, so holding it here could deadlock. Likewise,
+        //  socket I/O under the lock would stall every other tunnel.
+
+        private ITunnel GetTunnel(DirectionalKey tunnelKey)
+            => Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey));
+
+        private ITunnel? TryGetTunnel(DirectionalKey tunnelKey)
+            => Collection.Use((o) => o.SingleOrDefault(o => o.TunnelKey == tunnelKey));
+
+        private List<ITunnel> GetTunnels()
+            => Collection.Use((o) => o.ToList());
+
         public void Start(DirectionalKey tunnelKey)
-            => Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey).Start());
+            => GetTunnel(tunnelKey).Start();
 
         public void Stop(DirectionalKey tunnelKey)
-            => Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey).Stop());
+            => GetTunnel(tunnelKey).Stop();
 
         public void StartAll()
-            => Collection.Use((o) => o.ForEach((o) => o.Start()));
+            => GetTunnels().ForEach((o) => o.Start());
 
         public void StopAll()
-            => Collection.Use((o) => o.ForEach((o) => o.Stop()));
+            => GetTunnels().ForEach((o) => o.Stop());
 
         public TunnelPropertiesDisplay GetTunnelProperties(DirectionalKey tunnelKey)
-            => Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey).GetProperties());
+            => GetTunnel(tunnelKey).GetProperties();
 
         public EndpointPropertiesDisplay GetEndpointProperties(DirectionalKey tunnelKey, DirectionalKey endpointKey)
-            => Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey).GetEndpointProperties(endpointKey));
+            => GetTunnel(tunnelKey).GetEndpointProperties(endpointKey);
 
         public List<EndpointEdgeConnectionDisplay> GetEndpointEdgeConnections(DirectionalKey tunnelKey, DirectionalKey endpointKey)
-            => Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey).GetEndpointEdgeConnections(endpointKey));
+            => GetTunnel(tunnelKey).GetEndpointEdgeConnections(endpointKey);
 
         #endregion
 
         public void IncrementBytesSent(DirectionalKey tunnelKey, int bytes)
-        {
-            Collection.Use((o) =>
-            {
-                o.SingleOrDefault(o => o.TunnelKey == tunnelKey)?.IncrementBytesSent(bytes);
-            });
-        }
+            => TryGetTunnel(tunnelKey)?.IncrementBytesSent(bytes);
 
         public void IncrementBytesReceived(DirectionalKey tunnelKey, int bytes)
-        {
-            Collection.Use((o) =>
-            {
-                o.SingleOrDefault(o => o.TunnelKey == tunnelKey)?.IncrementBytesReceived(bytes);
-            });
-        }
+            => TryGetTunnel(tunnelKey)?.IncrementBytesReceived(bytes);
 
         #region Create / Delete.
 
@@ -70,56 +74,65 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// <param name="config"></param>
         public void UpsertTunnel(TunnelConfiguration config)
         {
-            Collection.Use((o) =>
+            var newTunnel = new TunnelOutbound(_serviceEngine, config);
+
+            var existingTunnel = Collection.Use((o) =>
             {
                 var existingTunnel = o.SingleOrDefault(o => o.Configuration.TunnelId == config.TunnelId);
                 if (existingTunnel != null)
                 {
-                    existingTunnel.Stop();
                     o.Remove(existingTunnel);
                 }
 
-                var newTunnel = new TunnelOutbound(_serviceEngine, config);
-                o.Add(newTunnel.EnsureNotNull());
-
+                o.Add(newTunnel);
                 SaveToDisk();
 
-                newTunnel.Start();
+                return existingTunnel;
             });
+
+            existingTunnel?.Stop();
+            newTunnel.Start();
         }
 
         public void DisconnectAndRemoveTunnel(DirectionalKey tunnelKey)
         {
-            Collection.Use((o) =>
+            var existingTunnel = Collection.Use((o) =>
             {
                 var existingTunnel = o.SingleOrDefault(o => o.TunnelKey == tunnelKey);
                 if (existingTunnel != null)
                 {
-                    existingTunnel.Stop();
                     o.Remove(existingTunnel);
                     SaveToDisk();
                 }
+                return existingTunnel;
             });
+
+            existingTunnel?.Stop();
         }
 
         public void DeleteBothEndsOfTunnel(DirectionalKey tunnelKey)
         {
-            Collection.Use((o) =>
+            var existingTunnel = Collection.Use((o) =>
             {
                 var existingTunnel = o.SingleOrDefault(o => o.TunnelKey == tunnelKey);
                 if (existingTunnel != null)
                 {
-                    if (existingTunnel.IsLoggedIn)
-                    {
-                        //Let the other end of the tunnel know that we are deleting the tunnel.
-                        existingTunnel.S2SPeerNotificationTunnelDeletion(tunnelKey.SwapDirection());
-                    }
-
-                    existingTunnel.Stop();
                     o.Remove(existingTunnel);
                     SaveToDisk();
                 }
+                return existingTunnel;
             });
+
+            if (existingTunnel != null)
+            {
+                if (existingTunnel.IsLoggedIn)
+                {
+                    //Let the other end of the tunnel know that we are deleting the tunnel.
+                    Exceptions.Ignore(() => existingTunnel.S2SPeerNotificationTunnelDeletion(tunnelKey.SwapDirection()));
+                }
+
+                existingTunnel.Stop();
+            }
         }
 
         /// <summary>
@@ -128,7 +141,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// <param name="config"></param>
         public DirectionalKey RegisterTunnel(Guid connectionId, TunnelConfiguration config, List<EndpointConfiguration> endpoints)
         {
-            return Collection.Use((o) =>
+            var existingTunnel = Collection.Use((o) =>
             {
                 var existingTunnel = o.OfType<TunnelInbound>()
                     .SingleOrDefault(o => o.Configuration.TunnelId == config.TunnelId);
@@ -139,19 +152,22 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                         //I'm not even sure if we can get here, but this is definitely an exception.
                         throw new Exception("This configuration is not supported.");
                     }
-                    existingTunnel.Stop();
                     o.Remove(existingTunnel);
                 }
-
-                var newTunnel = new TunnelInbound(_serviceEngine, connectionId, config);
-                newTunnel.LoadEndpoints(endpoints);
-
-                o.Add(newTunnel);
-
-                newTunnel.Start();
-
-                return newTunnel.TunnelKey;
+                return existingTunnel;
             });
+
+            //Stop the previous registration first so that its endpoints release their ports.
+            existingTunnel?.Stop();
+
+            var newTunnel = new TunnelInbound(_serviceEngine, connectionId, config);
+            newTunnel.LoadEndpoints(endpoints);
+
+            Collection.Use((o) => o.Add(newTunnel));
+
+            newTunnel.Start();
+
+            return newTunnel.TunnelKey;
         }
 
         /// <summary>
@@ -161,27 +177,26 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// <param name="config"></param>
         public void DeregisterTunnel(Guid connectionId)
         {
-            Collection.Use((o) =>
+            var existingTunnel = Collection.Use((o) =>
             {
                 var existingTunnel = o.OfType<TunnelInbound>().SingleOrDefault(o => o.ConnectionId == connectionId);
                 if (existingTunnel != null)
                 {
-                    existingTunnel.Stop();
                     o.Remove(existingTunnel);
                 }
+                return existingTunnel;
             });
+
+            existingTunnel?.Stop();
         }
 
         public void UpdateLastPing(DirectionalKey tunnelKey, double pingTime)
         {
-            Collection.Use((o) =>
+            var tunnel = TryGetTunnel(tunnelKey.SwapDirection());
+            if (tunnel != null)
             {
-                var tunnel = o.SingleOrDefault(o => o.TunnelKey == tunnelKey.SwapDirection());
-                if (tunnel != null)
-                {
-                    tunnel.PingTime = pingTime;
-                }
-            });
+                tunnel.PingTime = pingTime;
+            }
         }
 
         /// <summary>
@@ -192,7 +207,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// <param name="username">If the endpoint needs to saved to a user, then supply the username</param>
         public void UpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointConfiguration, string? username)
         {
-            var tunnel = Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey));
+            var tunnel = GetTunnel(tunnelKey);
 
             //Apply the endpoint here:
             tunnel.UpsertEndpoint(endpointConfiguration, username);
@@ -215,7 +230,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// <param name="username">If the endpoint needs to saved to a user, then supply the username</param>
         public void UpsertEndpointAndDistribute(DirectionalKey tunnelKey, EndpointConfiguration endpointConfiguration, string? username)
         {
-            var tunnel = Collection.Use((o) => o.Single(o => o.TunnelKey == tunnelKey));
+            var tunnel = GetTunnel(tunnelKey);
 
             //Apply the endpoint here:
             UpsertEndpoint(tunnelKey, endpointConfiguration, username);
@@ -231,34 +246,23 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// <param name="endpointId"></param>
         public void DeleteEndpointAndDistribute(DirectionalKey tunnelKey, Guid endpointId, string? username)
         {
-            Collection.Use((o) =>
+            var tunnel = GetTunnel(tunnelKey);
+            if (tunnel.IsLoggedIn)
             {
-                var tunnel = o.Single(o => o.TunnelKey == tunnelKey);
-                if (tunnel.IsLoggedIn)
-                {
-                    //Let the other end of the tunnel know that we are deleting the endpoint.
-                    tunnel.S2SPeerNotificationEndpointDeletion(tunnelKey.SwapDirection(), endpointId);
-                }
+                //Let the other end of the tunnel know that we are deleting the endpoint.
+                tunnel.S2SPeerNotificationEndpointDeletion(tunnelKey.SwapDirection(), endpointId);
+            }
 
-                tunnel.DeleteEndpoint(endpointId, username);
-            });
+            tunnel.DeleteEndpoint(endpointId, username);
         }
 
         public void DeleteEndpoint(DirectionalKey tunnelKey, Guid endpointId, string? username)
-        {
-            Collection.Use((o) => o.SingleOrDefault(o => o.TunnelKey == tunnelKey)?.DeleteEndpoint(endpointId, username));
-        }
+            => TryGetTunnel(tunnelKey)?.DeleteEndpoint(endpointId, username);
 
         #endregion
 
         public void DisconnectEndpointEdge(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
-        {
-            Collection.Use((o) =>
-            {
-                var tunnel = o.SingleOrDefault(o => o.TunnelKey == tunnelKey);
-                tunnel?.DisconnectEndpointEdge(endpointId, edgeId);
-            });
-        }
+            => TryGetTunnel(tunnelKey)?.DisconnectEndpointEdge(endpointId, edgeId);
 
         /// <summary>
         /// A remote service is telling the local service that an inbound connection has been made to an
@@ -271,26 +275,22 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// <exception cref="Exception"></exception>
         public void EstablishOutboundEndpointConnection(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
         {
-            Collection.Use((o) =>
-            {
-                var tunnel = o.Single(o => o.TunnelKey == tunnelKey);
+            var tunnel = GetTunnel(tunnelKey);
 
-                var endpoint = tunnel.Endpoints.Single(o => o.EndpointId == endpointId) as EndpointOutbound
-                    ?? throw new Exception("The endpoint could not be converted to outbound.");
+            var endpoint = tunnel.Endpoints.Single(o => o.EndpointId == endpointId) as EndpointOutbound
+                ?? throw new Exception("The endpoint could not be converted to outbound.");
 
-                endpoint.EstablishOutboundEndpointConnection(edgeId);
-            });
+            //Connecting (and the TLS handshake) can take a long time, so this must not be done under the collection lock.
+            endpoint.EstablishOutboundEndpointConnection(edgeId);
         }
 
         public void WriteEndpointEdgeData(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, long packetSequence, byte[] bytes)
         {
-            Collection.Use((o) =>
-            {
-                var tunnel = o.Single(o => o.TunnelKey == tunnelKey);
-                var endpoint = tunnel.Endpoints.Single(o => o.EndpointId == endpointId);
+            var tunnel = GetTunnel(tunnelKey);
+            var endpoint = tunnel.Endpoints.Single(o => o.EndpointId == endpointId);
 
-                endpoint.WriteEndpointEdgeData(edgeId, packetSequence, bytes);
-            });
+            //The write to the edge socket can block on a slow client, so this must not be done under the collection lock.
+            endpoint.WriteEndpointEdgeData(edgeId, packetSequence, bytes);
         }
 
         #region Disk Save/Load.

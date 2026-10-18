@@ -38,25 +38,50 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         }
 
         /// <summary>
-        /// Terminates TLS for a client that connected to us (e.g. a web-browser). Blocks until the handshake completes.
+        /// How long a TLS handshake may take before the connection is abandoned. Prevents a client
+        ///     that connects and never completes the handshake from holding a thread indefinitely.
+        /// </summary>
+        private static readonly TimeSpan TlsHandshakeTimeout = TimeSpan.FromSeconds(30);
+
+        /// <summary>
+        /// Terminates TLS for a client that connected to us (e.g. a web-browser). Blocks until the handshake completes or times out.
         /// </summary>
         public void AuthenticateAsTlsServer(X509Certificate2 certificate)
         {
             var sslStream = new SslStream(_stream, false);
-            sslStream.AuthenticateAsServer(certificate, false, SslProtocols.None, false);
+
+            using var cts = new CancellationTokenSource(TlsHandshakeTimeout);
+            sslStream.AuthenticateAsServerAsync(new SslServerAuthenticationOptions
+            {
+                ServerCertificate = certificate,
+                ClientCertificateRequired = false,
+                EnabledSslProtocols = SslProtocols.None, //Let the OS choose.
+                CertificateRevocationCheckMode = X509RevocationMode.NoCheck
+            }, cts.Token).GetAwaiter().GetResult();
+
             _stream = sslStream;
         }
 
         /// <summary>
-        /// Starts TLS to a server that we connected to (e.g. a web-server). Blocks until the handshake completes.
+        /// Starts TLS to a server that we connected to (e.g. a web-server). Blocks until the handshake completes or times out.
         /// </summary>
         public void AuthenticateAsTlsClient(string targetHost, bool ignoreCertificateErrors)
         {
-            var sslStream = ignoreCertificateErrors
-                ? new SslStream(_stream, false, (_, _, _, _) => true)
-                : new SslStream(_stream, false);
+            var sslStream = new SslStream(_stream, false);
 
-            sslStream.AuthenticateAsClient(targetHost);
+            var options = new SslClientAuthenticationOptions
+            {
+                TargetHost = targetHost
+            };
+
+            if (ignoreCertificateErrors)
+            {
+                options.RemoteCertificateValidationCallback = (_, _, _, _) => true;
+            }
+
+            using var cts = new CancellationTokenSource(TlsHandshakeTimeout);
+            sslStream.AuthenticateAsClientAsync(options, cts.Token).GetAwaiter().GetResult();
+
             _stream = sslStream;
         }
 

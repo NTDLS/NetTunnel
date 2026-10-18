@@ -1,4 +1,5 @@
-﻿using NetTunnel.Library.Payloads;
+﻿using NetTunnel.Library;
+using NetTunnel.Library.Payloads;
 using NetTunnel.UI.Helpers;
 using NetTunnel.UI.Properties;
 using NetTunnel.UI.Types;
@@ -940,7 +941,7 @@ namespace NetTunnel.UI.Forms
 
         private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using var form = new FormAbout("NetTunnel", this.Icon, Resources.Logo128);
+            using var form = new FormAbout(Constants.FriendlyName, this.Icon, Resources.Logo128);
             form.ShowDialog();
         }
 

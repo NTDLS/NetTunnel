@@ -59,7 +59,7 @@ namespace NetTunnel.Service.TunnelEngine
             }
             else
             {
-                RemoteClientAddress = $"{nativeSocket.LocalEndPoint}";
+                RemoteClientAddress = $"{nativeSocket.RemoteEndPoint}";
             }
 
             TunnelAddressIdentifier = $"[{LocalClientAddress}]/[{RemoteClientAddress}]";
@@ -127,7 +127,7 @@ namespace NetTunnel.Service.TunnelEngine
             }
             else
             {
-                RemoteClientAddress = $"{nativeSocket.LocalEndPoint}";
+                RemoteClientAddress = $"{nativeSocket.RemoteEndPoint}";
             }
 
             if (!$"[{LocalClientAddress}]/[{RemoteClientAddress}]".Equals(TunnelAddressIdentifier, StringComparison.InvariantCultureIgnoreCase))

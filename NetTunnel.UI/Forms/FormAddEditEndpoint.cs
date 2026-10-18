@@ -208,15 +208,24 @@ namespace NetTunnel.UI.Forms
                     if (string.IsNullOrWhiteSpace($"{row.Cells[columnHeader.Index].Value}") == false)
                     {
                         var headerType = Enum.Parse<NtHttpHeaderType>($"{row.Cells[columnType.Index].Value}");
+                        var verb = Enum.Parse<NtHttpVerb>($"{row.Cells[columnVerb.Index].Value}");
+
+                        if (headerType == NtHttpHeaderType.Response && verb != NtHttpVerb.Any)
+                        {
+                            //A response does not carry the verb of the request it answers, so such a rule could never match.
+                            tabControlBody.SelectedTab = tabPageHttpHeaders;
+                            dataGridViewHTTPHeaders.CurrentCell = row.Cells[columnVerb.Index];
+                            throw new Exception($"The response header rule for '{row.Cells[columnHeader.Index].Value}' must use the verb 'Any'.");
+                        }
 
                         endpointHttpHeaderRules.Add(new HttpHeaderRule
                         {
                             Enabled = bool.Parse(row.Cells[columnEnabled.Index].Value?.ToString() ?? "True"),
-                            HeaderType = Enum.Parse<NtHttpHeaderType>($"{row.Cells[columnType.Index].Value}"),
+                            HeaderType = headerType,
                             Action = Enum.Parse<NtHttpHeaderAction>($"{row.Cells[columnAction.Index].Value}"),
                             Name = $"{row.Cells[columnHeader.Index].Value}",
                             Value = $"{row.Cells[columnValue.Index].Value}",
-                            Verb = Enum.Parse<NtHttpVerb>($"{row.Cells[columnVerb.Index].Value}")
+                            Verb = verb
                         });
                     }
                 }

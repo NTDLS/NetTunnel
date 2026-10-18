@@ -105,6 +105,15 @@ namespace NetTunnel.Service.TunnelEngine
         public override void Start()
         {
             base.Start();
+
+            //Inbound tunnels have no connection thread to reload their endpoints, so restart any that a
+            //  previous Stop() shut down. Endpoint.Start() is a no-op for endpoints that are already running.
+            foreach (var endpoint in Endpoints)
+            {
+                endpoint.Start();
+            }
+
+            Status = NtTunnelStatus.Established;
         }
 
         public override void Stop()

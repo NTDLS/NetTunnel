@@ -12,7 +12,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
     internal class BaseEndpoint
     {
-        private readonly Thread _heartbeatThread;
+        private Thread? _heartbeatThread;
+        private readonly object _lifecycleLock = new();
         private readonly object _statisticsLock = new();
 
         internal readonly PessimisticCriticalResource<Dictionary<Guid, EndpointEdgeConnection>> _edgeConnections = new();
@@ -35,8 +36,6 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             _serviceEngine = serviceEngine;
             _tunnel = tunnel;
             EndpointId = endpointId;
-            _heartbeatThread = new Thread(HeartbeatThreadProc);
-            _heartbeatThread.Start();
         }
 
         private void HeartbeatThreadProc()
@@ -80,16 +79,58 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             }
         }
 
-        public virtual void Start()
+        /// <summary>
+        /// Marks the endpoint as running and starts the heartbeat thread.
+        /// Returns false if the endpoint was already running so that derived classes can skip their own startup.
+        /// </summary>
+        protected bool TryBeginStart()
         {
-            KeepRunning = true;
+            lock (_lifecycleLock)
+            {
+                if (KeepRunning)
+                {
+                    return false;
+                }
+
+                //KeepRunning must be set before the heartbeat thread starts, otherwise its loop exits immediately.
+                KeepRunning = true;
+                _heartbeatThread = new Thread(HeartbeatThreadProc);
+                _heartbeatThread.Start();
+                return true;
+            }
         }
 
-        public virtual void Stop()
+        /// <summary>
+        /// Marks the endpoint as stopped and waits on the heartbeat thread.
+        /// Returns false if the endpoint was not running so that derived classes can skip their own shutdown.
+        /// </summary>
+        protected bool TryBeginStop()
         {
-            KeepRunning = false;
-            _heartbeatThread.Join();
+            Thread? heartbeatThread;
+
+            lock (_lifecycleLock)
+            {
+                if (KeepRunning == false)
+                {
+                    return false;
+                }
+
+                KeepRunning = false;
+                heartbeatThread = _heartbeatThread;
+                _heartbeatThread = null;
+            }
+
+            if (heartbeatThread != null && heartbeatThread.ManagedThreadId != Environment.CurrentManagedThreadId)
+            {
+                heartbeatThread.Join();
+            }
+
+            return true;
         }
+
+        public virtual void Start() => TryBeginStart();
+
+        public virtual void Stop() => TryBeginStop();
 
         public void Disconnect(Guid edgeId)
         {
@@ -155,79 +196,37 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     _tunnel.S2SPeerNotificationEndpointConnect(_tunnel.TunnelKey, EndpointId, edgeConnection.EdgeId);
                 }
 
-                var httpHeaderBuilder = new StringBuilder();
+                //Only follow the HTTP stream if the traffic type is HTTP(S) and there are rules for what this end reads:
+                //  requests at the inbound endpoint and responses at the outbound endpoint.
+                var httpParser = (Configuration.TrafficType == NtTrafficType.Http || Configuration.TrafficType == NtTrafficType.Https)
+                    && Configuration.HttpHeaderRules.Any(o => o.Enabled
+                        && (o.HeaderType == NtHttpHeaderType.Any
+                            || (this is EndpointInbound && o.HeaderType == NtHttpHeaderType.Request)
+                            || (this is EndpointOutbound && o.HeaderType == NtHttpHeaderType.Response)))
+                    ? new HttpStreamParser(Configuration) : null;
 
                 var buffer = new ReceiveBuffer(Singletons.Configuration.InitialReceiveBufferSize);
 
                 while (KeepRunning && edgeConnection.IsConnected && edgeConnection.Read(ref buffer))
                 {
-                    packetSequence++;
-
                     lock (_statisticsLock)
                     {
                         BytesReceived += (ulong)buffer.Length;
                     }
 
-                    #region HTTP Header Augmentation.
+                    var (sendBytes, sendLength) = httpParser != null
+                        ? httpParser.Process(buffer.Bytes, buffer.Length)
+                        : (buffer.Bytes, buffer.Length);
 
-                    if (
-                         //Only parse HTTP headers if the traffic type is HTTP.
-                         (Configuration.TrafficType == NtTrafficType.Http || Configuration.TrafficType == NtTrafficType.Https)
-                         && (
-                            // and the direction is inbound/any and we have request rules.
-                            (
-                                this is EndpointInbound && Configuration.HttpHeaderRules
-                                    .Any(o => o.Enabled && (new[] { NtHttpHeaderType.Request, NtHttpHeaderType.Any }).Contains(o.HeaderType))
-                            )
-                            || (
-                                // or the direction is outbound/any and we have response rules.
-                                this is EndpointOutbound && Configuration.HttpHeaderRules
-                                    .Any(o => o.Enabled && (new[] { NtHttpHeaderType.Response, NtHttpHeaderType.Any }).Contains(o.HeaderType))
-                            )
-                         )
-                    )
+                    if (sendLength > 0) //Nothing to send while the parser is holding a partial HTTP header.
                     {
-                        switch (HttpUtility.Process(ref httpHeaderBuilder, Configuration, buffer))
-                        {
-                            case NtHTTPHeaderResult.WaitOnData:
-                                //We received a partial HTTP header, wait on more data. Nothing was sent, so
-                                //  give back the sequence number to avoid a gap at the peer.
-                                packetSequence--;
-                                continue;
-                            case NtHTTPHeaderResult.Present:
-                                //Found an HTTP header, send it to the peer. There may be bytes remaining
-                                //  in the buffer if buffer.Length > 0 so follow though to WriteBytesToPeer.
-
-                                var httpHeaderBytes = Encoding.Latin1.GetBytes(httpHeaderBuilder.ToString());
-
-                                _tunnel.S2SPeerNotificationEndpointDataExchange(
-                                    _tunnel.TunnelKey, EndpointId, edgeConnection.EdgeId, packetSequence, httpHeaderBytes, httpHeaderBytes.Length);
-
-                                httpHeaderBuilder.Clear();
-
-                                if (buffer.Length == 0)
-                                {
-                                    //The buffer held only the header, there is no remaining data to send.
-                                    buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);
-                                    continue;
-                                }
-
-                                //The remaining bytes are a separate packet and need their own sequence number.
-                                packetSequence++;
-                                break;
-                            case NtHTTPHeaderResult.NotPresent:
-                                //Didn't find an HTTP header.
-                                break;
-                        }
+                        //Send the data to the remote peer, along with all the IDs required to identify the tunnel,
+                        //  endpoint and endpoint-edge-connection (edgeId). At the tunnel-peer, This data will be
+                        //  sent to whatever is connected to the endpoint via a call to WriteEndpointEdgeData().
+                        //  Sequence numbers must be contiguous, so only consume one when a packet is actually sent.
+                        _tunnel.S2SPeerNotificationEndpointDataExchange(
+                            _tunnel.TunnelKey, Configuration.EndpointId, edgeConnection.EdgeId, ++packetSequence, sendBytes, sendLength);
                     }
-
-                    #endregion
-
-                    //Send the data to the remote peer, along with all the IDs required to identify the tunnel,
-                    //  endpoint and endpoint-edge-connection (edgeId). At the tunnel-peer, This data will be
-                    //  sent to whatever is connected to the endpoint via a call to WriteEndpointEdgeData().
-                    _tunnel.S2SPeerNotificationEndpointDataExchange(
-                        _tunnel.TunnelKey, Configuration.EndpointId, edgeConnection.EdgeId, packetSequence, buffer.Bytes, buffer.Length);
 
                     buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);
                 }

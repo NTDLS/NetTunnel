@@ -22,11 +22,17 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         public void Add(string username, string passwordHash, NtUserRole role)
             => Add(new User(username, passwordHash, role));
 
-        public void Add(User user) => _collection.Use((o)
-            => o.Add(user));
+        public void Add(User user) => _collection.Use((o) =>
+        {
+            o.Add(user);
+            SaveToDisk();
+        });
 
-        public void Delete(string username) => _collection.Use((o)
-            => o.RemoveAll(t => t.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase)));
+        public void Delete(string username) => _collection.Use((o) =>
+        {
+            o.RemoveAll(t => t.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase));
+            SaveToDisk();
+        });
 
         public void EditUser(User user)
         {
@@ -113,14 +119,15 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             {
                 o.Clear();
 
-                CommonApplicationData.LoadFromDisk(FriendlyName, new List<User>()).ForEach(o => Add(o));
+                //Add directly rather than through Add() so that loading doesn't rewrite the file once per user.
+                o.AddRange(CommonApplicationData.LoadFromDisk(FriendlyName, new List<User>()));
 
                 if (o.Count == 0)
                 {
 #if DEBUG
-                    Add("debug", Utility.ComputeSha256Hash("123456789"), NtUserRole.Administrator);
+                    o.Add(new User("debug", Utility.ComputeSha256Hash("123456789"), NtUserRole.Administrator));
 #endif
-                    Add("root", Utility.ComputeSha256Hash(Environment.MachineName.ToLower()), NtUserRole.Administrator);
+                    o.Add(new User("root", Utility.ComputeSha256Hash(Environment.MachineName.ToLower()), NtUserRole.Administrator));
                     SaveToDisk();
                 }
 

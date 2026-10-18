@@ -185,7 +185,7 @@ namespace NetTunnel.UI.Forms
 
         private void ButtonAbout_Click(object sender, EventArgs e)
         {
-            using var form = new FormAbout("NetTunnel", this.Icon, Resources.Logo128);
+            using var form = new FormAbout(Constants.FriendlyName, this.Icon, Resources.Logo128);
             form.ShowDialog();
         }
     }

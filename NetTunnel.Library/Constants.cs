@@ -7,13 +7,6 @@ namespace NetTunnel.Library
         public const string FriendlyName = "NetTunnel";
         public const string EventSourceName = "NetTunnel";
 
-        public enum NtHTTPHeaderResult
-        {
-            WaitOnData,
-            Present,
-            NotPresent
-        }
-
         public enum NtEdgeStatus
         {
             Normal, //This is a persistent connection.
