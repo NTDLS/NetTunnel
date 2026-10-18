@@ -188,7 +188,7 @@ namespace NetTunnel.UI.Forms
             labelTunnels.Dock = DockStyle.Top;
             labelTunnels.Location = new Point(0, 0);
             labelTunnels.Name = "labelTunnels";
-            labelTunnels.Size = new Size(48, 15);
+            labelTunnels.Size = new Size(49, 15);
             labelTunnels.TabIndex = 1;
             labelTunnels.Text = "Tunnels";
             // 

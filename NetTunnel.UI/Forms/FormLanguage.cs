@@ -4,6 +4,50 @@ using System.Globalization;
 namespace NetTunnel.UI.Forms
 {
     /// <summary>
+    /// A list of the languages to choose from.
+    /// </summary>
+    public sealed class FormLanguage : Form
+    {
+        private readonly ListBox _list = new();
+
+        public FormLanguage(string? currentLanguage)
+        {
+            Text = Localize("Language");
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            StartPosition = FormStartPosition.CenterParent;
+            MaximizeBox = MinimizeBox = ShowInTaskbar = false;
+            ClientSize = new Size(344, 400);
+
+            var prompt = new Label { Text = Localize("Choose the language of the user interface."), Location = new Point(12, 12), Size = new Size(320, 34) };
+
+            var choices = LanguageChoices.Build(Localizer.Default);
+            _list.Location = new Point(12, 49);
+            _list.Size = new Size(320, 300);
+            _list.IntegralHeight = false;
+            //Items rather than DataSource: a data source is not bound until the list is on a form, so the list would still be empty here.
+            _list.Items.AddRange(choices.ToArray<object>());
+            _list.SelectedIndex = LanguageChoices.IndexOf(choices, currentLanguage);
+            _list.DoubleClick += (_, _) =>
+            {
+                if (_list.IndexFromPoint(_list.PointToClient(MousePosition)) >= 0)
+                {
+                    DialogResult = DialogResult.OK;
+                }
+            };
+
+            var ok = new Button { Text = Localize("Ok"), DialogResult = DialogResult.OK, Location = new Point(148, 361), Size = new Size(88, 27) };
+            var cancel = new Button { Text = Localize("Cancel"), DialogResult = DialogResult.Cancel, Location = new Point(244, 361), Size = new Size(88, 27) };
+
+            AcceptButton = ok;
+            CancelButton = cancel;
+            Controls.AddRange([prompt, _list, ok, cancel]);
+        }
+
+        /// <summary>The chosen language: a culture code, or an empty string for Automatic.</summary>
+        public string SelectedLanguage => (_list.SelectedItem as LanguageChoice)?.Code ?? string.Empty;
+    }
+
+    /// <summary>
     /// One language in the list the user chooses from.
     /// </summary>
     public sealed class LanguageChoice
@@ -88,47 +132,4 @@ namespace NetTunnel.UI.Forms
             => string.IsNullOrEmpty(name) ? name : char.ToUpper(name[0], CultureInfo.CurrentCulture) + name[1..];
     }
 
-    /// <summary>
-    /// A list of the languages to choose from.
-    /// </summary>
-    public sealed class FormLanguage : Form
-    {
-        private readonly ListBox _list = new();
-
-        public FormLanguage(string? currentLanguage)
-        {
-            Text = Localize("Language");
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            StartPosition = FormStartPosition.CenterParent;
-            MaximizeBox = MinimizeBox = ShowInTaskbar = false;
-            ClientSize = new Size(344, 400);
-
-            var prompt = new Label { Text = Localize("Choose the language of the user interface."), Location = new Point(12, 12), Size = new Size(320, 34) };
-
-            var choices = LanguageChoices.Build(Localizer.Default);
-            _list.Location = new Point(12, 49);
-            _list.Size = new Size(320, 300);
-            _list.IntegralHeight = false;
-            //Items rather than DataSource: a data source is not bound until the list is on a form, so the list would still be empty here.
-            _list.Items.AddRange(choices.ToArray<object>());
-            _list.SelectedIndex = LanguageChoices.IndexOf(choices, currentLanguage);
-            _list.DoubleClick += (_, _) =>
-            {
-                if (_list.IndexFromPoint(_list.PointToClient(MousePosition)) >= 0)
-                {
-                    DialogResult = DialogResult.OK;
-                }
-            };
-
-            var ok = new Button { Text = Localize("Ok"), DialogResult = DialogResult.OK, Location = new Point(148, 361), Size = new Size(88, 27) };
-            var cancel = new Button { Text = Localize("Cancel"), DialogResult = DialogResult.Cancel, Location = new Point(244, 361), Size = new Size(88, 27) };
-
-            AcceptButton = ok;
-            CancelButton = cancel;
-            Controls.AddRange([prompt, _list, ok, cancel]);
-        }
-
-        /// <summary>The chosen language: a culture code, or an empty string for Automatic.</summary>
-        public string SelectedLanguage => (_list.SelectedItem as LanguageChoice)?.Code ?? string.Empty;
-    }
 }

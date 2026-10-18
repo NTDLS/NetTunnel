@@ -62,18 +62,18 @@
             labelCertificatePassword = new Label();
             textBoxCertificatePassword = new TextBox();
             checkBoxIgnoreBackendCertificateErrors = new CheckBox();
-            tabPageTls.SuspendLayout();
             tabControlBody.SuspendLayout();
             tabPageEndpoint.SuspendLayout();
             tabPageHttpHeaders.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewHTTPHeaders).BeginInit();
+            tabPageTls.SuspendLayout();
             SuspendLayout();
             // 
             // textBoxName
             // 
             textBoxName.Location = new Point(13, 29);
             textBoxName.Name = "textBoxName";
-            textBoxName.Size = new Size(369, 23);
+            textBoxName.Size = new Size(408, 23);
             textBoxName.TabIndex = 0;
             // 
             // labelName
@@ -103,7 +103,7 @@
             // 
             // textBoxTerminationAddress
             // 
-            textBoxTerminationAddress.Location = new Point(93, 82);
+            textBoxTerminationAddress.Location = new Point(113, 82);
             textBoxTerminationAddress.Name = "textBoxTerminationAddress";
             textBoxTerminationAddress.Size = new Size(191, 23);
             textBoxTerminationAddress.TabIndex = 2;
@@ -111,15 +111,15 @@
             // labelTerminationAddress
             // 
             labelTerminationAddress.AutoSize = true;
-            labelTerminationAddress.Location = new Point(93, 64);
+            labelTerminationAddress.Location = new Point(113, 64);
             labelTerminationAddress.Name = "labelTerminationAddress";
-            labelTerminationAddress.Size = new Size(147, 15);
+            labelTerminationAddress.Size = new Size(148, 15);
             labelTerminationAddress.TabIndex = 15;
             labelTerminationAddress.Text = "Termination address / host";
             // 
             // textBoxTerminationPort
             // 
-            textBoxTerminationPort.Location = new Point(290, 82);
+            textBoxTerminationPort.Location = new Point(329, 82);
             textBoxTerminationPort.Name = "textBoxTerminationPort";
             textBoxTerminationPort.Size = new Size(92, 23);
             textBoxTerminationPort.TabIndex = 3;
@@ -127,9 +127,9 @@
             // labelTerminationPort
             // 
             labelTerminationPort.AutoSize = true;
-            labelTerminationPort.Location = new Point(290, 64);
+            labelTerminationPort.Location = new Point(329, 64);
             labelTerminationPort.Name = "labelTerminationPort";
-            labelTerminationPort.Size = new Size(95, 15);
+            labelTerminationPort.Size = new Size(96, 15);
             labelTerminationPort.TabIndex = 17;
             labelTerminationPort.Text = "Termination port";
             // 
@@ -247,7 +247,7 @@
             label1.Location = new Point(13, 68);
             label1.Margin = new Padding(4, 0, 4, 0);
             label1.Name = "label1";
-            label1.Size = new Size(276, 15);
+            label1.Size = new Size(312, 15);
             label1.TabIndex = 13;
             label1.Text = "HTTP header rules (applicable to HTTP and HTTPS traffic)";
             // 
@@ -267,32 +267,32 @@
             labelInboundTrafficType.Location = new Point(13, 10);
             labelInboundTrafficType.Margin = new Padding(4, 0, 4, 0);
             labelInboundTrafficType.Name = "labelInboundTrafficType";
-            labelInboundTrafficType.Size = new Size(65, 15);
+            labelInboundTrafficType.Size = new Size(112, 15);
             labelInboundTrafficType.TabIndex = 11;
             labelInboundTrafficType.Text = "Inbound traffic type";
-            //
+            // 
             // comboBoxOutboundTrafficType
-            //
+            // 
             comboBoxOutboundTrafficType.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxOutboundTrafficType.FormattingEnabled = true;
-            comboBoxOutboundTrafficType.Location = new Point(190, 28);
+            comboBoxOutboundTrafficType.Location = new Point(218, 28);
             comboBoxOutboundTrafficType.Margin = new Padding(4, 3, 4, 3);
             comboBoxOutboundTrafficType.Name = "comboBoxOutboundTrafficType";
             comboBoxOutboundTrafficType.Size = new Size(157, 23);
             comboBoxOutboundTrafficType.TabIndex = 14;
-            //
+            // 
             // labelOutboundTrafficType
-            //
+            // 
             labelOutboundTrafficType.AutoSize = true;
-            labelOutboundTrafficType.Location = new Point(190, 10);
+            labelOutboundTrafficType.Location = new Point(218, 10);
             labelOutboundTrafficType.Margin = new Padding(4, 0, 4, 0);
             labelOutboundTrafficType.Name = "labelOutboundTrafficType";
-            labelOutboundTrafficType.Size = new Size(65, 15);
+            labelOutboundTrafficType.Size = new Size(122, 15);
             labelOutboundTrafficType.TabIndex = 15;
             labelOutboundTrafficType.Text = "Outbound traffic type";
-            //
+            // 
             // tabPageTls
-            //
+            // 
             tabPageTls.Controls.Add(labelTlsInfo);
             tabPageTls.Controls.Add(labelCertificatePath);
             tabPageTls.Controls.Add(textBoxCertificatePath);
@@ -306,70 +306,70 @@
             tabPageTls.TabIndex = 4;
             tabPageTls.Text = "TLS";
             tabPageTls.UseVisualStyleBackColor = true;
-            //
+            // 
             // labelTlsInfo
-            //
+            // 
             labelTlsInfo.Location = new Point(13, 10);
             labelTlsInfo.Name = "labelTlsInfo";
             labelTlsInfo.Size = new Size(570, 45);
             labelTlsInfo.TabIndex = 0;
-            labelTlsInfo.Text = "Only applicable when the traffic type is HTTPS. The inbound endpoint terminates TLS using the certificate below so that HTTP header rules can be applied, and the outbound endpoint re-encrypts the traffic to the destination.";
-            //
+            labelTlsInfo.Text = resources.GetString("labelTlsInfo.Text");
+            // 
             // labelCertificatePath
-            //
+            // 
             labelCertificatePath.AutoSize = true;
-            labelCertificatePath.Location = new Point(13, 68);
+            labelCertificatePath.Location = new Point(13, 92);
             labelCertificatePath.Name = "labelCertificatePath";
-            labelCertificatePath.Size = new Size(220, 15);
+            labelCertificatePath.Size = new Size(230, 15);
             labelCertificatePath.TabIndex = 1;
             labelCertificatePath.Text = "Certificate (PFX) path on the inbound host";
-            //
+            // 
             // textBoxCertificatePath
-            //
-            textBoxCertificatePath.Location = new Point(13, 86);
+            // 
+            textBoxCertificatePath.Location = new Point(13, 110);
             textBoxCertificatePath.Name = "textBoxCertificatePath";
             textBoxCertificatePath.Size = new Size(481, 23);
             textBoxCertificatePath.TabIndex = 2;
-            //
+            // 
             // buttonBrowseCertificate
-            //
-            buttonBrowseCertificate.Location = new Point(500, 85);
+            // 
+            buttonBrowseCertificate.Location = new Point(500, 109);
             buttonBrowseCertificate.Name = "buttonBrowseCertificate";
             buttonBrowseCertificate.Size = new Size(75, 25);
             buttonBrowseCertificate.TabIndex = 3;
             buttonBrowseCertificate.Text = "Browse...";
             buttonBrowseCertificate.UseVisualStyleBackColor = true;
             buttonBrowseCertificate.Click += ButtonBrowseCertificate_Click;
-            //
+            // 
             // labelCertificatePassword
-            //
+            // 
             labelCertificatePassword.AutoSize = true;
-            labelCertificatePassword.Location = new Point(13, 122);
+            labelCertificatePassword.Location = new Point(13, 146);
             labelCertificatePassword.Name = "labelCertificatePassword";
-            labelCertificatePassword.Size = new Size(110, 15);
+            labelCertificatePassword.Size = new Size(114, 15);
             labelCertificatePassword.TabIndex = 4;
             labelCertificatePassword.Text = "Certificate password";
-            //
+            // 
             // textBoxCertificatePassword
-            //
-            textBoxCertificatePassword.Location = new Point(13, 140);
+            // 
+            textBoxCertificatePassword.Location = new Point(13, 164);
             textBoxCertificatePassword.Name = "textBoxCertificatePassword";
             textBoxCertificatePassword.Size = new Size(260, 23);
             textBoxCertificatePassword.TabIndex = 5;
             textBoxCertificatePassword.UseSystemPasswordChar = true;
-            //
+            // 
             // checkBoxIgnoreBackendCertificateErrors
-            //
+            // 
             checkBoxIgnoreBackendCertificateErrors.AutoSize = true;
-            checkBoxIgnoreBackendCertificateErrors.Location = new Point(13, 184);
+            checkBoxIgnoreBackendCertificateErrors.Location = new Point(13, 208);
             checkBoxIgnoreBackendCertificateErrors.Name = "checkBoxIgnoreBackendCertificateErrors";
-            checkBoxIgnoreBackendCertificateErrors.Size = new Size(300, 19);
+            checkBoxIgnoreBackendCertificateErrors.Size = new Size(293, 19);
             checkBoxIgnoreBackendCertificateErrors.TabIndex = 6;
             checkBoxIgnoreBackendCertificateErrors.Text = "Ignore certificate errors from the destination server";
             checkBoxIgnoreBackendCertificateErrors.UseVisualStyleBackColor = true;
-            //
+            // 
             // FormAddEditEndpoint
-            //
+            // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(621, 404);
@@ -390,9 +390,9 @@
             tabPageEndpoint.PerformLayout();
             tabPageHttpHeaders.ResumeLayout(false);
             tabPageHttpHeaders.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dataGridViewHTTPHeaders).EndInit();
             tabPageTls.ResumeLayout(false);
             tabPageTls.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)dataGridViewHTTPHeaders).EndInit();
             ResumeLayout(false);
         }
 
