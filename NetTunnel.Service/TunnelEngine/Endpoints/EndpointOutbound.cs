@@ -64,12 +64,12 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 return;
             }
 
-            var tcpClient = new TcpClient();
+            TcpClient? tcpClient = null;
             EndpointEdgeConnection? activeConnection = null;
 
             try
             {
-                tcpClient.Connect(Configuration.OutboundAddress, Configuration.OutboundPort);
+                tcpClient = NetworkUtility.Connect(Configuration.OutboundAddress, Configuration.OutboundPort);
 
                 var dataExchangeThread = new Thread(EndpointEdgeConnectionDataPumpThreadProc);
                 //Keep track of the connection. ActiveEndpointConnection will handle closing and disposing of the client and its stream.
@@ -100,7 +100,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     Exceptions.Ignore(() => _edgeConnections.Use((o) => o.Remove(edgeId)));
                     Exceptions.Ignore(activeConnection.Dispose);
                 }
-                Exceptions.Ignore(tcpClient.Dispose);
+                Exceptions.Ignore(() => tcpClient?.Dispose());
 
                 Singletons.Logger.Exception(ex, $"EstablishOutboundEndpointConnection: {ex.Message}");
                 throw;

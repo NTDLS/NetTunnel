@@ -904,7 +904,7 @@ namespace NetTunnel.UI.Forms
                     var item = new ListViewItem(endpoint.Name);
                     item.Tag = new TunnelEndpointTag(tunnel, endpoint);
                     item.SubItems.Add(Localize("Outbound"));
-                    item.SubItems.Add($"{endpoint.OutboundAddress}:{endpoint.OutboundPort}");
+                    item.SubItems.Add(Utility.FormatHostPort(endpoint.OutboundAddress, endpoint.OutboundPort));
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");

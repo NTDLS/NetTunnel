@@ -56,7 +56,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 }
             }
 
-            _listener = new TcpListener(IPAddress.Any, Configuration.InboundPort);
+            _listener = NetworkUtility.CreateListener(Configuration.InboundPort);
 
             Singletons.Logger.Verbose(
                 $"Starting inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort}.");
@@ -113,9 +113,21 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
             try
             {
-                listener.Start();
+                try
+                {
+                    listener.Start();
+                }
+                catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressFamilyNotSupported && listener.Server.AddressFamily == AddressFamily.InterNetworkV6)
+                {
+                    //IPv6 is installed but not usable here (for example it is disabled on the network adapters). Listen on IPv4 only.
+                    Singletons.Logger.Warning($"IPv6 is not available for inbound endpoint '{Configuration.Name}', listening on IPv4 only.");
+                    Exceptions.Ignore(listener.Dispose);
+                    listener = new TcpListener(IPAddress.Any, Configuration.InboundPort);
+                    _listener = listener;
+                    listener.Start();
+                }
 
-                Singletons.Logger.Verbose($"Listening inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort}");
+                Singletons.Logger.Verbose($"Listening inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort} ({(listener.Server.AddressFamily == AddressFamily.InterNetworkV6 ? "IPv4 and IPv6" : "IPv4")})");
 
                 while (KeepRunning)
                 {

@@ -46,7 +46,7 @@ namespace NetTunnel.Service.TunnelEngine
 
             if (nativeSocket.LocalEndPoint is IPEndPoint localIpEndPoint)
             {
-                LocalClientAddress = $"{localIpEndPoint.Address}:{localIpEndPoint.Port}";
+                LocalClientAddress = Utility.FormatEndPoint(localIpEndPoint);
             }
             else
             {
@@ -55,7 +55,7 @@ namespace NetTunnel.Service.TunnelEngine
 
             if (nativeSocket.RemoteEndPoint is IPEndPoint remoteIpEndPoint)
             {
-                RemoteClientAddress = $"{remoteIpEndPoint.Address}:{remoteIpEndPoint.Port}";
+                RemoteClientAddress = Utility.FormatEndPoint(remoteIpEndPoint);
             }
             else
             {
@@ -114,7 +114,7 @@ namespace NetTunnel.Service.TunnelEngine
         {
             if (nativeSocket.LocalEndPoint is IPEndPoint localIpEndPoint)
             {
-                LocalClientAddress = $"{localIpEndPoint.Address}:{localIpEndPoint.Port}";
+                LocalClientAddress = Utility.FormatEndPoint(localIpEndPoint);
             }
             else
             {
@@ -123,7 +123,7 @@ namespace NetTunnel.Service.TunnelEngine
 
             if (nativeSocket.RemoteEndPoint is IPEndPoint remoteIpEndPoint)
             {
-                RemoteClientAddress = $"{remoteIpEndPoint.Address}:{remoteIpEndPoint.Port}";
+                RemoteClientAddress = Utility.FormatEndPoint(remoteIpEndPoint);
             }
             else
             {

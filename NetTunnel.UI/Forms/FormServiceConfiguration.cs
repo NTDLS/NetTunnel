@@ -37,6 +37,9 @@ namespace NetTunnel.UI.Forms
             toolTips.AddControls([labelManagementPort, textBoxManagementPort],
                 Localize("Port is used by both the user-interface and a remote NetTunnel service to communicate configuration changes to this NetTunnel service. Default: {0}", defaults.ServicePort.ToString("n0")));
 
+            toolTips.AddControls([checkBoxEnableIPv6],
+                Localize("Endpoints listen on IPv6 as well as IPv4 (one listener accepts both), and can connect to IPv6 destinations. Turn off to use IPv4 only. Takes effect when an endpoint is started. Default: on"));
+
             toolTips.AddControls([labelMessageQueryTimeoutMs, textBoxMessageQueryTimeoutMs],
                 Localize("Duration in milliseconds to wait on message query operations. Default: {0}", defaults.MessageQueryTimeoutMs.ToString("n0")));
 
@@ -120,6 +123,7 @@ namespace NetTunnel.UI.Forms
             else
             {
                 textBoxManagementPort.Text = $"{configuration.ServicePort:n0}";
+                checkBoxEnableIPv6.Checked = configuration.EnableIPv6;
                 textBoxMessageQueryTimeoutMs.Text = $"{configuration.MessageQueryTimeoutMs:n0}";
                 textBoxEndpointHeartbeatDelayMs.Text = $"{configuration.EndpointHeartbeatDelayMs:n0}";
                 textBoxTunnelCryptographyKeySize.Text = $"{configuration.TunnelCryptographyKeySize:n0}";
@@ -154,6 +158,8 @@ namespace NetTunnel.UI.Forms
 
                 configuration.ServicePort = textBoxManagementPort.GetAndValidateNumeric(1, 65535,
                     Localize("Service port must be an integer value between [min] and [max]."));
+
+                configuration.EnableIPv6 = checkBoxEnableIPv6.Checked;
 
                 configuration.MessageQueryTimeoutMs = textBoxMessageQueryTimeoutMs.GetAndValidateNumeric(1000, 3600000,
                     Localize("Message query timeout (ms) must be an integer value between [min] and [max]."));

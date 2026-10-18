@@ -340,8 +340,9 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                     if (edge.TcpClient.Client.RemoteEndPoint is IPEndPoint address)
                     {
-                        connection.AddressFamily = address.AddressFamily.ToString();
-                        connection.Address = address.Address.ToString();
+                        var remote = Utility.Unmap(address.Address);
+                        connection.AddressFamily = remote.AddressFamily == AddressFamily.InterNetworkV6 ? "IPv6" : "IPv4";
+                        connection.Address = remote.ToString();
                         connection.Port = address.Port;
                     }
 

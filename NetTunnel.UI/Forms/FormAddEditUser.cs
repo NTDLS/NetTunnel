@@ -78,7 +78,7 @@ namespace NetTunnel.UI.Forms
             }
             else
             {
-                item.SubItems.Add($"{endpoint.OutboundAddress}:{endpoint.OutboundPort}");
+                item.SubItems.Add(Utility.FormatHostPort(endpoint.OutboundAddress, endpoint.OutboundPort));
             }
 
             listViewEndpoints.Items.Add(item);

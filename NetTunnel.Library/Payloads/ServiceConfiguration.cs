@@ -15,6 +15,12 @@ namespace NetTunnel.Library.Payloads
         public int ServicePort { get; set; } = 52845;
 
         /// <summary>
+        /// When true, endpoints listen on IPv6 as well as IPv4 (one dual-stack listener), and can connect to IPv6 destinations.
+        /// When false, only IPv4 is used.
+        /// </summary>
+        public bool EnableIPv6 { get; set; } = true;
+
+        /// <summary>
         /// The number of milliseconds to wait between pings to the remote service. (0 = disabled);
         /// </summary>
         public int PingCadence { get; set; } = 5000;

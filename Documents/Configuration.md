@@ -54,8 +54,8 @@ The endpoint dialog has three tabs.
 | Setting | Meaning |
 | --- | --- |
 | **Name or description** | Your own label. Required. |
-| **Listen port** | Port the inbound endpoint listens on (1-65535). It listens on all network interfaces. |
-| **Termination address / host** | Host name, domain or IP the outbound endpoint connects to. Required. |
+| **Listen port** | Port the inbound endpoint listens on (1-65535). It listens on all network interfaces, IPv4 and IPv6. |
+| **Termination address / host** | Host name, domain, IPv4 or IPv6 address the outbound endpoint connects to. Required. |
 | **Termination port** | Port on the destination (1-65535). |
 
 ### HTTP Headers tab
@@ -74,6 +74,19 @@ The endpoint dialog has three tabs.
 | **Certificate password** | Password for the PFX. Leave empty if it has none. |
 | **Ignore certificate errors from the destination server** | Outbound HTTPS only. Skips validation of the destination's certificate. |
 | **Offer HTTP/2 to clients (the destination must support it)** | Inbound HTTPS only. Lets clients that support HTTP/2 use it. See [HTTP/2](#http2). |
+
+### IPv4 and IPv6
+
+Endpoints work with both. Unless you turn it off ([`EnableIPv6`](#8-service-configuration)):
+
+- **Inbound endpoints** use one dual-stack listener, so a single listen port accepts IPv6 and IPv4 clients alike. Clients are shown by their IPv4 address when they connected over IPv4, and the **Family** column in the connections window says IPv4 or IPv6.
+- **Outbound endpoints** can connect to an IPv6 destination. The termination address can be a host name, an IPv4 address or an IPv6 address (`2001:db8::10` or `[2001:db8::10]`, with or without the brackets). A host name with both kinds of address is tried address by address. With IPv6 turned off only its IPv4 addresses are used, and an IPv6 address is refused with a message that says so.
+- If the operating system has IPv6 but it cannot be used (for example it is disabled on the network adapters), the inbound endpoint logs a warning and listens on IPv4 only.
+
+Be careful with the firewall: IPv6 addresses are usually reachable from the internet without NAT in front of them. An endpoint that was only reachable on your IPv4 network can now be reachable on an IPv6 address too, so check the host firewall's IPv6 rules, or turn IPv6 off in the service configuration.
+
+The **service (management) port** is the exception: it is IPv4 only for now, so the UI and other NetTunnel services must reach a service over IPv4 (see [Known limitations](#12-known-limitations)).
+
 
 ## 3. Choosing traffic types
 
@@ -261,6 +274,7 @@ Open **Settings > Service configuration** (administrators only). Each service ha
 | Setting | Default | Allowed | Meaning |
 | --- | --- | --- | --- |
 | **Management port** (`ServicePort`) | 52845 | 1-65535 | Port the service accepts UI and tunnel connections on. Restart the service after changing. |
+| **Use IPv6 as well as IPv4** (`EnableIPv6`) | on | on / off | Endpoints listen on IPv6 as well as IPv4 and can connect to IPv6 destinations. Applies when an endpoint starts. See [IPv4 and IPv6](#ipv4-and-ipv6). |
 | **Message query timeout** (`MessageQueryTimeoutMs`) | 10000 | 1000-3600000 | Milliseconds to wait on a query to the peer. |
 | **Endpoint heartbeat** (`EndpointHeartbeatDelayMs`) | 5000 | 1000-216000000 | Milliseconds between endpoint heartbeats, which also check for stale connections. |
 | **Tunnel cryptography key size** (`TunnelCryptographyKeySize`) | 4096 | 128-81920 | Bits of key material negotiated per tunnel at each connect. |
@@ -349,7 +363,7 @@ Things to know:
 
 - **Change the default login first.** A new installation creates the user `root` with the machine's lower-case name as its password. Change it from the Users dialog before exposing the service.
 - Only the **management port** (default 52845) needs to be reachable on the service that accepts tunnels. Endpoint ports are only needed where clients connect. Open nothing else.
-- Endpoint listeners bind to **all network interfaces**. Restrict who can reach them with the host firewall.
+- Endpoint listeners bind to **all network interfaces, IPv4 and IPv6**. Restrict who can reach them with the host firewall, for both address families (IPv6 addresses are often directly reachable from the internet).
 - With HTTP or Raw edges, traffic is in the clear between the client and the inbound endpoint and between the outbound endpoint and the destination. Keep those hops on trusted networks, or use HTTPS at the edges.
 - Prefer a trusted certificate with the default validation over **Ignore certificate errors**.
 - Passwords are encrypted in the configuration files ([Secrets in the files](#secrets-in-the-files)). Back up the `secret.key` file on Linux, and keep the configuration folder readable only by administrators and the service account.
@@ -392,6 +406,7 @@ Things to know:
 ## 12. Known limitations
 
 - HTTP/1.x and HTTP/2 are supported, HTTP/3 (QUIC) is not: tunnels carry TCP and HTTP/3 is UDP. Clients fall back to HTTP/2 or HTTP/1.1. WebSockets and other upgrades are forwarded but not inspected.
+- The service (management) port is IPv4 only, because the messaging library it uses (NTDLS.ReliableMessaging) listens on IPv4 only. Tunnels and the UI must reach a service over IPv4. Endpoints are not affected.
 - HTTP/2 is relayed, not translated: a client that uses HTTP/2 needs a destination that speaks HTTP/2 (see [HTTP/2](#http2)). It is only available with an HTTPS inbound endpoint.
 - Header rules cannot change bodies, use variables, or match on values. They are applied on every message in order.
 - A response to a `HEAD` request carries a length but no body. NetTunnel cannot tell, so the rest of that connection is passed through unmodified.

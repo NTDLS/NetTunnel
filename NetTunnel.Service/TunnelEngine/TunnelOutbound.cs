@@ -192,7 +192,7 @@ namespace NetTunnel.Service.TunnelEngine
                         Status = NtTunnelStatus.Connecting;
 
                         Singletons.Logger.Verbose(
-                            $"Tunnel '{Configuration.Name}' connecting to service at {Configuration.Address}:{Configuration.ServicePort}.");
+                            $"Tunnel '{Configuration.Name}' connecting to service at {Utility.FormatHostPort(Configuration.Address, Configuration.ServicePort)}.");
 
                         //Make the outbound connection to the remote tunnel service.
                         _client.ConnectAndLogin(NtLoginType.Service, LoginStatusHandler);
@@ -252,4 +252,4 @@ namespace NetTunnel.Service.TunnelEngine
             }
         }
     }
-}
+}
