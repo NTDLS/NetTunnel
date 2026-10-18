@@ -1,7 +1,7 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Interfaces;
-using NetTunnel.Library.Payloads;
 using NetTunnel.Library.Logging;
+using NetTunnel.Library.Payloads;
 using NetTunnel.Service.Logging;
 using NTDLS.Persistence;
 

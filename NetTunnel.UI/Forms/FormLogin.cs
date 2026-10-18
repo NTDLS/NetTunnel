@@ -28,23 +28,7 @@ namespace NetTunnel.UI.Forms
 
             _serviceLogDelegate = serviceLogDelegate;
 
-            #region Set Tool-tips.
-
-            var toolTips = ToolTipHelpers.CreateToolTipControl(this);
-
-            toolTips.AddControls([labelAddress, textBoxAddress],
-                Localize("Host name, domain, or IP address of the NetTunnel service you want to connect to."));
-
-            toolTips.AddControls([labelPort, textBoxPort],
-                Localize("Port of the NetTunnel service you want to connect to."));
-
-            toolTips.AddControls([labelUsername, textBoxUsername],
-                Localize("Username to use when connecting to the NetTunnel service."));
-
-            toolTips.AddControls([labelPassword, textBoxPassword],
-                Localize("Password for the user to use when connecting to the NetTunnel service."));
-
-            #endregion
+            ApplyToolTips();
 
             AcceptButton = buttonLogin;
             CancelButton = buttonCancel;
@@ -87,7 +71,47 @@ namespace NetTunnel.UI.Forms
             textBoxUsername.TextChanged += (object? sender, EventArgs e) => ClearPassword();
             textBoxPassword.TextChanged += (object? sender, EventArgs e) => ClearPassword();
 
-            this.Shown += FormLogin_Shown   ;
+            this.Shown += FormLogin_Shown;
+        }
+
+        private ToolTip? _toolTips;
+
+        /// <summary>
+        /// Sets the tool-tips in the current language. Called at the start and whenever the language changes.
+        /// </summary>
+        private void ApplyToolTips()
+        {
+            _toolTips ??= ToolTipHelpers.CreateToolTipControl(this);
+
+            _toolTips.AddControls([labelAddress, textBoxAddress],
+                Localize("Host name, domain, or IP address of the NetTunnel service you want to connect to."));
+
+            _toolTips.AddControls([labelPort, textBoxPort],
+                Localize("Port of the NetTunnel service you want to connect to."));
+
+            _toolTips.AddControls([labelUsername, textBoxUsername],
+                Localize("Username to use when connecting to the NetTunnel service."));
+
+            _toolTips.AddControls([labelPassword, textBoxPassword],
+                Localize("Password for the user to use when connecting to the NetTunnel service."));
+        }
+
+        private void ButtonLanguage_Click(object sender, EventArgs e)
+        {
+            var settings = UISettings.Load();
+
+            using var form = new FormLanguage(settings.Language) { Icon = Icon };
+            if (form.ShowDialog(this) != DialogResult.OK)
+            {
+                return;
+            }
+
+            settings.Language = form.SelectedLanguage;
+            Localizer.Default.SetLanguage(settings.Language);
+            settings.Save();
+
+            FormLocalizer.Apply(this);
+            ApplyToolTips();
         }
 
         private void FormLogin_Shown(object? sender, EventArgs e)

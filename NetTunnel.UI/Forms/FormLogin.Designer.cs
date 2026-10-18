@@ -41,6 +41,7 @@
             textBoxAddress = new TextBox();
             labelAddress = new Label();
             buttonAbout = new Button();
+            buttonLanguage = new Button();
             checkBoxRememberPassword = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)pictureBoxLogin).BeginInit();
             SuspendLayout();
@@ -142,7 +143,7 @@
             // 
             // buttonAbout
             // 
-            buttonAbout.Location = new Point(23, 202);
+            buttonAbout.Location = new Point(12, 202);
             buttonAbout.Name = "buttonAbout";
             buttonAbout.Size = new Size(75, 23);
             buttonAbout.TabIndex = 7;
@@ -150,6 +151,17 @@
             buttonAbout.Text = "About";
             buttonAbout.UseVisualStyleBackColor = true;
             buttonAbout.Click += ButtonAbout_Click;
+            // 
+            // buttonLanguage
+            // 
+            buttonLanguage.Location = new Point(93, 202);
+            buttonLanguage.Name = "buttonLanguage";
+            buttonLanguage.Size = new Size(75, 23);
+            buttonLanguage.TabIndex = 8;
+            buttonLanguage.TabStop = false;
+            buttonLanguage.Text = "Language";
+            buttonLanguage.UseVisualStyleBackColor = true;
+            buttonLanguage.Click += ButtonLanguage_Click;
             // 
             // checkBoxRememberPassword
             // 
@@ -168,6 +180,7 @@
             ClientSize = new Size(380, 237);
             Controls.Add(checkBoxRememberPassword);
             Controls.Add(buttonAbout);
+            Controls.Add(buttonLanguage);
             Controls.Add(labelPort);
             Controls.Add(textBoxPort);
             Controls.Add(textBoxAddress);
@@ -206,6 +219,7 @@
         private TextBox textBoxAddress;
         private Label labelAddress;
         private Button buttonAbout;
+        private Button buttonLanguage;
         private CheckBox checkBoxRememberPassword;
     }
-}
+}

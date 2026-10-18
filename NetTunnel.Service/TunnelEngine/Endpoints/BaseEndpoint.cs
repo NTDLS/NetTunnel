@@ -5,7 +5,6 @@ using NTDLS.Helpers;
 using NTDLS.Semaphore;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Endpoints
