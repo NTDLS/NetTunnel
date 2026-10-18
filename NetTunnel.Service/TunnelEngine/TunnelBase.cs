@@ -3,6 +3,7 @@ using NetTunnel.Library.Interfaces;
 using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
 using NetTunnel.Service.TunnelEngine.Endpoints;
+using NTDLS.Helpers;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine
@@ -33,7 +34,22 @@ namespace NetTunnel.Service.TunnelEngine
         public ulong CurrentConnections { get; set; }
         public IServiceEngine ServiceEngine { get; private set; }
         public bool KeepRunning { get; private set; } = false;
-        public List<IEndpoint> Endpoints { get; private set; } = new();
+        private readonly object _endpointsLock = new();
+        private List<IEndpoint> _endpoints = new();
+
+        /// <summary>
+        /// A snapshot of the endpoints; safe to enumerate while endpoints are being added or removed.
+        /// </summary>
+        public IReadOnlyList<IEndpoint> Endpoints
+        {
+            get
+            {
+                lock (_endpointsLock)
+                {
+                    return _endpoints.ToList();
+                }
+            }
+        }
         bool ITunnel.IsLoggedIn => throw new NotImplementedException("This function should be overridden.");
 
         #endregion
@@ -52,17 +68,31 @@ namespace NetTunnel.Service.TunnelEngine
 
             Singletons.Logger.Verbose($"Loading endpoints for {tunnelDirection} tunnel '{Configuration.Name}'.");
 
-            Endpoints.Clear();
+            var newEndpoints = new List<IEndpoint>();
 
             endpoints.Where(o => o.Direction == NtDirection.Inbound)
-                .ToList().ForEach(o => Endpoints.Add(new EndpointInbound(ServiceEngine, this, o)));
+                .ToList().ForEach(o => newEndpoints.Add(new EndpointInbound(ServiceEngine, this, o)));
 
             endpoints.Where(o => o.Direction == NtDirection.Outbound)
-                .ToList().ForEach(o => Endpoints.Add(new EndpointOutbound(ServiceEngine, this, o)));
+                .ToList().ForEach(o => newEndpoints.Add(new EndpointOutbound(ServiceEngine, this, o)));
+
+            List<IEndpoint> oldEndpoints;
+            lock (_endpointsLock)
+            {
+                oldEndpoints = _endpoints;
+                _endpoints = newEndpoints;
+            }
+
+            //Stop any endpoints from a previous connection, otherwise they keep running orphaned
+            //  and the inbound listeners hold their ports so that the new ones cannot bind.
+            foreach (var endpoint in oldEndpoints)
+            {
+                Exceptions.Ignore(endpoint.Stop);
+            }
 
             Singletons.Logger.Verbose($"Starting endpoints for {tunnelDirection} tunnel '{Configuration.Name}'.");
 
-            foreach (var endpoint in Endpoints)
+            foreach (var endpoint in newEndpoints)
             {
                 endpoint.Start();
             }
@@ -112,13 +142,14 @@ namespace NetTunnel.Service.TunnelEngine
 
         public TunnelPropertiesDisplay GetProperties()
         {
+            //There is no connection state while the tunnel is disconnected.
             var serviceConnectionState = Singletons.ServiceEngine
-                .ServiceConnectionStates.Use(o => o.SingleOrDefault(o => o.Value.TunnelKey == TunnelKey).Value);
+                .ServiceConnectionStates.Use(o => o.Values.FirstOrDefault(o => o.TunnelKey == TunnelKey));
 
             var prop = new TunnelPropertiesDisplay()
             {
-                KeyHash = serviceConnectionState.KeyHash,
-                KeyLength = serviceConnectionState.KeyLength,
+                KeyHash = serviceConnectionState?.KeyHash ?? string.Empty,
+                KeyLength = serviceConnectionState?.KeyLength ?? 0,
                 BytesReceived = BytesReceived,
                 BytesSent = BytesSent,
                 CurrentConnections = CurrentConnections,
@@ -127,13 +158,13 @@ namespace NetTunnel.Service.TunnelEngine
                 Status = Status,
                 TotalConnections = TotalConnections,
                 TunnelKey = TunnelKey,
-                RemoteClientAddress = serviceConnectionState.RemoteClientAddress,
-                LocalClientAddress = serviceConnectionState.LocalClientAddress,
-                IsAuthenticated = serviceConnectionState.IsAuthenticated,
+                RemoteClientAddress = serviceConnectionState?.RemoteClientAddress ?? string.Empty,
+                LocalClientAddress = serviceConnectionState?.LocalClientAddress ?? string.Empty,
+                IsAuthenticated = serviceConnectionState?.IsAuthenticated ?? false,
                 KeepRunning = KeepRunning,
-                LoginTime = serviceConnectionState.LoginTime,
-                IsKeyExchangeComplete = serviceConnectionState.IsKeyExchangeComplete,
-                LoggedInUserName = serviceConnectionState.UserName,
+                LoginTime = serviceConnectionState?.LoginTime ?? DateTime.MinValue,
+                IsKeyExchangeComplete = serviceConnectionState?.IsKeyExchangeComplete ?? false,
+                LoggedInUserName = serviceConnectionState?.UserName ?? string.Empty,
                 ServiceId = Configuration.ServiceId,
                 Name = Configuration.Name,
                 Endpoints = Endpoints.Count,
@@ -174,7 +205,10 @@ namespace NetTunnel.Service.TunnelEngine
         {
             Singletons.Logger.Verbose($"Stopping tunnel '{Configuration.Name}'.");
 
-            Endpoints.ForEach(o => o.Stop());
+            foreach (var endpoint in Endpoints)
+            {
+                Exceptions.Ignore(endpoint.Stop);
+            }
 
             KeepRunning = false;
 
@@ -190,11 +224,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         public IEndpoint UpsertEndpoint(EndpointConfiguration configuration, string? username)
         {
-            var existingEndpoint = Endpoints.SingleOrDefault(o => o.EndpointId == configuration.EndpointId);
-            if (existingEndpoint != null)
-            {
-                DeleteEndpoint(existingEndpoint.EndpointId, null);
-            }
+            DeleteEndpoint(configuration.EndpointId, null);
 
             IEndpoint endpoint;
 
@@ -211,18 +241,29 @@ namespace NetTunnel.Service.TunnelEngine
                 throw new Exception("Endpoint direction is not well defined.");
             }
 
-            Endpoints.Add(endpoint);
+            lock (_endpointsLock)
+            {
+                _endpoints.Add(endpoint);
+            }
             endpoint.Start();
             return endpoint;
         }
 
         public void DeleteEndpoint(Guid endpointId, string? username)
         {
-            var endpoint = Endpoints.SingleOrDefault(o => o.EndpointId == endpointId);
+            IEndpoint? endpoint;
+            lock (_endpointsLock)
+            {
+                endpoint = _endpoints.SingleOrDefault(o => o.EndpointId == endpointId);
+                if (endpoint != null)
+                {
+                    _endpoints.Remove(endpoint);
+                }
+            }
+
             if (endpoint != null)
             {
                 endpoint.Stop();
-                Endpoints.Remove(endpoint);
 
                 //The user record owns the endpoint, so if we have been supplied one - delete it from the config.
                 if (string.IsNullOrEmpty(username) == false)

@@ -39,6 +39,7 @@ namespace NetTunnel.UI.Forms
             securityToolStripMenuItem = new ToolStripMenuItem();
             usersToolStripMenuItem = new ToolStripMenuItem();
             configurationToolStripMenuItem = new ToolStripMenuItem();
+            languageToolStripMenuItem = new ToolStripMenuItem();
             helpToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
             statusStripBody = new StatusStrip();
@@ -100,7 +101,7 @@ namespace NetTunnel.UI.Forms
             // 
             // securityToolStripMenuItem
             // 
-            securityToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { usersToolStripMenuItem, configurationToolStripMenuItem });
+            securityToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { usersToolStripMenuItem, configurationToolStripMenuItem, languageToolStripMenuItem });
             securityToolStripMenuItem.Name = "securityToolStripMenuItem";
             securityToolStripMenuItem.Size = new Size(61, 20);
             securityToolStripMenuItem.Text = "Settings";
@@ -118,6 +119,13 @@ namespace NetTunnel.UI.Forms
             configurationToolStripMenuItem.Size = new Size(148, 22);
             configurationToolStripMenuItem.Text = "Configuration";
             configurationToolStripMenuItem.Click += ConfigurationToolStripMenuItem_Click;
+            // 
+            // languageToolStripMenuItem
+            // 
+            languageToolStripMenuItem.Name = "languageToolStripMenuItem";
+            languageToolStripMenuItem.Size = new Size(148, 22);
+            languageToolStripMenuItem.Text = "Language...";
+            languageToolStripMenuItem.Click += LanguageToolStripMenuItem_Click;
             // 
             // helpToolStripMenuItem
             // 
@@ -180,7 +188,7 @@ namespace NetTunnel.UI.Forms
             labelTunnels.Dock = DockStyle.Top;
             labelTunnels.Location = new Point(0, 0);
             labelTunnels.Name = "labelTunnels";
-            labelTunnels.Size = new Size(48, 15);
+            labelTunnels.Size = new Size(49, 15);
             labelTunnels.TabIndex = 1;
             labelTunnels.Text = "Tunnels";
             // 
@@ -298,6 +306,7 @@ namespace NetTunnel.UI.Forms
         private ToolStripMenuItem helpToolStripMenuItem;
         private ToolStripMenuItem aboutToolStripMenuItem;
         private ToolStripMenuItem configurationToolStripMenuItem;
+        private ToolStripMenuItem languageToolStripMenuItem;
         private ToolStripSeparator toolStripMenuItem1;
         private SplitContainer splitContainerBody;
         private DoubleBufferedListView listViewLogs;
@@ -306,4 +315,4 @@ namespace NetTunnel.UI.Forms
         private ColumnHeader columnHeaderText;
         private DoubleBufferedListView listViewTunnels;
     }
-}
+}

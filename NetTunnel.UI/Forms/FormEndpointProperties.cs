@@ -1,6 +1,7 @@
 ﻿using NetTunnel.Library;
 using NetTunnel.Library.Payloads;
 using NTDLS.Helpers;
+using NTDLS.Localization;
 using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
 
@@ -18,6 +19,7 @@ namespace NetTunnel.UI.Forms
         public FormEndpointProperties()
         {
             InitializeComponent();
+            FormLocalizer.Apply(this);
             Theming.InitializeForm(this);
 
             _tunnelKey = new DirectionalKey();
@@ -27,13 +29,14 @@ namespace NetTunnel.UI.Forms
         public FormEndpointProperties(ServiceClient client, DirectionalKey tunnelKey, DirectionalKey endpointKey)
         {
             InitializeComponent();
+            FormLocalizer.Apply(this);
             Theming.InitializeForm(this);
 
             _client = client;
             _endpointKey = endpointKey;
             _tunnelKey = tunnelKey;
 
-            Text = $"{FriendlyName} : Endpoint Properties";
+            Text = $"{FriendlyName} : {Localize("Endpoint Properties")}";
 
             Shown += FormEndpointProperties_Shown;
             FormClosing += FormEndpointProperties_FormClosing;
@@ -68,7 +71,7 @@ namespace NetTunnel.UI.Forms
                     {
                         if (i == 1000)
                         {
-                            this.InvokeMessageBox("A timeout has occurred while waiting on the timer to terminate.",
+                            this.InvokeMessageBox(Localize("A timeout has occurred while waiting on the timer to terminate."),
                                 FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                             this.InvokeClose(DialogResult.OK);
                             return;
@@ -120,7 +123,7 @@ namespace NetTunnel.UI.Forms
 
                 if (selectedItem != null)
                 {
-                    menu.Items.Add("Copy to clipboard");
+                    UIUtility.AddMenuItem(menu, "Copy to clipboard", Localize("Copy to clipboard"));
                 }
 
                 menu.Show(listViewProperties, new Point(e.X, e.Y));
@@ -129,7 +132,7 @@ namespace NetTunnel.UI.Forms
                 {
                     menu.Hide();
 
-                    if (selectedItem != null && e.ClickedItem?.Text == "Copy to clipboard")
+                    if (selectedItem != null && e.ClickedItem?.Tag as string == "Copy to clipboard")
                     {
                         Clipboard.SetText(selectedItem.SubItems[1].Text);
                     }
@@ -145,14 +148,14 @@ namespace NetTunnel.UI.Forms
             }
             _firstShown = false;
 
-            var progressForm = new ProgressForm(FriendlyName, "Getting properties...");
+            var progressForm = new ProgressForm(FriendlyName, Localize("Getting properties..."));
 
             progressForm.Execute(() =>
             {
                 try
                 {
                     var result = _client.EnsureNotNull().UIQueryGetEndpointProperties(_tunnelKey, _endpointKey);
-                    this.InvokeSetText($"{FriendlyName} : {result.Properties.Name} Properties");
+                    this.InvokeSetText($"{FriendlyName} : {Localize("{0} Properties", result.Properties.Name)}");
 
                     listViewProperties.Invoke(PopulateListView, result.Properties);
 

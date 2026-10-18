@@ -2,6 +2,7 @@
 using NetTunnel.Library.Payloads;
 using NetTunnel.UI.Types;
 using NTDLS.Helpers;
+using NTDLS.Localization;
 using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
 
@@ -17,12 +18,14 @@ namespace NetTunnel.UI.Forms
         public FormAddEditUser()
         {
             InitializeComponent();
+            FormLocalizer.Apply(this);
             Theming.InitializeForm(this);
         }
 
         public FormAddEditUser(ServiceClient? client, User? user = null)
         {
             InitializeComponent();
+            FormLocalizer.Apply(this);
             Theming.InitializeForm(this);
 
             _client = client;
@@ -33,10 +36,10 @@ namespace NetTunnel.UI.Forms
             var toolTips = ToolTipHelpers.CreateToolTipControl(this);
 
             toolTips.AddControls([labelUsername, textBoxUsername],
-                "User name which the user will use when logging in to the NetTunnel service.");
+                Localize("User name which the user will use when logging in to the NetTunnel service."));
 
             toolTips.AddControls([labelPassword, textBoxPassword, labelConfirmPassword, textBoxConfirmPassword],
-                "Password which the user will use when logging in to the NetTunnel service.");
+                Localize("Password which the user will use when logging in to the NetTunnel service."));
 
             #endregion
 
@@ -46,7 +49,7 @@ namespace NetTunnel.UI.Forms
             textBoxUsername.Enabled = _isCreatingNewUser;
             checkBoxAdministrator.Checked = User.Role == NtUserRole.Administrator;
 
-            Text = _isCreatingNewUser ? $"{FriendlyName} : Create User" : $"{FriendlyName} : Edit User";
+            Text = _isCreatingNewUser ? $"{FriendlyName} : {Localize("Create User")}" : $"{FriendlyName} : {Localize("Edit User")}";
 
             listViewEndpoints.MouseDoubleClick += ListViewEndpoint_MouseDoubleClick;
             listViewEndpoints.MouseUp += ListViewEndpoints_MouseUp;
@@ -100,16 +103,16 @@ namespace NetTunnel.UI.Forms
 
                 if (eTag != null)
                 {
-                    menu.Items.Add("Edit");
+                    UIUtility.AddMenuItem(menu, "Edit", Localize("Edit"));
                     if (selectedItem != null)
                     {
-                        menu.Items.Add("Delete");
+                        UIUtility.AddMenuItem(menu, "Delete", Localize("Delete"));
                     }
                 }
                 else
                 {
-                    menu.Items.Add("Add inbound endpoint");
-                    menu.Items.Add("Add outbound endpoint");
+                    UIUtility.AddMenuItem(menu, "Add inbound endpoint", Localize("Add inbound endpoint"));
+                    UIUtility.AddMenuItem(menu, "Add outbound endpoint", Localize("Add outbound endpoint"));
                 }
 
                 menu.Show(listViewEndpoints, new Point(e.X, e.Y));
@@ -118,7 +121,7 @@ namespace NetTunnel.UI.Forms
                 {
                     menu.Hide();
 
-                    if (e.ClickedItem?.Text == "Add inbound endpoint")
+                    if (e.ClickedItem?.Tag as string == "Add inbound endpoint")
                     {
                         using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), NtDirection.Inbound);
                         if (form.ShowDialog() == DialogResult.OK)
@@ -127,7 +130,7 @@ namespace NetTunnel.UI.Forms
                             User.EnsureNotNull().Endpoints.Add(form.Endpoint);
                         }
                     }
-                    else if (e.ClickedItem?.Text == "Add outbound endpoint")
+                    else if (e.ClickedItem?.Tag as string == "Add outbound endpoint")
                     {
                         using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), NtDirection.Outbound);
                         if (form.ShowDialog() == DialogResult.OK)
@@ -136,7 +139,7 @@ namespace NetTunnel.UI.Forms
                             User.EnsureNotNull().Endpoints.Add(form.Endpoint);
                         }
                     }
-                    else if (eTag != null && e.ClickedItem?.Text == "Edit")
+                    else if (eTag != null && e.ClickedItem?.Tag as string == "Edit")
                     {
                         using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), eTag.Endpoint);
                         if (form.ShowDialog() == DialogResult.OK)
@@ -145,7 +148,7 @@ namespace NetTunnel.UI.Forms
                             AddEndpointToGrid(form.Endpoint);
                         }
                     }
-                    else if (selectedItem != null && eTag != null && e.ClickedItem?.Text == "Delete")
+                    else if (selectedItem != null && eTag != null && e.ClickedItem?.Tag as string == "Delete")
                     {
                         listViewEndpoints.Items.Remove(selectedItem);
                         User.EnsureNotNull().Endpoints.RemoveAll(o => o.EndpointId == eTag.Endpoint.EndpointId);
@@ -185,7 +188,7 @@ namespace NetTunnel.UI.Forms
 
             try
             {
-                string username = textBoxUsername.GetAndValidateText("You must specify a username.");
+                string username = textBoxUsername.GetAndValidateText(Localize("You must specify a username."));
 
                 string plainTextPassword = textBoxPassword.Text.Trim();
                 string? passwordHash = null;
@@ -198,13 +201,13 @@ namespace NetTunnel.UI.Forms
                 {
                     if (plainTextPassword != textBoxConfirmPassword.Text)
                     {
-                        throw new Exception("The password and confirm-passwords must match.");
+                        throw new Exception(Localize("The password and confirm-passwords must match."));
                     }
 
                     passwordHash = Utility.ComputeSha256Hash(plainTextPassword);
                 }
 
-                var progressForm = new ProgressForm(FriendlyName, "Saving user...");
+                var progressForm = new ProgressForm(FriendlyName, Localize("Saving user..."));
 
                 progressForm.Execute(() =>
                 {

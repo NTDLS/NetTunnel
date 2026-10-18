@@ -2,6 +2,7 @@
 using NetTunnel.Library.ReliablePayloads.Notification.UI;
 using NetTunnel.UI.Properties;
 using NTDLS.Helpers;
+using NTDLS.Localization;
 using NTDLS.Persistence;
 using NTDLS.ReliableMessaging;
 using NTDLS.WinFormsHelpers;
@@ -22,27 +23,12 @@ namespace NetTunnel.UI.Forms
         public FormLogin(Utility.ServiceLogDelegate serviceLogDelegate)
         {
             InitializeComponent();
+            FormLocalizer.Apply(this);
             Theming.InitializeForm(this);
 
             _serviceLogDelegate = serviceLogDelegate;
 
-            #region Set Tool-tips.
-
-            var toolTips = ToolTipHelpers.CreateToolTipControl(this);
-
-            toolTips.AddControls([labelAddress, textBoxAddress],
-                "Host name, domain, or IP address of the NetTunnel service you want to connect to.");
-
-            toolTips.AddControls([labelPort, textBoxPort],
-                "Port of the NetTunnel service you want to connect to.");
-
-            toolTips.AddControls([labelUsername, textBoxUsername],
-                "Username to use when connecting to the NetTunnel service.");
-
-            toolTips.AddControls([labelPassword, textBoxPassword],
-                "Password for the user to use when connecting to the NetTunnel service.");
-
-            #endregion
+            ApplyToolTips();
 
             AcceptButton = buttonLogin;
             CancelButton = buttonCancel;
@@ -85,7 +71,53 @@ namespace NetTunnel.UI.Forms
             textBoxUsername.TextChanged += (object? sender, EventArgs e) => ClearPassword();
             textBoxPassword.TextChanged += (object? sender, EventArgs e) => ClearPassword();
 
-            this.Shown += FormLogin_Shown   ;
+            this.Shown += FormLogin_Shown;
+        }
+
+        /// <summary>
+        /// Raised after the user has chosen a language and it has been applied and saved.
+        /// </summary>
+        public event EventHandler? LanguageChanged;
+
+        private ToolTip? _toolTips;
+
+        /// <summary>
+        /// Sets the tool-tips in the current language. Called at the start and whenever the language changes.
+        /// </summary>
+        private void ApplyToolTips()
+        {
+            _toolTips ??= ToolTipHelpers.CreateToolTipControl(this);
+
+            _toolTips.AddControls([labelAddress, textBoxAddress],
+                Localize("Host name, domain, or IP address of the NetTunnel service you want to connect to."));
+
+            _toolTips.AddControls([labelPort, textBoxPort],
+                Localize("Port of the NetTunnel service you want to connect to."));
+
+            _toolTips.AddControls([labelUsername, textBoxUsername],
+                Localize("Username to use when connecting to the NetTunnel service."));
+
+            _toolTips.AddControls([labelPassword, textBoxPassword],
+                Localize("Password for the user to use when connecting to the NetTunnel service."));
+        }
+
+        private void ButtonLanguage_Click(object sender, EventArgs e)
+        {
+            var settings = UISettings.Load();
+
+            using var form = new FormLanguage(settings.Language) { Icon = Icon };
+            if (form.ShowDialog(this) != DialogResult.OK)
+            {
+                return;
+            }
+
+            settings.Language = form.SelectedLanguage;
+            Localizer.Default.SetLanguage(settings.Language);
+            settings.Save();
+
+            FormLocalizer.Apply(this);
+            ApplyToolTips();
+            LanguageChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void FormLogin_Shown(object? sender, EventArgs e)
@@ -107,9 +139,9 @@ namespace NetTunnel.UI.Forms
         {
             try
             {
-                var port = textBoxPort.GetAndValidateNumeric(1, 65535, "A port number between [min] and [max] is required.");
-                var username = textBoxUsername.GetAndValidateText("A username is required.");
-                var address = textBoxAddress.GetAndValidateText("A hostname, domain, or IP address is required.");
+                var port = textBoxPort.GetAndValidateNumeric(1, 65535, Localize("A port number between [min] and [max] is required."));
+                var username = textBoxUsername.GetAndValidateText(Localize("A username is required."));
+                var address = textBoxAddress.GetAndValidateText(Localize("A hostname, domain, or IP address is required."));
                 string? passwordHash;
 
                 if (_savedPasswordHash != null && textBoxPassword.Text == _savedPasswordHash)
@@ -123,7 +155,7 @@ namespace NetTunnel.UI.Forms
                     passwordHash = Utility.ComputeSha256Hash(textBoxPassword.Text);
                 }
 
-                var progressForm = new ProgressForm(FriendlyName, "Logging in...");
+                var progressForm = new ProgressForm(FriendlyName, Localize("Logging in..."));
 
                 progressForm.Execute(() =>
                 {
@@ -185,7 +217,7 @@ namespace NetTunnel.UI.Forms
 
         private void ButtonAbout_Click(object sender, EventArgs e)
         {
-            using var form = new FormAbout("NetTunnel", this.Icon, Resources.Logo128);
+            using var form = new FormAbout(Constants.FriendlyName, this.Icon, Resources.Logo128);
             form.ShowDialog();
         }
     }

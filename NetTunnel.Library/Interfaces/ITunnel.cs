@@ -14,7 +14,10 @@ namespace NetTunnel.Library.Interfaces
         public ulong TotalConnections { get; set; }
         public ulong CurrentConnections { get; set; }
         public IServiceEngine ServiceEngine { get; }
-        public List<IEndpoint> Endpoints { get; }
+        /// <summary>
+        /// A snapshot of the endpoints; safe to enumerate while endpoints are being added or removed.
+        /// </summary>
+        public IReadOnlyList<IEndpoint> Endpoints { get; }
         public NtDirection Direction { get; }
         /// <summary>
         /// Unique ID that takes the direction and the ID into account.

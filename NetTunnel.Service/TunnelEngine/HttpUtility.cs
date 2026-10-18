@@ -1,5 +1,4 @@
-﻿using NetTunnel.Library;
-using NetTunnel.Library.Payloads;
+﻿using NetTunnel.Library.Payloads;
 using NetTunnel.Service.TunnelEngine;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -13,93 +12,6 @@ namespace NetTunnel.Service
         [
             "connect", "delete", "get", "head", "options", "patch", "post", "put", "trace"
         ];
-
-        public static NtHTTPHeaderResult Process(ref StringBuilder httpHeaderBuilder, EndpointConfiguration endpointConfig, ReceiveBuffer buffer)
-        {
-            try
-            {
-                //Latin1 maps bytes to chars 1:1 so that character counts equal byte counts and binary bodies survive untouched.
-                if (httpHeaderBuilder.Length > 0 //We are reconstructing a fragmented HTTP header.
-                    || StartsWithHTTPVerb(buffer.Bytes) || StartsWithHttpResponse(buffer.Bytes))
-                {
-                    httpHeaderBuilder.Append(Encoding.Latin1.GetString(buffer.Bytes, 0, buffer.Length));
-                }
-
-                if (httpHeaderBuilder.Length > 0)
-                {
-                    var text = httpHeaderBuilder.ToString();
-                    var headerType = IsHttpHeader(text, out string? requestVerb);
-
-                    if (headerType == NtHttpHeaderType.None || requestVerb == null)
-                    {
-                        if (text.Contains('\n') == false)
-                        {
-                            return NtHTTPHeaderResult.WaitOnData; //Not even the first line has arrived yet.
-                        }
-
-                        httpHeaderBuilder.Clear(); //Looked like HTTP but isn't.
-                        return NtHTTPHeaderResult.NotPresent;
-                    }
-
-                    if (endpointConfig.Direction == NtDirection.Inbound && headerType == NtHttpHeaderType.Response)
-                    {
-                        Singletons.Logger.Warning("A HTTP response header was detected on an inbound endpoint.");
-                    }
-                    else if (endpointConfig.Direction == NtDirection.Outbound && headerType == NtHttpHeaderType.Request)
-                    {
-                        Singletons.Logger.Warning("A HTTP request header was detected on an outbound endpoint.");
-                    }
-
-                    var endOfHeaderIndex = GetHttpHeaderEnd(text, out var headerDelimiter);
-                    if (endOfHeaderIndex < 0)
-                    {
-                        return NtHTTPHeaderResult.WaitOnData; //We have a HTTP header but its a fragment. Wait on the remaining header.
-                    }
-
-                    //Any bytes after the end of the header are the tail of the current buffer. Move them to the
-                    //  front of the buffer so that they are sent after the (modified) header.
-                    int bodyLength = text.Length - endOfHeaderIndex;
-                    if (bodyLength > 0)
-                    {
-                        Array.Copy(buffer.Bytes, buffer.Length - bodyLength, buffer.Bytes, 0, bodyLength);
-                    }
-                    buffer.Length = bodyLength;
-
-                    //Apply the header rules, replacing the original http header builder.
-                    httpHeaderBuilder = new StringBuilder(
-                        ApplyHttpHeaderRules(endpointConfig, text.Substring(0, endOfHeaderIndex), headerType, requestVerb, headerDelimiter));
-
-                    return NtHTTPHeaderResult.Present;
-                }
-            }
-            catch (Exception ex)
-            {
-                httpHeaderBuilder.Clear();
-                Singletons.Logger.Exception(ex, "An error occurred while parsing the HTTP request header.");
-            }
-
-            return NtHTTPHeaderResult.NotPresent;
-        }
-
-        public static int FindDelimiterIndexInByteArray(byte[] buffer, int bufferLength, string delimiter)
-        {
-            for (int bufIdx = 0; bufIdx <= bufferLength - delimiter.Length; bufIdx++)
-            {
-                bool found = true;
-                for (int delIdx = 0; delIdx < delimiter.Length; delIdx++)
-                {
-                    if (buffer[bufIdx + delIdx] != delimiter[delIdx])
-                    {
-                        found = false;
-                    }
-                }
-                if (found)
-                {
-                    return bufIdx;
-                }
-            }
-            return -1;
-        }
 
         public static string ApplyHttpHeaderRules(EndpointConfiguration endpointConfig,
             string httpHeader, NtHttpHeaderType headerType, string httpRequestVerb, string headerDelimiter)
@@ -144,29 +56,6 @@ namespace NetTunnel.Service
             return httpHeader;
         }
 
-        public static bool StartsWithHttpResponse(byte[] bytes)
-        {
-            return Encoding.ASCII.GetString(bytes.Take(5).ToArray()).Equals("HTTP/", StringComparison.OrdinalIgnoreCase);
-        }
-
-        public static bool StartsWithHTTPVerb(byte[] bytes)
-        {
-            var possibleHttpHeader = Encoding.UTF8.GetString(bytes.Take(10).ToArray()).ToLower();
-
-            foreach (var verb in HttpVerbStrings)
-            {
-                if (possibleHttpHeader.StartsWith(verb))
-                {
-                    if (possibleHttpHeader.Length > verb.Length)
-                    {
-                        return char.IsWhiteSpace(possibleHttpHeader[verb.Length]);
-                    }
-                }
-            }
-
-            return false;
-        }
-
         public static string? GetNextHeaderToken(string str, ref int position)
         {
             int spacePos = str.IndexOfAny([' ', '\n'], position);
@@ -182,18 +71,7 @@ namespace NetTunnel.Service
 
         public static bool IsHttpVerb(string? str)
         {
-            str = str?.ToUpper();
-
-            var verbs = Enum.GetValues(typeof(NtHttpVerb));
-
-            foreach (var verb in verbs)
-            {
-                if (str == verb?.ToString()?.ToUpper())
-                {
-                    return true;
-                }
-            }
-            return false;
+            return str != null && HttpVerbStrings.Contains(str, StringComparer.OrdinalIgnoreCase);
         }
 
         public static NtHttpHeaderType IsHttpHeader(byte[]? data, int length, out string? verb)

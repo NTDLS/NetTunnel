@@ -2,6 +2,7 @@
 using NetTunnel.Library.Payloads;
 using NetTunnel.UI.Types;
 using NTDLS.Helpers;
+using NTDLS.Localization;
 using NTDLS.WinFormsHelpers;
 using static NetTunnel.Library.Constants;
 
@@ -20,6 +21,7 @@ namespace NetTunnel.UI.Forms
         public FormEndpointEdgeConnections()
         {
             InitializeComponent();
+            FormLocalizer.Apply(this);
             Theming.InitializeForm(this);
 
             _tunnelKey = new DirectionalKey();
@@ -29,13 +31,14 @@ namespace NetTunnel.UI.Forms
         public FormEndpointEdgeConnections(ServiceClient client, DirectionalKey tunnelKey, DirectionalKey endpointKey)
         {
             InitializeComponent();
+            FormLocalizer.Apply(this);
             Theming.InitializeForm(this);
 
             _client = client;
             _endpointKey = endpointKey;
             _tunnelKey = tunnelKey;
 
-            Text = $"{FriendlyName} : Edge Connections";
+            Text = $"{FriendlyName} : {Localize("Edge Connections")}";
 
             Shown += FormEndpointEdgeConnections_Shown;
             FormClosing += FormEndpointEdgeConnections_FormClosing;
@@ -45,18 +48,18 @@ namespace NetTunnel.UI.Forms
             listViewConnections.MouseUp += ListViewConnections_MouseUp;
 
             listViewConnections.Columns.Clear();
-            AddListViewColumn(listViewConnections, "AddressFamily", "Family", 100);
-            AddListViewColumn(listViewConnections, "Address", "Address", 100);
-            AddListViewColumn(listViewConnections, "Port", "Port", 100);
+            AddListViewColumn(listViewConnections, "AddressFamily", Localize("Family"), 100);
+            AddListViewColumn(listViewConnections, "Address", Localize("Address"), 100);
+            AddListViewColumn(listViewConnections, "Port", Localize("Port"), 100);
 
-            AddListViewColumn(listViewConnections, "BytesReceived", "Received", 100);
-            AddListViewColumn(listViewConnections, "BytesSent", "Sent", 100);
+            AddListViewColumn(listViewConnections, "BytesReceived", Localize("Received"), 100);
+            AddListViewColumn(listViewConnections, "BytesSent", Localize("Sent"), 100);
 
-            AddListViewColumn(listViewConnections, "StartDateTime", "Started", 100);
-            AddListViewColumn(listViewConnections, "LastActivityDateTime", "Activity", 100);
-            AddListViewColumn(listViewConnections, "EdgeId", "Id", 100);
-            AddListViewColumn(listViewConnections, "ThreadId", "Thread Id", 100);
-            AddListViewColumn(listViewConnections, "IsConnected", "Connected", 100);
+            AddListViewColumn(listViewConnections, "StartDateTime", Localize("Started"), 100);
+            AddListViewColumn(listViewConnections, "LastActivityDateTime", Localize("Activity"), 100);
+            AddListViewColumn(listViewConnections, "EdgeId", Localize("Id"), 100);
+            AddListViewColumn(listViewConnections, "ThreadId", Localize("Thread Id"), 100);
+            AddListViewColumn(listViewConnections, "IsConnected", Localize("Connected"), 100);
             _connectionsGridColumnMap = new ListViewColumnMap(listViewConnections);
 
             #endregion
@@ -99,7 +102,7 @@ namespace NetTunnel.UI.Forms
                     {
                         if (i == 1000)
                         {
-                            this.InvokeMessageBox("A timeout has occurred while waiting on the timer to terminate.",
+                            this.InvokeMessageBox(Localize("A timeout has occurred while waiting on the timer to terminate."),
                                 FriendlyName, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                             this.InvokeClose(DialogResult.OK);
                             return;
@@ -151,7 +154,7 @@ namespace NetTunnel.UI.Forms
 
                 if (selectedItem != null)
                 {
-                    menu.Items.Add("Disconnect");
+                    UIUtility.AddMenuItem(menu, "Disconnect", Localize("Disconnect"));
                 }
 
                 menu.Show(listViewConnections, new Point(e.X, e.Y));
@@ -160,15 +163,15 @@ namespace NetTunnel.UI.Forms
                 {
                     menu.Hide();
 
-                    if (selectedItem != null && e.ClickedItem?.Text == "Disconnect")
+                    if (selectedItem != null && e.ClickedItem?.Tag as string == "Disconnect")
                     {
-                        if (MessageBox.Show($"Disconnect the endpoint edge connection?",
+                        if (MessageBox.Show(Localize("Disconnect the endpoint edge connection?"),
                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                         {
                             return;
                         }
 
-                        var progressForm = new ProgressForm(FriendlyName, "Terminating edge connection...");
+                        var progressForm = new ProgressForm(FriendlyName, Localize("Terminating edge connection..."));
 
                         progressForm.Execute(() =>
                         {
@@ -199,7 +202,7 @@ namespace NetTunnel.UI.Forms
             }
             _firstShown = false;
 
-            var progressForm = new ProgressForm(FriendlyName, "Getting connections...");
+            var progressForm = new ProgressForm(FriendlyName, Localize("Getting connections..."));
 
             progressForm.Execute(() =>
             {

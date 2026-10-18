@@ -60,19 +60,30 @@ namespace NetTunnel.Service.TunnelEngine
 
             _messageServer.OnException += (RmContext? context, Exception ex, IRmPayload? payload) =>
             {
-                Singletons.Logger.Exception($"RPC server exception: '{ex.Message}'"
-                    + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
+                Singletons.Logger.Exception(ex, "RPC server exception"
+                    + (payload != null ? $" (payload: {payload.GetType().Name})" : string.Empty));
             };
 
+            //OnLog is raised on the logger's background thread, so a slow or broken UI connection
+            //  delays only the log forwarding, never the code that is logging.
             Singletons.Logger.OnLog += (DateTime dateTime, NtLogSeverity severity, string message) =>
             {
-                //Loop through all UI connections.
-                var uiConnectionIds = Singletons.ServiceEngine.ServiceConnectionStates.Use(o =>
-                    o.Where(o => o.Value.LoginType == NtLoginType.UI).Select(o => o.Value.ConnectionId).ToList());
+                //Only forward to UI connections that have finished logging in.
+                var uiConnectionIds = ServiceConnectionStates.Use(o =>
+                    o.Values.Where(o => o.LoginType == NtLoginType.UI && o.IsAuthenticated && o.IsKeyExchangeComplete)
+                        .Select(o => o.ConnectionId).ToList());
 
                 foreach (var connectionId in uiConnectionIds)
                 {
-                    Singletons.ServiceEngine.UINotifyLog(connectionId, dateTime, severity, message);
+                    try
+                    {
+                        UINotifyLog(connectionId, dateTime, severity, message);
+                    }
+                    catch
+                    {
+                        //Deliberately not logged: logging this failure would be forwarded to the UI, fail again, and loop.
+                        //  The connection is cleaned up by its own disconnect handling.
+                    }
                 }
             };
         }

@@ -8,12 +8,13 @@ namespace NetTunnel.Library
         public delegate void MessageWritten(NtLogSeverity severity, string message);
         public event ILogger.OnLogDelegate? OnLog;
 
-        private readonly NtLogSeverity _logLevel;
         private readonly MessageWritten _onMessageWritten;
+
+        public NtLogSeverity LogLevel { get; set; }
 
         public DelegateLogger(NtLogSeverity logLevel, MessageWritten onMessageWritten)
         {
-            _logLevel = logLevel;
+            LogLevel = logLevel;
             _onMessageWritten = onMessageWritten;
         }
 
@@ -26,7 +27,7 @@ namespace NetTunnel.Library
 
         public void Write(NtLogSeverity severity, string text)
         {
-            if (severity > _logLevel)
+            if (severity > LogLevel)
             {
                 return;
             }

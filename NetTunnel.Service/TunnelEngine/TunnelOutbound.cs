@@ -4,6 +4,7 @@ using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Query.ServiceToService;
 using NetTunnel.Service.ReliableHandlers.ServiceClient.Notifications;
 using NetTunnel.Service.ReliableHandlers.ServiceClient.Queries;
+using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
 using System.Net.Sockets;
 using static NetTunnel.Library.Constants;
@@ -37,8 +38,8 @@ namespace NetTunnel.Service.TunnelEngine
 
             _client.Client.OnException += (context, ex, payload) =>
             {
-                Singletons.Logger.Exception($"RPC client exception: '{ex.Message}'"
-                    + (payload != null ? $", Payload: {payload?.GetType()?.Name}" : string.Empty));
+                Singletons.Logger.Exception(ex, "RPC client exception"
+                    + (payload != null ? $" (payload: {payload.GetType().Name})" : string.Empty));
             };
         }
 
@@ -96,7 +97,10 @@ namespace NetTunnel.Service.TunnelEngine
         {
             Status = NtTunnelStatus.Disconnected;
 
-            CurrentConnections--;
+            if (CurrentConnections > 0)
+            {
+                CurrentConnections--;
+            }
 
             ServiceEngine.ServiceConnectionStates.Use(o => o.Remove(context.ConnectionId));
 
@@ -166,7 +170,8 @@ namespace NetTunnel.Service.TunnelEngine
             void LoginStatusHandler(byte[] sharedSecret, string userName, NtLoginType loginType, NtUserRole userRole)
             {
                 var serviceConnectionState = ServiceEngine
-                    .ServiceConnectionStates.Use(o => o.SingleOrDefault(o => o.Value.TunnelKey?.Id == TunnelKey.Id).Value);
+                    .ServiceConnectionStates.Use(o => o.Values.FirstOrDefault(o => o.TunnelKey?.Id == TunnelKey.Id))
+                    ?? throw new Exception($"No connection state was found for tunnel '{Configuration.Name}'.");
 
                 serviceConnectionState.SetAuthenticated(userName, userRole, loginType);
                 serviceConnectionState.InformCryptographyProvider(sharedSecret);
@@ -174,10 +179,14 @@ namespace NetTunnel.Service.TunnelEngine
 
             while (KeepRunning)
             {
+                bool isRegistering = false;
+
                 try
                 {
                     if (_client.IsConnected == false)
                     {
+                        isRegistering = true;
+
                         PingTime = null;
                         previousPing = null;
                         Status = NtTunnelStatus.Connecting;
@@ -213,6 +222,13 @@ namespace NetTunnel.Service.TunnelEngine
                 catch (Exception ex)
                 {
                     Status = NtTunnelStatus.Disconnected;
+
+                    if (isRegistering)
+                    {
+                        //We may have connected but failed to log in, register or load endpoints. Drop the connection
+                        //  so that the next pass starts over; otherwise we would stay connected and only ever ping.
+                        Exceptions.Ignore(_client.Disconnect);
+                    }
 
                     if (ex.InnerException is SocketException sockEx)
                     {

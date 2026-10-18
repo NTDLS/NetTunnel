@@ -2,6 +2,7 @@
 using NetTunnel.Library.Payloads;
 using NetTunnel.Library.ReliablePayloads.Notification.UI;
 using NTDLS.Helpers;
+using NTDLS.Localization;
 using NTDLS.Persistence;
 using NTDLS.ReliableMessaging;
 using NTDLS.WinFormsHelpers;
@@ -19,6 +20,7 @@ namespace NetTunnel.UI.Forms
         public FormConnectTunnel(ServiceClient client, ServiceLogDelegate serviceLogDelegate)
         {
             InitializeComponent();
+            FormLocalizer.Apply(this);
             Theming.InitializeForm(this);
 
             _client = client;
@@ -29,19 +31,19 @@ namespace NetTunnel.UI.Forms
             var toolTips = ToolTipHelpers.CreateToolTipControl(this);
 
             toolTips.AddControls([textBoxName],
-                "Name or description you want to use to identify this tunnel.");
+                Localize("Name or description you want to use to identify this tunnel."));
 
             toolTips.AddControls([labelAddress, textBoxAddress],
-                "Host name, domain, or IP address of the remote NetTunnel service you want the new tunnel to connect to.");
+                Localize("Host name, domain, or IP address of the remote NetTunnel service you want the new tunnel to connect to."));
 
             toolTips.AddControls([labelPort, textBoxPort],
-                "Port of the remote NetTunnel service you want the new tunnel to connect to.");
+                Localize("Port of the remote NetTunnel service you want the new tunnel to connect to."));
 
             toolTips.AddControls([labelUsername, textBoxUsername],
-                "Username that will be used when connecting the tunnel to the remote NetTunnel service.");
+                Localize("Username that will be used when connecting the tunnel to the remote NetTunnel service."));
 
             toolTips.AddControls([labelPassword, textBoxPassword],
-                "Password that will be used when connecting the tunnel to the remote NetTunnel service.");
+                Localize("Password that will be used when connecting the tunnel to the remote NetTunnel service."));
 
             #endregion
 
@@ -70,11 +72,11 @@ namespace NetTunnel.UI.Forms
 
             try
             {
-                textBoxName.GetAndValidateText("You must specify a name. This is for your identification only.");
-                textBoxAddress.GetAndValidateText("You must specify a remote tunnel address.");
-                var connectPort = textBoxPort.GetAndValidateNumeric(1, 65535, "You must specify a valid remote tunnel management port between [min] and [max].");
-                textBoxUsername.GetAndValidateText("You must specify a remote tunnel username.");
-                textBoxPassword.GetAndValidateText("You must specify a valid remote tunnel password.");
+                textBoxName.GetAndValidateText(Localize("You must specify a name. This is for your identification only."));
+                textBoxAddress.GetAndValidateText(Localize("You must specify a remote tunnel address."));
+                var connectPort = textBoxPort.GetAndValidateNumeric(1, 65535, Localize("You must specify a valid remote tunnel management port between [min] and [max]."));
+                textBoxUsername.GetAndValidateText(Localize("You must specify a remote tunnel username."));
+                textBoxPassword.GetAndValidateText(Localize("You must specify a valid remote tunnel password."));
 
                 var tunnelId = Guid.NewGuid(); //The TunnelId is the same on both services.
 
@@ -82,7 +84,7 @@ namespace NetTunnel.UI.Forms
                     textBoxAddress.Text, connectPort,
                     textBoxUsername.Text, Utility.ComputeSha256Hash(textBoxPassword.Text));
 
-                var progressForm = new ProgressForm(FriendlyName, "Logging in to remote tunnel...");
+                var progressForm = new ProgressForm(FriendlyName, Localize("Logging in to remote tunnel..."));
 
                 try
                 {
@@ -107,7 +109,7 @@ namespace NetTunnel.UI.Forms
                         }
                         catch (Exception ex)
                         {
-                            if (progressForm.MessageBox(ex.Message + "\r\n\r\n" + "Would you like to add the tunnel anyway?",
+                            if (progressForm.MessageBox(ex.Message + "\r\n\r\n" + Localize("Would you like to add the tunnel anyway?"),
                                 FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                             {
                                 try
@@ -127,7 +129,7 @@ namespace NetTunnel.UI.Forms
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception($"Failed to login to the remote tunnel: {ex.Message}.");
+                    throw new Exception(Localize("Failed to login to the remote tunnel: {0}.", ex.Message));
                 }
             }
             catch (Exception ex)

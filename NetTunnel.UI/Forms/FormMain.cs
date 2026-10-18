@@ -1,8 +1,10 @@
-﻿using NetTunnel.Library.Payloads;
+﻿using NetTunnel.Library;
+using NetTunnel.Library.Payloads;
 using NetTunnel.UI.Helpers;
 using NetTunnel.UI.Properties;
 using NetTunnel.UI.Types;
 using NTDLS.Helpers;
+using NTDLS.Localization;
 using NTDLS.ReliableMessaging;
 using NTDLS.WinFormsHelpers;
 using NTDLS.WinFormsHelpers.Forms;
@@ -25,6 +27,7 @@ namespace NetTunnel.UI.Forms
         private readonly Stack<VisualLogEntry> _visualLogEntries = new();
         private System.Windows.Forms.Timer? _timer;
         private volatile int _gridPopulationScope = 0;
+        private readonly UISettings _settings = UISettings.Load();
 
         public FormMain()
         {
@@ -73,14 +76,14 @@ namespace NetTunnel.UI.Forms
             listViewTunnels.SelectedIndexChanged += ListViewTunnels_SelectedIndexChanged;
 
             listViewTunnels.Columns.Clear();
-            AddListViewColumn(listViewTunnels, "Name", "Name", 250);
-            AddListViewColumn(listViewTunnels, "Direction", "Direction", 75);
-            AddListViewColumn(listViewTunnels, "Address", "Address", 120);
-            AddListViewColumn(listViewTunnels, "Endpoints", "Endpoints", 70);
-            AddListViewColumn(listViewTunnels, "BytesSent", "Sent", 80);
-            AddListViewColumn(listViewTunnels, "BytesReceived", "Received", 80);
-            AddListViewColumn(listViewTunnels, "Status", "Status", 140);
-            AddListViewColumn(listViewTunnels, "Ping", "Ping", 80);
+            AddListViewColumn(listViewTunnels, "Name", () => Localize("Name"), 250);
+            AddListViewColumn(listViewTunnels, "Direction", () => Localize("Direction"), 75);
+            AddListViewColumn(listViewTunnels, "Address", () => Localize("Address"), 120);
+            AddListViewColumn(listViewTunnels, "Endpoints", () => Localize("Endpoints"), 70);
+            AddListViewColumn(listViewTunnels, "BytesSent", () => Localize("Sent"), 80);
+            AddListViewColumn(listViewTunnels, "BytesReceived", () => Localize("Received"), 80);
+            AddListViewColumn(listViewTunnels, "Status", () => Localize("Status"), 140);
+            AddListViewColumn(listViewTunnels, "Ping", () => Localize("Ping"), 80);
             _tunnelsGridColumnMap = new ListViewColumnMap(listViewTunnels);
 
             #endregion
@@ -94,35 +97,86 @@ namespace NetTunnel.UI.Forms
             listViewEndpoints.MouseDoubleClick += ListViewEndpoints_MouseDoubleClick;
 
             listViewEndpoints.Columns.Clear();
-            AddListViewColumn(listViewEndpoints, "Name", "Name", 250);
-            AddListViewColumn(listViewEndpoints, "Direction", "Direction", 75);
-            AddListViewColumn(listViewEndpoints, "Address", "Address", 120);
-            AddListViewColumn(listViewEndpoints, "BytesSent", "Sent", 80);
-            AddListViewColumn(listViewEndpoints, "BytesReceived", "Received", 80);
-            //AddListViewColumn(listViewEndpoints, "CompressionRatio", "Comp. Ratio", 80);
-            AddListViewColumn(listViewEndpoints, "CurrentConnections", "Current Conn.", 100);
-            AddListViewColumn(listViewEndpoints, "TotalConnections", "Total Conn.", 100);
+            AddListViewColumn(listViewEndpoints, "Name", () => Localize("Name"), 250);
+            AddListViewColumn(listViewEndpoints, "Direction", () => Localize("Direction"), 75);
+            AddListViewColumn(listViewEndpoints, "Address", () => Localize("Address"), 120);
+            AddListViewColumn(listViewEndpoints, "BytesSent", () => Localize("Sent"), 80);
+            AddListViewColumn(listViewEndpoints, "BytesReceived", () => Localize("Received"), 80);
+            //AddListViewColumn(listViewEndpoints, "CompressionRatio", () => Localize("Comp. Ratio"), 80);
+            AddListViewColumn(listViewEndpoints, "CurrentConnections", () => Localize("Current Conn."), 100);
+            AddListViewColumn(listViewEndpoints, "TotalConnections", () => Localize("Total Conn."), 100);
             _endpointsGridColumnMap = new ListViewColumnMap(listViewEndpoints);
 
             #endregion
 
-            static void AddListViewColumn(ListView listView, string name, string text, int width)
+            ApplyLanguage();
+
+            static void AddListViewColumn(ListView listView, string name, Func<string> text, int width)
             {
+                //The tag holds the function which produces the text in the current language.
                 listView.Columns.Add(new ColumnHeader
                 {
                     Name = name,
-                    Text = text,
+                    Text = text(),
+                    Tag = text,
                     Width = width
                 });
             }
         }
+
+        #region Language.
+
+        private void LanguageToolStripMenuItem_Click(object? sender, EventArgs e)
+        {
+            using var form = new FormLanguage(_settings.Language) { Icon = Icon };
+            if (form.ShowDialog(this) != DialogResult.OK)
+            {
+                return;
+            }
+
+            _settings.Language = form.SelectedLanguage;
+            Localizer.Default.SetLanguage(_settings.Language);
+            _settings.Save();
+            ApplyLanguage();
+        }
+
+        /// <summary>
+        /// Puts all of the text on the window in the current language. Called at the start and whenever the language changes.
+        /// The text the designer put on the controls is translated by <see cref="FormLocalizer"/>; the rest is set here.
+        /// </summary>
+        private void ApplyLanguage()
+        {
+            FormLocalizer.Apply(this);
+
+            foreach (var listView in new[] { listViewTunnels, listViewEndpoints })
+            {
+                foreach (ColumnHeader column in listView.Columns)
+                {
+                    if (column.Tag is Func<string> text)
+                    {
+                        column.Text = text();
+                    }
+                }
+            }
+
+            Text = _client != null ? $"{FriendlyName} : {_client.Address}" : FriendlyName;
+
+            if (_client != null)
+            {
+                //Repopulates the grids, which have text that is built in the current language.
+                RepopulateTunnelsGrid();
+                ListViewTunnels_SelectedIndexChanged(null, EventArgs.Empty);
+            }
+        }
+
+        #endregion
 
         private void ListViewLogs_MouseUp(object? sender, MouseEventArgs e)
         {
 
             var menu = new ContextMenuStrip();
 
-            menu.Items.Add("Clear");
+            UIUtility.AddMenuItem(menu, "Clear", Localize("Clear"));
 
             menu.Show(listViewLogs, new Point(e.X, e.Y));
 
@@ -130,7 +184,7 @@ namespace NetTunnel.UI.Forms
             {
                 menu.Hide();
 
-                if (e.ClickedItem?.Text == "Clear")
+                if (e.ClickedItem?.Tag as string == "Clear")
                 {
                     listViewLogs.Items.Clear();
                 }
@@ -191,6 +245,11 @@ namespace NetTunnel.UI.Forms
 
                 using var form = new FormLogin(WriteVisualLog);
                 form.Owner = this;
+                form.LanguageChanged += (_, _) =>
+                {
+                    _settings.Language = UISettings.Load().Language;
+                    ApplyLanguage();
+                };
                 if (form.ShowDialog() == DialogResult.OK)
                 {
                     _client = form.ResultingClient.EnsureNotNull();
@@ -369,7 +428,7 @@ namespace NetTunnel.UI.Forms
                                 _tunnelsGridColumnMap.EnsureNotNull();
                                 _tunnelsGridColumnMap.SubItem(item, "BytesSent").Text = $"{Formatters.FileSize((long)tunnelStats.BytesSent)}";
                                 _tunnelsGridColumnMap.SubItem(item, "BytesReceived").Text = $"{Formatters.FileSize((long)tunnelStats.BytesReceived)}";
-                                _tunnelsGridColumnMap.SubItem(item, "Status").Text = tunnelStats.Status.ToString();
+                                _tunnelsGridColumnMap.SubItem(item, "Status").Text = UIUtility.StatusText(tunnelStats.Status);
                                 _tunnelsGridColumnMap.SubItem(item, "Ping").Text = $"{(tunnelStats.PingTime?.ToString("n2") ?? "∞")}ms";
 
                                 var isDark = Theming.IsDarkMode;
@@ -407,7 +466,7 @@ namespace NetTunnel.UI.Forms
         {
             _client.EnsureNotNull();
 
-            labelEndpoints.Text = "Endpoints of ";
+            labelEndpoints.Text = Localize("Endpoints of (select a tunnel above)");
 
             if (listViewTunnels.SelectedItems.Count == 1)
             {
@@ -415,7 +474,9 @@ namespace NetTunnel.UI.Forms
 
                 if (selectedRow.Tag is TunnelTag tTag)
                 {
-                    labelEndpoints.Text += $"{selectedRow.SubItems[1].Text.ToLower()} tunnel '{tTag.Tunnel.Name}'";
+                    labelEndpoints.Text = tTag.Tunnel.Direction == NtDirection.Inbound
+                        ? Localize("Endpoints of inbound tunnel '{0}'", tTag.Tunnel.Name)
+                        : Localize("Endpoints of outbound tunnel '{0}'", tTag.Tunnel.Name);
 
                     lock (listViewEndpoints)
                     {
@@ -425,7 +486,7 @@ namespace NetTunnel.UI.Forms
             }
             else
             {
-                labelEndpoints.Text += " (select a tunnel above)";
+                labelEndpoints.Text = Localize("Endpoints of (select a tunnel above)");
             }
         }
 
@@ -456,16 +517,16 @@ namespace NetTunnel.UI.Forms
                     if (tTag.Tunnel.Direction == NtDirection.Outbound
                         || (tTag.Tunnel.Direction == NtDirection.Inbound && tTag.Tunnel.IsLoggedIn))
                     {
-                        menu.Items.Add("Add Inbound Endpoint").Enabled = IsAdministrator();
-                        menu.Items.Add("Add Outbound Endpoint").Enabled = IsAdministrator();
+                        UIUtility.AddMenuItem(menu, "Add Inbound Endpoint", Localize("Add Inbound Endpoint")).Enabled = IsAdministrator();
+                        UIUtility.AddMenuItem(menu, "Add Outbound Endpoint", Localize("Add Outbound Endpoint")).Enabled = IsAdministrator();
 
                         if (eTag != null)
                         {
                             menu.Items.Add(new ToolStripSeparator());
-                            menu.Items.Add("Delete Endpoint").Enabled = IsAdministrator();
+                            UIUtility.AddMenuItem(menu, "Delete Endpoint", Localize("Delete Endpoint")).Enabled = IsAdministrator();
                             menu.Items.Add(new ToolStripSeparator());
-                            menu.Items.Add("Edge Connections");
-                            menu.Items.Add("Properties");
+                            UIUtility.AddMenuItem(menu, "Edge Connections", Localize("Edge Connections"));
+                            UIUtility.AddMenuItem(menu, "Properties", Localize("Properties"));
                         }
                     }
                 }
@@ -476,7 +537,7 @@ namespace NetTunnel.UI.Forms
                 {
                     menu.Hide();
 
-                    if (e.ClickedItem?.Text == "Add Inbound Endpoint")
+                    if (e.ClickedItem?.Tag as string == "Add Inbound Endpoint")
                     {
                         using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tTag.Tunnel, NtDirection.Inbound);
                         if (form.ShowDialog() == DialogResult.OK)
@@ -484,7 +545,7 @@ namespace NetTunnel.UI.Forms
                             RepopulateTunnelsGrid();
                         }
                     }
-                    else if (e.ClickedItem?.Text == "Add Outbound Endpoint")
+                    else if (e.ClickedItem?.Tag as string == "Add Outbound Endpoint")
                     {
                         using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tTag.Tunnel, NtDirection.Outbound);
                         if (form.ShowDialog() == DialogResult.OK)
@@ -492,7 +553,7 @@ namespace NetTunnel.UI.Forms
                             RepopulateTunnelsGrid();
                         }
                     }
-                    else if (eTag != null && e.ClickedItem?.Text == "Edge Connections")
+                    else if (eTag != null && e.ClickedItem?.Tag as string == "Edge Connections")
                     {
                         try
                         {
@@ -507,7 +568,7 @@ namespace NetTunnel.UI.Forms
                         listViewEndpoints.InvokeClearRows();
                     }
 
-                    else if (eTag != null && e.ClickedItem?.Text == "Properties")
+                    else if (eTag != null && e.ClickedItem?.Tag as string == "Properties")
                     {
                         try
                         {
@@ -521,15 +582,15 @@ namespace NetTunnel.UI.Forms
 
                         listViewEndpoints.InvokeClearRows();
                     }
-                    else if (eTag != null && e.ClickedItem?.Text == "Delete Endpoint")
+                    else if (eTag != null && e.ClickedItem?.Tag as string == "Delete Endpoint")
                     {
-                        if (MessageBox.Show($"Delete the endpoint '{eTag.Endpoint.Name}'?",
+                        if (MessageBox.Show(Localize("Delete the endpoint '{0}'?", eTag.Endpoint.Name),
                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                         {
                             return;
                         }
 
-                        var progressForm = new ProgressForm(FriendlyName, "Deleting endpoint...");
+                        var progressForm = new ProgressForm(FriendlyName, Localize("Deleting endpoint..."));
 
                         progressForm.Execute(() =>
                         {
@@ -564,15 +625,15 @@ namespace NetTunnel.UI.Forms
 
                 var menu = new ContextMenuStrip();
 
-                menu.Items.Add("Create New Tunnel");
+                UIUtility.AddMenuItem(menu, "Create New Tunnel", Localize("Create New Tunnel"));
 
                 if (selectedRow != null && tTag != null)
                 {
                     if (_client != null && tTag.Tunnel.IsLoggedIn)
                     {
                         menu.Items.Add(new ToolStripSeparator());
-                        menu.Items.Add("Add Inbound Endpoint").Enabled = IsAdministrator();
-                        menu.Items.Add("Add Outbound Endpoint").Enabled = IsAdministrator();
+                        UIUtility.AddMenuItem(menu, "Add Inbound Endpoint", Localize("Add Inbound Endpoint")).Enabled = IsAdministrator();
+                        UIUtility.AddMenuItem(menu, "Add Outbound Endpoint", Localize("Add Outbound Endpoint")).Enabled = IsAdministrator();
                     }
 
                     if (IsAdministrator() && tTag.Tunnel.Direction == NtDirection.Outbound)
@@ -581,19 +642,19 @@ namespace NetTunnel.UI.Forms
 
                         if (tTag.TunnelStatus == NtTunnelStatus.Stopped)
                         {
-                            menu.Items.Add("Start");
+                            UIUtility.AddMenuItem(menu, "Start", Localize("Start"));
                         }
                         else
                         {
-                            menu.Items.Add("Stop");
+                            UIUtility.AddMenuItem(menu, "Stop", Localize("Stop"));
                         }
 
                         menu.Items.Add(new ToolStripSeparator());
-                        menu.Items.Add("Delete Tunnel");
+                        UIUtility.AddMenuItem(menu, "Delete Tunnel", Localize("Delete Tunnel"));
                     }
 
                     menu.Items.Add(new ToolStripSeparator());
-                    menu.Items.Add("Properties");
+                    UIUtility.AddMenuItem(menu, "Properties", Localize("Properties"));
                 }
 
                 menu.Show(listViewTunnels, new Point(e.X, e.Y));
@@ -602,7 +663,7 @@ namespace NetTunnel.UI.Forms
                 {
                     menu.Hide();
 
-                    if (e.ClickedItem?.Text == "Create New Tunnel")
+                    if (e.ClickedItem?.Tag as string == "Create New Tunnel")
                     {
                         using var form = new FormConnectTunnel(_client.EnsureNotNull(), WriteVisualLog);
                         if (form.ShowDialog() == DialogResult.OK)
@@ -610,7 +671,7 @@ namespace NetTunnel.UI.Forms
                             RepopulateTunnelsGrid();
                         }
                     }
-                    else if (tTag != null && e.ClickedItem?.Text == "Add Inbound Endpoint")
+                    else if (tTag != null && e.ClickedItem?.Tag as string == "Add Inbound Endpoint")
                     {
                         using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tTag.Tunnel, NtDirection.Inbound);
                         if (form.ShowDialog() == DialogResult.OK)
@@ -618,7 +679,7 @@ namespace NetTunnel.UI.Forms
                             RepopulateTunnelsGrid();
                         }
                     }
-                    else if (tTag != null && e.ClickedItem?.Text == "Add Outbound Endpoint")
+                    else if (tTag != null && e.ClickedItem?.Tag as string == "Add Outbound Endpoint")
                     {
                         using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), tTag.Tunnel, NtDirection.Outbound);
                         if (form.ShowDialog() == DialogResult.OK)
@@ -626,15 +687,15 @@ namespace NetTunnel.UI.Forms
                             RepopulateTunnelsGrid();
                         }
                     }
-                    else if (tTag != null && e.ClickedItem?.Text == "Stop")
+                    else if (tTag != null && e.ClickedItem?.Tag as string == "Stop")
                     {
-                        if (MessageBox.Show($"Stop the tunnel '{tTag.Tunnel.Name}'?",
+                        if (MessageBox.Show(Localize("Stop the tunnel '{0}'?", tTag.Tunnel.Name),
                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                         {
                             return;
                         }
 
-                        var progressForm = new ProgressForm(FriendlyName, "Stopping tunnel...");
+                        var progressForm = new ProgressForm(FriendlyName, Localize("Stopping tunnel..."));
 
                         progressForm.Execute(() =>
                         {
@@ -651,9 +712,9 @@ namespace NetTunnel.UI.Forms
                             }
                         });
                     }
-                    else if (tTag != null && e.ClickedItem?.Text == "Start")
+                    else if (tTag != null && e.ClickedItem?.Tag as string == "Start")
                     {
-                        var progressForm = new ProgressForm(FriendlyName, "Starting tunnel...");
+                        var progressForm = new ProgressForm(FriendlyName, Localize("Starting tunnel..."));
 
                         progressForm.Execute(() =>
                         {
@@ -670,7 +731,7 @@ namespace NetTunnel.UI.Forms
                             }
                         });
                     }
-                    else if (tTag != null && e.ClickedItem?.Text == "Properties")
+                    else if (tTag != null && e.ClickedItem?.Tag as string == "Properties")
                     {
                         try
                         {
@@ -684,9 +745,9 @@ namespace NetTunnel.UI.Forms
 
                         listViewEndpoints.InvokeClearRows();
                     }
-                    else if (tTag != null && e.ClickedItem?.Text == "Delete Tunnel")
+                    else if (tTag != null && e.ClickedItem?.Tag as string == "Delete Tunnel")
                     {
-                        if (MessageBox.Show($"Delete the tunnel '{tTag.Tunnel.Name}'?",
+                        if (MessageBox.Show(Localize("Delete the tunnel '{0}'?", tTag.Tunnel.Name),
                             FriendlyName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                         {
                             return;
@@ -770,7 +831,7 @@ namespace NetTunnel.UI.Forms
                 {
                     var item = new ListViewItem(tunnel.Name);
                     item.Tag = new TunnelTag(tunnel);
-                    item.SubItems.Add($"{tunnel.Direction}");
+                    item.SubItems.Add(UIUtility.DirectionText(tunnel.Direction));
                     item.SubItems.Add($"{tunnel.Address}");
                     item.SubItems.Add($"{tunnel.Endpoints.Count:n0}");
                     item.SubItems.Add("∞");
@@ -821,7 +882,7 @@ namespace NetTunnel.UI.Forms
                 {
                     var item = new ListViewItem(endpoint.Name);
                     item.Tag = new TunnelEndpointTag(tunnel, endpoint);
-                    item.SubItems.Add("Inbound");
+                    item.SubItems.Add(Localize("Inbound"));
                     item.SubItems.Add($"*:{endpoint.InboundPort}");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
@@ -842,7 +903,7 @@ namespace NetTunnel.UI.Forms
                 {
                     var item = new ListViewItem(endpoint.Name);
                     item.Tag = new TunnelEndpointTag(tunnel, endpoint);
-                    item.SubItems.Add("Outbound");
+                    item.SubItems.Add(Localize("Outbound"));
                     item.SubItems.Add($"{endpoint.OutboundAddress}:{endpoint.OutboundPort}");
                     item.SubItems.Add("∞");
                     item.SubItems.Add("∞");
@@ -940,7 +1001,7 @@ namespace NetTunnel.UI.Forms
 
         private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using var form = new FormAbout("NetTunnel", this.Icon, Resources.Logo128);
+            using var form = new FormAbout(Constants.FriendlyName, this.Icon, Resources.Logo128);
             form.ShowDialog();
         }
 

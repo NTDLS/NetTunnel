@@ -35,7 +35,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         public override void Start()
         {
-            base.Start();
+            if (TryBeginStart() == false)
+            {
+                return; //Already running.
+            }
 
             if (Configuration.TrafficType == NtTrafficType.Https)
             {
@@ -46,7 +49,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 }
                 catch (Exception ex)
                 {
-                    Singletons.Logger.Exception($"Failed to load TLS certificate '{Configuration.TlsCertificatePath}' for endpoint '{Configuration.Name}': {ex.Message}");
+                    //Don't listen at all: every connection would fail the TLS handshake anyway.
+                    Singletons.Logger.Exception(ex, $"Inbound endpoint '{Configuration.Name}' will not listen on port {Configuration.InboundPort}"
+                        + $" because the TLS certificate '{Configuration.TlsCertificatePath}' could not be loaded");
+                    return;
                 }
             }
 
@@ -61,13 +67,23 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         public override void Stop()
         {
-            base.Stop();
+            if (TryBeginStop() == false)
+            {
+                return; //Not running.
+            }
 
             if (_listener != null)
             {
                 Exceptions.Ignore(_listener.Stop);
                 Exceptions.Ignore(_listener.Dispose);
+                _listener = null;
             }
+
+            if (_inboundConnectionThread != null && _inboundConnectionThread.ManagedThreadId != Environment.CurrentManagedThreadId)
+            {
+                _inboundConnectionThread.Join();
+            }
+            _inboundConnectionThread = null;
 
             Singletons.Logger.Verbose(
                 $"Stopping inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort}.");
@@ -92,46 +108,47 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
             Thread.CurrentThread.Name = $"InboundConnectionThreadProc:{Environment.CurrentManagedThreadId}";
 
+            //Stop() clears the field, so hold onto our own reference.
+            var listener = _listener.EnsureNotNull();
+
             try
             {
-                _listener.EnsureNotNull().Start();
+                listener.Start();
 
                 Singletons.Logger.Verbose($"Listening inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort}");
 
                 while (KeepRunning)
                 {
-                    var tcpClient = _listener.AcceptTcpClient(); //Wait for an inbound connection.
+                    var tcpClient = listener.AcceptTcpClient(); //Wait for an inbound connection.
 
-                    if (tcpClient.Connected)
+                    //Check again, we may have received a connection while shutting down.
+                    if (tcpClient.Connected == false || KeepRunning == false)
                     {
-                        if (KeepRunning) //Check again, we may have received a connection while shutting down.
-                        {
-                            var endpointEdgeConnectionPumpThread = new Thread(EndpointEdgeConnectionDataPumpThreadProc);
-
-                            //Keep track of the connection. ActiveEndpointConnection will handle closing and disposing of the client and its stream.
-                            var activeConnection = new EndpointEdgeConnection(endpointEdgeConnectionPumpThread, tcpClient, Guid.NewGuid());
-                            _edgeConnections.Use((o) => o.Add(activeConnection.EdgeId, activeConnection));
-
-                            Singletons.Logger.Debug($"Accepted inbound endpoint connection: {activeConnection.EdgeId}");
-
-                            endpointEdgeConnectionPumpThread.Start(activeConnection);
-                        }
+                        Exceptions.Ignore(tcpClient.Dispose);
+                        continue;
                     }
+
+                    var endpointEdgeConnectionPumpThread = new Thread(EndpointEdgeConnectionDataPumpThreadProc);
+
+                    //Keep track of the connection. ActiveEndpointConnection will handle closing and disposing of the client and its stream.
+                    var activeConnection = new EndpointEdgeConnection(endpointEdgeConnectionPumpThread, tcpClient, Guid.NewGuid());
+                    _edgeConnections.Use((o) => o.Add(activeConnection.EdgeId, activeConnection));
+
+                    Singletons.Logger.Debug($"Accepted inbound endpoint connection: {activeConnection.EdgeId}");
+
+                    endpointEdgeConnectionPumpThread.Start(activeConnection);
                 }
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains("blocking operation was interrupted", StringComparison.InvariantCultureIgnoreCase) == false)
+                if (KeepRunning) //Exceptions are expected when Stop() closes the listener.
                 {
-                    Singletons.Logger.Exception($"InboundConnectionThreadProc: {ex.Message}");
+                    Singletons.Logger.Exception(ex, "InboundConnectionThreadProc");
                 }
             }
             finally
             {
-                if (_listener != null)
-                {
-                    Exceptions.Ignore(_listener.Stop);
-                }
+                Exceptions.Ignore(listener.Stop);
             }
         }
 
