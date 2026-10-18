@@ -52,7 +52,9 @@ namespace NetTunnel.Library
             Head,
             Options,
             Post,
-            Put
+            Put,
+            Patch,
+            Trace
         }
 
         public enum NtHttpHeaderAction

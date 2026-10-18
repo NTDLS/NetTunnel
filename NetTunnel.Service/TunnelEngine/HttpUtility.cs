@@ -71,18 +71,7 @@ namespace NetTunnel.Service
 
         public static bool IsHttpVerb(string? str)
         {
-            str = str?.ToUpper();
-
-            var verbs = Enum.GetValues(typeof(NtHttpVerb));
-
-            foreach (var verb in verbs)
-            {
-                if (str == verb?.ToString()?.ToUpper())
-                {
-                    return true;
-                }
-            }
-            return false;
+            return str != null && HttpVerbStrings.Contains(str, StringComparer.OrdinalIgnoreCase);
         }
 
         public static NtHttpHeaderType IsHttpHeader(byte[]? data, int length, out string? verb)
