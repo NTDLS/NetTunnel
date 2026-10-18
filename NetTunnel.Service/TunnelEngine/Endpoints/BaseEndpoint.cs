@@ -140,6 +140,14 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
             try
             {
+                if (Configuration.TrafficType == NtTrafficType.Https && this is EndpointInbound inboundEndpoint)
+                {
+                    //Terminate TLS here so that the tunneled data (and HTTP header rules) are in the clear.
+                    //  This must complete before we notify the peer, otherwise it could write to us mid-handshake.
+                    edgeConnection.AuthenticateAsTlsServer(inboundEndpoint.Certificate
+                        ?? throw new Exception($"No TLS certificate is loaded for endpoint '{Configuration.Name}'."));
+                }
+
                 if (Configuration.Direction == NtDirection.Inbound)
                 {
                     //SEARCH FOR: Process:Endpoint:Connect:001: If this is an inbound endpoint, then let the remote service
@@ -164,7 +172,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
                     if (
                          //Only parse HTTP headers if the traffic type is HTTP.
-                         Configuration.TrafficType == NtTrafficType.Http
+                         (Configuration.TrafficType == NtTrafficType.Http || Configuration.TrafficType == NtTrafficType.Https)
                          && (
                             // and the direction is inbound/any and we have request rules.
                             (
@@ -174,7 +182,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                             || (
                                 // or the direction is outbound/any and we have response rules.
                                 this is EndpointOutbound && Configuration.HttpHeaderRules
-                                    .Any(o => o.Enabled && (new[] { NtHttpHeaderType.Request, NtHttpHeaderType.Any }).Contains(o.HeaderType))
+                                    .Any(o => o.Enabled && (new[] { NtHttpHeaderType.Response, NtHttpHeaderType.Any }).Contains(o.HeaderType))
                             )
                          )
                     )
@@ -182,18 +190,30 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                         switch (HttpUtility.Process(ref httpHeaderBuilder, Configuration, buffer))
                         {
                             case NtHTTPHeaderResult.WaitOnData:
-                                //We received a partial HTTP header, wait on more data.
+                                //We received a partial HTTP header, wait on more data. Nothing was sent, so
+                                //  give back the sequence number to avoid a gap at the peer.
+                                packetSequence--;
                                 continue;
                             case NtHTTPHeaderResult.Present:
                                 //Found an HTTP header, send it to the peer. There may be bytes remaining
                                 //  in the buffer if buffer.Length > 0 so follow though to WriteBytesToPeer.
 
-                                var httpHeaderBytes = Encoding.UTF8.GetBytes(httpHeaderBuilder.ToString());
+                                var httpHeaderBytes = Encoding.Latin1.GetBytes(httpHeaderBuilder.ToString());
 
                                 _tunnel.S2SPeerNotificationEndpointDataExchange(
                                     _tunnel.TunnelKey, EndpointId, edgeConnection.EdgeId, packetSequence, httpHeaderBytes, httpHeaderBytes.Length);
 
                                 httpHeaderBuilder.Clear();
+
+                                if (buffer.Length == 0)
+                                {
+                                    //The buffer held only the header, there is no remaining data to send.
+                                    buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);
+                                    continue;
+                                }
+
+                                //The remaining bytes are a separate packet and need their own sequence number.
+                                packetSequence++;
                                 break;
                             case NtHTTPHeaderResult.NotPresent:
                                 //Didn't find an HTTP header.

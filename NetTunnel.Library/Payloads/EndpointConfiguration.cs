@@ -19,9 +19,39 @@ namespace NetTunnel.Library.Payloads
         public int InboundPort { get; set; }
         public int OutboundPort { get; set; }
 
+        /// <summary>
+        /// The type of traffic accepted at the inbound endpoint. Https terminates TLS using the certificate below.
+        /// </summary>
         [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
-        public NtTrafficType TrafficType { get; set; } = NtTrafficType.Raw;
+        public NtTrafficType InboundTrafficType { get; set; } = NtTrafficType.Raw;
+
+        /// <summary>
+        /// The type of traffic sent from the outbound endpoint. Https re-encrypts the connection to the destination.
+        /// </summary>
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+        public NtTrafficType OutboundTrafficType { get; set; } = NtTrafficType.Raw;
+
+        /// <summary>
+        /// The traffic type that applies to the end of the endpoint described by <see cref="Direction"/>.
+        /// </summary>
+        [Newtonsoft.Json.JsonIgnore]
+        public NtTrafficType TrafficType => Direction == NtDirection.Outbound ? OutboundTrafficType : InboundTrafficType;
+
         public List<HttpHeaderRule> HttpHeaderRules { get; set; } = new();
+
+        /// <summary>
+        /// Path to the PFX/PKCS#12 certificate used to terminate TLS at the inbound endpoint (HTTPS traffic type only).
+        /// </summary>
+        public string TlsCertificatePath { get; set; } = string.Empty;
+        /// <summary>
+        /// Password for the PFX certificate (if any).
+        /// </summary>
+        public string TlsCertificatePassword { get; set; } = string.Empty;
+        /// <summary>
+        /// When true, the outbound endpoint will not validate the backend server's certificate when re-encrypting (HTTPS traffic type only).
+        /// </summary>
+        public bool TlsIgnoreBackendCertificateErrors { get; set; }
+
         public DirectionalKey EndpointKey => new(EndpointId, Direction);
 
         public EndpointConfiguration SwapDirection()
@@ -36,7 +66,7 @@ namespace NetTunnel.Library.Payloads
         }
 
         public EndpointConfiguration(Guid endpointId, string name,
-            string outboundAddress, int inboundPort, int outboundPort, List<HttpHeaderRule> httpHeaderRules, NtTrafficType trafficType)
+            string outboundAddress, int inboundPort, int outboundPort, List<HttpHeaderRule> httpHeaderRules, NtTrafficType inboundTrafficType, NtTrafficType outboundTrafficType)
         {
             EndpointId = endpointId;
             Direction = NtDirection.Undefined;
@@ -44,12 +74,13 @@ namespace NetTunnel.Library.Payloads
             OutboundAddress = outboundAddress;
             InboundPort = inboundPort;
             OutboundPort = outboundPort;
-            TrafficType = trafficType;
+            InboundTrafficType = inboundTrafficType;
+            OutboundTrafficType = outboundTrafficType;
             HttpHeaderRules.AddRange(httpHeaderRules);
         }
 
         public EndpointConfiguration(Guid endpointId, NtDirection direction, string name,
-            string outboundAddress, int inboundPort, int outboundPort, List<HttpHeaderRule> httpHeaderRules, NtTrafficType trafficType)
+            string outboundAddress, int inboundPort, int outboundPort, List<HttpHeaderRule> httpHeaderRules, NtTrafficType inboundTrafficType, NtTrafficType outboundTrafficType)
         {
             EndpointId = endpointId;
             Direction = direction;
@@ -57,7 +88,8 @@ namespace NetTunnel.Library.Payloads
             OutboundAddress = outboundAddress;
             InboundPort = inboundPort;
             OutboundPort = outboundPort;
-            TrafficType = trafficType;
+            InboundTrafficType = inboundTrafficType;
+            OutboundTrafficType = outboundTrafficType;
             HttpHeaderRules.AddRange(httpHeaderRules);
         }
 
@@ -71,7 +103,11 @@ namespace NetTunnel.Library.Payloads
                 OutboundAddress = OutboundAddress,
                 InboundPort = InboundPort,
                 OutboundPort = OutboundPort,
-                TrafficType = TrafficType,
+                InboundTrafficType = InboundTrafficType,
+                OutboundTrafficType = OutboundTrafficType,
+                TlsCertificatePath = TlsCertificatePath,
+                TlsCertificatePassword = TlsCertificatePassword,
+                TlsIgnoreBackendCertificateErrors = TlsIgnoreBackendCertificateErrors,
             };
 
             foreach (var rule in HttpHeaderRules)
@@ -90,7 +126,11 @@ namespace NetTunnel.Library.Payloads
                 OutboundAddress.GetHashCode(),
                 InboundPort.GetHashCode(),
                 OutboundPort.GetHashCode(),
-                TrafficType.GetHashCode(),
+                InboundTrafficType.GetHashCode(),
+                OutboundTrafficType.GetHashCode(),
+                TlsCertificatePath.GetHashCode(),
+                TlsCertificatePassword.GetHashCode(),
+                TlsIgnoreBackendCertificateErrors.GetHashCode(),
                 HttpHeaderRules.GetHashCode()]);
         }
     }

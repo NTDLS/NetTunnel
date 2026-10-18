@@ -1,13 +1,16 @@
 ﻿using NetTunnel.Library;
 using NTDLS.Helpers;
 using NTDLS.ReliableMessaging;
+using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
 
 namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
     internal class EndpointEdgeConnection : IDisposable
     {
-        private readonly NetworkStream _stream;
+        private Stream _stream;
 
         public bool IsConnected { get; private set; }
         public DateTime LastActivityDateTime { get; private set; } = DateTime.UtcNow;
@@ -32,6 +35,29 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             EdgeId = edgeId;
             _stream = tcpClient.GetStream();
             IsConnected = true;
+        }
+
+        /// <summary>
+        /// Terminates TLS for a client that connected to us (e.g. a web-browser). Blocks until the handshake completes.
+        /// </summary>
+        public void AuthenticateAsTlsServer(X509Certificate2 certificate)
+        {
+            var sslStream = new SslStream(_stream, false);
+            sslStream.AuthenticateAsServer(certificate, false, SslProtocols.None, false);
+            _stream = sslStream;
+        }
+
+        /// <summary>
+        /// Starts TLS to a server that we connected to (e.g. a web-server). Blocks until the handshake completes.
+        /// </summary>
+        public void AuthenticateAsTlsClient(string targetHost, bool ignoreCertificateErrors)
+        {
+            var sslStream = ignoreCertificateErrors
+                ? new SslStream(_stream, false, (_, _, _, _) => true)
+                : new SslStream(_stream, false);
+
+            sslStream.AuthenticateAsClient(targetHost);
+            _stream = sslStream;
         }
 
         public void Disconnect()

@@ -103,8 +103,11 @@ namespace NetTunnel.UI.Forms
             toolTips.AddControls([labelTerminationPort, textBoxTerminationPort],
                 "Host name, domain or IP address that the outbound endpoint will make a connection to.");
 
-            toolTips.AddControls([labelTrafficType, comboBoxTrafficType],
-                "Type of traffic that is expected be tunneled on this endpoint. Note that HTTP headers can only be manipulated if HTTP is selected (HTTPS is not supported for header manipulation). ");
+            toolTips.AddControls([labelOutboundTrafficType, comboBoxOutboundTrafficType],
+                "Type of traffic the outbound endpoint sends to the destination. HTTPS re-encrypts the connection to the destination server; HTTP and Raw send plain traffic.");
+
+            toolTips.AddControls([labelInboundTrafficType, comboBoxInboundTrafficType],
+                "Type of traffic accepted by the inbound endpoint. HTTPS terminates TLS using the certificate on the TLS tab. HTTP header rules apply to HTTP and HTTPS.");
 
             #endregion
 
@@ -115,9 +118,13 @@ namespace NetTunnel.UI.Forms
                 new ("HTTPS", NtTrafficType.Https)
             };
 
-            comboBoxTrafficType.DisplayMember = "Display";
-            comboBoxTrafficType.ValueMember = "Value";
-            comboBoxTrafficType.DataSource = trafficTypes;
+            comboBoxInboundTrafficType.DisplayMember = "Display";
+            comboBoxInboundTrafficType.ValueMember = "Value";
+            comboBoxInboundTrafficType.DataSource = trafficTypes;
+
+            comboBoxOutboundTrafficType.DisplayMember = "Display";
+            comboBoxOutboundTrafficType.ValueMember = "Value";
+            comboBoxOutboundTrafficType.DataSource = new List<ComboItem>(trafficTypes);
 
             if (_existingEndpoint != null)
             {
@@ -127,7 +134,12 @@ namespace NetTunnel.UI.Forms
                         $"{rule.Verb}", rule.Name, $"{rule.Action}", rule.Value]);
                 }
 
-                comboBoxTrafficType.SelectedValue = _existingEndpoint.TrafficType;
+                comboBoxInboundTrafficType.SelectedValue = _existingEndpoint.InboundTrafficType;
+                comboBoxOutboundTrafficType.SelectedValue = _existingEndpoint.OutboundTrafficType;
+
+                textBoxCertificatePath.Text = _existingEndpoint.TlsCertificatePath;
+                textBoxCertificatePassword.Text = _existingEndpoint.TlsCertificatePassword;
+                checkBoxIgnoreBackendCertificateErrors.Checked = _existingEndpoint.TlsIgnoreBackendCertificateErrors;
 
                 textBoxName.Text = _existingEndpoint.Name;
                 textBoxListenPort.Text = $"{_existingEndpoint.InboundPort:n0}";
@@ -136,7 +148,8 @@ namespace NetTunnel.UI.Forms
             }
             else
             {
-                comboBoxTrafficType.SelectedValue = NtTrafficType.Raw;
+                comboBoxInboundTrafficType.SelectedValue = NtTrafficType.Raw;
+                comboBoxOutboundTrafficType.SelectedValue = NtTrafficType.Raw;
 #if DEBUG
 
                 textBoxName.Text = "Website Redirector Endpoint";
@@ -144,6 +157,20 @@ namespace NetTunnel.UI.Forms
                 textBoxTerminationAddress.Text = "127.0.0.1";
                 textBoxTerminationPort.Text = "80";
 #endif
+            }
+        }
+
+        private void ButtonBrowseCertificate_Click(object? sender, EventArgs e)
+        {
+            using var dialog = new OpenFileDialog
+            {
+                Title = "Select TLS certificate",
+                Filter = "PKCS#12 certificate (*.pfx;*.p12)|*.pfx;*.p12|All files (*.*)|*.*"
+            };
+
+            if (dialog.ShowDialog(this) == DialogResult.OK)
+            {
+                textBoxCertificatePath.Text = dialog.FileName;
             }
         }
 
@@ -202,7 +229,20 @@ namespace NetTunnel.UI.Forms
                     listenPort,
                     terminationPort,
                     endpointHttpHeaderRules,
-                    Enum.Parse<NtTrafficType>($"{comboBoxTrafficType.SelectedValue}"));
+                    Enum.Parse<NtTrafficType>($"{comboBoxInboundTrafficType.SelectedValue}"),
+                    Enum.Parse<NtTrafficType>($"{comboBoxOutboundTrafficType.SelectedValue}"))
+                {
+                    TlsCertificatePath = textBoxCertificatePath.Text.Trim(),
+                    TlsCertificatePassword = textBoxCertificatePassword.Text,
+                    TlsIgnoreBackendCertificateErrors = checkBoxIgnoreBackendCertificateErrors.Checked
+                };
+
+                if (Endpoint.InboundTrafficType == NtTrafficType.Https
+                    && string.IsNullOrWhiteSpace(Endpoint.TlsCertificatePath))
+                {
+                    tabControlBody.SelectedTab = tabPageTls;
+                    throw new Exception("You must specify a certificate (PFX) path to terminate HTTPS traffic.");
+                }
 
                 var progressForm = new ProgressForm(FriendlyName, "Saving endpoint...");
 

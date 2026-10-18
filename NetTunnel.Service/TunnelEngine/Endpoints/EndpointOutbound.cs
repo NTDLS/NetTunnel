@@ -65,6 +65,20 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                         var dataExchangeThread = new Thread(EndpointEdgeConnectionDataPumpThreadProc);
                         //Keep track of the connection. ActiveEndpointConnection will handle closing and disposing of the client and its stream.
                         var activeConnection = new EndpointEdgeConnection(dataExchangeThread, tcpClient, edgeId);
+
+                        if (Configuration.TrafficType == NtTrafficType.Https)
+                        {
+                            //Re-encrypt to the backend. Done before the connection is registered so peer data cannot arrive mid-handshake.
+                            try
+                            {
+                                activeConnection.AuthenticateAsTlsClient(Configuration.OutboundAddress, Configuration.TlsIgnoreBackendCertificateErrors);
+                            }
+                            catch
+                            {
+                                Exceptions.Ignore(activeConnection.Dispose);
+                                throw;
+                            }
+                        }
                         var outboundConnection = _edgeConnections.Use((o) => o.TryAdd(edgeId, activeConnection));
 
                         Singletons.Logger.Debug($"Established outbound endpoint connection: {activeConnection.EdgeId}");
@@ -74,6 +88,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 }
                 catch (Exception ex)
                 {
+                    //Covers failures to connect or to start the thread; Dispose is safe to call more than once.
+                    Exceptions.Ignore(tcpClient.Dispose);
                     Singletons.Logger.Exception(ex, $"EstablishOutboundEndpointConnection: {ex.Message}");
                     throw;
                 }
@@ -90,7 +106,11 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 OutboundAddress = Configuration.OutboundAddress,
                 InboundPort = Configuration.InboundPort,
                 OutboundPort = Configuration.OutboundPort,
-                TrafficType = Configuration.TrafficType,
+                InboundTrafficType = Configuration.InboundTrafficType,
+                OutboundTrafficType = Configuration.OutboundTrafficType,
+                TlsCertificatePath = Configuration.TlsCertificatePath,
+                TlsCertificatePassword = Configuration.TlsCertificatePassword,
+                TlsIgnoreBackendCertificateErrors = Configuration.TlsIgnoreBackendCertificateErrors,
             };
 
             foreach (var rule in Configuration.HttpHeaderRules)

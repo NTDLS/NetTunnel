@@ -18,76 +18,58 @@ namespace NetTunnel.Service
         {
             try
             {
-                if (httpHeaderBuilder.Length > 0) //We are reconstructing a fragmented HTTP request header.
+                //Latin1 maps bytes to chars 1:1 so that character counts equal byte counts and binary bodies survive untouched.
+                if (httpHeaderBuilder.Length > 0 //We are reconstructing a fragmented HTTP header.
+                    || StartsWithHTTPVerb(buffer.Bytes) || StartsWithHttpResponse(buffer.Bytes))
                 {
-                    var stringContent = Encoding.UTF8.GetString(buffer.Bytes, 0, buffer.Length);
-                    httpHeaderBuilder.Append(stringContent);
+                    httpHeaderBuilder.Append(Encoding.Latin1.GetString(buffer.Bytes, 0, buffer.Length));
                 }
-                else if (StartsWithHTTPVerb(buffer.Bytes))
-                {
-                    var stringContent = Encoding.UTF8.GetString(buffer.Bytes, 0, buffer.Length);
-                    httpHeaderBuilder.Append(stringContent);
-                }
-
-                string headerDelimiter = string.Empty;
 
                 if (httpHeaderBuilder.Length > 0)
                 {
-                    var headerType = IsHttpHeader(httpHeaderBuilder.ToString(), out string? requestVerb);
+                    var text = httpHeaderBuilder.ToString();
+                    var headerType = IsHttpHeader(text, out string? requestVerb);
+
+                    if (headerType == NtHttpHeaderType.None || requestVerb == null)
+                    {
+                        if (text.Contains('\n') == false)
+                        {
+                            return NtHTTPHeaderResult.WaitOnData; //Not even the first line has arrived yet.
+                        }
+
+                        httpHeaderBuilder.Clear(); //Looked like HTTP but isn't.
+                        return NtHTTPHeaderResult.NotPresent;
+                    }
 
                     if (endpointConfig.Direction == NtDirection.Inbound && headerType == NtHttpHeaderType.Response)
                     {
                         Singletons.Logger.Warning("A HTTP response header was detected on an inbound endpoint.");
                     }
-                    else if (endpointConfig.Direction == NtDirection.Outbound && headerType == NtHttpHeaderType.Response)
+                    else if (endpointConfig.Direction == NtDirection.Outbound && headerType == NtHttpHeaderType.Request)
                     {
                         Singletons.Logger.Warning("A HTTP request header was detected on an outbound endpoint.");
                     }
 
-                    if (headerType != NtHttpHeaderType.None && requestVerb != null)
+                    var endOfHeaderIndex = GetHttpHeaderEnd(text, out var headerDelimiter);
+                    if (endOfHeaderIndex < 0)
                     {
-                        var endOfHeaderIndex = GetHttpHeaderEnd(httpHeaderBuilder.ToString(), out headerDelimiter);
-                        if (endOfHeaderIndex < 0)
-                        {
-                            return NtHTTPHeaderResult.WaitOnData; //We have a HTTP header but its a fragment. Wait on the remaining header.
-                        }
-                        else
-                        {
-                            if (buffer.Length > headerDelimiter.Length * 2) // "\r\n" or "\r\n\r\n"
-                            {
-                                //If we received more bytes than just the delimiter then we
-                                //  need to determine how many non-header bytes need to be sent to the peer.
-
-                                int endOfHeaderInBufferIndex = FindDelimiterIndexInByteArray(buffer.Bytes, buffer.Length, $"{headerDelimiter}{headerDelimiter}");
-                                if (endOfHeaderInBufferIndex < 0)
-                                {
-                                    throw new Exception("Could not locate HTTP header in receive buffer.");
-                                }
-
-                                int bufferEndOfHeaderOffset = endOfHeaderInBufferIndex + (headerDelimiter.Length * 2);
-
-                                if (bufferEndOfHeaderOffset > buffer.Length)
-                                {
-                                    //We received extra non-header bytes. We need to remove the header bytes from the buffer
-                                    //  and then send them after we modify and send the header.
-                                    int newBufferLength = buffer.Length - bufferEndOfHeaderOffset;
-                                    Array.Copy(buffer.Bytes, bufferEndOfHeaderOffset, buffer.Bytes, 0, newBufferLength);
-                                }
-
-                                buffer.Length -= bufferEndOfHeaderOffset;
-                            }
-                            else
-                            {
-                                buffer.Length = 0;
-                            }
-                        }
-
-                        //Apply the header rules, replacing the original http header builder.
-                        httpHeaderBuilder = new StringBuilder(
-                            ApplyHttpHeaderRules(endpointConfig, httpHeaderBuilder.ToString(), headerType, requestVerb, headerDelimiter));
-
-                        return NtHTTPHeaderResult.Present;
+                        return NtHTTPHeaderResult.WaitOnData; //We have a HTTP header but its a fragment. Wait on the remaining header.
                     }
+
+                    //Any bytes after the end of the header are the tail of the current buffer. Move them to the
+                    //  front of the buffer so that they are sent after the (modified) header.
+                    int bodyLength = text.Length - endOfHeaderIndex;
+                    if (bodyLength > 0)
+                    {
+                        Array.Copy(buffer.Bytes, buffer.Length - bodyLength, buffer.Bytes, 0, bodyLength);
+                    }
+                    buffer.Length = bodyLength;
+
+                    //Apply the header rules, replacing the original http header builder.
+                    httpHeaderBuilder = new StringBuilder(
+                        ApplyHttpHeaderRules(endpointConfig, text.Substring(0, endOfHeaderIndex), headerType, requestVerb, headerDelimiter));
+
+                    return NtHTTPHeaderResult.Present;
                 }
             }
             catch (Exception ex)
@@ -160,6 +142,11 @@ namespace NetTunnel.Service
             }
 
             return httpHeader;
+        }
+
+        public static bool StartsWithHttpResponse(byte[] bytes)
+        {
+            return Encoding.ASCII.GetString(bytes.Take(5).ToArray()).Equals("HTTP/", StringComparison.OrdinalIgnoreCase);
         }
 
         public static bool StartsWithHTTPVerb(byte[] bytes)
@@ -301,105 +288,68 @@ namespace NetTunnel.Service
             return endOfHeader;
         }
 
+        private static Regex HeaderLineFinder(string name, bool includeLineBreak)
+            => new(@"^" + Regex.Escape(name) + @"[ \t]*:[^\r\n]*" + (includeLineBreak ? @"(\r?\n)?" : string.Empty),
+                RegexOptions.IgnoreCase | RegexOptions.Multiline);
+
+        /// <summary>
+        /// Appends a header line to the end of the header block (just before the blank line which terminates it).
+        /// </summary>
+        private static string AppendHttpHeaderLine(string headerText, string name, string value, string lineBreak)
+        {
+            var newLine = $"{name}: {value}{lineBreak}";
+
+            //The header block ends with a blank line. Insert ahead of it, or at the end if the block was not terminated.
+            if (headerText.EndsWith(lineBreak + lineBreak))
+            {
+                return headerText.Insert(headerText.Length - lineBreak.Length, newLine);
+            }
+
+            return headerText + newLine;
+        }
+
         /// <summary>
         /// Adds a new Http header value if it does not already exist.
         /// </summary>
-        /// <param name="headerText"></param>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        /// <param name="lineBreak"></param>
-        /// <returns></returns>
         public static string InsertHttpHostHeaderValue(string headerText, string name, string value, string lineBreak)
         {
-            var fieldFinder = new Regex(@"(?i:" + name + @")\:.*");
-            var existingMatch = fieldFinder.Match(headerText);
-
-            string newFieldValue = string.Format("{0}: {1}", name, value);
-
-            if (existingMatch != null)
+            if (HeaderLineFinder(name, false).IsMatch(headerText))
             {
-                ///Do nothing.               
-            }
-            else
-            {
-                headerText += newFieldValue + lineBreak;
+                return headerText; //Already present, do nothing.
             }
 
-            return headerText;
+            return AppendHttpHeaderLine(headerText, name, value, lineBreak);
         }
 
         /// <summary>
         /// Adds a new Http header value or updates it if it already exists.
         /// </summary>
-        /// <param name="headerText"></param>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        /// <param name="lineBreak"></param>
-        /// <returns></returns>
         public static string UpsertHttpHostHeaderValue(string headerText, string name, string value, string lineBreak)
         {
-            var fieldFinder = new Regex(@"(?i:" + name + @")\:.*");
-            var existingMatch = fieldFinder.Match(headerText);
+            var fieldFinder = HeaderLineFinder(name, false);
 
-            string newFieldValue = string.Format("{0}: {1}", name, value);
-
-            if (existingMatch != null)
+            if (fieldFinder.IsMatch(headerText))
             {
-                headerText = fieldFinder.Replace(headerText, newFieldValue);
-            }
-            else
-            {
-                headerText += newFieldValue + lineBreak;
+                return fieldFinder.Replace(headerText, _ => $"{name}: {value}");
             }
 
-            return headerText;
+            return AppendHttpHeaderLine(headerText, name, value, lineBreak);
         }
 
         /// <summary>
-        /// Adds a new Http header value or updates it if it already exists.
+        /// Updates an Http header value if it exists, otherwise does nothing.
         /// </summary>
-        /// <param name="headerText"></param>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        /// <param name="lineBreak"></param>
-        /// <returns></returns>
         public static string UpdateHttpHostHeaderValue(string headerText, string name, string value, string lineBreak)
         {
-            var fieldFinder = new Regex(@"(?i:" + name + @")\:.*");
-            var existingMatch = fieldFinder.Match(headerText);
-
-            string newFieldValue = string.Format("{0}: {1}", name, value);
-
-            if (existingMatch != null)
-            {
-                headerText = fieldFinder.Replace(headerText, newFieldValue);
-            }
-            else
-            {
-                //Do nothing.
-            }
-
-            return headerText;
+            return HeaderLineFinder(name, false).Replace(headerText, _ => $"{name}: {value}");
         }
 
         /// <summary>
-        /// Removes a Http header value if it exists, otherwise does nothing.
+        /// Removes an Http header (the whole line) if it exists, otherwise does nothing.
         /// </summary>
-        /// <param name="headerText"></param>
-        /// <param name="name"></param>
-        /// <param name="lineBreak"></param>
-        /// <returns></returns>
         public static string DeleteHttpHostHeaderValue(string headerText, string name, string lineBreak)
         {
-            var fieldFinder = new Regex(@"(?i:" + name + @")\:.*");
-            var existingMatch = fieldFinder.Match(headerText);
-
-            if (existingMatch != null)
-            {
-                headerText = fieldFinder.Replace(headerText, string.Empty);
-            }
-
-            return headerText;
+            return HeaderLineFinder(name, true).Replace(headerText, string.Empty);
         }
     }
 }

@@ -3,6 +3,7 @@ using NetTunnel.Library.Payloads;
 using NTDLS.Helpers;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 using static NetTunnel.Library.Constants;
 
 namespace NetTunnel.Service.TunnelEngine.Endpoints
@@ -27,9 +28,27 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
         }
 
+        /// <summary>
+        /// The certificate used to terminate TLS (HTTPS traffic type only).
+        /// </summary>
+        internal X509Certificate2? Certificate { get; private set; }
+
         public override void Start()
         {
             base.Start();
+
+            if (Configuration.TrafficType == NtTrafficType.Https)
+            {
+                try
+                {
+                    Certificate = X509CertificateLoader.LoadPkcs12FromFile(Configuration.TlsCertificatePath,
+                        string.IsNullOrEmpty(Configuration.TlsCertificatePassword) ? null : Configuration.TlsCertificatePassword);
+                }
+                catch (Exception ex)
+                {
+                    Singletons.Logger.Exception($"Failed to load TLS certificate '{Configuration.TlsCertificatePath}' for endpoint '{Configuration.Name}': {ex.Message}");
+                }
+            }
 
             _listener = new TcpListener(IPAddress.Any, Configuration.InboundPort);
 
@@ -61,6 +80,9 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 }
                 o.Clear();
             });
+
+            Exceptions.Ignore(() => Certificate?.Dispose());
+            Certificate = null;
 
             Singletons.Logger.Verbose(
                 $"Stopped inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort}.");
@@ -123,7 +145,11 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 OutboundAddress = Configuration.OutboundAddress,
                 InboundPort = Configuration.InboundPort,
                 OutboundPort = Configuration.OutboundPort,
-                TrafficType = Configuration.TrafficType,
+                InboundTrafficType = Configuration.InboundTrafficType,
+                OutboundTrafficType = Configuration.OutboundTrafficType,
+                TlsCertificatePath = Configuration.TlsCertificatePath,
+                TlsCertificatePassword = Configuration.TlsCertificatePassword,
+                TlsIgnoreBackendCertificateErrors = Configuration.TlsIgnoreBackendCertificateErrors,
             };
 
             foreach (var rule in Configuration.HttpHeaderRules)
