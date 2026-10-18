@@ -104,7 +104,7 @@
             // labelMessageQueryTimeoutMs
             // 
             labelMessageQueryTimeoutMs.AutoSize = true;
-            labelMessageQueryTimeoutMs.Location = new Point(6, 47);
+            labelMessageQueryTimeoutMs.Location = new Point(6, 49);
             labelMessageQueryTimeoutMs.Name = "labelMessageQueryTimeoutMs";
             labelMessageQueryTimeoutMs.Size = new Size(158, 15);
             labelMessageQueryTimeoutMs.TabIndex = 8;
@@ -131,7 +131,7 @@
             // labelStaleEndpointExpirationMs
             // 
             labelStaleEndpointExpirationMs.AutoSize = true;
-            labelStaleEndpointExpirationMs.Location = new Point(6, 47);
+            labelStaleEndpointExpirationMs.Location = new Point(6, 49);
             labelStaleEndpointExpirationMs.Name = "labelStaleEndpointExpirationMs";
             labelStaleEndpointExpirationMs.Size = new Size(165, 15);
             labelStaleEndpointExpirationMs.TabIndex = 11;
@@ -146,9 +146,9 @@
             // 
             // textBoxMessageQueryTimeoutMs
             // 
-            textBoxMessageQueryTimeoutMs.Location = new Point(6, 65);
+            textBoxMessageQueryTimeoutMs.Location = new Point(6, 67);
             textBoxMessageQueryTimeoutMs.Name = "textBoxMessageQueryTimeoutMs";
-            textBoxMessageQueryTimeoutMs.Size = new Size(130, 23);
+            textBoxMessageQueryTimeoutMs.Size = new Size(163, 23);
             textBoxMessageQueryTimeoutMs.TabIndex = 1;
             // 
             // textBoxEndpointHeartbeatDelayMs
@@ -162,12 +162,12 @@
             // 
             textBoxTunnelCryptographyKeySize.Location = new Point(6, 21);
             textBoxTunnelCryptographyKeySize.Name = "textBoxTunnelCryptographyKeySize";
-            textBoxTunnelCryptographyKeySize.Size = new Size(130, 23);
+            textBoxTunnelCryptographyKeySize.Size = new Size(163, 23);
             textBoxTunnelCryptographyKeySize.TabIndex = 0;
             // 
             // textBoxStaleEndpointExpirationMs
             // 
-            textBoxStaleEndpointExpirationMs.Location = new Point(6, 65);
+            textBoxStaleEndpointExpirationMs.Location = new Point(6, 67);
             textBoxStaleEndpointExpirationMs.Name = "textBoxStaleEndpointExpirationMs";
             textBoxStaleEndpointExpirationMs.Size = new Size(135, 23);
             textBoxStaleEndpointExpirationMs.TabIndex = 1;
@@ -203,21 +203,21 @@
             // 
             textBoxInitialReceiveBufferSize.Location = new Point(8, 37);
             textBoxInitialReceiveBufferSize.Name = "textBoxInitialReceiveBufferSize";
-            textBoxInitialReceiveBufferSize.Size = new Size(130, 23);
+            textBoxInitialReceiveBufferSize.Size = new Size(155, 23);
             textBoxInitialReceiveBufferSize.TabIndex = 3;
             // 
             // textBoxMaxReceiveBufferSize
             // 
             textBoxMaxReceiveBufferSize.Location = new Point(8, 81);
             textBoxMaxReceiveBufferSize.Name = "textBoxMaxReceiveBufferSize";
-            textBoxMaxReceiveBufferSize.Size = new Size(130, 23);
+            textBoxMaxReceiveBufferSize.Size = new Size(155, 23);
             textBoxMaxReceiveBufferSize.TabIndex = 4;
             // 
             // textBoxReceiveBufferGrowthRate
             // 
             textBoxReceiveBufferGrowthRate.Location = new Point(8, 125);
             textBoxReceiveBufferGrowthRate.Name = "textBoxReceiveBufferGrowthRate";
-            textBoxReceiveBufferGrowthRate.Size = new Size(130, 23);
+            textBoxReceiveBufferGrowthRate.Size = new Size(155, 23);
             textBoxReceiveBufferGrowthRate.TabIndex = 5;
             // 
             // tabControlBody
@@ -263,15 +263,15 @@
             // 
             // textBoxPingCadence
             // 
-            textBoxPingCadence.Location = new Point(6, 109);
+            textBoxPingCadence.Location = new Point(6, 113);
             textBoxPingCadence.Name = "textBoxPingCadence";
-            textBoxPingCadence.Size = new Size(130, 23);
+            textBoxPingCadence.Size = new Size(163, 23);
             textBoxPingCadence.TabIndex = 2;
             // 
             // labelPingCadence
             // 
             labelPingCadence.AutoSize = true;
-            labelPingCadence.Location = new Point(6, 91);
+            labelPingCadence.Location = new Point(6, 95);
             labelPingCadence.Name = "labelPingCadence";
             labelPingCadence.Size = new Size(108, 15);
             labelPingCadence.TabIndex = 30;
@@ -285,7 +285,7 @@
             groupBoxBuffering.Controls.Add(labelReceiveBufferGrowthRate);
             groupBoxBuffering.Controls.Add(textBoxInitialReceiveBufferSize);
             groupBoxBuffering.Controls.Add(textBoxMaxReceiveBufferSize);
-            groupBoxBuffering.Location = new Point(6, 138);
+            groupBoxBuffering.Location = new Point(6, 153);
             groupBoxBuffering.Name = "groupBoxBuffering";
             groupBoxBuffering.Size = new Size(236, 166);
             groupBoxBuffering.TabIndex = 28;
@@ -346,7 +346,7 @@
             // labelLogPath
             // 
             labelLogPath.AutoSize = true;
-            labelLogPath.Location = new Point(6, 47);
+            labelLogPath.Location = new Point(6, 49);
             labelLogPath.Name = "labelLogPath";
             labelLogPath.Size = new Size(73, 15);
             labelLogPath.TabIndex = 2;
@@ -354,7 +354,7 @@
             // 
             // textBoxLogPath
             // 
-            textBoxLogPath.Location = new Point(6, 65);
+            textBoxLogPath.Location = new Point(6, 67);
             textBoxLogPath.Name = "textBoxLogPath";
             textBoxLogPath.Size = new Size(480, 23);
             textBoxLogPath.TabIndex = 3;
@@ -362,7 +362,7 @@
             // labelLogFileMaxSizeMB
             // 
             labelLogFileMaxSizeMB.AutoSize = true;
-            labelLogFileMaxSizeMB.Location = new Point(6, 91);
+            labelLogFileMaxSizeMB.Location = new Point(6, 95);
             labelLogFileMaxSizeMB.Name = "labelLogFileMaxSizeMB";
             labelLogFileMaxSizeMB.Size = new Size(130, 15);
             labelLogFileMaxSizeMB.TabIndex = 4;
@@ -370,7 +370,7 @@
             // 
             // textBoxLogFileMaxSizeMB
             // 
-            textBoxLogFileMaxSizeMB.Location = new Point(6, 109);
+            textBoxLogFileMaxSizeMB.Location = new Point(6, 113);
             textBoxLogFileMaxSizeMB.Name = "textBoxLogFileMaxSizeMB";
             textBoxLogFileMaxSizeMB.Size = new Size(140, 23);
             textBoxLogFileMaxSizeMB.TabIndex = 5;
@@ -378,7 +378,7 @@
             // labelLogFileRetainedCount
             // 
             labelLogFileRetainedCount.AutoSize = true;
-            labelLogFileRetainedCount.Location = new Point(6, 135);
+            labelLogFileRetainedCount.Location = new Point(6, 141);
             labelLogFileRetainedCount.Name = "labelLogFileRetainedCount";
             labelLogFileRetainedCount.Size = new Size(126, 15);
             labelLogFileRetainedCount.TabIndex = 6;
@@ -386,7 +386,7 @@
             // 
             // textBoxLogFileRetainedCount
             // 
-            textBoxLogFileRetainedCount.Location = new Point(6, 153);
+            textBoxLogFileRetainedCount.Location = new Point(6, 159);
             textBoxLogFileRetainedCount.Name = "textBoxLogFileRetainedCount";
             textBoxLogFileRetainedCount.Size = new Size(140, 23);
             textBoxLogFileRetainedCount.TabIndex = 7;

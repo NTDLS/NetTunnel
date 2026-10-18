@@ -78,7 +78,7 @@
             // 
             textBoxUsername.Location = new Point(90, 90);
             textBoxUsername.Name = "textBoxUsername";
-            textBoxUsername.Size = new Size(275, 23);
+            textBoxUsername.Size = new Size(278, 23);
             textBoxUsername.TabIndex = 2;
             // 
             // textBoxPassword
@@ -122,7 +122,7 @@
             // 
             textBoxPort.Location = new Point(294, 34);
             textBoxPort.Name = "textBoxPort";
-            textBoxPort.Size = new Size(71, 23);
+            textBoxPort.Size = new Size(74, 23);
             textBoxPort.TabIndex = 1;
             // 
             // textBoxAddress

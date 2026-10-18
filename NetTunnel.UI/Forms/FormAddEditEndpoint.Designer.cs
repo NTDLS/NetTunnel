@@ -79,7 +79,7 @@
             // labelName
             // 
             labelName.AutoSize = true;
-            labelName.Location = new Point(13, 11);
+            labelName.Location = new Point(10, 11);
             labelName.Name = "labelName";
             labelName.Size = new Size(115, 15);
             labelName.TabIndex = 8;
@@ -89,7 +89,7 @@
             // 
             textBoxListenPort.Location = new Point(13, 82);
             textBoxListenPort.Name = "textBoxListenPort";
-            textBoxListenPort.Size = new Size(74, 23);
+            textBoxListenPort.Size = new Size(157, 23);
             textBoxListenPort.TabIndex = 1;
             // 
             // labelListenPort
@@ -103,7 +103,7 @@
             // 
             // textBoxTerminationAddress
             // 
-            textBoxTerminationAddress.Location = new Point(113, 82);
+            textBoxTerminationAddress.Location = new Point(194, 82);
             textBoxTerminationAddress.Name = "textBoxTerminationAddress";
             textBoxTerminationAddress.Size = new Size(191, 23);
             textBoxTerminationAddress.TabIndex = 2;
@@ -111,7 +111,7 @@
             // labelTerminationAddress
             // 
             labelTerminationAddress.AutoSize = true;
-            labelTerminationAddress.Location = new Point(113, 64);
+            labelTerminationAddress.Location = new Point(194, 64);
             labelTerminationAddress.Name = "labelTerminationAddress";
             labelTerminationAddress.Size = new Size(148, 15);
             labelTerminationAddress.TabIndex = 15;
@@ -119,15 +119,15 @@
             // 
             // textBoxTerminationPort
             // 
-            textBoxTerminationPort.Location = new Point(329, 82);
+            textBoxTerminationPort.Location = new Point(411, 82);
             textBoxTerminationPort.Name = "textBoxTerminationPort";
-            textBoxTerminationPort.Size = new Size(92, 23);
+            textBoxTerminationPort.Size = new Size(157, 23);
             textBoxTerminationPort.TabIndex = 3;
             // 
             // labelTerminationPort
             // 
             labelTerminationPort.AutoSize = true;
-            labelTerminationPort.Location = new Point(329, 64);
+            labelTerminationPort.Location = new Point(411, 64);
             labelTerminationPort.Name = "labelTerminationPort";
             labelTerminationPort.Size = new Size(96, 15);
             labelTerminationPort.TabIndex = 17;
@@ -167,14 +167,19 @@
             // 
             tabPageEndpoint.Controls.Add(labelName);
             tabPageEndpoint.Controls.Add(textBoxName);
+            tabPageEndpoint.Controls.Add(comboBoxInboundTrafficType);
             tabPageEndpoint.Controls.Add(labelListenPort);
+            tabPageEndpoint.Controls.Add(labelInboundTrafficType);
             tabPageEndpoint.Controls.Add(textBoxTerminationPort);
+            tabPageEndpoint.Controls.Add(comboBoxOutboundTrafficType);
             tabPageEndpoint.Controls.Add(textBoxListenPort);
+            tabPageEndpoint.Controls.Add(labelOutboundTrafficType);
             tabPageEndpoint.Controls.Add(labelTerminationPort);
             tabPageEndpoint.Controls.Add(labelTerminationAddress);
             tabPageEndpoint.Controls.Add(textBoxTerminationAddress);
             tabPageEndpoint.Location = new Point(4, 24);
             tabPageEndpoint.Name = "tabPageEndpoint";
+            tabPageEndpoint.Padding = new Padding(3);
             tabPageEndpoint.Size = new Size(594, 321);
             tabPageEndpoint.TabIndex = 2;
             tabPageEndpoint.Text = "Endpoint";
@@ -184,12 +189,9 @@
             // 
             tabPageHttpHeaders.Controls.Add(dataGridViewHTTPHeaders);
             tabPageHttpHeaders.Controls.Add(label1);
-            tabPageHttpHeaders.Controls.Add(comboBoxInboundTrafficType);
-            tabPageHttpHeaders.Controls.Add(labelInboundTrafficType);
-            tabPageHttpHeaders.Controls.Add(comboBoxOutboundTrafficType);
-            tabPageHttpHeaders.Controls.Add(labelOutboundTrafficType);
             tabPageHttpHeaders.Location = new Point(4, 24);
             tabPageHttpHeaders.Name = "tabPageHttpHeaders";
+            tabPageHttpHeaders.Padding = new Padding(3);
             tabPageHttpHeaders.Size = new Size(594, 321);
             tabPageHttpHeaders.TabIndex = 3;
             tabPageHttpHeaders.Text = "HTTP Headers";
@@ -200,9 +202,9 @@
             dataGridViewHTTPHeaders.BackgroundColor = SystemColors.ButtonFace;
             dataGridViewHTTPHeaders.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewHTTPHeaders.Columns.AddRange(new DataGridViewColumn[] { columnEnabled, columnType, columnVerb, columnHeader, columnAction, columnValue });
-            dataGridViewHTTPHeaders.Location = new Point(13, 87);
+            dataGridViewHTTPHeaders.Location = new Point(13, 33);
             dataGridViewHTTPHeaders.Name = "dataGridViewHTTPHeaders";
-            dataGridViewHTTPHeaders.Size = new Size(572, 227);
+            dataGridViewHTTPHeaders.Size = new Size(572, 281);
             dataGridViewHTTPHeaders.TabIndex = 14;
             // 
             // columnEnabled
@@ -244,7 +246,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(13, 68);
+            label1.Location = new Point(7, 15);
             label1.Margin = new Padding(4, 0, 4, 0);
             label1.Name = "label1";
             label1.Size = new Size(312, 15);
@@ -255,7 +257,7 @@
             // 
             comboBoxInboundTrafficType.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxInboundTrafficType.FormattingEnabled = true;
-            comboBoxInboundTrafficType.Location = new Point(13, 28);
+            comboBoxInboundTrafficType.Location = new Point(13, 131);
             comboBoxInboundTrafficType.Margin = new Padding(4, 3, 4, 3);
             comboBoxInboundTrafficType.Name = "comboBoxInboundTrafficType";
             comboBoxInboundTrafficType.Size = new Size(157, 23);
@@ -264,7 +266,7 @@
             // labelInboundTrafficType
             // 
             labelInboundTrafficType.AutoSize = true;
-            labelInboundTrafficType.Location = new Point(13, 10);
+            labelInboundTrafficType.Location = new Point(13, 113);
             labelInboundTrafficType.Margin = new Padding(4, 0, 4, 0);
             labelInboundTrafficType.Name = "labelInboundTrafficType";
             labelInboundTrafficType.Size = new Size(112, 15);
@@ -275,7 +277,7 @@
             // 
             comboBoxOutboundTrafficType.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxOutboundTrafficType.FormattingEnabled = true;
-            comboBoxOutboundTrafficType.Location = new Point(218, 28);
+            comboBoxOutboundTrafficType.Location = new Point(411, 131);
             comboBoxOutboundTrafficType.Margin = new Padding(4, 3, 4, 3);
             comboBoxOutboundTrafficType.Name = "comboBoxOutboundTrafficType";
             comboBoxOutboundTrafficType.Size = new Size(157, 23);
@@ -284,7 +286,7 @@
             // labelOutboundTrafficType
             // 
             labelOutboundTrafficType.AutoSize = true;
-            labelOutboundTrafficType.Location = new Point(218, 10);
+            labelOutboundTrafficType.Location = new Point(411, 113);
             labelOutboundTrafficType.Margin = new Padding(4, 0, 4, 0);
             labelOutboundTrafficType.Name = "labelOutboundTrafficType";
             labelOutboundTrafficType.Size = new Size(122, 15);
@@ -302,6 +304,7 @@
             tabPageTls.Controls.Add(checkBoxIgnoreBackendCertificateErrors);
             tabPageTls.Location = new Point(4, 24);
             tabPageTls.Name = "tabPageTls";
+            tabPageTls.Padding = new Padding(3);
             tabPageTls.Size = new Size(594, 321);
             tabPageTls.TabIndex = 4;
             tabPageTls.Text = "TLS";
@@ -333,18 +336,18 @@
             // 
             // buttonBrowseCertificate
             // 
-            buttonBrowseCertificate.Location = new Point(500, 109);
+            buttonBrowseCertificate.Location = new Point(500, 108);
             buttonBrowseCertificate.Name = "buttonBrowseCertificate";
             buttonBrowseCertificate.Size = new Size(75, 25);
             buttonBrowseCertificate.TabIndex = 3;
-            buttonBrowseCertificate.Text = "Browse...";
+            buttonBrowseCertificate.Text = "Browse";
             buttonBrowseCertificate.UseVisualStyleBackColor = true;
             buttonBrowseCertificate.Click += ButtonBrowseCertificate_Click;
             // 
             // labelCertificatePassword
             // 
             labelCertificatePassword.AutoSize = true;
-            labelCertificatePassword.Location = new Point(13, 146);
+            labelCertificatePassword.Location = new Point(13, 136);
             labelCertificatePassword.Name = "labelCertificatePassword";
             labelCertificatePassword.Size = new Size(114, 15);
             labelCertificatePassword.TabIndex = 4;
@@ -352,7 +355,7 @@
             // 
             // textBoxCertificatePassword
             // 
-            textBoxCertificatePassword.Location = new Point(13, 164);
+            textBoxCertificatePassword.Location = new Point(13, 154);
             textBoxCertificatePassword.Name = "textBoxCertificatePassword";
             textBoxCertificatePassword.Size = new Size(260, 23);
             textBoxCertificatePassword.TabIndex = 5;
@@ -361,7 +364,7 @@
             // checkBoxIgnoreBackendCertificateErrors
             // 
             checkBoxIgnoreBackendCertificateErrors.AutoSize = true;
-            checkBoxIgnoreBackendCertificateErrors.Location = new Point(13, 208);
+            checkBoxIgnoreBackendCertificateErrors.Location = new Point(13, 183);
             checkBoxIgnoreBackendCertificateErrors.Name = "checkBoxIgnoreBackendCertificateErrors";
             checkBoxIgnoreBackendCertificateErrors.Size = new Size(293, 19);
             checkBoxIgnoreBackendCertificateErrors.TabIndex = 6;
