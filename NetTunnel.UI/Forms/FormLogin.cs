@@ -74,6 +74,11 @@ namespace NetTunnel.UI.Forms
             this.Shown += FormLogin_Shown;
         }
 
+        /// <summary>
+        /// Raised after the user has chosen a language and it has been applied and saved.
+        /// </summary>
+        public event EventHandler? LanguageChanged;
+
         private ToolTip? _toolTips;
 
         /// <summary>
@@ -112,6 +117,7 @@ namespace NetTunnel.UI.Forms
 
             FormLocalizer.Apply(this);
             ApplyToolTips();
+            LanguageChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void FormLogin_Shown(object? sender, EventArgs e)

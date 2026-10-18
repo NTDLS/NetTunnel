@@ -66,9 +66,9 @@
             // 
             // buttonCreateUser
             // 
-            buttonCreateUser.Location = new Point(539, 251);
+            buttonCreateUser.Location = new Point(487, 251);
             buttonCreateUser.Name = "buttonCreateUser";
-            buttonCreateUser.Size = new Size(87, 23);
+            buttonCreateUser.Size = new Size(139, 23);
             buttonCreateUser.TabIndex = 2;
             buttonCreateUser.Text = "Create User";
             buttonCreateUser.UseVisualStyleBackColor = true;

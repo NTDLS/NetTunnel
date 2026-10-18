@@ -245,6 +245,11 @@ namespace NetTunnel.UI.Forms
 
                 using var form = new FormLogin(WriteVisualLog);
                 form.Owner = this;
+                form.LanguageChanged += (_, _) =>
+                {
+                    _settings.Language = UISettings.Load().Language;
+                    ApplyLanguage();
+                };
                 if (form.ShowDialog() == DialogResult.OK)
                 {
                     _client = form.ResultingClient.EnsureNotNull();
