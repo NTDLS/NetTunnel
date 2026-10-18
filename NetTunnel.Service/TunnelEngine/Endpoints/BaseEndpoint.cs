@@ -177,6 +177,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             }
 
             long packetSequence = -1;
+            bool inTlsHandshake = false;
 
             try
             {
@@ -184,8 +185,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 {
                     //Terminate TLS here so that the tunneled data (and HTTP header rules) are in the clear.
                     //  This must complete before we notify the peer, otherwise it could write to us mid-handshake.
+                    inTlsHandshake = true;
                     edgeConnection.AuthenticateAsTlsServer(inboundEndpoint.Certificate
                         ?? throw new Exception($"No TLS certificate is loaded for endpoint '{Configuration.Name}'."));
+                    inTlsHandshake = false;
                 }
 
                 if (Configuration.Direction == NtDirection.Inbound)
@@ -228,6 +231,20 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     }
 
                     buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);
+                }
+            }
+            catch (Exception ex) when (inTlsHandshake && ex is IOException or System.Security.Authentication.AuthenticationException)
+            {
+                //Browsers routinely open speculative connections and drop them without completing the handshake, or reject
+                //  a certificate they don't trust. Neither is a fault in the service, so no stack trace.
+                var reason = ex.InnerException?.Message ?? ex.Message;
+                if (ex is System.Security.Authentication.AuthenticationException)
+                {
+                    Singletons.Logger.Warning($"TLS handshake failed on inbound endpoint '{Configuration.Name}' (port {Configuration.InboundPort}): {reason}");
+                }
+                else
+                {
+                    Singletons.Logger.Verbose($"TLS handshake on inbound endpoint '{Configuration.Name}' (port {Configuration.InboundPort}) ended by the client: {ex.Message}");
                 }
             }
             catch (IOException ex)
