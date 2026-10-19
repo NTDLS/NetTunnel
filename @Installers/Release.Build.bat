@@ -21,10 +21,9 @@ iscc ./InnoScripts/NetTunnel.UI.Windows.x64.Iss
 
 REM Compile service for Windows.x64 (full).
 dotnet publish ..\NetTunnel.Service -c Release -o publish\Windows.x64\Full --runtime win-x64 --self-contained false
-del Publish\Windows.x64\NetTunnel.Service\*.pdb
 REM Compile UI for Windows.x64 (full).
 dotnet publish ..\NetTunnel.UI -c Release -o publish\Windows.x64\Full --runtime win-x64 --self-contained false
-del Publish\Windows.x64\NetTunnel.UI\*.pdb
+del Publish\Windows.x64\Full\*.pdb
 iscc ./InnoScripts/NetTunnel.Full.Windows.x64.Iss
 
 REM Compile service for Linux.x64.
