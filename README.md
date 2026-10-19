@@ -1,6 +1,6 @@
 # NetTunnel
 
-## NetTunnel is a TCP/IP tool that is designed to allow ingress traversal through firewalls where the rules cannot be altered. 
+**NetTunnel is a TCP/IP tool that is designed to allow ingress traversal through firewalls where the rules cannot be altered.**
 
 ![Screenshot 2024-06-11 165343](https://github.com/NTDLS/NetTunnel/assets/11428567/40a59de6-7626-4cfc-9081-2427a938b1a8)
 
