@@ -110,8 +110,27 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             });
         }
 
+        /// <summary>
+        /// Saves the users to disk. The secrets (password hashes and certificate passwords) are written protected, see <see cref="SecretProtector"/>.
+        /// </summary>
         public void SaveToDisk()
-            => _collection.Use((o) => CommonApplicationData.SaveToDisk(FriendlyName, o));
+            => _collection.Use((o) =>
+            {
+                var users = o.Select(user => new User
+                {
+                    Username = user.Username,
+                    PasswordHash = SecretProtector.Protect(user.PasswordHash),
+                    Role = user.Role,
+                    Endpoints = user.Endpoints.Select(endpoint =>
+                    {
+                        var clone = endpoint.CloneConfiguration();
+                        clone.TlsCertificatePassword = SecretProtector.Protect(clone.TlsCertificatePassword) ?? string.Empty;
+                        return clone;
+                    }).ToList()
+                }).ToList();
+
+                CommonApplicationData.SaveToDisk(FriendlyName, users);
+            });
 
         private void LoadFromDisk()
         {
@@ -121,6 +140,27 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
                 //Add directly rather than through Add() so that loading doesn't rewrite the file once per user.
                 o.AddRange(CommonApplicationData.LoadFromDisk(FriendlyName, new List<User>()));
+
+                //Secrets in files written by an older version (or typed in by hand) are plain text: read them, then save them protected.
+                bool hasPlainTextSecrets = false;
+
+                foreach (var user in o)
+                {
+                    user.PasswordHash = SecretProtector.Unprotect(user.PasswordHash, $"the password of user '{user.Username}'", out var plain);
+                    hasPlainTextSecrets |= plain;
+
+                    foreach (var endpoint in user.Endpoints)
+                    {
+                        endpoint.TlsCertificatePassword = SecretProtector.Unprotect(endpoint.TlsCertificatePassword,
+                            $"the certificate password of endpoint '{endpoint.Name}' (user '{user.Username}')", out plain) ?? string.Empty;
+                        hasPlainTextSecrets |= plain;
+                    }
+                }
+
+                if (hasPlainTextSecrets)
+                {
+                    SaveToDisk();
+                }
 
                 if (o.Count == 0)
                 {

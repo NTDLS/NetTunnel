@@ -37,6 +37,7 @@
             labelTunnelCryptographyKeySize = new Label();
             labelStaleEndpointExpirationMs = new Label();
             textBoxManagementPort = new TextBox();
+            checkBoxEnableIPv6 = new CheckBox();
             textBoxMessageQueryTimeoutMs = new TextBox();
             textBoxEndpointHeartbeatDelayMs = new TextBox();
             textBoxTunnelCryptographyKeySize = new TextBox();
@@ -144,6 +145,16 @@
             textBoxManagementPort.Size = new Size(106, 23);
             textBoxManagementPort.TabIndex = 0;
             // 
+            // checkBoxEnableIPv6
+            // 
+            checkBoxEnableIPv6.AutoSize = true;
+            checkBoxEnableIPv6.Location = new Point(6, 60);
+            checkBoxEnableIPv6.Name = "checkBoxEnableIPv6";
+            checkBoxEnableIPv6.Size = new Size(200, 19);
+            checkBoxEnableIPv6.TabIndex = 1;
+            checkBoxEnableIPv6.Text = "Use IPv6 as well as IPv4";
+            checkBoxEnableIPv6.UseVisualStyleBackColor = true;
+            // 
             // textBoxMessageQueryTimeoutMs
             // 
             textBoxMessageQueryTimeoutMs.Location = new Point(6, 67);
@@ -236,6 +247,7 @@
             // 
             tabPageManagement.Controls.Add(labelManagementPort);
             tabPageManagement.Controls.Add(textBoxManagementPort);
+            tabPageManagement.Controls.Add(checkBoxEnableIPv6);
             tabPageManagement.Location = new Point(4, 24);
             tabPageManagement.Name = "tabPageManagement";
             tabPageManagement.Padding = new Padding(3);
@@ -440,6 +452,7 @@
         private Label labelTunnelCryptographyKeySize;
         private Label labelStaleEndpointExpirationMs;
         private TextBox textBoxManagementPort;
+        private CheckBox checkBoxEnableIPv6;
         private TextBox textBoxMessageQueryTimeoutMs;
         private TextBox textBoxEndpointHeartbeatDelayMs;
         private TextBox textBoxTunnelCryptographyKeySize;
@@ -468,4 +481,4 @@
         private TextBox textBoxPingCadence;
         private Label labelPingCadence;
     }
-}
+}

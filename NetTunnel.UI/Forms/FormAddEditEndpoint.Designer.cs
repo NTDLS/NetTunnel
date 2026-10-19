@@ -62,6 +62,7 @@
             labelCertificatePassword = new Label();
             textBoxCertificatePassword = new TextBox();
             checkBoxIgnoreBackendCertificateErrors = new CheckBox();
+            checkBoxAllowHttp2 = new CheckBox();
             tabControlBody.SuspendLayout();
             tabPageEndpoint.SuspendLayout();
             tabPageHttpHeaders.SuspendLayout();
@@ -302,6 +303,7 @@
             tabPageTls.Controls.Add(labelCertificatePassword);
             tabPageTls.Controls.Add(textBoxCertificatePassword);
             tabPageTls.Controls.Add(checkBoxIgnoreBackendCertificateErrors);
+            tabPageTls.Controls.Add(checkBoxAllowHttp2);
             tabPageTls.Location = new Point(4, 24);
             tabPageTls.Name = "tabPageTls";
             tabPageTls.Padding = new Padding(3);
@@ -371,6 +373,16 @@
             checkBoxIgnoreBackendCertificateErrors.Text = "Ignore certificate errors from the destination server";
             checkBoxIgnoreBackendCertificateErrors.UseVisualStyleBackColor = true;
             // 
+            // checkBoxAllowHttp2
+            // 
+            checkBoxAllowHttp2.AutoSize = true;
+            checkBoxAllowHttp2.Location = new Point(13, 213);
+            checkBoxAllowHttp2.Name = "checkBoxAllowHttp2";
+            checkBoxAllowHttp2.Size = new Size(380, 19);
+            checkBoxAllowHttp2.TabIndex = 7;
+            checkBoxAllowHttp2.Text = "Offer HTTP/2 to clients (the destination must support it)";
+            checkBoxAllowHttp2.UseVisualStyleBackColor = true;
+            // 
             // FormAddEditEndpoint
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -415,6 +427,7 @@
         private TabPage tabPageEndpoint;
         private TabPage tabPageHttpHeaders;
         private TabPage tabPageTls;
+        private CheckBox checkBoxAllowHttp2;
         private Label labelTlsInfo;
         private Label labelCertificatePath;
         private TextBox textBoxCertificatePath;
@@ -435,4 +448,4 @@
         private DataGridViewComboBoxColumn columnAction;
         private DataGridViewTextBoxColumn columnValue;
     }
-}
+}

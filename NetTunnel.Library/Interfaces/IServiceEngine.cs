@@ -6,7 +6,7 @@ namespace NetTunnel.Library.Interfaces
 {
     public interface IServiceEngine
     {
-        public void S2SPeerNotificationEndpointConnect(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId, Guid edgeId);
+        public void S2SPeerNotificationEndpointConnect(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, string? applicationProtocol = null);
         public void S2SPeerNotificationEndpointDisconnect(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId, Guid edgeId);
         public void S2SPeerNotificationTunnelDeletion(Guid connectionId, DirectionalKey tunnelKey);
         public void S2SPeerNotificationEndpointDeletion(Guid connectionId, DirectionalKey tunnelKey, Guid endpointId);

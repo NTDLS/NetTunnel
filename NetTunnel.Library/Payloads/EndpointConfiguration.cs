@@ -52,6 +52,12 @@ namespace NetTunnel.Library.Payloads
         /// </summary>
         public bool TlsIgnoreBackendCertificateErrors { get; set; }
 
+        /// <summary>
+        /// When true, the inbound endpoint offers HTTP/2 to clients (HTTPS inbound traffic type only). The destination must then also
+        ///     speak HTTP/2 for those clients: a client that negotiates HTTP/2 is connected to the destination using HTTP/2.
+        /// </summary>
+        public bool AllowHttp2 { get; set; }
+
         public DirectionalKey EndpointKey => new(EndpointId, Direction);
 
         public EndpointConfiguration SwapDirection()
@@ -108,6 +114,7 @@ namespace NetTunnel.Library.Payloads
                 TlsCertificatePath = TlsCertificatePath,
                 TlsCertificatePassword = TlsCertificatePassword,
                 TlsIgnoreBackendCertificateErrors = TlsIgnoreBackendCertificateErrors,
+                AllowHttp2 = AllowHttp2,
             };
 
             foreach (var rule in HttpHeaderRules)
@@ -131,6 +138,7 @@ namespace NetTunnel.Library.Payloads
                 TlsCertificatePath.GetHashCode(),
                 TlsCertificatePassword.GetHashCode(),
                 TlsIgnoreBackendCertificateErrors.GetHashCode(),
+                AllowHttp2.GetHashCode(),
                 HttpHeaderRules.GetHashCode()]);
         }
     }

@@ -13,16 +13,24 @@ namespace NetTunnel.Service
             "connect", "delete", "get", "head", "options", "patch", "post", "put", "trace"
         ];
 
+        /// <summary>
+        /// The enabled rules that apply to a message of the given type (request or response) and, for requests, method.
+        /// </summary>
+        public static List<HttpHeaderRule> GetApplicableRules(EndpointConfiguration endpointConfig, NtHttpHeaderType headerType, string httpRequestVerb)
+        {
+            return endpointConfig.HttpHeaderRules.Where(o =>
+                (o.HeaderType == headerType || o.HeaderType == NtHttpHeaderType.Any)
+                && (o.Verb.ToString().Equals(httpRequestVerb, StringComparison.CurrentCultureIgnoreCase) || o.Verb == NtHttpVerb.Any)
+                && o.Enabled == true
+                ).ToList();
+        }
+
         public static string ApplyHttpHeaderRules(EndpointConfiguration endpointConfig,
             string httpHeader, NtHttpHeaderType headerType, string httpRequestVerb, string headerDelimiter)
         {
             try
             {
-                var availableRules = endpointConfig.HttpHeaderRules.Where(o =>
-                                      (o.HeaderType == headerType || o.HeaderType == NtHttpHeaderType.Any)
-                                      && (o.Verb.ToString().Equals(httpRequestVerb, StringComparison.CurrentCultureIgnoreCase) || o.Verb == NtHttpVerb.Any)
-                                      && o.Enabled == true
-                                      ).ToList();
+                var availableRules = GetApplicableRules(endpointConfig, headerType, httpRequestVerb);
 
                 foreach (var rule in availableRules)
                 {

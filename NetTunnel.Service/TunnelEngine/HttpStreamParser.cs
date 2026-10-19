@@ -20,7 +20,7 @@ namespace NetTunnel.Service.TunnelEngine
     ///     sees one direction of the conversation so it cannot know the request was a HEAD; it will treat
     ///     the start of the next response as body and then pass the rest of that connection through.
     /// </summary>
-    internal class HttpStreamParser
+    internal class HttpStreamParser : IHttpStreamProcessor
     {
         /// <summary>
         /// Headers larger than this are not modified; the connection is passed through instead.

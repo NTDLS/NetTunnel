@@ -108,13 +108,16 @@ namespace NetTunnel.UI.Forms
                 Localize("Host name, domain or IP address that the outbound endpoint will make a connection to."));
 
             toolTips.AddControls([labelTerminationPort, textBoxTerminationPort],
-                Localize("Host name, domain or IP address that the outbound endpoint will make a connection to."));
+                Localize("Port on the destination that the outbound endpoint will make a connection to."));
 
             toolTips.AddControls([labelOutboundTrafficType, comboBoxOutboundTrafficType],
                 Localize("Type of traffic the outbound endpoint sends to the destination. HTTPS re-encrypts the connection to the destination server; HTTP and Raw send plain traffic."));
 
             toolTips.AddControls([labelInboundTrafficType, comboBoxInboundTrafficType],
                 Localize("Type of traffic accepted by the inbound endpoint. HTTPS terminates TLS using the certificate on the TLS tab. HTTP header rules apply to HTTP and HTTPS."));
+
+            toolTips.AddControls([checkBoxAllowHttp2],
+                Localize("Lets clients that support HTTP/2 use it (HTTPS inbound traffic type only). The destination must support HTTP/2 too: a client that uses it is connected to the destination with it, and fails if the destination does not agree. HTTP header rules work with HTTP/2."));
 
             #endregion
 
@@ -147,6 +150,7 @@ namespace NetTunnel.UI.Forms
                 textBoxCertificatePath.Text = _existingEndpoint.TlsCertificatePath;
                 textBoxCertificatePassword.Text = _existingEndpoint.TlsCertificatePassword;
                 checkBoxIgnoreBackendCertificateErrors.Checked = _existingEndpoint.TlsIgnoreBackendCertificateErrors;
+                checkBoxAllowHttp2.Checked = _existingEndpoint.AllowHttp2;
 
                 textBoxName.Text = _existingEndpoint.Name;
                 textBoxListenPort.Text = $"{_existingEndpoint.InboundPort:n0}";
@@ -251,7 +255,8 @@ namespace NetTunnel.UI.Forms
                 {
                     TlsCertificatePath = textBoxCertificatePath.Text.Trim(),
                     TlsCertificatePassword = textBoxCertificatePassword.Text,
-                    TlsIgnoreBackendCertificateErrors = checkBoxIgnoreBackendCertificateErrors.Checked
+                    TlsIgnoreBackendCertificateErrors = checkBoxIgnoreBackendCertificateErrors.Checked,
+                    AllowHttp2 = checkBoxAllowHttp2.Checked
                 };
 
                 if (Endpoint.InboundTrafficType == NtTrafficType.Https

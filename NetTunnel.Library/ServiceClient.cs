@@ -172,8 +172,8 @@ namespace NetTunnel.Library
         public S2SQueryRegisterTunnelReply S2SQueryRegisterTunnel(TunnelConfiguration configuration)
             => Client.Query(new S2SQueryRegisterTunnel(configuration));
 
-        public void S2SNotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
-            => Client.Query(new S2SNotificationEndpointConnectQuery(tunnelKey, endpointId, edgeId));
+        public void S2SNotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, string? applicationProtocol = null)
+            => Client.Query(new S2SNotificationEndpointConnectQuery(tunnelKey, endpointId, edgeId, applicationProtocol));
 
         public void S2SPeerNotificationEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
             => Client.Notify(new S2SNotificationEndpointDisconnect(tunnelKey, endpointId, edgeId));

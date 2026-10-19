@@ -85,7 +85,7 @@ namespace NetTunnel.Service.TunnelEngine
             _fileLogSink?.Configure(configuration.LogPath,
                 configuration.LogFileMaxSizeMB * 1024L * 1024L, configuration.LogFileRetainedCount);
 
-            if (_eventLogSink != null)
+            if (OperatingSystem.IsWindows() && _eventLogSink != null)
             {
                 _eventLogSink.IsEnabled = configuration.LogToEventLog;
             }
