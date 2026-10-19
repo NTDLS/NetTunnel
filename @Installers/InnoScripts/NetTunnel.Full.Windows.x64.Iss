@@ -28,9 +28,8 @@
 
 
 [Files]
- Source: "..\Publish\Windows.x64\NetTunnel.UI\*.*";        DestDir: "{app}";           Flags: IgnoreVersion;                 Components: Base\Management;
- Source: "..\Publish\Windows.x64\NetTunnel.Service\*.*";   DestDir: "{app}";           Flags: IgnoreVersion;                 Components: Base\Service;
-  
+ Source: "..\Publish\Windows.x64\Full\*.*"; DestDir: "{app}"; Flags: IgnoreVersion; Components: Base\Service;
+   
 [Icons]
  Name: "{commondesktop}\NetTunnel Manager"; Filename: "{app}\NetTunnel.UI.exe";                                                    Components: Base\Management;
  Name: "{group}\NetTunnel Manager";         Filename: "{app}\NetTunnel.UI.exe";                                                    Components: Base\Management;
