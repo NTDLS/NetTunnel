@@ -85,7 +85,7 @@ Endpoints work with both. Unless you turn it off ([`EnableIPv6`](#8-service-conf
 
 Be careful with the firewall: IPv6 addresses are usually reachable from the internet without NAT in front of them. An endpoint that was only reachable on your IPv4 network can now be reachable on an IPv6 address too, so check the host firewall's IPv6 rules, or turn IPv6 off in the service configuration.
 
-The **service (management) port** is the exception: it is IPv4 only for now, so the UI and other NetTunnel services must reach a service over IPv4 (see [Known limitations](#12-known-limitations)).
+The **service (management) port**, which the UI and other NetTunnel services connect to, follows the same setting: with IPv6 on it accepts IPv6 and IPv4 connections on one listener, so a tunnel or the UI can reach a service by its IPv6 address (`2001:db8::10` or `[2001:db8::10]`). Changing the setting takes effect after the service is restarted.
 
 
 ## 3. Choosing traffic types
@@ -274,7 +274,7 @@ Open **Settings > Service configuration** (administrators only). Each service ha
 | Setting | Default | Allowed | Meaning |
 | --- | --- | --- | --- |
 | **Management port** (`ServicePort`) | 52845 | 1-65535 | Port the service accepts UI and tunnel connections on. Restart the service after changing. |
-| **Use IPv6 as well as IPv4** (`EnableIPv6`) | on | on / off | Endpoints listen on IPv6 as well as IPv4 and can connect to IPv6 destinations. Applies when an endpoint starts. See [IPv4 and IPv6](#ipv4-and-ipv6). |
+| **Use IPv6 as well as IPv4** (`EnableIPv6`) | on | on / off | Endpoints and the service port listen on IPv6 as well as IPv4, and endpoints can connect to IPv6 destinations. Restart the service after changing. See [IPv4 and IPv6](#ipv4-and-ipv6). |
 | **Message query timeout** (`MessageQueryTimeoutMs`) | 10000 | 1000-3600000 | Milliseconds to wait on a query to the peer. |
 | **Endpoint heartbeat** (`EndpointHeartbeatDelayMs`) | 5000 | 1000-216000000 | Milliseconds between endpoint heartbeats, which also check for stale connections. |
 | **Tunnel cryptography key size** (`TunnelCryptographyKeySize`) | 4096 | 128-81920 | Bits of key material negotiated per tunnel at each connect. |
@@ -406,7 +406,6 @@ Things to know:
 ## 12. Known limitations
 
 - HTTP/1.x and HTTP/2 are supported, HTTP/3 (QUIC) is not: tunnels carry TCP and HTTP/3 is UDP. Clients fall back to HTTP/2 or HTTP/1.1. WebSockets and other upgrades are forwarded but not inspected.
-- The service (management) port is IPv4 only, because the messaging library it uses (NTDLS.ReliableMessaging) listens on IPv4 only. Tunnels and the UI must reach a service over IPv4. Endpoints are not affected.
 - HTTP/2 is relayed, not translated: a client that uses HTTP/2 needs a destination that speaks HTTP/2 (see [HTTP/2](#http2)). It is only available with an HTTPS inbound endpoint.
 - Header rules cannot change bodies, use variables, or match on values. They are applied on every message in order.
 - A response to a `HEAD` request carries a length but no body. NetTunnel cannot tell, so the rest of that connection is passed through unmodified.

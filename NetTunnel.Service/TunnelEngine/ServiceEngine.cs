@@ -47,6 +47,7 @@ namespace NetTunnel.Service.TunnelEngine
                 InitialReceiveBufferSize = Singletons.Configuration.InitialReceiveBufferSize,
                 MaxReceiveBufferSize = Singletons.Configuration.MaxReceiveBufferSize,
                 ReceiveBufferGrowthRate = Singletons.Configuration.ReceiveBufferGrowthRate,
+                ListenOnIPv6 = Singletons.Configuration.EnableIPv6,
             });
             _messageServer.SetCompressionProvider(new RmDeflateCompressionProvider());
 
