@@ -20,7 +20,7 @@ namespace NetTunnel.Service
         {
             return endpointConfig.HttpHeaderRules.Where(o =>
                 (o.HeaderType == headerType || o.HeaderType == NtHttpHeaderType.Any)
-                && (o.Verb.ToString().Equals(httpRequestVerb, StringComparison.CurrentCultureIgnoreCase) || o.Verb == NtHttpVerb.Any)
+                && (o.Verb.ToString().Equals(httpRequestVerb, StringComparison.OrdinalIgnoreCase) || o.Verb == NtHttpVerb.Any)
                 && o.Enabled == true
                 ).ToList();
         }
@@ -99,7 +99,7 @@ namespace NetTunnel.Service
             int firstLineBreak = httpHeader.IndexOf('\n') + 1;
             if (firstLineBreak > 1)
             {
-                httpHeader = httpHeader.Substring(0, firstLineBreak).ToUpper();
+                httpHeader = httpHeader.Substring(0, firstLineBreak).ToUpperInvariant();
 
                 int headerTokPos = 0;
                 var token = GetNextHeaderToken(httpHeader, ref headerTokPos);
@@ -108,7 +108,7 @@ namespace NetTunnel.Service
                 {
                     //Not much to do...
                 }
-                else if (httpHeader.StartsWith("Http/", StringComparison.InvariantCultureIgnoreCase))
+                else if (httpHeader.StartsWith("Http/", StringComparison.OrdinalIgnoreCase))
                 {
                     //Is response header.
                     verb = string.Empty;
@@ -129,7 +129,7 @@ namespace NetTunnel.Service
                             return NtHttpHeaderType.None;
                         }
 
-                        if (token.StartsWith("HTTP/", StringComparison.InvariantCultureIgnoreCase))
+                        if (token.StartsWith("HTTP/", StringComparison.OrdinalIgnoreCase))
                         {
                             //Is request header
                             return NtHttpHeaderType.Request;
@@ -151,8 +151,9 @@ namespace NetTunnel.Service
         /// <returns></returns>
         public static int GetHttpHeaderEnd(string header, out string delimiter)
         {
-            int crlf = header.IndexOf("\r\n\r\n");
-            int lf = header.IndexOf("\n\n");
+            //Ordinal: the default is a culture-sensitive search, which is orders of magnitude slower and not what protocol text calls for.
+            int crlf = header.IndexOf("\r\n\r\n", StringComparison.Ordinal);
+            int lf = header.IndexOf("\n\n", StringComparison.Ordinal);
             int endOfHeader = 0;
 
             if (crlf > 0 && (crlf < lf || lf < 0))
@@ -174,13 +175,97 @@ namespace NetTunnel.Service
             return endOfHeader;
         }
 
-        //Rules are applied to every message, so the expressions are built once per distinct header name rather than per message.
-        private static readonly System.Collections.Concurrent.ConcurrentDictionary<(string Name, bool IncludeLineBreak), Regex> _headerLineFinders = new();
+        /// <summary>
+        /// Finds the next line, at or after <paramref name="searchFrom"/>, which is the header with the given name: the name (without regard to
+        /// case), optional spaces or tabs, then a colon. <paramref name="colon"/> is the index of the colon and <paramref name="valueEnd"/> the
+        /// index of the first line break character after it (or the end of the text). Header rules run on every message of a connection,
+        /// so this scans the text once instead of building and running a regular expression.
+        /// </summary>
+        internal static bool TryFindHeaderLine(string text, string name, int searchFrom, out int lineStart, out int colon, out int valueEnd)
+        {
+            int position = searchFrom;
 
-        private static Regex HeaderLineFinder(string name, bool includeLineBreak)
-            => _headerLineFinders.GetOrAdd((name, includeLineBreak),
-                key => new Regex(@"^" + Regex.Escape(key.Name) + @"[ \t]*:[^\r\n]*" + (key.IncludeLineBreak ? @"(\r?\n)?" : string.Empty),
-                    RegexOptions.IgnoreCase | RegexOptions.Multiline));
+            while (position < text.Length)
+            {
+                if (name.Length > 0 && position + name.Length <= text.Length
+                    && text.AsSpan(position, name.Length).Equals(name, StringComparison.OrdinalIgnoreCase))
+                {
+                    int index = position + name.Length;
+                    while (index < text.Length && (text[index] == ' ' || text[index] == '\t'))
+                    {
+                        index++;
+                    }
+
+                    if (index < text.Length && text[index] == ':')
+                    {
+                        lineStart = position;
+                        colon = index;
+                        int end = text.AsSpan(index + 1).IndexOfAny('\r', '\n');
+                        valueEnd = end < 0 ? text.Length : index + 1 + end;
+                        return true;
+                    }
+                }
+
+                int lineFeed = text.IndexOf('\n', position);
+                if (lineFeed < 0)
+                {
+                    break;
+                }
+                position = lineFeed + 1;
+            }
+
+            lineStart = colon = valueEnd = -1;
+            return false;
+        }
+
+        /// <summary>
+        /// Replaces every header line with the given name using <paramref name="replacement"/> for the line's text (without its line break),
+        /// or removes the lines, including their line break, when the replacement is null. Returns the text as it was when there is no such line.
+        /// </summary>
+        private static string ReplaceHeaderLines(string headerText, string name, string? replacement)
+        {
+            System.Text.StringBuilder? result = null;
+            int copiedUpTo = 0;
+            int searchFrom = 0;
+
+            while (TryFindHeaderLine(headerText, name, searchFrom, out int lineStart, out _, out int valueEnd))
+            {
+                result ??= new System.Text.StringBuilder(headerText.Length + 32);
+                result.Append(headerText, copiedUpTo, lineStart - copiedUpTo);
+
+                int matchEnd = valueEnd;
+                if (replacement != null)
+                {
+                    result.Append(replacement);
+                }
+                else if (matchEnd < headerText.Length)
+                {
+                    //Remove the line break too: "\r\n" or "\n".
+                    if (headerText[matchEnd] == '\r' && matchEnd + 1 < headerText.Length && headerText[matchEnd + 1] == '\n')
+                    {
+                        matchEnd += 2;
+                    }
+                    else if (headerText[matchEnd] == '\n')
+                    {
+                        matchEnd++;
+                    }
+                }
+
+                copiedUpTo = matchEnd;
+                searchFrom = matchEnd > lineStart ? matchEnd : lineStart + 1;
+            }
+
+            if (result == null)
+            {
+                return headerText;
+            }
+
+            result.Append(headerText, copiedUpTo, headerText.Length - copiedUpTo);
+            return result.ToString();
+        }
+
+        private static bool HasHeaderLine(string headerText, string name)
+            => TryFindHeaderLine(headerText, name, 0, out _, out _, out _);
 
         /// <summary>
         /// Appends a header line to the end of the header block (just before the blank line which terminates it).
@@ -190,7 +275,7 @@ namespace NetTunnel.Service
             var newLine = $"{name}: {value}{lineBreak}";
 
             //The header block ends with a blank line. Insert ahead of it, or at the end if the block was not terminated.
-            if (headerText.EndsWith(lineBreak + lineBreak))
+            if (headerText.EndsWith(lineBreak + lineBreak, StringComparison.Ordinal))
             {
                 return headerText.Insert(headerText.Length - lineBreak.Length, newLine);
             }
@@ -203,7 +288,7 @@ namespace NetTunnel.Service
         /// </summary>
         public static string InsertHttpHostHeaderValue(string headerText, string name, string value, string lineBreak)
         {
-            if (HeaderLineFinder(name, false).IsMatch(headerText))
+            if (HasHeaderLine(headerText, name))
             {
                 return headerText; //Already present, do nothing.
             }
@@ -216,14 +301,12 @@ namespace NetTunnel.Service
         /// </summary>
         public static string UpsertHttpHostHeaderValue(string headerText, string name, string value, string lineBreak)
         {
-            var fieldFinder = HeaderLineFinder(name, false);
+            var replaced = ReplaceHeaderLines(headerText, name, $"{name}: {value}");
 
-            if (fieldFinder.IsMatch(headerText))
-            {
-                return fieldFinder.Replace(headerText, _ => $"{name}: {value}");
-            }
-
-            return AppendHttpHeaderLine(headerText, name, value, lineBreak);
+            //The same instance comes back when there was no such header.
+            return ReferenceEquals(replaced, headerText)
+                ? AppendHttpHeaderLine(headerText, name, value, lineBreak)
+                : replaced;
         }
 
         /// <summary>
@@ -231,7 +314,7 @@ namespace NetTunnel.Service
         /// </summary>
         public static string UpdateHttpHostHeaderValue(string headerText, string name, string value, string lineBreak)
         {
-            return HeaderLineFinder(name, false).Replace(headerText, _ => $"{name}: {value}");
+            return ReplaceHeaderLines(headerText, name, $"{name}: {value}");
         }
 
         /// <summary>
@@ -239,7 +322,7 @@ namespace NetTunnel.Service
         /// </summary>
         public static string DeleteHttpHostHeaderValue(string headerText, string name, string lineBreak)
         {
-            return HeaderLineFinder(name, true).Replace(headerText, string.Empty);
+            return ReplaceHeaderLines(headerText, name, null);
         }
     }
 }

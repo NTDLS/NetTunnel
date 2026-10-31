@@ -35,12 +35,6 @@ namespace NetTunnel.Service.TunnelEngine
         private static readonly string[] HttpStartTokens =
             HttpUtility.HttpVerbStrings.Select(o => $"{o.ToUpperInvariant()} ").Append("HTTP/").ToArray();
 
-        private static readonly Regex ContentLengthFinder =
-            new(@"^Content-Length[ \t]*:[ \t]*(\d+)[ \t]*\r?$", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-
-        private static readonly Regex TransferEncodingFinder =
-            new(@"^Transfer-Encoding[ \t]*:([^\r\n]*)", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-
         private enum ParserState
         {
             Header,
@@ -125,8 +119,59 @@ namespace NetTunnel.Service.TunnelEngine
             return (output.GetBuffer(), (int)output.Length);
         }
 
+        /// <summary>
+        /// The index just after the blank line that ends a header block ("\r\n\r\n" or "\n\n", whichever ends it first), or -1.
+        /// </summary>
+        private static int FindHeaderEnd(ReadOnlySpan<byte> span)
+        {
+            int end = -1;
+
+            int crlf = span.IndexOf("\r\n\r\n"u8);
+            if (crlf >= 0)
+            {
+                end = crlf + 4;
+                span = span[..end]; //Only an earlier "\n\n" matters now, so the rest need not be searched.
+            }
+
+            int lf = span.IndexOf("\n\n"u8);
+            return lf >= 0 ? lf + 2 : end;
+        }
+
         private int ConsumeHeader(byte[] bytes, int position, int length, MemoryStream output)
         {
+            //Common case: nothing is held back and the header is in the receive buffer in one piece. Find the end of it in one search
+            //  and decode it from the buffer, instead of collecting it a byte at a time.
+            if (_pending.Length == 0)
+            {
+                var span = bytes.AsSpan(position, length - position);
+
+                if (IsPlausibleHttpStart(span[..Math.Min(span.Length, 8)]) == false)
+                {
+                    BeginPassthrough(output, null);
+                    return position;
+                }
+
+                int end = FindHeaderEnd(span);
+
+                if (end >= 0 && end <= MaxHeaderBytes)
+                {
+                    var header = Encoding.Latin1.GetString(span[..end]);
+                    CompleteHeader(header, output);
+                    return position + end;
+                }
+
+                if ((end < 0 ? span.Length : end) > MaxHeaderBytes)
+                {
+                    output.Write(span);
+                    BeginPassthrough(output, $"HTTP header exceeded {MaxHeaderBytes:n0} bytes on endpoint '{_configuration.Name}'.");
+                    return length;
+                }
+
+                //The header continues in the next receive.
+                _pending.Write(span);
+                return length;
+            }
+
             while (position < length)
             {
                 _pending.WriteByte(bytes[position++]);
@@ -135,7 +180,7 @@ namespace NetTunnel.Service.TunnelEngine
                 int pendingLength = (int)_pending.Length;
 
                 //Until we have enough bytes to recognize the start of a request or response line, make sure it still could be one.
-                if (pendingLength <= 8 && IsPlausibleHttpStart(pending, pendingLength) == false)
+                if (pendingLength <= 8 && IsPlausibleHttpStart(pending.AsSpan(0, pendingLength)) == false)
                 {
                     BeginPassthrough(output, null);
                     return position;
@@ -168,6 +213,11 @@ namespace NetTunnel.Service.TunnelEngine
             var header = Encoding.Latin1.GetString(_pending.GetBuffer(), 0, (int)_pending.Length);
             _pending.SetLength(0);
 
+            CompleteHeader(header, output);
+        }
+
+        private void CompleteHeader(string header, MemoryStream output)
+        {
             var headerType = HttpUtility.IsHttpHeader(header, out var verb);
             if (headerType == NtHttpHeaderType.None || verb == null || HttpUtility.GetHttpHeaderEnd(header, out var delimiter) < 0)
             {
@@ -197,13 +247,10 @@ namespace NetTunnel.Service.TunnelEngine
         {
             contentLength = 0;
 
-            var transferEncoding = TransferEncodingFinder.Match(header);
-            bool isChunked = transferEncoding.Success
-                && transferEncoding.Groups[1].Value.Contains("chunked", StringComparison.OrdinalIgnoreCase);
+            bool isChunked = HttpUtility.TryFindHeaderLine(header, "Transfer-Encoding", 0, out _, out int encodingColon, out int encodingEnd)
+                && header.AsSpan(encodingColon + 1, encodingEnd - encodingColon - 1).Contains("chunked", StringComparison.OrdinalIgnoreCase);
 
-            var contentLengthMatch = ContentLengthFinder.Match(header);
-            bool hasContentLength = contentLengthMatch.Success
-                && long.TryParse(contentLengthMatch.Groups[1].Value, out contentLength);
+            bool hasContentLength = TryGetContentLength(header, out contentLength);
 
             if (headerType == NtHttpHeaderType.Request)
             {
@@ -238,6 +285,35 @@ namespace NetTunnel.Service.TunnelEngine
             }
 
             return ParserState.Passthrough; //The body is delimited by the server closing the connection.
+        }
+
+        /// <summary>
+        /// The value of the first Content-Length header whose value is nothing but digits (spaces and tabs around it are allowed).
+        /// </summary>
+        internal static bool TryGetContentLength(string header, out long contentLength)
+        {
+            int searchFrom = 0;
+
+            while (HttpUtility.TryFindHeaderLine(header, "Content-Length", searchFrom, out _, out int colon, out int valueEnd))
+            {
+                var value = header.AsSpan(colon + 1, valueEnd - colon - 1).Trim(" \t");
+
+                //The line must end properly: a carriage return that is not part of a line break means the framing is ambiguous, and
+                //  a proxy and a server that read it differently is how request smuggling happens. Such a line is not a length.
+                bool endsProperly = valueEnd >= header.Length
+                    || header[valueEnd] == '\n'
+                    || (header[valueEnd] == '\r' && (valueEnd + 1 >= header.Length || header[valueEnd + 1] == '\n'));
+
+                if (endsProperly && value.Length > 0 && value.IndexOfAnyExceptInRange('0', '9') < 0 && long.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out contentLength))
+                {
+                    return true;
+                }
+
+                searchFrom = valueEnd;
+            }
+
+            contentLength = 0;
+            return false;
         }
 
         private static int GetResponseStatusCode(string header)
@@ -332,16 +408,16 @@ namespace NetTunnel.Service.TunnelEngine
             }
         }
 
-        private static bool IsPlausibleHttpStart(byte[] pending, int pendingLength)
+        private static bool IsPlausibleHttpStart(ReadOnlySpan<byte> start)
         {
             foreach (var token in HttpStartTokens)
             {
-                int compareLength = Math.Min(pendingLength, token.Length);
+                int compareLength = Math.Min(start.Length, token.Length);
                 bool isMatch = true;
 
                 for (int i = 0; i < compareLength; i++)
                 {
-                    if (char.ToUpperInvariant((char)pending[i]) != token[i])
+                    if (char.ToUpperInvariant((char)start[i]) != token[i])
                     {
                         isMatch = false;
                         break;

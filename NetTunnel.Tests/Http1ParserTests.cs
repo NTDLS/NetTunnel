@@ -162,6 +162,26 @@ namespace NetTunnel.Tests
         }
 
         [Fact]
+        public void ProtocolText_IsNotAffectedByTheMachinesCulture()
+        {
+            //In Turkish, "i" upper-cases to a dotted capital I, which broke verb matching ("options" is not "OPTIONS").
+            var original = System.Globalization.CultureInfo.CurrentCulture;
+            try
+            {
+                System.Globalization.CultureInfo.CurrentCulture = new System.Globalization.CultureInfo("tr-TR");
+
+                var config = Config(Rule(NtHttpHeaderType.Request, NtHttpHeaderAction.Upsert, "X-Test", "1", NtHttpVerb.Options));
+                var input = "options * http/1.1\r\nhost: x\r\n\r\nOPTIONS * HTTP/1.1\r\n\r\n";
+                var expected = "options * http/1.1\r\nhost: x\r\nX-Test: 1\r\n\r\nOPTIONS * HTTP/1.1\r\nX-Test: 1\r\n\r\n";
+                AssertSplitInvariant(config, input, expected);
+            }
+            finally
+            {
+                System.Globalization.CultureInfo.CurrentCulture = original;
+            }
+        }
+
+        [Fact]
         public void HeaderBytesAbove127_AreNotAltered()
         {
             var input = "GET /café HTTP/1.1\r\nX-Raw: ÿ\u0080©\r\n\r\n";
