@@ -207,7 +207,9 @@ namespace NetTunnel.Service.TunnelEngine.Http2
                     throw new HpackException("The header block is too large.");
                 }
 
-                fields.Add(field);
+                //The field may be an entry of the static table (shared by every connection) or of the dynamic table. Header rules
+                //  replace field values, so hand out a copy; otherwise a rule would change what later blocks that index the entry decode to.
+                fields.Add(new HeaderField(field.Name, field.Value, field.NeverIndex));
             }
 
             return fields;
