@@ -25,7 +25,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="NTDLS.Persistence" Version="2.0.1" />
+		<PackageReference Include="NTDLS.Persistence" Version="2.1.0" />
 		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.14" />
 		<PackageReference Include="Topshelf" Version="4.3.0" />
 		<PackageReference Include="TopShelf.ServiceInstaller" Version="4.3.0" />

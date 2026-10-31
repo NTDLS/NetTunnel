@@ -16,7 +16,8 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         private long _closeAfterPackets = -1;
         private Timer? _closeTimer;
 
-        public bool IsConnected { get; private set; }
+        private volatile bool _isConnected;
+        public bool IsConnected => _isConnected;
         public DateTime LastActivityDateTime { get; private set; } = DateTime.UtcNow;
         public DateTime StartDateTime { get; private set; } = DateTime.UtcNow;
         public Guid EdgeId { get; private set; }
@@ -44,7 +45,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             TcpClient = tcpClient;
             EdgeId = edgeId;
             _stream = tcpClient.GetStream();
-            IsConnected = true;
+            _isConnected = true;
         }
 
         /// <summary>
@@ -122,9 +123,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         public void Disconnect()
         {
+            //Marked first: whoever sees the socket close (including the data pump, on another thread) must also see that we are disconnected.
+            _isConnected = false;
             Exceptions.Ignore(_stream.Close);
             Exceptions.Ignore(TcpClient.Close);
-            IsConnected = false;
         }
 
         public void Write(long packetSequence, byte[] buffer)

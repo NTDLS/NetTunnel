@@ -20,7 +20,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="NTDLS.Localization" Version="1.0.2" />
-		<PackageReference Include="NTDLS.Persistence" Version="2.0.1" />
+		<PackageReference Include="NTDLS.Persistence" Version="2.1.0" />
 		<PackageReference Include="NTDLS.WinFormsHelpers" Version="1.6.3" />
 	</ItemGroup>
 

@@ -193,3 +193,75 @@ namespace NetTunnel.Tests
         }
     }
 }
+
+namespace NetTunnel.Tests
+{
+    public class LargeRequestPerformanceTests(ITestOutputHelper output)
+    {
+        private static EndpointConfiguration Config()
+        {
+            var config = new EndpointConfiguration { Direction = NtDirection.Inbound, InboundTrafficType = NtTrafficType.Http };
+            config.HttpHeaderRules.Add(new HttpHeaderRule(NtHttpVerb.Any, "X-Forwarded-For", NtHttpHeaderAction.Upsert, "10.0.0.1")
+            { HeaderType = NtHttpHeaderType.Request, Enabled = true });
+            return config;
+        }
+
+        private double Run(string label, byte[] stream, int receiveSize, int repeats = 3)
+        {
+            double Pass()
+            {
+                var parser = new HttpStreamParser(Config());
+                var buffer = new byte[receiveSize];
+                var timer = Stopwatch.StartNew();
+                for (int position = 0; position < stream.Length; position += receiveSize)
+                {
+                    int size = Math.Min(receiveSize, stream.Length - position);
+                    Array.Copy(stream, position, buffer, 0, size);
+                    parser.Process(buffer, size);
+                }
+                return stream.Length / 1048576.0 / timer.Elapsed.TotalSeconds;
+            }
+
+            Pass();
+            double best = 0;
+            for (int i = 0; i < repeats; i++) best = Math.Max(best, Pass());
+            output.WriteLine($"{label,-52} {best,9:n0} MB/s");
+            return best;
+        }
+
+        private static byte[] Chunked(int total, int chunkSize)
+        {
+            var s = new MemoryStream();
+            s.Write(Encoding.ASCII.GetBytes("POST /u HTTP/1.1\r\nHost: x\r\nTransfer-Encoding: chunked\r\n\r\n"));
+            var chunk = new byte[chunkSize];
+            var prefix = Encoding.ASCII.GetBytes(chunkSize.ToString("x") + "\r\n");
+            for (int sent = 0; sent < total; sent += chunkSize) { s.Write(prefix); s.Write(chunk); s.Write("\r\n"u8); }
+            s.Write("0\r\n\r\n"u8);
+            return s.ToArray();
+        }
+
+        private static byte[] WithLength(int total, string extraHeaders = "")
+        {
+            var s = new MemoryStream();
+            s.Write(Encoding.ASCII.GetBytes($"POST /u HTTP/1.1\r\nHost: x\r\n{extraHeaders}Content-Length: {total}\r\n\r\n"));
+            s.Write(new byte[total]);
+            return s.ToArray();
+        }
+
+        [Fact]
+        public void LargeRequests()
+        {
+            const int total = 64 * 1024 * 1024;
+            Run("content-length 64MB, 16KB receives", WithLength(total), 16 * 1024);
+            Run("content-length 64MB, 1460-byte receives", WithLength(total), 1460);
+            Run("chunked 64MB, 64KB chunks, 16KB receives", Chunked(total, 64 * 1024), 16 * 1024);
+            Run("chunked 64MB, 8KB chunks, 16KB receives", Chunked(total, 8 * 1024), 16 * 1024);
+            Run("chunked 64MB, 1KB chunks, 16KB receives", Chunked(total, 1024), 16 * 1024);
+            Run("chunked 16MB, 100-byte chunks, 16KB receives", Chunked(16 * 1024 * 1024, 100), 16 * 1024);
+
+            var bigCookie = $"Cookie: {new string('c', 16000)}\r\n";
+            Run("16KB header, then 1MB body, 16KB receives", WithLength(1024 * 1024, bigCookie), 16 * 1024, 20);
+            Run("16KB header, 1460-byte receives (split header)", WithLength(1024, bigCookie), 1460, 2000);
+        }
+    }
+}
