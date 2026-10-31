@@ -139,7 +139,8 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
             {
                 EnforceTunnelOwnership(context, notification.TunnelKey);
 
-                Singletons.ServiceEngine.Tunnels.DisconnectEndpointEdge(notification.TunnelKey, notification.EndpointId, notification.EdgeId);
+                Singletons.ServiceEngine.Tunnels.DisconnectEndpointEdge(
+                    notification.TunnelKey, notification.EndpointId, notification.EdgeId, notification.PacketCount);
             }
             catch (Exception ex)
             {

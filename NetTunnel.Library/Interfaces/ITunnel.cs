@@ -38,7 +38,7 @@ namespace NetTunnel.Library.Interfaces
         /// Disconnect the endpoint edge from the external server, browser, etc.
         /// </summary>
         public void DeleteEndpoint(Guid endpointId, string? username);
-        public void DisconnectEndpointEdge(Guid endpointId, Guid edgeId);
+        public void DisconnectEndpointEdge(Guid endpointId, Guid edgeId, long packetCount = -1);
 
         public TunnelConfiguration CloneConfiguration();
 
@@ -63,7 +63,7 @@ namespace NetTunnel.Library.Interfaces
         /// <param name="endpointId">The id of the endpoint that owns the connection.</param>
         /// <param name="edgeId">The id that will uniquely identity the associated endpoint connections at each service</param>
         public void S2SPeerNotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, string? applicationProtocol = null);
-        public void S2SPeerNotificationEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId);
+        public void S2SPeerNotificationEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, long packetCount = -1);
         public void S2SPeerNotificationTunnelDeletion(DirectionalKey tunnelKey);
         public void S2SPeerNotificationEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId);
         public S2SQueryUpsertEndpointReply S2SPeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointId);

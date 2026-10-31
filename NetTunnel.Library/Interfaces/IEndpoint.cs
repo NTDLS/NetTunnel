@@ -10,7 +10,7 @@ namespace NetTunnel.Library.Interfaces
         /// </summary>
         public Guid EndpointId { get; }
         public bool KeepRunning { get; }
-        public void Disconnect(Guid edgeId);
+        public void Disconnect(Guid edgeId, long packetCount = -1);
         public void WriteEndpointEdgeData(Guid edgeId, long packetSequence, byte[] buffer);
         public void Start();
         public void Stop();

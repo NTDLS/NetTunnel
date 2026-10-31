@@ -82,10 +82,10 @@ namespace NetTunnel.Service.TunnelEngine
             ServiceEngine.S2SPeerNotificationEndpointConnect(ConnectionId, tunnelKey, endpointId, edgeId, applicationProtocol);
         }
 
-        public void S2SPeerNotificationEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
+        public void S2SPeerNotificationEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, long packetCount = -1)
         {
             //Inbound tunnels communicate all data through the ServiceEngine._messageServer based on the ConnectionId.
-            ServiceEngine.S2SPeerNotificationEndpointDisconnect(ConnectionId, tunnelKey, endpointId, edgeId);
+            ServiceEngine.S2SPeerNotificationEndpointDisconnect(ConnectionId, tunnelKey, endpointId, edgeId, packetCount);
         }
 
         public void S2SPeerNotificationTunnelDeletion(DirectionalKey tunnelKey)

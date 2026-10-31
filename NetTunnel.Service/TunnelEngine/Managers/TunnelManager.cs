@@ -261,8 +261,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         #endregion
 
-        public void DisconnectEndpointEdge(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
-            => TryGetTunnel(tunnelKey)?.DisconnectEndpointEdge(endpointId, edgeId);
+        public void DisconnectEndpointEdge(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, long packetCount = -1)
+            => TryGetTunnel(tunnelKey)?.DisconnectEndpointEdge(endpointId, edgeId, packetCount);
 
         /// <summary>
         /// A remote service is telling the local service that an inbound connection has been made to an

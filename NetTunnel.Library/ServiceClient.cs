@@ -175,8 +175,8 @@ namespace NetTunnel.Library
         public void S2SNotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, string? applicationProtocol = null)
             => Client.Query(new S2SNotificationEndpointConnectQuery(tunnelKey, endpointId, edgeId, applicationProtocol));
 
-        public void S2SPeerNotificationEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
-            => Client.Notify(new S2SNotificationEndpointDisconnect(tunnelKey, endpointId, edgeId));
+        public void S2SPeerNotificationEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, long packetCount = -1)
+            => Client.Notify(new S2SNotificationEndpointDisconnect(tunnelKey, endpointId, edgeId, packetCount));
 
         public void S2SPeerNotificationTunnelDeletion(DirectionalKey tunnelKey)
             => Client.Notify(new S2SNotificationTunnelDeletion(tunnelKey));

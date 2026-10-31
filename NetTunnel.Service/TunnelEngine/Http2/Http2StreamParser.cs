@@ -86,19 +86,18 @@ namespace NetTunnel.Service.TunnelEngine.Http2
 
         public (byte[] Bytes, int Length) Process(byte[] bytes, int length)
         {
-            var output = new MemoryStream(length + 64);
-
-            //Fast path: the payload of a frame that is being passed on, with nothing held back.
+            //Fast path: the payload of a frame that is being passed on, with nothing held back. The bytes are forwarded as they are.
             if (_state == ParserState.Payload && _start == _end && !_collecting && _payloadRemaining >= length)
             {
-                output.Write(bytes, 0, length);
                 _payloadRemaining -= length;
                 if (_payloadRemaining == 0)
                 {
                     _state = ParserState.FrameHeader;
                 }
-                return (output.GetBuffer(), (int)output.Length);
+                return (bytes, length);
             }
+
+            var output = new MemoryStream(length + 64);
 
             Append(bytes, length);
 

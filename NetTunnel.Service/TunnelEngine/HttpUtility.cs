@@ -174,9 +174,13 @@ namespace NetTunnel.Service
             return endOfHeader;
         }
 
+        //Rules are applied to every message, so the expressions are built once per distinct header name rather than per message.
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<(string Name, bool IncludeLineBreak), Regex> _headerLineFinders = new();
+
         private static Regex HeaderLineFinder(string name, bool includeLineBreak)
-            => new(@"^" + Regex.Escape(name) + @"[ \t]*:[^\r\n]*" + (includeLineBreak ? @"(\r?\n)?" : string.Empty),
-                RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            => _headerLineFinders.GetOrAdd((name, includeLineBreak),
+                key => new Regex(@"^" + Regex.Escape(key.Name) + @"[ \t]*:[^\r\n]*" + (key.IncludeLineBreak ? @"(\r?\n)?" : string.Empty),
+                    RegexOptions.IgnoreCase | RegexOptions.Multiline));
 
         /// <summary>
         /// Appends a header line to the end of the header block (just before the blank line which terminates it).

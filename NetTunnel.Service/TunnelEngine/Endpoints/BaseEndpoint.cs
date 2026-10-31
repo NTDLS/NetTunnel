@@ -132,8 +132,23 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         public virtual void Stop() => TryBeginStop();
 
-        public void Disconnect(Guid edgeId)
+        /// <param name="packetCount">
+        /// When the peer is the one disconnecting, the number of data packets it sent first. They are delivered before the connection is closed.
+        /// Negative closes the connection at once.
+        /// </param>
+        public void Disconnect(Guid edgeId, long packetCount = -1)
         {
+            if (packetCount >= 0)
+            {
+                var edgeConnection = _edgeConnections.Use((o) => o.GetValueOrDefault(edgeId));
+                if (edgeConnection != null)
+                {
+                    //The data pump removes the connection once it sees the end, so it is left in place until then.
+                    Exceptions.Ignore(() => edgeConnection.DisconnectAfter(packetCount));
+                }
+                return;
+            }
+
             _edgeConnections.Use((o) =>
             {
                 if (o.TryGetValue(edgeId, out var activeEndpointConnection))
@@ -244,9 +259,11 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                         //Send the data to the remote peer, along with all the IDs required to identify the tunnel,
                         //  endpoint and endpoint-edge-connection (edgeId). At the tunnel-peer, This data will be
                         //  sent to whatever is connected to the endpoint via a call to WriteEndpointEdgeData().
-                        //  Sequence numbers must be contiguous, so only consume one when a packet is actually sent.
+                        //  Sequence numbers must be contiguous, so only consume one when a packet is actually sent. The count is
+                        //  what tells the peer how many packets to wait for when we disconnect.
                         _tunnel.S2SPeerNotificationEndpointDataExchange(
-                            _tunnel.TunnelKey, Configuration.EndpointId, edgeConnection.EdgeId, ++packetSequence, sendBytes, sendLength);
+                            _tunnel.TunnelKey, Configuration.EndpointId, edgeConnection.EdgeId, packetSequence + 1, sendBytes, sendLength);
+                        packetSequence++;
                     }
 
                     buffer.AutoResize(Singletons.Configuration.MaxReceiveBufferSize);
@@ -304,8 +321,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 });
             }
 
+            //Tell the peer how many packets we sent, because it handles notifications concurrently and the disconnect can otherwise
+            //  overtake the last of them, truncating the transfer.
             Exceptions.Ignore(() =>
-                _tunnel.S2SPeerNotificationEndpointDisconnect(_tunnel.TunnelKey.SwapDirection(), EndpointId, edgeConnection.EdgeId));
+                _tunnel.S2SPeerNotificationEndpointDisconnect(_tunnel.TunnelKey.SwapDirection(), EndpointId, edgeConnection.EdgeId, packetSequence + 1));
         }
 
         public EndpointPropertiesDisplay GetProperties()

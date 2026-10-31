@@ -12,6 +12,9 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
     {
         private Stream _stream;
         private readonly object _writeLock = new();
+        private long _packetsDelivered;
+        private long _closeAfterPackets = -1;
+        private Timer? _closeTimer;
 
         public bool IsConnected { get; private set; }
         public DateTime LastActivityDateTime { get; private set; } = DateTime.UtcNow;
@@ -126,17 +129,63 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         public void Write(long packetSequence, byte[] buffer)
         {
-            //Notifications may be dispatched concurrently, but the stream accepts one writer at a time
+            bool closeNow;
+
+            //Notifications are dispatched concurrently and out of order, but the stream accepts one writer at a time
             //  and the packets must reach it in sequence.
             lock (_writeLock)
             {
                 SequenceBuffer.Process(buffer, packetSequence,
-                    (data) => _stream.Write(data));
+                    (data) =>
+                    {
+                        _stream.Write(data);
+                        _packetsDelivered++;
+                    });
+
+                closeNow = _closeAfterPackets >= 0 && _packetsDelivered >= _closeAfterPackets;
             }
 
             BytesSent += (ulong)buffer.Length;
             LastActivityDateTime = DateTime.UtcNow;
+
+            if (closeNow)
+            {
+                Disconnect(); //The peer said this was the last packet, and everything before it has now been delivered.
+            }
         }
+
+        /// <summary>
+        /// The peer has finished with this connection and sent <paramref name="packetCount"/> data packets before saying so. Because
+        ///     notifications are handled concurrently, the packets may still be on their way: the connection is closed once they have
+        ///     all been written, not before. A negative count means the number is not known and the connection is closed at once.
+        /// </summary>
+        public void DisconnectAfter(long packetCount)
+        {
+            bool closeNow;
+
+            lock (_writeLock)
+            {
+                if (packetCount >= 0)
+                {
+                    _closeAfterPackets = packetCount;
+                }
+                closeNow = packetCount < 0 || _packetsDelivered >= packetCount;
+            }
+
+            if (closeNow)
+            {
+                Disconnect();
+                return;
+            }
+
+            //Packets that never arrive must not hold the connection open for ever.
+            _closeTimer = new Timer(_ => Exceptions.Ignore(Disconnect), null, DisconnectGracePeriod, Timeout.InfiniteTimeSpan);
+        }
+
+        /// <summary>
+        /// How long to wait for the packets that precede a disconnect before giving up on them.
+        /// </summary>
+        public TimeSpan DisconnectGracePeriod { get; init; } = TimeSpan.FromSeconds(15);
 
         public bool Read(ref ReceiveBuffer buffer)
         {
@@ -150,6 +199,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         {
             Disconnect();
 
+            Exceptions.Ignore(() => _closeTimer?.Dispose());
             Exceptions.Ignore(_stream.Dispose);
             Exceptions.Ignore(TcpClient.Dispose);
             Exceptions.Ignore(SequenceBuffer.Clear);

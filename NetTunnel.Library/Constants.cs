@@ -7,6 +7,7 @@ namespace NetTunnel.Library
         public const string FriendlyName = "NetTunnel";
         public const string EventSourceName = "NetTunnel";
 
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
         public enum NtEdgeStatus
         {
             Normal, //This is a persistent connection.
@@ -22,6 +23,7 @@ namespace NetTunnel.Library
             public Guid EdgeId { get; set; }
         }
 
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
         public enum NtTrafficType
         {
             Raw,
@@ -29,6 +31,7 @@ namespace NetTunnel.Library
             Https
         }
 
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
         public enum NtLoginType
         {
             Undefined,
@@ -36,6 +39,7 @@ namespace NetTunnel.Library
             UI
         }
 
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
         public enum NtUserRole
         {
             Undefined,
@@ -43,6 +47,7 @@ namespace NetTunnel.Library
             Administrator
         }
 
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
         public enum NtHttpVerb
         {
             Any,
@@ -57,6 +62,7 @@ namespace NetTunnel.Library
             Trace
         }
 
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
         public enum NtHttpHeaderAction
         {
             Insert,
@@ -65,6 +71,7 @@ namespace NetTunnel.Library
             Upsert
         }
 
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
         public enum NtHttpHeaderType
         {
             None,
@@ -73,6 +80,7 @@ namespace NetTunnel.Library
             Any
         }
 
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
         public enum NtDirection
         {
             Undefined,
@@ -93,6 +101,7 @@ namespace NetTunnel.Library
             throw new Exception("The direction cannot be reversed.");
         }
 
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
         public enum NtTunnelStatus
         {
             Undefined,
@@ -102,6 +111,7 @@ namespace NetTunnel.Library
             Stopped
         }
 
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
         public enum NtLogSeverity
         {
             Exception = 0,//An actual exception has been thrown.

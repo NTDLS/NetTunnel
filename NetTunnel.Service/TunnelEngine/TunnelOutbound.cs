@@ -82,8 +82,8 @@ namespace NetTunnel.Service.TunnelEngine
         public void S2SPeerNotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, string? applicationProtocol = null)
             => _client.S2SNotificationEndpointConnect(tunnelKey, endpointId, edgeId, applicationProtocol);
 
-        public void S2SPeerNotificationEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
-            => _client.S2SPeerNotificationEndpointDisconnect(tunnelKey, endpointId, edgeId);
+        public void S2SPeerNotificationEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, long packetCount = -1)
+            => _client.S2SPeerNotificationEndpointDisconnect(tunnelKey, endpointId, edgeId, packetCount);
 
         public void S2SPeerNotificationTunnelDeletion(DirectionalKey tunnelKey)
             => _client.S2SPeerNotificationTunnelDeletion(tunnelKey);

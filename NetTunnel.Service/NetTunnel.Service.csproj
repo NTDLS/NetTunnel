@@ -32,6 +32,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<InternalsVisibleTo Include="NetTunnel.Tests" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\NetTunnel.Library\NetTunnel.Library.csproj" />
 	</ItemGroup>
 

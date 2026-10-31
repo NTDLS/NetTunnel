@@ -97,7 +97,8 @@ namespace NetTunnel.Service.ReliableHandlers.ServiceClient.Notifications
             {
                 var tunnel = EnforceLoginCryptographyAndGetTunnel(context);
 
-                Singletons.ServiceEngine.Tunnels.DisconnectEndpointEdge(notification.TunnelKey, notification.EndpointId, notification.EdgeId);
+                Singletons.ServiceEngine.Tunnels.DisconnectEndpointEdge(
+                    notification.TunnelKey, notification.EndpointId, notification.EdgeId, notification.PacketCount);
             }
             catch (Exception ex)
             {

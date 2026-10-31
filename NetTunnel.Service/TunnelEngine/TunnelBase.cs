@@ -131,7 +131,7 @@ namespace NetTunnel.Service.TunnelEngine
         void ITunnel.S2SPeerNotificationEndpointDeletion(DirectionalKey tunnelKey, Guid endpointId)
            => throw new NotImplementedException("This function should be overridden.");
 
-        void ITunnel.S2SPeerNotificationEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId)
+        void ITunnel.S2SPeerNotificationEndpointDisconnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, long packetCount)
            => throw new NotImplementedException("This function should be overridden.");
 
         public EndpointPropertiesDisplay GetEndpointProperties(DirectionalKey endpointKey)
@@ -279,8 +279,8 @@ namespace NetTunnel.Service.TunnelEngine
         /// <summary>
         /// Disconnect the endpoint edge from the external server, browser, etc.
         /// </summary>
-        public void DisconnectEndpointEdge(Guid endpointId, Guid edgeId)
-            => Endpoints.SingleOrDefault(o => o.EndpointId == endpointId)?.Disconnect(edgeId);
+        public void DisconnectEndpointEdge(Guid endpointId, Guid edgeId, long packetCount = -1)
+            => Endpoints.SingleOrDefault(o => o.EndpointId == endpointId)?.Disconnect(edgeId, packetCount);
 
         public override int GetHashCode()
         {
