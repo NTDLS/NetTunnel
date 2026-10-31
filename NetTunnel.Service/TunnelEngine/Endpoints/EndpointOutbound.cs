@@ -9,7 +9,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
     /// <summary>
     /// This is the class that makes an outbound TCP/IP connection to a listening endpoint.
     /// </summary>
-    internal class EndpointOutbound : BaseEndpoint, IEndpoint
+    internal class EndpointOutbound : BaseEndpoint, IEndpoint, IOutboundEndpoint
     {
         /// <summary>
         /// Unique ID that takes the direction and the ID into account.

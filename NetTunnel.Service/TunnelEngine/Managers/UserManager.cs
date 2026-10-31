@@ -26,6 +26,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         public void Add(User user) => _collection.Use((o) =>
         {
+            user.Endpoints.ForEach(endpoint => endpoint.Validate()); //An endpoint which contradicts itself is refused before it is saved.
+
             //Two users with the same name would make every lookup by name fail, including the log in of both of them.
             if (o.Any(u => u.Username.Equals(user.Username, StringComparison.OrdinalIgnoreCase)))
             {
@@ -44,6 +46,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         public void EditUser(User user)
         {
+            user.Endpoints.ForEach(endpoint => endpoint.Validate());
+
             _collection.Use((o) =>
             {
                 o.FirstOrDefault(t => t.Username.Equals(user.Username, StringComparison.OrdinalIgnoreCase))
@@ -102,6 +106,8 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         /// </summary>
         public void UpsertEndpoint(string username, EndpointConfiguration endpoint)
         {
+            endpoint.Validate();
+
             _collection.Use((o) =>
             {
                 var user = o.FirstOrDefault(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));

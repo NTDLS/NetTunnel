@@ -111,10 +111,10 @@ namespace NetTunnel.UI.Forms
                 Localize("Port on the destination that the outbound endpoint will make a connection to."));
 
             toolTips.AddControls([labelOutboundTrafficType, comboBoxOutboundTrafficType],
-                Localize("Type of traffic the outbound endpoint sends to the destination. HTTPS re-encrypts the connection to the destination server; HTTP and Raw send plain traffic."));
+                Localize("Type of traffic the outbound endpoint sends to the destination. HTTPS re-encrypts the connection to the destination server; HTTP and Raw send plain TCP traffic. UDP carries datagrams and must be chosen for both the inbound and the outbound type."));
 
             toolTips.AddControls([labelInboundTrafficType, comboBoxInboundTrafficType],
-                Localize("Type of traffic accepted by the inbound endpoint. HTTPS terminates TLS using the certificate on the TLS tab. HTTP header rules apply to HTTP and HTTPS."));
+                Localize("Type of traffic accepted by the inbound endpoint. HTTPS terminates TLS using the certificate on the TLS tab. HTTP header rules apply to HTTP and HTTPS. UDP carries datagrams: each client address and port is a session that ends when it has been quiet for the UDP session timeout."));
 
             toolTips.AddControls([checkBoxAllowHttp2],
                 Localize("Lets clients that support HTTP/2 use it (HTTPS inbound traffic type only). The destination must support HTTP/2 too: a client that uses it is connected to the destination with it, and fails if the destination does not agree. HTTP header rules work with HTTP/2."));
@@ -125,7 +125,8 @@ namespace NetTunnel.UI.Forms
             {
                 new ("Raw", NtTrafficType.Raw),
                 new ("HTTP", NtTrafficType.Http),
-                new ("HTTPS", NtTrafficType.Https)
+                new ("HTTPS", NtTrafficType.Https),
+                new ("UDP", NtTrafficType.Udp)
             };
 
             comboBoxInboundTrafficType.DisplayMember = "Display";
@@ -168,6 +169,26 @@ namespace NetTunnel.UI.Forms
                 textBoxTerminationAddress.Text = "127.0.0.1";
                 textBoxTerminationPort.Text = "80";
 #endif
+            }
+
+            //UDP is chosen for both ends or for neither, so choosing it on one side chooses it on the other. Wired up last so that
+            //  filling in the form does not trigger it.
+            comboBoxInboundTrafficType.SelectedIndexChanged += (_, _) => KeepUdpTogether(comboBoxInboundTrafficType, comboBoxOutboundTrafficType);
+            comboBoxOutboundTrafficType.SelectedIndexChanged += (_, _) => KeepUdpTogether(comboBoxOutboundTrafficType, comboBoxInboundTrafficType);
+        }
+
+        private static void KeepUdpTogether(ComboBox changed, ComboBox other)
+        {
+            bool changedIsUdp = $"{changed.SelectedValue}" == nameof(NtTrafficType.Udp);
+            bool otherIsUdp = $"{other.SelectedValue}" == nameof(NtTrafficType.Udp);
+
+            if (changedIsUdp && !otherIsUdp)
+            {
+                other.SelectedValue = NtTrafficType.Udp;
+            }
+            else if (!changedIsUdp && otherIsUdp)
+            {
+                other.SelectedValue = NtTrafficType.Raw; //Leaving UDP on one side leaves it on the other too.
             }
         }
 
@@ -258,6 +279,9 @@ namespace NetTunnel.UI.Forms
                     TlsIgnoreBackendCertificateErrors = checkBoxIgnoreBackendCertificateErrors.Checked,
                     AllowHttp2 = checkBoxAllowHttp2.Checked
                 };
+
+                //Settings which contradict each other (UDP with header rules, for example) are refused here, with the reason.
+                Endpoint.Validate();
 
                 if (Endpoint.InboundTrafficType == NtTrafficType.Https
                     && string.IsNullOrWhiteSpace(Endpoint.TlsCertificatePath))

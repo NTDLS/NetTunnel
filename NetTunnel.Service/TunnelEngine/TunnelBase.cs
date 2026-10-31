@@ -78,11 +78,21 @@ namespace NetTunnel.Service.TunnelEngine
 
             var newEndpoints = new List<IEndpoint>();
 
-            endpoints.Where(o => o.Direction == NtDirection.Inbound)
-                .ToList().ForEach(o => newEndpoints.Add(new EndpointInbound(ServiceEngine, this, o)));
-
-            endpoints.Where(o => o.Direction == NtDirection.Outbound)
-                .ToList().ForEach(o => newEndpoints.Add(new EndpointOutbound(ServiceEngine, this, o)));
+            foreach (var direction in new[] { NtDirection.Inbound, NtDirection.Outbound })
+            {
+                foreach (var configuration in endpoints.Where(o => o.Direction == direction))
+                {
+                    try
+                    {
+                        newEndpoints.Add(EndpointFactory.Create(ServiceEngine, this, configuration));
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        //One endpoint which contradicts itself must not keep the others of the tunnel from loading.
+                        Singletons.Logger.Warning($"Endpoint '{configuration.Name}' was not loaded: {ex.Message}");
+                    }
+                }
+            }
 
             List<IEndpoint> oldEndpoints;
             lock (_endpointsLock)
@@ -233,22 +243,12 @@ namespace NetTunnel.Service.TunnelEngine
 
         public IEndpoint UpsertEndpoint(EndpointConfiguration configuration, string? username)
         {
+            //Checked before the endpoint it replaces is deleted: a configuration that is refused must leave things as they were.
+            configuration.Validate();
+
             DeleteEndpoint(configuration.EndpointId, null);
 
-            IEndpoint endpoint;
-
-            if (configuration.Direction == NtDirection.Inbound)
-            {
-                endpoint = new EndpointInbound(ServiceEngine, this, configuration);
-            }
-            else if (configuration.Direction == NtDirection.Outbound)
-            {
-                endpoint = new EndpointOutbound(ServiceEngine, this, configuration);
-            }
-            else
-            {
-                throw new Exception("Endpoint direction is not well defined.");
-            }
+            var endpoint = EndpointFactory.Create(ServiceEngine, this, configuration);
 
             lock (_endpointsLock)
             {

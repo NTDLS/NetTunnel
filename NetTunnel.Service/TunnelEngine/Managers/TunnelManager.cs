@@ -277,7 +277,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             var tunnel = GetTunnel(tunnelKey);
 
-            var endpoint = tunnel.Endpoints.Single(o => o.EndpointId == endpointId) as EndpointOutbound
+            var endpoint = tunnel.Endpoints.Single(o => o.EndpointId == endpointId) as IOutboundEndpoint
                 ?? throw new Exception("The endpoint could not be converted to outbound.");
 
             //Connecting (and the TLS handshake) can take a long time, so this must not be done under the collection lock.

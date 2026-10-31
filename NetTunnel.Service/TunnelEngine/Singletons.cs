@@ -116,6 +116,8 @@ namespace NetTunnel.Service.TunnelEngine
             Require(configuration.StaleEndpointExpirationMs >= 0, "The stale endpoint expiration cannot be negative.");
             Require(configuration.TunnelCryptographyKeySize >= 128 && configuration.TunnelCryptographyKeySize % 128 == 0,
                 "The tunnel cryptography key size must be a multiple of 128 bits.");
+            Require(configuration.UdpSessionTimeoutMs >= 1000, "The UDP session timeout must be at least 1,000 milliseconds.");
+            Require(configuration.UdpMaxSessionsPerEndpoint >= 1, "The maximum number of UDP sessions per endpoint must be at least 1.");
             Require(configuration.LogFileMaxSizeMB >= 1, "The log file size must be at least 1 MB.");
             Require(configuration.LogFileRetainedCount >= 0, "The number of retained log files cannot be negative.");
         }

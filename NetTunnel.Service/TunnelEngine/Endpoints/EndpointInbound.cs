@@ -19,6 +19,12 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         /// <summary>
         /// Unique ID that takes the direction and the ID into account.
         /// </summary>
+        /// <summary>
+        /// True once the port is bound and connections are being accepted. The endpoint binds in the background after it is started, so a
+        /// client that connects at once can be too early.
+        /// </summary>
+        public bool IsListening => _listener?.Server.IsBound == true;
+
         public DirectionalKey EndpointKey => new(this);
         public NtDirection Direction { get => NtDirection.Inbound; }
         public override int GetHashCode() => Configuration.GetHashCode();

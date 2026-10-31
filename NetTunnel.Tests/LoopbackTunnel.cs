@@ -18,7 +18,7 @@ namespace NetTunnel.Tests
         private static readonly Random Jitter = new(4711);
 
         public LoopbackTunnelSide? Peer { get; set; }
-        public Dictionary<Guid, BaseEndpoint> EndpointsById { get; } = [];
+        public Dictionary<Guid, IEndpoint> EndpointsById { get; } = [];
 
         /// <summary>
         /// Send the old kind of disconnect, which says nothing about how many packets precede it.
@@ -63,7 +63,7 @@ namespace NetTunnel.Tests
         public void S2SPeerNotificationEndpointConnect(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, string? applicationProtocol = null)
         {
             Interlocked.Increment(ref ConnectsSent);
-            ((EndpointOutbound)Peer!.EndpointsById[endpointId]).EstablishOutboundEndpointConnection(edgeId, applicationProtocol); //A query: waits.
+            ((IOutboundEndpoint)Peer!.EndpointsById[endpointId]).EstablishOutboundEndpointConnection(edgeId, applicationProtocol); //A query: waits.
         }
 
         public void S2SPeerNotificationEndpointDataExchange(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, long sequence, byte[] bytes, int length)
@@ -119,12 +119,23 @@ namespace NetTunnel.Tests
     {
         public LoopbackTunnelSide InboundSide { get; }
         public LoopbackTunnelSide OutboundSide { get; }
-        public EndpointInbound Inbound { get; }
-        public EndpointOutbound Outbound { get; }
+        public IEndpoint Inbound { get; }
+        public IEndpoint Outbound { get; }
         public int ListenPort { get; }
+
+        /// <summary>
+        /// The tunnel most recently created, so that a failing test can say what each end of it saw.
+        /// </summary>
+        public static LoopbackTunnel? Last { get; private set; }
+
+        public string Describe() =>
+            $"inbound: sessions total {Inbound.TotalConnections}, current {Inbound.CurrentConnections}, bytes in {Inbound.BytesReceived}, out {Inbound.BytesSent}; "
+            + $"outbound: sessions total {Outbound.TotalConnections}, current {Outbound.CurrentConnections}, bytes in {Outbound.BytesReceived}, out {Outbound.BytesSent}; "
+            + $"packets into the tunnel: from the inbound end {InboundSide.DataPacketsSent}, from the outbound end {OutboundSide.DataPacketsSent}; connects {InboundSide.ConnectsSent}";
 
         public LoopbackTunnel(int serverPort, Action<EndpointConfiguration>? configure = null, bool start = true)
         {
+            Last = this;
             var tunnelId = Guid.NewGuid();
             InboundSide = new LoopbackTunnelSide(NtDirection.Inbound, tunnelId);
             OutboundSide = new LoopbackTunnelSide(NtDirection.Outbound, tunnelId);
@@ -144,8 +155,8 @@ namespace NetTunnel.Tests
             };
             configure?.Invoke(configuration);
 
-            Inbound = new EndpointInbound(null!, InboundSide, configuration);
-            Outbound = new EndpointOutbound(null!, OutboundSide, configuration.SwapDirection());
+            Inbound = EndpointFactory.Create(null!, InboundSide, configuration);
+            Outbound = EndpointFactory.Create(null!, OutboundSide, configuration.SwapDirection());
 
             InboundSide.EndpointsById[configuration.EndpointId] = Inbound;
             OutboundSide.EndpointsById[configuration.EndpointId] = Outbound;
@@ -154,7 +165,34 @@ namespace NetTunnel.Tests
             if (start)
             {
                 Inbound.Start();
+                WaitUntilListening();
             }
+        }
+
+        /// <summary>
+        /// The endpoint binds its port in the background, so a client that sends at once can be too early.
+        /// </summary>
+        public void WaitUntilListening()
+        {
+            var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(10);
+            while (DateTime.UtcNow < deadline)
+            {
+                bool listening = Inbound switch
+                {
+                    EndpointInbound tcp => tcp.IsListening,
+                    UdpEndpointInbound udp => udp.IsListening,
+                    _ => true
+                };
+
+                if (listening)
+                {
+                    return;
+                }
+
+                Thread.Sleep(5);
+            }
+
+            throw new TimeoutException("The inbound endpoint never started listening.");
         }
 
         public void Dispose()

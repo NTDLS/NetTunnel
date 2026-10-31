@@ -1,6 +1,6 @@
 # NetTunnel configuration guide
 
-How to configure NetTunnel for **Raw TCP**, **HTTP** and **HTTPS** traffic, what every setting does, and general guidance for running it.
+How to configure NetTunnel for **Raw TCP**, **HTTP**, **HTTPS** and **UDP** traffic, what every setting does, and general guidance for running it.
 
 Contents
 
@@ -8,6 +8,7 @@ Contents
 2. [Endpoint settings](#2-endpoint-settings)
 3. [Choosing traffic types](#3-choosing-traffic-types)
 4. [Raw (plain TCP)](#4-raw-plain-tcp)
+   - [UDP (datagrams)](#udp-datagrams)
 5. [HTTP](#5-http)
 6. [HTTPS (TLS termination and re-encryption)](#6-https-tls-termination-and-re-encryption)
 7. [HTTP header rules](#7-http-header-rules)
@@ -62,8 +63,8 @@ The endpoint dialog has three tabs.
 
 | Setting | Meaning |
 | --- | --- |
-| **Inbound traffic type** | Raw, HTTP or HTTPS, as spoken by clients connecting to the inbound endpoint. |
-| **Outbound traffic type** | Raw, HTTP or HTTPS, as spoken to the destination. |
+| **Inbound traffic type** | Raw, HTTP, HTTPS or UDP, as spoken by clients connecting to the inbound endpoint. |
+| **Outbound traffic type** | Raw, HTTP, HTTPS or UDP, as spoken to the destination. UDP must be chosen for both types (choosing it for one chooses it for the other). |
 | **Header rules grid** | HTTP header changes (see [section 7](#7-http-header-rules)). Applies to HTTP and HTTPS only. |
 
 ### TLS tab
@@ -100,6 +101,9 @@ The two types are independent, so every combination is allowed. The ones people 
 | HTTPS | HTTPS | HTTPS in, HTTPS to the backend (re-encrypt) | Yes | Yes |
 | HTTP | HTTPS | Plain in, HTTPS to the backend | Yes | No |
 | Raw | Raw (carrying TLS) | Pass an end-to-end TLS session through untouched | No | No |
+| UDP | UDP | DNS, syslog, game servers, VoIP, VPNs such as WireGuard, HTTP/3 (QUIC) passed through | No | No |
+
+UDP is the one exception to "the two types are independent": it has to be chosen for both. See [UDP](#udp-datagrams).
 
 The deciding question is whether NetTunnel has to **read** the HTTP. Header rules can only be applied to HTTP that NetTunnel can see, which means HTTP, or HTTPS that NetTunnel terminates itself. If you only need to move bytes, use Raw.
 
@@ -118,6 +122,31 @@ Example: reach an SSH server in an office network from home.
 3. Connect with `ssh -p 2222 user@home-machine`.
 
 Raw is also how you carry TLS **end to end**: if the client and the destination negotiate TLS between themselves, NetTunnel just forwards the encrypted bytes. The certificate is then the destination's, not NetTunnel's, and header rules do not apply.
+
+### UDP (datagrams)
+
+A UDP endpoint carries datagrams instead of TCP connections. UDP has no connections, so NetTunnel treats each **client address and port** that sends to the inbound endpoint as a **session**.
+
+- When a client sends its first datagram, the inbound endpoint tells the other service, which opens a UDP socket of its own to the destination for that client. The destination therefore sees one source per client and answers each one separately.
+- Every datagram is carried whole: its boundaries and size (up to 65,507 bytes) are kept. Datagrams of one session arrive in the order they were sent, and none is lost or repeated *inside* the tunnel (the tunnel connection is reliable). A datagram can still be lost where UDP itself loses them: between the client and the inbound endpoint, or between the outbound endpoint and the destination.
+- The destination may send datagrams without being asked, as game servers and streams do; they go to the client that owns the session.
+- A session ends when no datagram has gone either way for the **UDP session timeout** (60 seconds by default, see [section 8](#8-service-configuration)). The client is not shut out: its next datagram starts a new session. Pick a timeout longer than the quietest period your protocol has.
+- At most **UDP maximum sessions per endpoint** sessions exist at once (10,000 by default). Datagrams from further clients are dropped until a session ends, so that spoofed source addresses cannot use up the service's memory.
+- A destination that is not listening yet does not end the session; the datagrams that follow are delivered once it is.
+
+Example: reach a DNS server in an office network from home.
+
+1. Connect the tunnel as for any endpoint.
+2. On the home service, add an **inbound** endpoint:
+   - Listen port `5353`
+   - Termination address `192.168.1.1` (the DNS server, as seen from the office)
+   - Termination port `53`
+   - Inbound traffic type `UDP`, outbound traffic type `UDP`
+3. Query it with `nslookup -port=5353 example.com home-machine`.
+
+What does not apply to UDP: HTTP header rules, TLS (including the certificate), and HTTP/2. An endpoint that combines UDP with any of them is refused with the reason. HTTP/3 (QUIC) travels as UDP: it is carried untouched, end to end, and is not inspected.
+
+TCP and UDP can use the same port number on one machine (they are different ports to the operating system), but two endpoints of the same kind cannot.
 
 ## 5. HTTP
 
@@ -279,6 +308,8 @@ Open **Settings > Service configuration** (administrators only). Each service ha
 | **Endpoint heartbeat** (`EndpointHeartbeatDelayMs`) | 5000 | 1000-216000000 | Milliseconds between endpoint heartbeats, which also check for stale connections. |
 | **Tunnel cryptography key size** (`TunnelCryptographyKeySize`) | 4096 | 128-81920 | Bits of key material negotiated per tunnel at each connect. |
 | **Stale endpoint expiration** (`StaleEndpointExpirationMs`) | 0 (off) | 0-216000000 | Disconnect an endpoint connection after this many idle milliseconds. |
+| **UDP session timeout** (`UdpSessionTimeoutMs`) | 60000 | 1000 or more | Milliseconds without a datagram either way after which a UDP session ends. UDP has no connection that closes, so this is the only thing that ends a session. |
+| **UDP maximum sessions per endpoint** (`UdpMaxSessionsPerEndpoint`) | 10000 | 1 or more | Most UDP sessions one endpoint keeps at a time. Datagrams from further clients are dropped until a session ends. |
 | **Initial receive buffer** (`InitialReceiveBufferSize`) | 16384 | 1024-1073741824 | Starting size, in bytes, of each connection's receive buffer. |
 | **Maximum receive buffer** (`MaxReceiveBufferSize`) | 1048576 | 1024-1073741824 | Largest the buffer grows to. |
 | **Receive buffer growth rate** (`ReceiveBufferGrowthRate`) | 0.2 | 0.01-1.0 | How fast the buffer grows when it fills. |
@@ -405,7 +436,8 @@ Things to know:
 
 ## 12. Known limitations
 
-- HTTP/1.x and HTTP/2 are supported, HTTP/3 (QUIC) is not: tunnels carry TCP and HTTP/3 is UDP. Clients fall back to HTTP/2 or HTTP/1.1. WebSockets and other upgrades are forwarded but not inspected.
+- HTTP/1.x and HTTP/2 are supported and can be inspected (header rules). HTTP/3 (QUIC) is UDP: a UDP endpoint carries it untouched, but it cannot be inspected, and an HTTPS endpoint does not offer it, so clients fall back to HTTP/2 or HTTP/1.1. WebSockets and other upgrades are forwarded but not inspected.
+- UDP endpoints keep no state for a client beyond its session: there is no ordering across clients, no retransmission (UDP does not do it either), and an empty datagram is not forwarded. Datagrams larger than the path allows (the MTU) are fragmented or dropped by the network as usual.
 - HTTP/2 is relayed, not translated: a client that uses HTTP/2 needs a destination that speaks HTTP/2 (see [HTTP/2](#http2)). It is only available with an HTTPS inbound endpoint.
 - Header rules cannot change bodies, use variables, or match on values. They are applied on every message in order.
 - A response to a `HEAD` request carries a length but no body. NetTunnel cannot tell, so the rest of that connection is passed through unmodified.

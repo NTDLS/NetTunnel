@@ -72,6 +72,18 @@ namespace NetTunnel.Library.Payloads
         /// </summary>
         public int StaleEndpointExpirationMs { get; set; } = 0;
 
+        /// <summary>
+        /// A UDP session (a client address and port) ends when no datagram has gone either way for this many milliseconds. UDP has no
+        /// connection that closes, so this is the only thing that ends a session, and it must not be turned off.
+        /// </summary>
+        public int UdpSessionTimeoutMs { get; set; } = 60_000;
+
+        /// <summary>
+        /// The most UDP sessions one endpoint keeps at a time. Datagrams from further clients are dropped until a session ends, so that
+        /// clients using spoofed addresses cannot use up the memory of the service.
+        /// </summary>
+        public int UdpMaxSessionsPerEndpoint { get; set; } = 10_000;
+
         #region Reliable Messaging Configuration.
 
         /// <summary>

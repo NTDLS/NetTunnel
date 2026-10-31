@@ -8,7 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace NetTunnel.Service.TunnelEngine.Endpoints
 {
-    internal class EndpointEdgeConnection : IDisposable
+    internal class EndpointEdgeConnection : IEdgeConnection
     {
         private Stream _stream;
         private readonly object _writeLock = new();
@@ -23,6 +23,22 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
         public Guid EdgeId { get; private set; }
         public TcpClient TcpClient { get; private set; }
         public Thread Thread { get; private set; }
+        public int ThreadId => Thread.ManagedThreadId;
+
+        public System.Net.IPEndPoint? RemoteEndPoint
+        {
+            get
+            {
+                try
+                {
+                    return TcpClient.Client.RemoteEndPoint as System.Net.IPEndPoint;
+                }
+                catch (ObjectDisposedException)
+                {
+                    return null; //The connection closed while this was being asked.
+                }
+            }
+        }
         public ulong BytesReceived { get; internal set; }
         public ulong BytesSent { get; internal set; }
         public RmSequenceBuffer<byte[]> SequenceBuffer { get; internal set; } = new();

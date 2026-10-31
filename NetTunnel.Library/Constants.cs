@@ -10,6 +10,11 @@ namespace NetTunnel.Library
         /// The environment variable which gives the service a data folder (and so a configuration) of its own. The tests use it so that
         /// they never read or change the configuration of an installed service.
         /// </summary>
+        /// <summary>
+        /// The largest payload of a UDP datagram (65,535 less the IPv4 and UDP headers).
+        /// </summary>
+        public const int UdpMaxDatagramSize = 65507;
+
         public const string DataFolderNameVariable = "NETTUNNEL_DATA_NAME";
 
         /// <summary>
@@ -45,7 +50,12 @@ namespace NetTunnel.Library
         {
             Raw,
             Http,
-            Https
+            Https,
+            /// <summary>
+            /// Datagrams. A UDP endpoint carries each client address and port as a session for as long as it keeps sending. The inbound and the
+            /// outbound traffic types must both be Udp, and HTTP header rules and TLS do not apply.
+            /// </summary>
+            Udp
         }
 
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]

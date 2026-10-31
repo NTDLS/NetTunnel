@@ -14,9 +14,9 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
     {
         private Thread? _heartbeatThread;
         private readonly object _lifecycleLock = new();
-        private readonly object _statisticsLock = new();
+        protected readonly object _statisticsLock = new();
 
-        internal readonly PessimisticCriticalResource<Dictionary<Guid, EndpointEdgeConnection>> _edgeConnections = new();
+        internal readonly PessimisticCriticalResource<Dictionary<Guid, IEdgeConnection>> _edgeConnections = new();
         internal readonly ITunnel _tunnel;
         internal readonly IServiceEngine _serviceEngine;
 
@@ -50,15 +50,19 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                 {
                     _edgeConnections.Use((o) =>
                     {
-                        List<EndpointEdgeConnection> connectionsToClose = new();
+                        List<IEdgeConnection> connectionsToClose = new();
 
                         foreach (var connection in o)
                         {
                             Exceptions.Ignore(() =>
                             {
-                                //We've are connected but haven't done much in a while.
-                                if (Singletons.Configuration.StaleEndpointExpirationMs > 0
-                                    && connection.Value.ActivityAgeInMilliseconds > Singletons.Configuration.StaleEndpointExpirationMs)
+                                //We've are connected but haven't done much in a while. UDP has no connection that closes, so a session
+                                //  which stops sending is the only way it ever ends: it always has a limit.
+                                double limit = Configuration.IsUdp
+                                    ? Singletons.Configuration.UdpSessionTimeoutMs
+                                    : Singletons.Configuration.StaleEndpointExpirationMs;
+
+                                if (limit > 0 && connection.Value.ActivityAgeInMilliseconds > limit)
                                 {
                                     connectionsToClose.Add(connection.Value);
                                 }
@@ -126,6 +130,63 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             }
 
             return true;
+        }
+
+        protected void AddBytesReceived(int bytes)
+        {
+            lock (_statisticsLock)
+            {
+                BytesReceived += (ulong)bytes;
+            }
+        }
+
+        protected void NoteConnectionOpened()
+        {
+            lock (_statisticsLock)
+            {
+                TotalConnections++;
+                CurrentConnections++;
+            }
+        }
+
+        protected void NoteConnectionClosed()
+        {
+            lock (_statisticsLock)
+            {
+                if (CurrentConnections > 0)
+                {
+                    CurrentConnections--;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The configuration of the endpoint as it is shown to the UI.
+        /// </summary>
+        protected EndpointConfiguration BuildDisplayConfiguration(NtDirection direction)
+        {
+            var result = new EndpointConfiguration
+            {
+                EndpointId = EndpointId,
+                Direction = direction,
+                Name = Configuration.Name,
+                OutboundAddress = Configuration.OutboundAddress,
+                InboundPort = Configuration.InboundPort,
+                OutboundPort = Configuration.OutboundPort,
+                InboundTrafficType = Configuration.InboundTrafficType,
+                OutboundTrafficType = Configuration.OutboundTrafficType,
+                TlsCertificatePath = Configuration.TlsCertificatePath,
+                TlsCertificatePassword = Configuration.TlsCertificatePassword,
+                TlsIgnoreBackendCertificateErrors = Configuration.TlsIgnoreBackendCertificateErrors,
+                AllowHttp2 = Configuration.AllowHttp2,
+            };
+
+            foreach (var rule in Configuration.HttpHeaderRules)
+            {
+                result.HttpHeaderRules.Add(rule.CloneConfiguration());
+            }
+
+            return result;
         }
 
         public virtual void Start() => TryBeginStart();
@@ -369,10 +430,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                         IsConnected = edge.IsConnected,
                         LastActivityDateTime = edge.LastActivityDateTime,
                         StartDateTime = edge.StartDateTime,
-                        ThreadId = edge.Thread.ManagedThreadId
+                        ThreadId = edge.ThreadId
                     };
 
-                    if (edge.TcpClient.Client.RemoteEndPoint is IPEndPoint address)
+                    if (edge.RemoteEndPoint is IPEndPoint address)
                     {
                         var remote = Utility.Unmap(address.Address);
                         connection.AddressFamily = remote.AddressFamily == AddressFamily.InterNetworkV6 ? "IPv6" : "IPv4";

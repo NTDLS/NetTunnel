@@ -23,6 +23,8 @@ namespace NetTunnel.Tests
             {
                 LogLevel = NtLogSeverity.Warning,
                 LogToEventLog = false,
+                UdpSessionTimeoutMs = 20_000, //Generous: a stall while the process warms up must never end a session with a datagram in flight. The idle tests lower it.
+                EndpointHeartbeatDelayMs = 200,
                 PingCadence = 0
             });
 

@@ -37,6 +37,45 @@ namespace NetTunnel.Library.Payloads
         [Newtonsoft.Json.JsonIgnore]
         public NtTrafficType TrafficType => Direction == NtDirection.Outbound ? OutboundTrafficType : InboundTrafficType;
 
+        /// <summary>
+        /// True for an endpoint which carries UDP datagrams rather than TCP connections.
+        /// </summary>
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
+        public bool IsUdp => InboundTrafficType == NtTrafficType.Udp || OutboundTrafficType == NtTrafficType.Udp;
+
+        /// <summary>
+        /// Throws if the settings contradict each other. UDP is a different kind of traffic at both ends of the tunnel, and none of the
+        /// things which read or wrap a TCP stream (HTTP header rules, TLS, HTTP/2) can be applied to datagrams.
+        /// </summary>
+        public void Validate()
+        {
+            if (!IsUdp)
+            {
+                return;
+            }
+
+            if (InboundTrafficType != NtTrafficType.Udp || OutboundTrafficType != NtTrafficType.Udp)
+            {
+                throw new ArgumentException($"Endpoint '{Name}': UDP must be chosen for both the inbound and the outbound traffic type.");
+            }
+
+            if (HttpHeaderRules.Count > 0)
+            {
+                throw new ArgumentException($"Endpoint '{Name}': HTTP header rules do not apply to UDP.");
+            }
+
+            if (AllowHttp2)
+            {
+                throw new ArgumentException($"Endpoint '{Name}': HTTP/2 does not apply to UDP.");
+            }
+
+            if (InboundPort is < 1 or > 65535 || OutboundPort is < 1 or > 65535)
+            {
+                throw new ArgumentException($"Endpoint '{Name}': the ports must be between 1 and 65535.");
+            }
+        }
+
         public List<HttpHeaderRule> HttpHeaderRules { get; set; } = new();
 
         /// <summary>
