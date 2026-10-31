@@ -5,6 +5,23 @@ namespace NetTunnel.Library
     public static class Constants
     {
         public const string FriendlyName = "NetTunnel";
+
+        /// <summary>
+        /// The environment variable which gives the service a data folder (and so a configuration) of its own. The tests use it so that
+        /// they never read or change the configuration of an installed service.
+        /// </summary>
+        public const string DataFolderNameVariable = "NETTUNNEL_DATA_NAME";
+
+        /// <summary>
+        /// The name of the folder (under the common application data folder) that holds the configuration, users, tunnels and secret key.
+        /// </summary>
+        public static string DataFolderName
+            => Environment.GetEnvironmentVariable(DataFolderNameVariable) is { Length: > 0 } name ? name : FriendlyName;
+
+        /// <summary>
+        /// True when the service is using a data folder other than its own (tests), so it must not touch the machine: no event log source.
+        /// </summary>
+        public static bool IsUsingAlternateDataFolder => DataFolderName != FriendlyName;
         public const string EventSourceName = "NetTunnel";
 
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]

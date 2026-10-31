@@ -38,12 +38,12 @@ namespace NetTunnel.Service.TunnelEngine
 
         public void IncrementBytesSent(int bytes)
         {
-            BytesSent += (ulong)bytes;
+            AddBytesSent(bytes);
         }
 
         public void IncrementBytesReceived(int bytes)
         {
-            BytesReceived += (ulong)bytes;
+            AddBytesReceived(bytes);
         }
 
         public S2SQueryUpsertEndpointReply S2SPeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpoint)

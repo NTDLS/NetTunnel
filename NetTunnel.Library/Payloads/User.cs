@@ -19,8 +19,8 @@ namespace NetTunnel.Library.Payloads
 
         public User(string username, string? passwordHash, NtUserRole role)
         {
-            Username = username.ToLower();
-            PasswordHash = passwordHash?.ToLower();
+            Username = username.ToLowerInvariant();
+            PasswordHash = passwordHash?.ToLowerInvariant();
             Role = role;
         }
 

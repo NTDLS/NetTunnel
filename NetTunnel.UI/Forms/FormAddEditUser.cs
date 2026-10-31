@@ -64,6 +64,25 @@ namespace NetTunnel.UI.Forms
         }
 
 
+        /// <summary>
+        /// The endpoint form returns a new endpoint (with the same id) rather than changing the one it was given, so the user's list has to
+        /// be told about it; otherwise the edit is shown in the grid but the old endpoint is what gets saved with the user.
+        /// </summary>
+        private void ReplaceEndpoint(EndpointConfiguration edited)
+        {
+            var endpoints = User.EnsureNotNull().Endpoints;
+            int index = endpoints.FindIndex(o => o.EndpointId == edited.EndpointId);
+
+            if (index >= 0)
+            {
+                endpoints[index] = edited;
+            }
+            else
+            {
+                endpoints.Add(edited);
+            }
+        }
+
         public void AddEndpointToGrid(EndpointConfiguration endpoint)
         {
             var item = new ListViewItem(endpoint.Name)
@@ -146,6 +165,7 @@ namespace NetTunnel.UI.Forms
                         {
                             listViewEndpoints.Items.Remove(selectedItem.EnsureNotNull());
                             AddEndpointToGrid(form.Endpoint);
+                            ReplaceEndpoint(form.Endpoint);
                         }
                     }
                     else if (selectedItem != null && eTag != null && e.ClickedItem?.Tag as string == "Delete")
@@ -176,7 +196,9 @@ namespace NetTunnel.UI.Forms
                     using var form = new FormAddEditEndpoint(_client.EnsureNotNull(), eTag.Endpoint);
                     if (form.ShowDialog() == DialogResult.OK)
                     {
-                        eTag.Endpoint = form.Endpoint;
+                        listViewEndpoints.Items.Remove(selectedItem);
+                        AddEndpointToGrid(form.Endpoint);
+                        ReplaceEndpoint(form.Endpoint);
                     }
                 }
             }

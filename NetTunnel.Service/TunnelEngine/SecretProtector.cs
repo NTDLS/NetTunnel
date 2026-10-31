@@ -127,7 +127,7 @@ namespace NetTunnel.Service.TunnelEngine
                     return _key;
                 }
 
-                var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), FriendlyName);
+                var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), DataFolderName);
                 var path = Path.Combine(folder, "secret.key");
 
                 if (File.Exists(path))

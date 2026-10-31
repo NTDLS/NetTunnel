@@ -104,7 +104,7 @@ namespace NetTunnel.Service.TunnelEngine
 
         public void SetAuthenticated(string userName, NtUserRole role, NtLoginType loginType)
         {
-            UserName = userName.ToLower();
+            UserName = userName.ToLowerInvariant();
             UserRole = role;
             LoginType = loginType;
             IsAuthenticated = true;

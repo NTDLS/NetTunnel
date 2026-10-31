@@ -145,9 +145,10 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
                     });
 
                 closeNow = _closeAfterPackets >= 0 && _packetsDelivered >= _closeAfterPackets;
+
+                BytesSent += (ulong)buffer.Length; //Writers run concurrently, so the counter is only changed under the lock.
             }
 
-            BytesSent += (ulong)buffer.Length;
             LastActivityDateTime = DateTime.UtcNow;
 
             if (closeNow)

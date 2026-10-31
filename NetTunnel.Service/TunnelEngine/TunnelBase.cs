@@ -28,8 +28,16 @@ namespace NetTunnel.Service.TunnelEngine
         public double? PingTime { get; set; }
         public TunnelConfiguration Configuration { get; private set; }
         public NtTunnelStatus Status { get; set; }
-        public ulong BytesReceived { get; set; }
-        public ulong BytesSent { get; set; }
+        private ulong _bytesReceived;
+        private ulong _bytesSent;
+        public ulong BytesReceived { get => Interlocked.Read(ref _bytesReceived); set => Interlocked.Exchange(ref _bytesReceived, value); }
+        public ulong BytesSent { get => Interlocked.Read(ref _bytesSent); set => Interlocked.Exchange(ref _bytesSent, value); }
+
+        /// <summary>
+        /// Called from many threads at once (every message handler), so the counters are added to atomically.
+        /// </summary>
+        protected void AddBytesReceived(int bytes) => Interlocked.Add(ref _bytesReceived, (ulong)bytes);
+        protected void AddBytesSent(int bytes) => Interlocked.Add(ref _bytesSent, (ulong)bytes);
         public ulong TotalConnections { get; set; }
         public ulong CurrentConnections { get; set; }
         public IServiceEngine ServiceEngine { get; private set; }

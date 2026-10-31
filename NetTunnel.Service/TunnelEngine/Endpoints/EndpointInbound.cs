@@ -113,25 +113,61 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
             try
             {
-                try
+                //A port that is busy (another program, or a previous listener that has not let go yet) must not leave the endpoint
+                //  "running" but deaf for ever, so keep trying until it can be bound or the endpoint is stopped.
+                int bindAttempts = 0;
+                while (true)
                 {
-                    listener.Start();
-                }
-                catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressFamilyNotSupported && listener.Server.AddressFamily == AddressFamily.InterNetworkV6)
-                {
-                    //IPv6 is installed but not usable here (for example it is disabled on the network adapters). Listen on IPv4 only.
-                    Singletons.Logger.Warning($"IPv6 is not available for inbound endpoint '{Configuration.Name}', listening on IPv4 only.");
-                    Exceptions.Ignore(listener.Dispose);
-                    listener = new TcpListener(IPAddress.Any, Configuration.InboundPort);
-                    _listener = listener;
-                    listener.Start();
+                    try
+                    {
+                        listener = StartListener(listener);
+                        break;
+                    }
+                    catch (SocketException ex) when (KeepRunning)
+                    {
+                        if (bindAttempts++ % 12 == 0) //Once, then about once a minute.
+                        {
+                            Singletons.Logger.Warning($"Inbound endpoint '{Configuration.Name}' cannot listen on port {Configuration.InboundPort}"
+                                + $" and will keep trying: {ex.Message}");
+                        }
+
+                        Exceptions.Ignore(listener.Stop);
+                        WaitWhileRunning(TimeSpan.FromSeconds(5));
+                        if (KeepRunning == false)
+                        {
+                            return;
+                        }
+
+                        listener = NetworkUtility.CreateListener(Configuration.InboundPort);
+                        _listener = listener;
+                    }
                 }
 
                 Singletons.Logger.Verbose($"Listening inbound endpoint '{Configuration.Name}' on port {Configuration.InboundPort} ({(listener.Server.AddressFamily == AddressFamily.InterNetworkV6 ? "IPv4 and IPv6" : "IPv4")})");
 
+                int acceptFailures = 0;
+
                 while (KeepRunning)
                 {
-                    var tcpClient = listener.AcceptTcpClient(); //Wait for an inbound connection.
+                    TcpClient tcpClient;
+
+                    try
+                    {
+                        tcpClient = listener.AcceptTcpClient(); //Wait for an inbound connection.
+                        acceptFailures = 0;
+                    }
+                    catch (SocketException ex) when (KeepRunning)
+                    {
+                        //A single failed accept (a client that reset before it was accepted, or the system being out of handles for a moment)
+                        //  says nothing about the next one, and must not end the loop: the endpoint would stay "running" and never accept again.
+                        if (acceptFailures++ % 60 == 0)
+                        {
+                            Singletons.Logger.Warning($"Inbound endpoint '{Configuration.Name}' failed to accept a connection on port {Configuration.InboundPort}: {ex.Message}");
+                        }
+
+                        WaitWhileRunning(TimeSpan.FromMilliseconds(Math.Min(50 * acceptFailures, 2000)));
+                        continue;
+                    }
 
                     //Check again, we may have received a connection while shutting down.
                     if (tcpClient.Connected == false || KeepRunning == false)
@@ -161,6 +197,40 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
             finally
             {
                 Exceptions.Ignore(listener.Stop);
+            }
+        }
+
+        /// <summary>
+        /// Starts listening, falling back to IPv4 only when IPv6 turns out not to be usable. Returns the listener that is started.
+        /// </summary>
+        private TcpListener StartListener(TcpListener listener)
+        {
+            try
+            {
+                listener.Start();
+                return listener;
+            }
+            catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressFamilyNotSupported && listener.Server.AddressFamily == AddressFamily.InterNetworkV6)
+            {
+                //IPv6 is installed but not usable here (for example it is disabled on the network adapters). Listen on IPv4 only.
+                Singletons.Logger.Warning($"IPv6 is not available for inbound endpoint '{Configuration.Name}', listening on IPv4 only.");
+                Exceptions.Ignore(listener.Dispose);
+                listener = new TcpListener(IPAddress.Any, Configuration.InboundPort);
+                _listener = listener;
+                listener.Start();
+                return listener;
+            }
+        }
+
+        /// <summary>
+        /// Sleeps for the given time, but wakes up when the endpoint is stopped so that stopping never waits on a retry delay.
+        /// </summary>
+        private void WaitWhileRunning(TimeSpan duration)
+        {
+            var until = DateTime.UtcNow + duration;
+            while (KeepRunning && DateTime.UtcNow < until)
+            {
+                Thread.Sleep(50);
             }
         }
 

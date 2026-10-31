@@ -308,7 +308,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 configuration.PasswordHash = SecretProtector.Protect(configuration.PasswordHash) ?? string.Empty;
             }
 
-            CommonApplicationData.SaveToDisk(Constants.FriendlyName, ownedConfiguration);
+            CommonApplicationData.SaveToDisk(Constants.DataFolderName, ownedConfiguration);
         }
 
         private void LoadFromDisk()
@@ -318,7 +318,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
             Collection.Use((o) =>
             {
                 o.Clear();
-                CommonApplicationData.LoadFromDisk<List<TunnelConfiguration>>(FriendlyName)?
+                CommonApplicationData.LoadFromDisk<List<TunnelConfiguration>>(DataFolderName)?
                     .ForEach(c =>
                     {
                         c.PasswordHash = SecretProtector.Unprotect(c.PasswordHash, $"the password of tunnel '{c.Name}'", out var plain) ?? string.Empty;

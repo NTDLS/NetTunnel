@@ -50,7 +50,7 @@ namespace NetTunnel.Service.TunnelEngine
                                 configuration.LogFileMaxSizeMB * 1024L * 1024L, configuration.LogFileRetainedCount);
                             sinks.Add(_fileLogSink);
 
-                            if (OperatingSystem.IsWindows())
+                            if (OperatingSystem.IsWindows() && !Constants.IsUsingAlternateDataFolder)
                             {
                                 _eventLogSink = new EventLogSink { IsEnabled = configuration.LogToEventLog };
                                 sinks.Add(_eventLogSink);
@@ -91,13 +91,44 @@ namespace NetTunnel.Service.TunnelEngine
             }
         }
 
+        /// <summary>
+        /// Refuses settings which would stop the service from working. A bad value is saved to disk, so it would break every start
+        /// afterwards too; a receive buffer of zero bytes, for example, reads as "the connection closed" on every read.
+        /// </summary>
+        internal static void ValidateConfiguration(ServiceConfiguration configuration)
+        {
+            static void Require(bool valid, string message)
+            {
+                if (!valid)
+                {
+                    throw new ArgumentException(message);
+                }
+            }
+
+            Require(configuration.ServicePort is >= 1 and <= 65535, "The service port must be between 1 and 65535.");
+            Require(configuration.InitialReceiveBufferSize >= 1024, "The initial receive buffer size must be at least 1,024 bytes.");
+            Require(configuration.MaxReceiveBufferSize >= configuration.InitialReceiveBufferSize,
+                "The maximum receive buffer size must not be smaller than the initial receive buffer size.");
+            Require(configuration.ReceiveBufferGrowthRate > 0, "The receive buffer growth rate must be greater than zero.");
+            Require(configuration.PingCadence >= 0, "The ping cadence cannot be negative.");
+            Require(configuration.MessageQueryTimeoutMs >= 1000, "The message query timeout must be at least 1,000 milliseconds.");
+            Require(configuration.EndpointHeartbeatDelayMs >= 100, "The endpoint heartbeat delay must be at least 100 milliseconds.");
+            Require(configuration.StaleEndpointExpirationMs >= 0, "The stale endpoint expiration cannot be negative.");
+            Require(configuration.TunnelCryptographyKeySize >= 128 && configuration.TunnelCryptographyKeySize % 128 == 0,
+                "The tunnel cryptography key size must be a multiple of 128 bits.");
+            Require(configuration.LogFileMaxSizeMB >= 1, "The log file size must be at least 1 MB.");
+            Require(configuration.LogFileRetainedCount >= 0, "The number of retained log files cannot be negative.");
+        }
+
         public static void UpdateConfiguration(ServiceConfiguration configuration)
         {
+            ValidateConfiguration(configuration);
+
             //The service id identifies this instance (and which tunnels it owns), it must never change.
             configuration.ServiceId = Configuration.ServiceId;
 
             _configuration = configuration;
-            CommonApplicationData.SaveToDisk(Constants.FriendlyName, _configuration);
+            CommonApplicationData.SaveToDisk(Constants.DataFolderName, _configuration);
 
             ApplyLoggingConfiguration(configuration);
         }
@@ -109,13 +140,13 @@ namespace NetTunnel.Service.TunnelEngine
             {
                 if (_configuration == null)
                 {
-                    _configuration = CommonApplicationData.LoadFromDisk<ServiceConfiguration>(Constants.FriendlyName);
+                    _configuration = CommonApplicationData.LoadFromDisk<ServiceConfiguration>(Constants.DataFolderName);
 
                     if (_configuration == null)
                     {
                         //We didn't find a config file, create one with default values.
                         _configuration = new ServiceConfiguration();
-                        CommonApplicationData.SaveToDisk(Constants.FriendlyName, _configuration);
+                        CommonApplicationData.SaveToDisk(Constants.DataFolderName, _configuration);
                     }
 
                     if (_configuration == null)

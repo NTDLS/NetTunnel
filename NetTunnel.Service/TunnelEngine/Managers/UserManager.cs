@@ -1,4 +1,6 @@
-﻿using NetTunnel.Library;
+﻿using System.Security.Cryptography;
+using System.Text;
+using NetTunnel.Library;
 using NetTunnel.Library.Payloads;
 using NTDLS.Persistence;
 using NTDLS.Semaphore;
@@ -24,13 +26,19 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         public void Add(User user) => _collection.Use((o) =>
         {
+            //Two users with the same name would make every lookup by name fail, including the log in of both of them.
+            if (o.Any(u => u.Username.Equals(user.Username, StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new InvalidOperationException($"The user '{user.Username}' already exists.");
+            }
+
             o.Add(user);
             SaveToDisk();
         });
 
         public void Delete(string username) => _collection.Use((o) =>
         {
-            o.RemoveAll(t => t.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase));
+            o.RemoveAll(t => t.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
             SaveToDisk();
         });
 
@@ -38,7 +46,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             _collection.Use((o) =>
             {
-                o.FirstOrDefault(t => t.Username.Equals(user.Username, StringComparison.CurrentCultureIgnoreCase))
+                o.FirstOrDefault(t => t.Username.Equals(user.Username, StringComparison.OrdinalIgnoreCase))
                     ?.Modify(user);
 
                 SaveToDisk();
@@ -47,11 +55,19 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         public NtUserRole ValidateLoginAndGetRole(string username, string passwordHash)
         {
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(passwordHash))
+            {
+                return NtUserRole.Undefined;
+            }
+
+            var supplied = Encoding.UTF8.GetBytes(passwordHash.ToLowerInvariant());
+
             return _collection.Use((o) =>
-                o.SingleOrDefault(u =>
-                    u.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase)
+                o.FirstOrDefault(u =>
+                    u.Username.Equals(username, StringComparison.OrdinalIgnoreCase)
                     && u.PasswordHash != null
-                    && u.PasswordHash.Equals(passwordHash, StringComparison.CurrentCultureIgnoreCase))
+                    //Compared in constant time, so the time taken does not tell how much of a guess was right.
+                    && CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(u.PasswordHash.ToLowerInvariant()), supplied))
                 )?.Role ?? NtUserRole.Undefined;
         }
 
@@ -68,7 +84,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
             _collection.Use((o) =>
             {
-                var user = o.SingleOrDefault(u => u.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase));
+                var user = o.FirstOrDefault(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
                 if (user != null)
                 {
                     foreach (var endpoint in user.Endpoints)
@@ -88,7 +104,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             _collection.Use((o) =>
             {
-                var user = o.SingleOrDefault(u => u.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase));
+                var user = o.FirstOrDefault(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
 
                 user?.Endpoints.RemoveAll(o => o.EndpointId == endpoint.EndpointId);
                 user?.Endpoints.Add(endpoint);
@@ -104,7 +120,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
         {
             _collection.Use((o) =>
             {
-                var user = o.SingleOrDefault(u => u.Username.Equals(username, StringComparison.CurrentCultureIgnoreCase));
+                var user = o.FirstOrDefault(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
                 user?.Endpoints.RemoveAll(o => o.EndpointId == endpointId);
                 SaveToDisk();
             });
@@ -129,7 +145,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                     }).ToList()
                 }).ToList();
 
-                CommonApplicationData.SaveToDisk(FriendlyName, users);
+                CommonApplicationData.SaveToDisk(DataFolderName, users);
             });
 
         private void LoadFromDisk()
@@ -139,7 +155,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
                 o.Clear();
 
                 //Add directly rather than through Add() so that loading doesn't rewrite the file once per user.
-                o.AddRange(CommonApplicationData.LoadFromDisk(FriendlyName, new List<User>()));
+                o.AddRange(CommonApplicationData.LoadFromDisk(DataFolderName, new List<User>()));
 
                 //Secrets in files written by an older version (or typed in by hand) are plain text: read them, then save them protected.
                 bool hasPlainTextSecrets = false;
@@ -167,7 +183,7 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 #if DEBUG
                     o.Add(new User("debug", Utility.ComputeSha256Hash("123456789"), NtUserRole.Administrator));
 #endif
-                    o.Add(new User("root", Utility.ComputeSha256Hash(Environment.MachineName.ToLower()), NtUserRole.Administrator));
+                    o.Add(new User("root", Utility.ComputeSha256Hash(Environment.MachineName.ToLowerInvariant()), NtUserRole.Administrator));
                     SaveToDisk();
                 }
 

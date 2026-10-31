@@ -47,12 +47,12 @@ namespace NetTunnel.Service.TunnelEngine
 
         public void IncrementBytesSent(int bytes)
         {
-            BytesSent += (ulong)bytes;
+            AddBytesSent(bytes);
         }
 
         public void IncrementBytesReceived(int bytes)
         {
-            BytesReceived += (ulong)bytes;
+            AddBytesReceived(bytes);
         }
 
         public S2SQueryUpsertEndpointReply S2SPeerQueryUpsertEndpoint(DirectionalKey tunnelKey, EndpointConfiguration endpointId)
@@ -137,6 +137,11 @@ namespace NetTunnel.Service.TunnelEngine
 
         public override void Start()
         {
+            if (KeepRunning)
+            {
+                return; //Already running. A second connection thread would fight the first over the same client.
+            }
+
             base.Start();
 
             _establishConnectionThread = new Thread(EstablishConnectionThread);
@@ -177,6 +182,10 @@ namespace NetTunnel.Service.TunnelEngine
                 serviceConnectionState.InformCryptographyProvider(sharedSecret);
             }
 
+            //Each failed attempt costs both services a key exchange, so a service that is down or credentials that are wrong must not
+            //  be retried every second for ever: the wait grows to half a minute, and resets as soon as a connection succeeds.
+            int failedAttempts = 0;
+
             while (KeepRunning)
             {
                 bool isRegistering = false;
@@ -202,6 +211,7 @@ namespace NetTunnel.Service.TunnelEngine
                         LoadEndpoints(registerResult.Endpoints);
 
                         Status = NtTunnelStatus.Established;
+                        failedAttempts = 0;
                     }
                     else
                     {
@@ -222,6 +232,7 @@ namespace NetTunnel.Service.TunnelEngine
                 catch (Exception ex)
                 {
                     Status = NtTunnelStatus.Disconnected;
+                    failedAttempts++;
 
                     if (isRegistering)
                     {
@@ -248,7 +259,25 @@ namespace NetTunnel.Service.TunnelEngine
                     }
                 }
 
-                Thread.Sleep(1000);
+                WaitWhileRunning(RetryDelay(failedAttempts));
+            }
+        }
+
+        /// <summary>
+        /// One second while connected (or after the first failure), then doubling up to thirty seconds.
+        /// </summary>
+        internal static TimeSpan RetryDelay(int failedAttempts)
+            => TimeSpan.FromSeconds(failedAttempts <= 1 ? 1 : Math.Min(Math.Pow(2, failedAttempts - 1), 30));
+
+        /// <summary>
+        /// Sleeps, but wakes up when the tunnel is stopped so that stopping never waits on a retry delay.
+        /// </summary>
+        private void WaitWhileRunning(TimeSpan duration)
+        {
+            var until = DateTime.UtcNow + duration;
+            while (KeepRunning && DateTime.UtcNow < until)
+            {
+                Thread.Sleep(100);
             }
         }
     }
