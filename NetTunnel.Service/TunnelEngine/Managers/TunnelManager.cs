@@ -286,11 +286,11 @@ namespace NetTunnel.Service.TunnelEngine.Managers
 
         public void WriteEndpointEdgeData(DirectionalKey tunnelKey, Guid endpointId, Guid edgeId, long packetSequence, byte[] bytes)
         {
-            var tunnel = GetTunnel(tunnelKey);
-            var endpoint = tunnel.Endpoints.Single(o => o.EndpointId == endpointId);
+            //The tunnel or endpoint may have been removed while data was in flight, in which case there is nothing to deliver it to.
+            var endpoint = TryGetTunnel(tunnelKey)?.Endpoints.SingleOrDefault(o => o.EndpointId == endpointId);
 
             //The write to the edge socket can block on a slow client, so this must not be done under the collection lock.
-            endpoint.WriteEndpointEdgeData(edgeId, packetSequence, bytes);
+            endpoint?.WriteEndpointEdgeData(edgeId, packetSequence, bytes);
         }
 
         #region Disk Save/Load.

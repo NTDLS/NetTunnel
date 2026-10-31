@@ -218,7 +218,8 @@ namespace NetTunnel.Service.TunnelEngine
         }
 
         public void WriteEndpointEdgeData(Guid endpointId, Guid edgeId, long packetSequence, byte[] bytes)
-            => Endpoints.Single(o => o.EndpointId == endpointId).WriteEndpointEdgeData(edgeId, packetSequence, bytes);
+            //The endpoint may have been deleted while data was in flight, in which case there is nothing to deliver it to.
+            => Endpoints.SingleOrDefault(o => o.EndpointId == endpointId)?.WriteEndpointEdgeData(edgeId, packetSequence, bytes);
 
         #region Add/Delete Endpoints.
 

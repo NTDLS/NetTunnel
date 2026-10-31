@@ -11,6 +11,7 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
     internal class EndpointEdgeConnection : IDisposable
     {
         private Stream _stream;
+        private readonly object _writeLock = new();
 
         public bool IsConnected { get; private set; }
         public DateTime LastActivityDateTime { get; private set; } = DateTime.UtcNow;
@@ -125,8 +126,13 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         public void Write(long packetSequence, byte[] buffer)
         {
-            SequenceBuffer.Process(buffer, packetSequence,
-                (data) => _stream.Write(data));
+            //Notifications may be dispatched concurrently, but the stream accepts one writer at a time
+            //  and the packets must reach it in sequence.
+            lock (_writeLock)
+            {
+                SequenceBuffer.Process(buffer, packetSequence,
+                    (data) => _stream.Write(data));
+            }
 
             BytesSent += (ulong)buffer.Length;
             LastActivityDateTime = DateTime.UtcNow;

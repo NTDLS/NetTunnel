@@ -147,18 +147,33 @@ namespace NetTunnel.Service.TunnelEngine.Endpoints
 
         public void WriteEndpointEdgeData(Guid edgeId, long packetSequence, byte[] buffer)
         {
-            lock (_statisticsLock)
-            {
-                BytesSent += (ulong)buffer.Length;
-            }
-
             var edgeConnection = _edgeConnections.Use((o) =>
             {
                 o.TryGetValue(edgeId, out var edgeConnection);
                 return edgeConnection;
             });
 
-            edgeConnection?.Write(packetSequence, buffer);
+            if (edgeConnection == null)
+            {
+                return; //The edge connection has already closed; discard the data.
+            }
+
+            lock (_statisticsLock)
+            {
+                BytesSent += (ulong)buffer.Length;
+            }
+
+            try
+            {
+                edgeConnection.Write(packetSequence, buffer);
+            }
+            catch (Exception ex) when (ex is IOException or SocketException or ObjectDisposedException)
+            {
+                //The client (browser, server, etc.) went away while we were delivering to it. That is not a fault in the
+                //  service, but the connection is unusable, so close it. The data pump will notify the peer when it unwinds.
+                Singletons.Logger.Verbose($"Write to edge connection {edgeId} failed, closing it: {ex.Message}");
+                Disconnect(edgeId);
+            }
         }
 
         /// <summary>

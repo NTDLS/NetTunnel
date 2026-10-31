@@ -1,4 +1,5 @@
-﻿using NetTunnel.Library.ReliablePayloads.Notification.ServiceToService;
+﻿using NetTunnel.Library.Payloads;
+using NetTunnel.Library.ReliablePayloads.Notification.ServiceToService;
 using NetTunnel.Library.ReliablePayloads.Notification.UI;
 using NetTunnel.Library.ReliablePayloads.Notification.UIOrService;
 using NetTunnel.Service.TunnelEngine;
@@ -14,6 +15,24 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
     /// </summary>
     internal class ServiceNotificationHandlers : ServiceHandlerBase, IRmMessageHandler
     {
+        /// <summary>
+        /// Service-to-service notifications are only accepted from an authenticated, encrypted connection, and only
+        ///     for the tunnel that the connection registered. Otherwise any connected client could inject data into,
+        ///     disconnect or delete endpoints and tunnels that belong to someone else.
+        /// </summary>
+        /// <param name="localTunnelKey">The tunnel key as it is known to this service (i.e. already swapped if it came from the peer).</param>
+        private ServiceConnectionState EnforceTunnelOwnership(RmContext context, DirectionalKey localTunnelKey)
+        {
+            var connectionContext = EnforceLoginCryptographyAndGetServiceConnectionContext(context);
+
+            if (connectionContext.TunnelKey == null || connectionContext.TunnelKey != localTunnelKey)
+            {
+                throw new Exception("The connection is not associated with the specified tunnel.");
+            }
+
+            return connectionContext;
+        }
+
         /// <summary>
         /// The remote service is letting us know that they are about to start using the cryptography provider,
         /// so we need to apply the one that we have ready on this end.
@@ -39,7 +58,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
         {
             try
             {
-                var connectionContext = GetServiceConnectionContext(context);
+                EnforceTunnelOwnership(context, notification.TunnelKey.SwapDirection());
 
                 Singletons.Logger.Verbose($"Received endpoint connection notification.");
 
@@ -63,7 +82,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
         {
             try
             {
-                var connectionContext = GetServiceConnectionContext(context);
+                EnforceTunnelOwnership(context, notification.TunnelKey.SwapDirection());
 
                 Singletons.ServiceEngine.Tunnels.WriteEndpointEdgeData(
                     notification.TunnelKey.SwapDirection(), notification.EndpointId, notification.EdgeId, notification.PacketSequence, notification.Bytes);
@@ -82,7 +101,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
         {
             try
             {
-                var connectionContext = GetServiceConnectionContext(context);
+                EnforceTunnelOwnership(context, notification.TunnelKey);
 
                 Singletons.ServiceEngine.Tunnels.DeleteBothEndsOfTunnel(notification.TunnelKey);
             }
@@ -100,7 +119,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
         {
             try
             {
-                var connectionContext = GetServiceConnectionContext(context);
+                var connectionContext = EnforceTunnelOwnership(context, notification.TunnelKey);
 
                 Singletons.ServiceEngine.Tunnels.DeleteEndpoint(notification.TunnelKey, notification.EndpointId, connectionContext.UserName);
             }
@@ -118,7 +137,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
         {
             try
             {
-                var connectionContext = GetServiceConnectionContext(context);
+                EnforceTunnelOwnership(context, notification.TunnelKey);
 
                 Singletons.ServiceEngine.Tunnels.DisconnectEndpointEdge(notification.TunnelKey, notification.EndpointId, notification.EdgeId);
             }
@@ -136,7 +155,7 @@ namespace NetTunnel.Service.ReliableHandlers.Service.Notifications
         {
             try
             {
-                var connectionContext = GetServiceConnectionContext(context);
+                EnforceLoginCryptographyAndGetServiceConnectionContext(context);
 
                 Singletons.ServiceEngine.Tunnels.DisconnectEndpointEdge(notification.TunnelKey, notification.EndpointId, notification.EdgeId);
             }
